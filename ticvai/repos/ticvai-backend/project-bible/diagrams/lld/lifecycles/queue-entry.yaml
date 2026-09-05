@@ -35,7 +35,7 @@ transitions:
   guard: Queue closed or the attraction went out of service
 - from: called
   to: redeemed
-  operation: redeemQueueEntry
+  operation: redeemWaitingGuest
   trigger: operation
   guard: Guest presented within the window
 - from: called
@@ -45,12 +45,12 @@ transitions:
     they were called and did not come
 - from: called
   to: noShow
-  operation: overrideQueueEntry
+  operation: overrideWaitingGuest
   trigger: operation
   guard: Operator recorded a no-show
 - from: called
   to: waiting
-  operation: overrideQueueEntry
+  operation: overrideWaitingGuest
   trigger: operation
   guard: Returned to the queue — called in error, or the guest asked for more time
   isReversal: true

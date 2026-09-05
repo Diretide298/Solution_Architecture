@@ -7,21 +7,28 @@
  "audience": "partner",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-01",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 21,
-  "operations": 105,
-  "contracts": 9,
-  "modules": 8,
+  "screens": 51,
+  "operations": 141,
+  "contracts": 10,
+  "modules": 9,
   "undrawn": 0,
   "operationsWithNoScreen": 3
  },
  "waves": {
   "wave2": 11,
-  "wave3": 10
+  "wave3": 40
  },
  "modules": [
+  {
+   "module": "Partners",
+   "screens": 30,
+   "waves": [
+    3
+   ]
+  },
   {
    "module": "Access & Account",
    "screens": 5,
@@ -83,6 +90,10 @@
  ],
  "contracts": [
   {
+   "contract": "subscription",
+   "operations": 34
+  },
+  {
    "contract": "orders",
    "operations": 26
   },
@@ -111,12 +122,12 @@
    "operations": 6
   },
   {
-   "contract": "seating",
+   "contract": "public-api",
    "operations": 4
   },
   {
-   "contract": "subscription",
-   "operations": 2
+   "contract": "seating",
+   "operations": 4
   }
  ],
  "screens": [
@@ -216,7 +227,7 @@
    "module": "Booking & Quotes",
    "wave": 3,
    "route": "/general/quote-management",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -288,7 +299,7 @@
    "module": "Access & Account",
    "wave": 3,
    "route": "/general/api-credentials-and-integration",
-   "operations": 0,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -308,15 +319,285 @@
    "route": "/general/support-and-contact",
    "operations": 7,
    "drawn": true
+  },
+  {
+   "id": "PTR-022",
+   "name": "Partner Management Command Center",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-management-command-center-ptr-022",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-023",
+   "name": "Partner Profile & Organization Setup",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-profile-organization-setup-ptr-023",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-024",
+   "name": "Partner Onboarding & Application Workflow",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-onboarding-application-workflow-ptr-024",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-025",
+   "name": "Partner Contacts & User Administration",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-contacts-user-administration-ptr-025",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-026",
+   "name": "Territory, Market & Distribution Rights",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/territory-market-distribution-rights-ptr-026",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-027",
+   "name": "Partner Brand, Venue & Business Scope Assignment",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-brand-venue-business-scope-assignment-ptr-027",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-028",
+   "name": "Partner Documentation & Compliance Repository",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-documentation-compliance-repository-ptr-028",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-029",
+   "name": "Partner Access, Roles & Permission Profile",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-access-roles-permission-profile-ptr-029",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-030",
+   "name": "Partner Approval, Status & Lifecycle Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-approval-status-lifecycle-management-ptr-030",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-031",
+   "name": "Partner 360\u00b0 Profile, Readiness & AI Review",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-360-profile-readiness-ai-review-ptr-031",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-032",
+   "name": "Commercial Agreement Command Center",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/commercial-agreement-command-center-ptr-032",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-033",
+   "name": "Agreement & Contract Terms Builder",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/agreement-contract-terms-builder-ptr-033",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-034",
+   "name": "Partner Rate & Net Pricing Configuration",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-rate-net-pricing-configuration-ptr-034",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-035",
+   "name": "Commission, Margin & Incentive Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/commission-margin-incentive-management-ptr-035",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-036",
+   "name": "Credit Limit & Exposure Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/credit-limit-exposure-management-ptr-036",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-037",
+   "name": "Deposit, Guarantee & Financial Security Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/deposit-guarantee-financial-security-management-ptr-037",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-038",
+   "name": "Payment Terms, Billing & Account Configuration",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/payment-terms-billing-account-configuration-ptr-038",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-039",
+   "name": "Commercial Allocation, Quota & Commitment Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/commercial-allocation-quota-commitment-management-ptr-039",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-040",
+   "name": "Booking Limits, Commercial Exceptions & Approval",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/booking-limits-commercial-exceptions-approval-ptr-040",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-041",
+   "name": "Commercial Agreement 360\u00b0, Health & AI Review",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/commercial-agreement-360-health-ai-review-ptr-041",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-042",
+   "name": "Partner Operations Command Center",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-operations-command-center-ptr-042",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-043",
+   "name": "Partner Orders & Booking Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-orders-booking-management-ptr-043",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-044",
+   "name": "Reservations, Holds & Release Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/reservations-holds-release-management-ptr-044",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-045",
+   "name": "Partner Cancellations, Refunds & Amendments",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-cancellations-refunds-amendments-ptr-045",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-046",
+   "name": "Partner Statement & Account Activity",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-statement-account-activity-ptr-046",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-047",
+   "name": "Partner Reconciliation & Exception Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-reconciliation-exception-management-ptr-047",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-048",
+   "name": "Commission Calculation & Settlement Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/commission-calculation-settlement-management-ptr-048",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-049",
+   "name": "Partner Disputes, Cases & Service Management",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-disputes-cases-service-management-ptr-049",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-050",
+   "name": "Partner Performance Scorecard & Risk Monitoring",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-performance-scorecard-risk-monitoring-ptr-050",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "PTR-051",
+   "name": "Partner AI Intelligence & Relationship Optimization",
+   "module": "Partners",
+   "wave": 3,
+   "route": "/partners/partner-ai-intelligence-relationship-optimization-ptr-051",
+   "operations": 1,
+   "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
+    "operation": "issueApiToken",
+    "contract": "public-api",
     "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
+    "summary": "Exchange a credential for an access token"
    },
    {
     "operation": "createPartnerUser",

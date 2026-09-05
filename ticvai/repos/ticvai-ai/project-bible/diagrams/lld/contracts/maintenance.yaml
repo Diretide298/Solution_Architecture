@@ -10,7 +10,8 @@ operations:
   path: /work-orders/{workOrderId}/accept
   scope: venue
   permission: MAINTENANCE_EXECUTE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -23,7 +24,8 @@ operations:
   path: /work-orders/{workOrderId}/attachments
   scope: venue
   permission: MAINTENANCE_EXECUTE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - assets.media_asset
@@ -37,7 +39,8 @@ operations:
   path: /work-orders/{workOrderId}/cancel
   scope: venue
   permission: WORK_ORDER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -50,7 +53,8 @@ operations:
   path: /work-orders/{workOrderId}/close
   scope: venue
   permission: MAINTENANCE_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -64,7 +68,8 @@ operations:
   path: /work-orders/{workOrderId}/complete
   scope: venue
   permission: WORK_ORDER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -72,12 +77,14 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.work_order
+  - platform.outbox
 - operation: createAsset
   verb: POST
   path: /assets
   scope: venue
   permission: ASSET_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -90,7 +97,8 @@ operations:
   path: /inspection-templates
   scope: tenant
   permission: INSPECTION_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -103,7 +111,8 @@ operations:
   path: /maintenance-plans
   scope: venue
   permission: ASSET_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -116,7 +125,8 @@ operations:
   path: /work-orders
   scope: venue
   permission: WORK_ORDER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -129,7 +139,8 @@ operations:
   path: /assets/{assetId}
   scope: venue
   permission: ASSET_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - maintenance.asset
@@ -141,7 +152,8 @@ operations:
   path: /assets/{assetId}/history
   scope: venue
   permission: ASSET_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - maintenance.asset
@@ -151,7 +163,8 @@ operations:
   path: /maintenance-plans/due
   scope: venue
   permission: ASSET_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - maintenance.asset
@@ -162,7 +175,8 @@ operations:
   path: /incidents/{incidentId}
   scope: venue
   permission: INCIDENT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - maintenance.incident
@@ -172,7 +186,8 @@ operations:
   path: /work-orders/{workOrderId}
   scope: venue
   permission: WORK_ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - maintenance.work_order
@@ -182,7 +197,8 @@ operations:
   path: /assets
   scope: venue
   permission: ASSET_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - maintenance.asset
@@ -192,7 +208,8 @@ operations:
   path: /incidents
   scope: venue
   permission: INCIDENT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - maintenance.incident
@@ -202,7 +219,8 @@ operations:
   path: /inspection-templates
   scope: venue
   permission: INSPECTION_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - maintenance.inspection_template
@@ -212,7 +230,8 @@ operations:
   path: /inspections
   scope: venue
   permission: INSPECTION_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - maintenance.inspection
@@ -222,7 +241,8 @@ operations:
   path: /maintenance-plans
   scope: venue
   permission: ASSET_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - maintenance.maintenance_plan
@@ -232,7 +252,8 @@ operations:
   path: /work-orders
   scope: venue
   permission: WORK_ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - maintenance.work_order
@@ -242,7 +263,8 @@ operations:
   path: /assets/lookup
   scope: venue
   permission: ASSET_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - maintenance.asset
@@ -254,7 +276,8 @@ operations:
   path: /work-orders/{workOrderId}/pause
   scope: venue
   permission: MAINTENANCE_EXECUTE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -268,7 +291,8 @@ operations:
   path: /incidents/{incidentId}/notify-authority
   scope: venue
   permission: INCIDENT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -281,7 +305,8 @@ operations:
   path: /work-orders/{workOrderId}/parts
   scope: venue
   permission: WORK_ORDER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -294,7 +319,8 @@ operations:
   path: /work-orders/{workOrderId}/time
   scope: venue
   permission: WORK_ORDER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -307,7 +333,8 @@ operations:
   path: /work-orders/{workOrderId}/reject
   scope: venue
   permission: MAINTENANCE_EXECUTE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -320,7 +347,8 @@ operations:
   path: /incidents
   scope: venue
   permission: INCIDENT_REPORT
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -333,7 +361,8 @@ operations:
   path: /work-orders/{workOrderId}/resume
   scope: venue
   permission: MAINTENANCE_EXECUTE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -346,7 +375,8 @@ operations:
   path: /assets/{assetId}/status
   scope: venue
   permission: ASSET_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -359,7 +389,8 @@ operations:
   path: /work-orders/{workOrderId}/start
   scope: venue
   permission: MAINTENANCE_EXECUTE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -372,7 +403,8 @@ operations:
   path: /inspections
   scope: venue
   permission: INSPECTION_SUBMIT
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -385,7 +417,8 @@ operations:
   path: /assets/{assetId}
   scope: venue
   permission: ASSET_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -398,7 +431,8 @@ operations:
   path: /incidents/{incidentId}
   scope: venue
   permission: INCIDENT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -411,7 +445,8 @@ operations:
   path: /maintenance-plans/{planId}
   scope: venue
   permission: ASSET_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -424,7 +459,8 @@ operations:
   path: /work-orders/{workOrderId}
   scope: venue
   permission: WORK_ORDER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -437,7 +473,8 @@ operations:
   path: /work-orders/{workOrderId}/verify
   scope: venue
   permission: WORK_ORDER_VERIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -445,3 +482,4 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.work_order
+  - platform.outbox

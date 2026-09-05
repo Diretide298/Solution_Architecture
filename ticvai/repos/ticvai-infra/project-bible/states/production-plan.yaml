@@ -1,0 +1,61 @@
+entity: ProductionPlan
+contract: fnb
+enum: ProductionPlan.status
+enumKind: inline
+enumSchema: ProductionPlan
+enumProperty: status
+owner: FnbService
+description: 'What a central kitchen intends to make, between somebody forecasting it and the kitchen
+  working to it.
+
+
+  **A plan is a commitment to consume stock.** Releasing one is the act that makes a requisition real,
+  which is why the release is a transition rather than a flag.'
+initial:
+- draft
+terminal:
+- superseded
+- cancelled
+states:
+- name: draft
+  description: Built and not binding. **Editable, and nothing downstream sees it** — a forecast a chef
+    has not agreed to is a number, not a plan.
+- name: released
+  description: 'The kitchen is working to it. **Stock is committed from here**, which is why a released
+    plan cannot be edited: a plan that changes under a kitchen already prepping is worse than a second
+    plan.'
+- name: superseded
+  description: A later plan replaced it. **Kept, not deleted** — the variance between what was planned
+    and what was made is the number the whole exercise exists to produce, and it needs both.
+- name: cancelled
+  description: 'Called off. **Distinct from superseded**: superseded means somebody planned again, cancelled
+    means the service is not happening, and a kitchen reading its board needs to know which.'
+transitions:
+- from: draft
+  to: released
+  trigger: release
+  operation: releaseProductionPlan
+  guard: '**Every line has a quantity and a target.** A plan released with a blank line is a line the
+    kitchen guesses at.'
+- from: draft
+  to: cancelled
+  trigger: cancel
+  operation: buildProductionPlan
+  guard: No guard. **An unreleased plan can be dropped freely** — nothing has been committed.
+- from: released
+  to: superseded
+  trigger: supersede
+  operation: releaseProductionPlan
+  guard: '**A new plan for the same period exists.** The old one is not edited; it is replaced, and
+    both are readable.'
+- from: released
+  to: cancelled
+  trigger: cancel
+  operation: releaseProductionPlan
+  guard: '**Committed stock has to be released back.** Cancelling after release is not the same act
+    as cancelling a draft, and the requisition it raised does not disappear on its own.'
+openQuestions: '**Does cancelling a released plan reverse its requisition automatically, or raise a
+  task?** Automatic reversal is tidy and wrong when the stock has already been picked. Undecided.'
+notes: '**`superseded` and `cancelled` are both terminal and both keep the plan.** Planned-versus-made
+  is the variance a central kitchen is judged on, and it needs the plan that was replaced as much as
+  the one that replaced it.'

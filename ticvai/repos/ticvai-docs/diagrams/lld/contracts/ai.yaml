@@ -1,5 +1,5 @@
 id: LLD-ai
-title: ai — 30 operations
+title: ai — 31 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -10,7 +10,9 @@ operations:
   path: /conversations
   scope: venue
   permission: AI_USE
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - ai.conversation
@@ -23,7 +25,8 @@ operations:
   path: /collections
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.chunk_ref
@@ -39,7 +42,8 @@ operations:
   path: /proposed-actions/{actionId}/decide
   scope: venue
   permission: AI_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.proposed_action
@@ -53,24 +57,25 @@ operations:
   path: /generate/configuration
   scope: venue
   permission: AI_USE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.chunk_ref
   - ai.policy
   - ai.provider
   - cache:idempotency
-  - catalogue.attribute_axis
+  - catalogue.channel_capacity
   - catalogue.entitlement_template
-  - catalogue.envelope
   - catalogue.event
   - catalogue.performance
   - catalogue.price
   - catalogue.price_list
   - catalogue.product
+  - catalogue.variant_dimension
   - marketing.loyalty_programme
+  - platform.org_unit
   - platform.region_settings
-  - platform.scope_node
   - promotions.promotion
   - qdrant:knowledge
   - seating.seat
@@ -88,7 +93,8 @@ operations:
   path: /generate/venue-layout
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.provider
@@ -103,7 +109,8 @@ operations:
   path: /policy
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.policy
@@ -113,7 +120,8 @@ operations:
   path: /usage
   scope: tenant
   permission: AI_AUDIT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.interaction
@@ -123,7 +131,8 @@ operations:
   path: /collections/{collectionId}/documents
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.chunk_ref
@@ -141,7 +150,9 @@ operations:
   path: /conversations
   scope: venue
   permission: AI_USE
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - ai.conversation
@@ -151,7 +162,8 @@ operations:
   path: /interactions
   scope: tenant
   permission: AI_AUDIT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.interaction
@@ -161,17 +173,30 @@ operations:
   path: /providers
   scope: region
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.provider
+  writes: []
+- operation: listIndexFailures
+  verb: GET
+  path: /index-failures
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.index_failure
   writes: []
 - operation: listIndexJobs
   verb: GET
   path: /index-jobs
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.index_job
@@ -181,7 +206,8 @@ operations:
   path: /index-sources
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.index_job
@@ -192,7 +218,8 @@ operations:
   path: /collections
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.chunk_ref
@@ -204,7 +231,8 @@ operations:
   path: /proposed-actions
   scope: venue
   permission: AI_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.proposed_action
@@ -283,7 +311,8 @@ operations:
   path: /index-sources/{sourceId}/reindex
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.index_source
@@ -311,7 +340,8 @@ operations:
   path: /index-sources/{sourceId}/entries/{entryId}
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.index_entry
@@ -345,7 +375,8 @@ operations:
   path: /search
   scope: venue
   permission: AI_USE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.chunk_ref
@@ -365,7 +396,9 @@ operations:
   path: /conversations/{conversationId}/messages
   scope: venue
   permission: AI_USE
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - ai.chunk_ref
@@ -390,7 +423,8 @@ operations:
   path: /ai-providers/{providerId}/credential
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.provider
@@ -403,7 +437,8 @@ operations:
   path: /policy
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.policy
@@ -416,7 +451,8 @@ operations:
   path: /providers
   scope: region
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.provider
@@ -429,7 +465,8 @@ operations:
   path: /index-sources
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.index_source
@@ -459,7 +496,8 @@ operations:
   path: /ai-providers/{providerId}/test
   scope: tenant
   permission: AI_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.provider

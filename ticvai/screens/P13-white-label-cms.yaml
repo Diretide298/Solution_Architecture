@@ -1,9 +1,3 @@
-# P13 — Staff Web — White-Label CMS
-#
-# Derived from the wireframe board on 14 August. **Purposes and navigation are real;
-# components, states and operations are not yet written.** Every screen carries
-# wireframe.status drafted so the gap is visible rather than implied.
-
 platform:
   code: P13
   audience: staff
@@ -28,7 +22,7 @@ platform:
     deviceOwnership: tenant workstation
     networkAssumption: public internet
     releaseCadence: weekly
-  screenCount: 20
+  screenCount: 60
   designReferences:
   - path: sources/designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
     note: The CMS **is** the White Label Builder. These six boards are the design, not a reference for
@@ -85,40 +79,42 @@ screens:
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
         label: Remove licence add on
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setSsoConfig
       - kind: confirmDialog
-        label: Remove this licence add-on?
-        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
-          replacing one identical definition that had been pasted onto all 39 screens - the label read
-          *Confirm*, which is the *are you sure* the library entry rules out.
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
 
 
-          **Name the tenant, the module and every screen the tenant loses.** Writes `control.subscription`,
-          so **entitlement changes mid-session for users already signed in**. No state model, no event
-          - nothing tells the tenant.
-
-
-          **`Licence add-on` has no state model** - nothing declares what the record becomes.'
-        bindsTo: removeLicenceAddOn
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_MANAGE` and 5 more to
-      manage platforms; a person without it sees the reason and who to ask, because an empty table reads
-      as *there is no data* and sends somebody to support with the wrong question.
+      needs `PLATFORM_BILLING_MANAGE`, `PLATFORM_BILLING_VIEW`, `PLATFORM_CELL_MANAGE` and 5 more to manage
+      platforms; a person without it sees the reason and who to ask, because an empty table reads as *there
+      is no data* and sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `membership` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-002
@@ -130,12 +126,12 @@ screens:
     status: designed
     board: wireframes/Marketing Board 7.dc.html#crm-7f
     generatedFallback: wireframes/P13 Venue CMS.dc.html#cms-001
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
-    **The tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August**
-    — `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read
-    as unreachable. **Drawn 31 August** — `Marketing Board 7.dc.html` frame `crm-7f` (*Agent Workspace*),
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **The
+    tenant workspace.** Lands a tenant on what is live rather than on a form. **Declared 20 August** —
+    `isEntryPoint` existed in the schema and five platforms used none, so every screen in them read as
+    unreachable. **Drawn 31 August** — `Marketing Board 7.dc.html` frame `crm-7f` (*Agent Workspace*),
     matched on title at 0.84 within this board’s platforms.
   implementation:
     app: venue-management-web
@@ -255,6 +251,11 @@ screens:
         impliedBy: setBrandIdentity
         label: Save brand identity
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setBrandIdentity
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -264,8 +265,8 @@ screens:
       support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
   navigation:
     exitTo:
@@ -278,9 +279,9 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-002
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/brand-kit
@@ -308,11 +309,11 @@ screens:
     params:
     - name: uploadId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `uploadId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `uploadId`.'
   requiresModule: core
   statesDerived: true
 - id: CMS-003
@@ -333,17 +334,22 @@ screens:
         impliedBy: setFonts
         label: Save fonts
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setFonts
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load. Editing is blocked
   navigation:
     exitTo:
@@ -354,13 +360,13 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-003
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
-    **37 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
-    **identical 41 operations** — a Typography screen that could create banners and a Component Preview
-    that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only
-    walking the white-label journey surfaced it.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **37
+    operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical
+    41 operations** — a Typography screen that could create banners and a Component Preview that could
+    set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label
+    journey surfaced it.
   implementation:
     app: venue-management-web
     route: /white-label/typography
@@ -395,8 +401,8 @@ screens:
     - name: version
       from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
-      are for.** The screen opens the requested version read-only, says it is not current, and links
-      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      are for.** The screen opens the requested version read-only, says it is not current, and links to
+      the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
       `policyKind`.'
   requiresModule: core
   statesDerived: true
@@ -428,26 +434,31 @@ screens:
         impliedBy: lookupAsset
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createAsset
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `ASSET_MANAGE`, `ASSET_VIEW` to manage assets; a person without it sees the reason and who
-      to ask, because an empty table reads as *there is no data* and sends somebody to support with
-      the wrong question.
+      to ask, because an empty table reads as *there is no data* and sends somebody to support with the
+      wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `maintenance` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
@@ -457,9 +468,9 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-004
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/logo-assets
@@ -499,11 +510,11 @@ screens:
     params:
     - name: assetId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `assetId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `assetId`.'
   requiresModule: maintenance
   statesDerived: true
 - id: CMS-005
@@ -524,17 +535,22 @@ screens:
         impliedBy: setTheme
         label: Save theme
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setTheme
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
   navigation:
     exitTo:
@@ -547,9 +563,9 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-005
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/theme-editor
@@ -590,38 +606,47 @@ screens:
         impliedBy: listConfigVersions
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPreview
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE`, `TENANT_PUBLISH` to configure tenants; a person without it sees the
-      reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
-      support with the wrong question.
+      needs `TENANT_CONFIGURE`, `TENANT_PUBLISH` to configure tenants; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-005
+    notes: '**Reached from CMS-005** — a preview shows the component being edited. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-006
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
-    **36 operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the
-    **identical 41 operations** — a Typography screen that could create banners and a Component Preview
-    that could set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only
-    walking the white-label journey surfaced it.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual. **36
+    operations removed 24 August.** Every white-label screen across P09, P12 and P13 declared the **identical
+    41 operations** — a Typography screen that could create banners and a Component Preview that could
+    set FAQs. **The worst instance of the 18 August bulk attach found so far**, and only walking the white-label
+    journey surfaced it.
   implementation:
     app: venue-management-web
     route: /white-label/component-preview
@@ -660,8 +685,8 @@ screens:
     - name: version
       from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
-      are for.** The screen opens the requested version read-only, says it is not current, and links
-      to the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      are for.** The screen opens the requested version read-only, says it is not current, and links to
+      the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
       `policyKind`.'
   requiresModule: core
   statesDerived: true
@@ -683,17 +708,22 @@ screens:
         impliedBy: setHomepageLayout
         label: Save homepage layout
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setHomepageLayout
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
   navigation:
     exitTo:
@@ -706,9 +736,9 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-007
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/page-builder
@@ -748,30 +778,34 @@ screens:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-001
+    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-008
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/content-blocks
@@ -812,38 +846,47 @@ screens:
         impliedBy: createMenu
         label: Create menu
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createMenu
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` to configure products; a person without it sees the
-      reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
-      support with the wrong question.
+      needs `PRODUCT_CONFIGURE`, `PRODUCT_VIEW` to configure products; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `fnb` is not licensed.** The tenant has not bought this module, which is a
-      commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `fnb` is not licensed.** The tenant has not bought this module, which is a commercial
+      answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-001
+    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-009
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/navigation-menus
@@ -875,11 +918,11 @@ screens:
     params:
     - name: menuId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `menuId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `menuId`.'
   requiresModule: fnb
   statesDerived: true
 - id: CMS-010
@@ -915,51 +958,58 @@ screens:
         impliedBy: listCollections
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: appendEntitlementToMedia
       - kind: confirmDialog
-        label: Delete this asset?
-        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
-          replacing one identical definition that had been pasted onto all 39 screens - the label read
-          *Confirm*, which is the *are you sure* the library entry rules out.
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
 
 
-          **Name every place the asset is in use** - `assets.media_usage` has the list. It has **no
-          state model**, so this is a hard delete and a live page will break. No event is emitted.
-
-
-          **`Media asset` has no state model** - nothing declares what the record becomes.'
-        bindsTo: deleteMediaAsset
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `ASSET_LIBRARY_MANAGE`, `ASSET_LIBRARY_VIEW`, `ORDER_CREATE` and 1 more to manage assets;
-      a person without it sees the reason and who to ask, because an empty table reads as *there is
-      no data* and sends somebody to support with the wrong question.
+      a person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-001
+    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-010
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/media-library
@@ -1023,11 +1073,11 @@ screens:
       from: deepLink
     - name: uploadId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `mediaCode`, `mediaId`, `uploadId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `mediaCode`, `mediaId`, `uploadId`.'
   requiresModule: ticketing
   statesDerived: true
 - id: CMS-013
@@ -1052,13 +1102,17 @@ screens:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-016
+    notes: '**Reached from CMS-016** — metadata is a site setting. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-013
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/seo-metadata
@@ -1066,6 +1120,11 @@ screens:
     status: notStarted
   density: compact
   requiresModule: core
+  apis:
+  - operationId: setSeoMetadata
+    contract: marketing-crm
+    purpose: Title, description and share image
+    trigger: onAction
 - id: CMS-011
   name: Translations
   module: White Label
@@ -1084,30 +1143,39 @@ screens:
         impliedBy: setLanguages
         label: Save languages
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setLanguages
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-001
+    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-011
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/translations
@@ -1138,17 +1206,22 @@ screens:
         derived: true
         impliedBy: validateTenantConfig
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: validateTenantConfig
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
   navigation:
     exitTo:
@@ -1161,9 +1234,9 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-012
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/rtl-preview
@@ -1199,17 +1272,22 @@ screens:
         impliedBy: publishTenantConfig
         label: Publish tenant config
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: publishTenantConfig
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE`, `TENANT_PUBLISH` to configure tenants; a person without it sees the
-      reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
-      support with the wrong question.
+      needs `TENANT_CONFIGURE`, `TENANT_PUBLISH` to configure tenants; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
   navigation:
     exitTo:
@@ -1222,9 +1300,9 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-014
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/publishing-workflow
@@ -1268,22 +1346,27 @@ screens:
         derived: true
         impliedBy: restoreConfigVersion
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: restoreConfigVersion
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE`, `TENANT_PUBLISH` to configure tenants; a person without it sees the
-      reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
-      support with the wrong question.
+      needs `TENANT_CONFIGURE`, `TENANT_PUBLISH` to configure tenants; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
@@ -1293,9 +1376,9 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-015
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/version-history
@@ -1320,8 +1403,8 @@ screens:
     - name: version
       from: deepLink
     coldEntry: '**A version link is expected to point at something superseded — that is what versions
-      are for.** The screen opens the requested version read-only, says it is not current, and links
-      to the one that is. **An old version is history, not an error.** Arrives with `version`.'
+      are for.** The screen opens the requested version read-only, says it is not current, and links to
+      the one that is. **An old version is history, not an error.** Arrives with `version`.'
   requiresModule: core
   statesDerived: true
 - id: CMS-016
@@ -1342,27 +1425,31 @@ screens:
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
       (ADR-0018)
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
-    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
-      overwrites what someone else set'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
+      what someone else set'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-001
+    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-016
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/site-settings
@@ -1398,13 +1485,17 @@ screens:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-016
+    notes: '**Reached from CMS-016** — a domain is a site setting. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-017
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/domain-certificate
@@ -1412,6 +1503,29 @@ screens:
     status: notStarted
   density: compact
   requiresModule: core
+  apis:
+  - operationId: listCustomDomains
+    contract: white-label
+    purpose: Domains claimed, and their state
+    trigger: onLoad
+  - operationId: claimCustomDomain
+    contract: white-label
+    purpose: Claim a domain
+    trigger: onAction
+  - operationId: verifyCustomDomain
+    contract: white-label
+    purpose: Prove control before it serves traffic
+    trigger: onAction
+  - operationId: releaseCustomDomain
+    contract: white-label
+    purpose: Release a domain
+    trigger: onAction
+  entryState:
+    params:
+    - name: domainId
+      from: navigation
+    coldEntry: '**Verification and release act on one domain**, taken from the row. A release issued against
+      a domain nobody can see is a site going dark with no record of who asked.'
 - id: CMS-018
   name: Consent & Legal
   module: White Label
@@ -1439,6 +1553,11 @@ screens:
         impliedBy: searchGuests
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordConsent
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1448,29 +1567,33 @@ screens:
       support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-016
+    notes: '**Reached from CMS-016** — consent and legal are site settings. Stated on 4 September: this
+      screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-018
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/consent-legal
@@ -1552,29 +1675,33 @@ screens:
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `ROLE_MANAGE`, `USER_MANAGE` to manage roles; a person without it sees the reason and who
-      to ask, because an empty table reads as *there is no data* and sends somebody to support with
-      the wrong question.
+      to ask, because an empty table reads as *there is no data* and sends somebody to support with the
+      wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-001
+    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-019
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/user-access
@@ -1614,30 +1741,34 @@ screens:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to
-      ask, because an empty table reads as *there is no data* and sends somebody to support with the
-      wrong question.
+      needs `TENANT_CONFIGURE` to configure tenants; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - CMS-001
     - CMS-002
     - CMS-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - CMS-001
+    notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-020
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. States derived from the screen pattern on 17 August, not individually considered
-    — sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written. States derived from the screen pattern on 17 August, not individually considered —
+    sound for a list, a form or a money screen, and worth revisiting where this screen is unusual.
   implementation:
     app: venue-management-web
     route: /white-label/change-log
@@ -1651,3 +1782,2236 @@ screens:
   density: compact
   requiresModule: core
   statesDerived: true
+- id: CMS-021
+  name: Privacy & Consent Configuration Command Center
+  module: Policy
+  requiresModule: core
+  purpose: Provide administrators with one central dashboard for configuring and governing TICVAI's privacy
+    framework across tenants, brands, venues and customer channels.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPrivacyConsent
+    contract: marketing-crm
+    purpose: Privacy & Consent Configuration Command Center
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/privacy-consent-configuration-command-center-cms-021
+    component: apps/venue-management-web/src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-021
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-021
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.1
+    page: 4
+  navigation:
+    entryFrom:
+    - CMS-001
+    exitTo:
+    - CMS-001
+    - CMS-022
+    - CMS-023
+    - CMS-024
+    - CMS-025
+    - CMS-026
+    - CMS-027
+    - CMS-028
+    - CMS-029
+    - CMS-030
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: CMS-022
+  name: Data Processing Purpose & Lawful Basis Registry
+  module: Policy
+  requiresModule: core
+  purpose: Create a central registry explaining why customer data is being collected or processed. This
+    becomes the foundation used by consent forms, policies, customer journeys and downstream systems.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first data entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listDataProcessingPurpose
+    contract: marketing-crm
+    purpose: Data Processing Purpose & Lawful Basis Registry
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/data-processing-purpose-lawful-basis-registry-cms-022
+    component: apps/venue-management-web/src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-022
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-022
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.2
+    page: 5
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-023
+  name: Consent Purpose & Consent Type Builder
+  module: Policy
+  requiresModule: core
+  purpose: Configure the actual consent objects that TICVAI may request from customers.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first consent entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setConsentPurposes
+    contract: marketing-crm
+    purpose: Configure consent purposes
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/consent-purpose-consent-type-builder-cms-023
+    component: apps/venue-management-web/src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-023
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-023
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.3
+    page: 7
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-024
+  name: Communication Preference & Marketing Permission Configuration
+  module: Policy
+  requiresModule: core
+  purpose: Define how customers control the communications they wish to receive. This screen should integrate
+    strongly with CRM and Marketing but remain governed by the central Privacy Engine.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first communication entry,
+      and this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setCommunicationPreferenceMarketing
+    contract: marketing-crm
+    purpose: Communication Preference & Marketing Permission Configuration
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/communication-preference-marketing-permission-configurat-cms-024
+    component: apps/venue-management-web/src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-024
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-024
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.4
+    page: 8
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-025
+  name: Cookie, Tracking & Digital Technology Registry
+  module: Policy
+  requiresModule: core
+  purpose: Maintain a centralized registry of cookies, SDKs, pixels and other governed tracking technologies
+    used by TICVAI digital channels. This should cover more than traditional browser cookies.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first cookie, entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCookieTrackingDigital
+    contract: marketing-crm
+    purpose: Cookie, Tracking & Digital Technology Registry
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/cookie-tracking-digital-technology-registry-cms-025
+    component: apps/venue-management-web/src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-025
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-025
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.5
+    page: 10
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-026
+  name: Cookie Banner & Preference Center Designer
+  module: Policy
+  requiresModule: core
+  purpose: Provide a no-code designer for privacy/cookie interfaces displayed on digital channels.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first cookie entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCookieBannerPreference
+    contract: marketing-crm
+    purpose: Cookie Banner & Preference Center Designer
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/cookie-banner-preference-center-designer-cms-026
+    component: apps/venue-management-web/src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-026
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-026
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.6
+    page: 11
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-027
+  name: Consent Capture Point & Customer Journey Configuration
+  module: Policy
+  requiresModule: core
+  purpose: Define where, when and under what circumstances privacy notices and consent requests appear.
+    This prevents each channel from implementing consent independently.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first consent entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setConsentCapturePoint
+    contract: marketing-crm
+    purpose: Consent Capture Point & Customer Journey Configuration
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/consent-capture-point-customer-journey-configuration-cms-027
+    component: apps/venue-management-web/src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-027
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-027
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.7
+    page: 12
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-028
+  name: Privacy Notice, Policy & Terms Version Management
+  module: Policy
+  requiresModule: core
+  purpose: Manage customer-facing privacy notices and related governed documents with complete version
+    control.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPrivacyNoticePolicy
+    contract: marketing-crm
+    purpose: Privacy Notice, Policy & Terms Version Management
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/privacy-notice-policy-terms-version-management-cms-028
+    component: apps/venue-management-web/src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-028
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-028
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.8
+    page: 14
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-029
+  name: Minor, Guardian & Age-Based Privacy Configuration
+  module: Policy
+  requiresModule: core
+  purpose: 'Provide specialized privacy configuration for journeys involving children and guardians. This
+    is especially important for TICVAI customers operating: Theme parks Attractions Camps Academies Family
+    entertainment Children''s events'
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first minor, entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setMinorGuardianAge
+    contract: marketing-crm
+    purpose: Minor, Guardian & Age-Based Privacy Configuration
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/minor-guardian-age-based-privacy-configuration-cms-029
+    component: apps/venue-management-web/src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-029
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-029
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.9
+    page: 15
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-030
+  name: Privacy Configuration Testing, Approval & Publication
+  module: Policy
+  requiresModule: core
+  purpose: Act as the final governance gate before privacy configurations are deployed into production.
+    No major privacy configuration should move directly from editing to production without validation.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: approvePrivacyTesting
+    contract: marketing-crm
+    purpose: Privacy Configuration Testing, Approval & Publication
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/privacy-configuration-testing-approval-publication-cms-030
+    component: apps/venue-management-web/src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-030
+    workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-030
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '1'
+    number: 17.1.10
+    page: 16
+  navigation:
+    entryFrom:
+    - CMS-021
+    exitTo:
+    - CMS-021
+    inferred: false
+    notes: '**Reached from CMS-021, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-031
+  name: Privacy Operations Command Center
+  module: Policy
+  requiresModule: core
+  purpose: Provide Privacy, Compliance and authorized operational teams with a centralized real-time overview
+    of privacy operations across TICVAI.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Total Customer Privacy Profiles
+      - kind: metricTile
+        notes: Active Consent Records
+      - kind: metricTile
+        notes: Withdrawn Consents
+      - kind: metricTile
+        notes: Marketing Opt-ins
+      - kind: metricTile
+        notes: Marketing Opt-outs
+      - kind: metricTile
+        notes: Pending Data Rights Requests
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPrivacy
+    contract: marketing-crm
+    purpose: Privacy Operations Command Center
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/privacy-operations-command-center-cms-031
+    component: apps/venue-management-web/src/routes/policy/PrivacyOperationsCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-031
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-031
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.1
+    page: 21
+  navigation:
+    entryFrom:
+    - CMS-001
+    exitTo:
+    - CMS-001
+    - CMS-032
+    - CMS-033
+    - CMS-034
+    - CMS-035
+    - CMS-036
+    - CMS-037
+    - CMS-038
+    - CMS-039
+    - CMS-040
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: CMS-032
+  name: Customer Privacy, Consent & Preference 360°
+  module: Policy
+  requiresModule: core
+  purpose: Provide one authoritative privacy view for an individual customer or participant. This becomes
+    the privacy equivalent of the customer 360° workspace.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first customer entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCustomerPrivacyConsent
+    contract: marketing-crm
+    purpose: Customer Privacy, Consent & Preference 360°
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/customer-privacy-consent-preference-360-cms-032
+    component: apps/venue-management-web/src/routes/policy/CustomerPrivacyConsentPreference360.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-032
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-032
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.2
+    page: 22
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-033
+  name: Consent Evidence, History & Withdrawal Management
+  module: Policy
+  requiresModule: core
+  purpose: Maintain legally and operationally useful evidence of every consent event and manage subsequent
+    withdrawals.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: timeline
+        notes: What changed, when, and by whom
+      - kind: searchField
+        notes: Find a change
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first consent entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listConsentEvidenceWithdrawal
+    contract: marketing-crm
+    purpose: Consent Evidence, History & Withdrawal Management
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/consent-evidence-history-withdrawal-management-cms-033
+    component: apps/venue-management-web/src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-033
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-033
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.3
+    page: 24
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-034
+  name: Data Subject / Customer Privacy Request Management
+  module: Policy
+  requiresModule: core
+  purpose: Provide a governed case-management workflow for customer privacy requests.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first data entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listDataSubjectCustomer
+    contract: marketing-crm
+    purpose: Data Subject / Customer Privacy Request Management
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/data-subject-customer-privacy-request-management-cms-034
+    component: apps/venue-management-web/src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-034
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-034
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.4
+    page: 26
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-035
+  name: Data Discovery, Access, Export & Correction Workspace
+  module: Policy
+  requiresModule: core
+  purpose: Allow authorized privacy teams to locate customer data across TICVAI and connected systems
+    when fulfilling access, export or correction requests.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first data entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setDataDiscoveryAccess
+    contract: marketing-crm
+    purpose: Data Discovery, Access, Export & Correction Workspace
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/data-discovery-access-export-correction-workspace-cms-035
+    component: apps/venue-management-web/src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-035
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-035
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.5
+    page: 28
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-036
+  name: Deletion, Anonymization & Restriction Operations
+  module: Policy
+  requiresModule: core
+  purpose: Govern privacy requests or policies requiring personal data to be deleted, anonymized or restricted.
+    This screen requires strong controls because deletion may affect financial, ticketing, fraud, legal
+    and operational records.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first deletion, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listDeletionAnonymizationRestriction
+    contract: marketing-crm
+    purpose: Deletion, Anonymization & Restriction Operations
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/deletion-anonymization-restriction-operations-cms-036
+    component: apps/venue-management-web/src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-036
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-036
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.6
+    page: 29
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-037
+  name: Data Retention, Expiry & Legal Hold Operations
+  module: Policy
+  requiresModule: core
+  purpose: Operationalize retention policies associated with Board 1 processing purposes and data categories.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first data entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listDataRetentionExpiry
+    contract: marketing-crm
+    purpose: Data Retention, Expiry & Legal Hold Operations
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/data-retention-expiry-legal-hold-operations-cms-037
+    component: apps/venue-management-web/src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-037
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-037
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.7
+    page: 30
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-038
+  name: Privacy Compliance, Exception & Investigation Workspace
+  module: Policy
+  requiresModule: core
+  purpose: Provide a centralized workspace for privacy configuration and operational exceptions requiring
+    investigation.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setPrivacyComplianceException
+    contract: marketing-crm
+    purpose: Privacy Compliance, Exception & Investigation Workspace
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/privacy-compliance-exception-investigation-workspace-cms-038
+    component: apps/venue-management-web/src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-038
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-038
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.8
+    page: 32
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-039
+  name: Privacy Audit, Evidence & Compliance Reporting
+  module: Policy
+  requiresModule: core
+  purpose: Provide immutable auditability and management/compliance reporting across privacy operations.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: timeline
+        notes: What changed, when, and by whom
+      - kind: searchField
+        notes: Find a change
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPrivacyEvidenceCompliance
+    contract: marketing-crm
+    purpose: Privacy Audit, Evidence & Compliance Reporting
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/privacy-audit-evidence-compliance-reporting-cms-039
+    component: apps/venue-management-web/src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-039
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-039
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.9
+    page: 33
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-040
+  name: Privacy Analytics & AI Compliance Intelligence
+  module: Policy
+  requiresModule: core
+  purpose: Provide executives, Privacy Officers and Compliance teams with actionable privacy analytics
+    and AI-assisted risk detection. This should be the intelligence layer across both Privacy Boards.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPrivacyCompliance
+    contract: marketing-crm
+    purpose: Privacy Analytics & AI Compliance Intelligence
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/privacy-analytics-ai-compliance-intelligence-cms-040
+    component: apps/venue-management-web/src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-040
+    workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-040
+  source:
+    pack: Privacy__Consent___Preference_Management_Reference.pdf
+    board: '2'
+    number: 17.2.10
+    page: 35
+  navigation:
+    entryFrom:
+    - CMS-031
+    exitTo:
+    - CMS-031
+    inferred: false
+    notes: '**Reached from CMS-031, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-041
+  name: Waiver & Consent Command Center
+  module: Policy
+  requiresModule: core
+  purpose: Provide administrators with a centralized workspace for managing every waiver, consent form
+    and digital declaration configured across TICVAI.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Total Templates
+      - kind: metricTile
+        notes: Published
+      - kind: metricTile
+        notes: Draft
+      - kind: metricTile
+        notes: Pending Approval
+      - kind: metricTile
+        notes: Scheduled
+      - kind: metricTile
+        notes: Expiring
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first waiver entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listWaiverConsent
+    contract: marketing-crm
+    purpose: Waiver & Consent Command Center
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/waiver-consent-command-center-cms-041
+    component: apps/venue-management-web/src/routes/policy/WaiverConsentCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-041
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-041
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.1
+    page: 6
+  navigation:
+    entryFrom:
+    - CMS-001
+    exitTo:
+    - CMS-001
+    - CMS-042
+    - CMS-043
+    - CMS-044
+    - CMS-045
+    - CMS-046
+    - CMS-047
+    - CMS-048
+    - CMS-049
+    - CMS-050
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: CMS-042
+  name: Waiver Template Library & Master Setup
+  module: Policy
+  requiresModule: core
+  purpose: Create the master definition of a waiver or consent form before individual content and questions
+    are configured.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first waiver entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listWaiverTemplateMaster
+    contract: marketing-crm
+    purpose: Waiver Template Library & Master Setup
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/waiver-template-library-master-setup-cms-042
+    component: apps/venue-management-web/src/routes/policy/WaiverTemplateLibraryMasterSetup.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-042
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-042
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.2
+    page: 8
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-043
+  name: Digital Waiver & Form Builder
+  module: Policy
+  requiresModule: core
+  purpose: Provide a no-code visual builder for creating the actual customer-facing waiver or digital
+    form.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first digital entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setDigitalWaiverForm
+    contract: marketing-crm
+    purpose: Digital Waiver & Form Builder
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/digital-waiver-form-builder-cms-043
+    component: apps/venue-management-web/src/routes/policy/DigitalWaiverFormBuilder.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-043
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-043
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.3
+    page: 9
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-044
+  name: Dynamic Fields, Questions & Conditional Logic
+  module: Policy
+  requiresModule: core
+  purpose: Configure the information that must be collected from the participant or signatory.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: timeline
+        notes: What changed, when, and by whom
+      - kind: searchField
+        notes: Find a change
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first dynamic entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listDynamicFieldQuestion
+    contract: marketing-crm
+    purpose: Dynamic Fields, Questions & Conditional Logic
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/dynamic-fields-questions-conditional-logic-cms-044
+    component: apps/venue-management-web/src/routes/policy/DynamicFieldsQuestionsConditionalLogic.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-044
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-044
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.4
+    page: 11
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-045
+  name: Signatory, Signature & Guardian Rule Configuration
+  module: Policy
+  requiresModule: core
+  purpose: Define who is legally or operationally required to complete and sign the waiver.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first signatory, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setSignatorySignatureGuardian
+    contract: marketing-crm
+    purpose: Signatory, Signature & Guardian Rule Configuration
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/signatory-signature-guardian-rule-configuration-cms-045
+    component: apps/venue-management-web/src/routes/policy/SignatorySignatureGuardianRuleConfiguration.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-045
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-045
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.5
+    page: 13
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-046
+  name: Product, Event & Experience Association
+  module: Policy
+  requiresModule: core
+  purpose: Determine which TICVAI products or activities require each waiver.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first product, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listProductEventExperience
+    contract: marketing-crm
+    purpose: Product, Event & Experience Association
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/product-event-experience-association-cms-046
+    component: apps/venue-management-web/src/routes/policy/ProductEventExperienceAssociation.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-046
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-046
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.6
+    page: 14
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-047
+  name: Waiver Trigger, Eligibility & Completion Rules
+  module: Policy
+  requiresModule: core
+  purpose: Define when a waiver is required, when it must be completed and what happens if it is not completed.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first waiver entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listWaiverTriggerEligibility
+    contract: marketing-crm
+    purpose: Waiver Trigger, Eligibility & Completion Rules
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/waiver-trigger-eligibility-completion-rules-cms-047
+    component: apps/venue-management-web/src/routes/policy/WaiverTriggerEligibilityCompletionRules.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-047
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-047
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.7
+    page: 16
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-048
+  name: Versioning, Effective Dates & Legal Change Control
+  module: Policy
+  requiresModule: core
+  purpose: Ensure TICVAI maintains a complete historical record of exactly which waiver wording each participant
+    accepted.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first versioning, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listVersioningEffectiveDate
+    contract: marketing-crm
+    purpose: Versioning, Effective Dates & Legal Change Control
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/versioning-effective-dates-legal-change-control-cms-048
+    component: apps/venue-management-web/src/routes/policy/VersioningEffectiveDatesLegalChangeControl.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-048
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-048
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.8
+    page: 18
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-049
+  name: Localization, Branding & Customer Experience Configuration
+  module: Policy
+  requiresModule: core
+  purpose: Configure how the waiver appears across different brands, languages and customer channels.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first localization, entry,
+      and this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setLocalizationBrandingCustomer
+    contract: marketing-crm
+    purpose: Localization, Branding & Customer Experience Configuration
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/localization-branding-customer-experience-configuration-cms-049
+    component: apps/venue-management-web/src/routes/policy/LocalizationBrandingCustomerExperienceConfigurat.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-049
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-049
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.9
+    page: 19
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-050
+  name: Waiver Approval, Testing & Publication Workspace
+  module: Policy
+  requiresModule: core
+  purpose: Provide the final governance gate before a waiver becomes operational.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first waiver entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: approveWaiverTesting
+    contract: marketing-crm
+    purpose: Waiver Approval, Testing & Publication Workspace
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/waiver-approval-testing-publication-workspace-cms-050
+    component: apps/venue-management-web/src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-050
+    workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-050
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '1'
+    number: 11.1.10
+    page: 21
+  navigation:
+    entryFrom:
+    - CMS-041
+    exitTo:
+    - CMS-041
+    inferred: false
+    notes: '**Reached from CMS-041, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-051
+  name: Waiver Operations Command Center
+  module: Policy
+  requiresModule: core
+  purpose: Provide Operations, Customer Service, Compliance and venue teams with a real-time overview
+    of waiver completion across upcoming and active activities.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Waivers Required
+      - kind: metricTile
+        notes: Completed
+      - kind: metricTile
+        notes: Pending
+      - kind: metricTile
+        notes: Partially Completed
+      - kind: metricTile
+        notes: Expiring
+      - kind: metricTile
+        notes: Invalid
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first waiver entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listWaiver
+    contract: marketing-crm
+    purpose: Waiver Operations Command Center
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/waiver-operations-command-center-cms-051
+    component: apps/venue-management-web/src/routes/policy/WaiverOperationsCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-051
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-051
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.1
+    page: 26
+  navigation:
+    entryFrom:
+    - CMS-001
+    exitTo:
+    - CMS-001
+    - CMS-052
+    - CMS-053
+    - CMS-054
+    - CMS-055
+    - CMS-056
+    - CMS-057
+    - CMS-058
+    - CMS-059
+    - CMS-060
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: CMS-052
+  name: Participant Waiver Status & Tracking
+  module: Policy
+  requiresModule: core
+  purpose: Provide a detailed operational record of the waiver requirements for each participant.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first participant entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listParticipantWaiverStatus
+    contract: marketing-crm
+    purpose: Participant Waiver Status & Tracking
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/participant-waiver-status-tracking-cms-052
+    component: apps/venue-management-web/src/routes/policy/ParticipantWaiverStatusTracking.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-052
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-052
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.2
+    page: 28
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-053
+  name: Digital Signing & Collection Operations
+  module: Policy
+  requiresModule: core
+  purpose: Manage the actual distribution and completion of digital waivers. 29 | Pag e
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first digital entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listDigitalSigningCollection
+    contract: marketing-crm
+    purpose: Digital Signing & Collection Operations
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/digital-signing-collection-operations-cms-053
+    component: apps/venue-management-web/src/routes/policy/DigitalSigningCollectionOperations.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-053
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-053
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.3
+    page: 29
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-054
+  name: Minor, Guardian & Group Consent Management
+  module: Policy
+  requiresModule: core
+  purpose: Manage complex consent relationships for minors and organized groups. This screen is particularly
+    important for camps, academies, schools, family attractions and youth activities.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first minor, entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listMinorGuardianGroup
+    contract: marketing-crm
+    purpose: Minor, Guardian & Group Consent Management
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/minor-guardian-group-consent-management-cms-054
+    component: apps/venue-management-web/src/routes/policy/MinorGuardianGroupConsentManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-054
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-054
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.4
+    page: 31
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-055
+  name: Waiver Verification & Validation Workspace
+  module: Policy
+  requiresModule: core
+  purpose: Provide authorized staff with a controlled process for reviewing waiver submissions that require
+    verification.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first waiver entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setWaiverVerificationValidation
+    contract: marketing-crm
+    purpose: Waiver Verification & Validation Workspace
+    trigger: onAction
+  implementation:
+    app: venue-management-web
+    route: /policy/waiver-verification-validation-workspace-cms-055
+    component: apps/venue-management-web/src/routes/policy/WaiverVerificationValidationWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-055
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-055
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.5
+    page: 33
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-056
+  name: Missing, Expired & Invalid Waiver Management
+  module: Policy
+  requiresModule: core
+  purpose: Provide a dedicated exception workspace for waiver requirements preventing operational readiness.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first missing, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listMissingExpiredInvalid
+    contract: marketing-crm
+    purpose: Missing, Expired & Invalid Waiver Management
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/missing-expired-invalid-waiver-management-cms-056
+    component: apps/venue-management-web/src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-056
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-056
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.6
+    page: 34
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-057
+  name: On-Site Waiver & Exception Handling
+  module: Policy
+  requiresModule: core
+  purpose: Support customers who arrive at the venue without completing required waivers.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first on-site entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listSiteWaiverException
+    contract: marketing-crm
+    purpose: On-Site Waiver & Exception Handling
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/on-site-waiver-exception-handling-cms-057
+    component: apps/venue-management-web/src/routes/policy/OnSiteWaiverExceptionHandling.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-057
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-057
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.7
+    page: 36
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-058
+  name: Compliance Evidence, Audit & Waiver Repository
+  module: Policy
+  requiresModule: core
+  purpose: Maintain the complete evidentiary record of every waiver and consent transaction.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: timeline
+        notes: What changed, when, and by whom
+      - kind: searchField
+        notes: Find a change
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first compliance entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listComplianceEvidenceWaiver
+    contract: marketing-crm
+    purpose: Compliance Evidence, Audit & Waiver Repository
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/compliance-evidence-audit-waiver-repository-cms-058
+    component: apps/venue-management-web/src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-058
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-058
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.8
+    page: 38
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-059
+  name: Waiver Analytics, Compliance & Operational Insights
+  module: Policy
+  requiresModule: core
+  purpose: Analyze waiver completion, customer behavior and operational effectiveness.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first waiver entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listWaiverComplianceOperational
+    contract: marketing-crm
+    purpose: Waiver Analytics, Compliance & Operational Insights
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/waiver-analytics-compliance-operational-insights-cms-059
+    component: apps/venue-management-web/src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-059
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-059
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.9
+    page: 39
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: CMS-060
+  name: AI Waiver Compliance & Risk Intelligence Center
+  module: Policy
+  requiresModule: core
+  purpose: Provide an AI intelligence layer across the complete waiver lifecycle. This should combine
+    Board 1 configuration data + Board 2 operational data.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first ai entry, and this state
+      carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listWaiverComplianceRisk
+    contract: marketing-crm
+    purpose: AI Waiver Compliance & Risk Intelligence Center
+    trigger: onLoad
+  implementation:
+    app: venue-management-web
+    route: /policy/ai-waiver-compliance-risk-intelligence-center-cms-060
+    component: apps/venue-management-web/src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P13 Venue CMS.dc.html#cms-060
+    workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-060
+  source:
+    pack: Waiver, Consent & Digital Form Management_Reference.pdf
+    board: '2'
+    number: 11.2.10
+    page: 41
+  navigation:
+    entryFrom:
+    - CMS-051
+    exitTo:
+    - CMS-051
+    inferred: false
+    notes: '**Reached from CMS-051, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'

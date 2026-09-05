@@ -40,7 +40,7 @@ operationsByContract:
     permission: LEDGER_APPROVE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: beginPeriodClose
     verb: POST
     path: /fiscal-periods/{periodId}/begin-close
@@ -64,7 +64,7 @@ operationsByContract:
     permission: LEDGER_APPROVE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createAccount
     verb: POST
     path: /accounts
@@ -489,7 +489,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.account_mapping
-  columns: 4
+  columns: 5
   store: postgres
   parent: ledger.account
   writtenBy:
@@ -548,13 +548,13 @@ tables:
   - orders
   - shift
 - table: ledger.journal_line
-  columns: 7
+  columns: 8
   store: postgres
   parent: ledger.journal_entry
   writtenBy: []
   foreignWriters: null
 - table: ledger.legal_entity
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -586,7 +586,7 @@ tables:
   - finance
   foreignWriters: null
 - table: ledger.settlement
-  columns: 15
+  columns: 16
   store: postgres
   parent: null
   writtenBy:
@@ -643,6 +643,7 @@ screens:
 - P08:BO-077 FX Rates & Variances
 - P08:BO-089 Journal Entries
 - P08:BO-090 Period Close
+- P08:BO-101 Orders & Money
 - P10:PTR-014 Settlement & Payment History
 - P10:PTR-018 Reports & Sales Performance
 - P12:SUP-008 Agent Performance & SLA View

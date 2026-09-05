@@ -33,23 +33,23 @@
   }
  ],
  "stores": {
-  "postgres": 41,
+  "postgres": 40,
   "postgres-analytical": 5,
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-08-24",
+ "generated": "2026-09-03",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 32,
   "schemas": 22,
   "states": 11,
   "events": 11,
-  "tables": 51,
-  "screens": 31,
+  "tables": 50,
+  "screens": 33,
   "flows": 11,
-  "documents": 13,
-  "openConflicts": 0
+  "documents": 17,
+  "openConflicts": 1
  },
  "metrics": {
   "design": [
@@ -97,7 +97,7 @@
   "build": 0
  },
  "waves": {
-  "wave2": 13,
+  "wave2": 15,
   "wave3": 12,
   "wave1": 6
  },
@@ -161,28 +161,34 @@
   "operations": []
  },
  "storage": {
-  "postgres": 41,
+  "postgres": 40,
   "postgres-analytical": 5,
   "redis": 4,
   "qdrant": 1
  },
- "inboundKeys": [
-  {
-   "from": "marketing.conversation_message",
-   "column": "ai_interaction_id",
-   "to": "ai.interaction"
-  }
- ],
+ "inboundKeys": [],
  "conflicts": {
-  "open": 0,
+  "open": 1,
   "closed": 33,
-  "openIds": []
+  "openIds": [
+   "CF-166"
+  ]
  },
  "unmodelledLifecycles": [],
  "documents": [
   {
    "file": "docs/active/ai-scope-for-confirmation.md",
    "title": "AI scope \u2014 for confirmation",
+   "status": ""
+  },
+  {
+   "file": "docs/active/deep-audit-24-august.md",
+   "title": "Deep audit \u2014 ten invariants, run adversarially",
+   "status": ""
+  },
+  {
+   "file": "docs/active/deployment-configs-costed.md",
+   "title": "Deployment architecture \u2014 four configurations, costed on AWS and GCP",
    "status": ""
   },
   {
@@ -233,6 +239,16 @@
   {
    "file": "docs/adr/0028-service-decomposition.md",
    "title": "ADR-0028: Sixteen services, and the data boundary decides where they split",
+   "status": "Accepted \u2014 the data topology is reopened (CF-161, 24 August)"
+  },
+  {
+   "file": "docs/adr/0033-outbox-and-dead-letters.md",
+   "title": "ADR-0033: Every asynchronous handoff has an outbox and a place to fail",
+   "status": "Accepted"
+  },
+  {
+   "file": "docs/adr/0034-ai-retrieval-and-cost.md",
+   "title": "ADR-0034: The cheapest AI call is the one that never reaches a provider",
    "status": "Accepted"
   },
   {

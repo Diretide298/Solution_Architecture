@@ -29,7 +29,19 @@ import { buildRelationships } from './relationships.mjs';
 // So a candidate has to carry the sheets this file reads. Where a file sits and
 // when it arrived describe where it came from; its sheets describe what it is,
 // and what it is, is the question being asked.
-const WORKBOOK_DIRS = ['backend', 'handoff', 'docs', 'sources'];
+// **The package root is in this list because a build can land there.**
+// `tools/build-schema-workbook.py` ended with `wb.save('TICVAI_Schema_Reference.xlsx')` — a bare
+// filename, so it wrote to whatever directory it was invoked from, which under refresh.sh is the
+// package root. The root was not searched here, so the freshest build was never a candidate and
+// the winner was always the older copy in handoff/.
+//
+// It showed up as 520 warnings that the DDL had invented columns the workbook did not list. The
+// DDL was right every time; the workbook being read was four hours older than the SQL.
+//
+// **The generator now writes both tracked copies from one build, to absolute paths**, so the two
+// cannot drift at the source. The root stays in this list anyway: a tool run by hand from another
+// directory still puts a build somewhere, and finding it is cheaper than being wrong about it.
+const WORKBOOK_DIRS = ['.', 'backend', 'handoff', 'docs', 'sources'];
 const WORKBOOK_SHEETS = ['Modules', 'Tables', 'Columns'];
 
 async function findWorkbook(root) {
@@ -452,15 +464,28 @@ export async function buildBackend(root, contractSchemas = []) {
   // whichever folder you happen to open decides which numbers you believe.
   // Only real copies reach here now, so this can no longer report a workbook on
   // an unrelated subject as an older build of this one.
+  //
+  // **Compared by what the sheets say, not by file size.** Byte length was the test, and two
+  // saves of the same workbook object differ by about a hundred bytes — openpyxl does not write
+  // a zip deterministically. Once `build-schema-workbook.py` began writing the root and
+  // `handoff/` copies from one build, that test called them stale versions of each other on
+  // every single run.
+  //
+  // A copy is stale when it *describes a different build*, so that is what is compared: how many
+  // tables, columns and modules it lists. Same three numbers, same build — which is also the
+  // thing a reader would be misled about, and the reason this warning exists.
+  const shape = (c) => WORKBOOK_SHEETS.map((n) => (c.sheets.get(n) ?? []).length).join('/');
+  const winner = shape(workbook);
   for (const other of copies.slice(1)) {
-    if (other.size === workbook.size) continue;
+    if (shape(other) === winner) continue;
     problems.push({
       severity: 'warning',
       kind: 'backend-stale-workbook',
       file: other.rel,
       message:
-        `${other.rel} is an older build of the schema workbook than ${workbook.rel} ` +
-        `(${other.size} bytes against ${workbook.size}). Reading the newer one.`,
+        `${other.rel} is a different build of the schema workbook than ${workbook.rel} ` +
+        `(${WORKBOOK_SHEETS.join('/')} rows: ${shape(other)} against ${winner}). ` +
+        'Reading the newer one.',
     });
   }
 
@@ -609,9 +634,20 @@ export async function buildBackend(root, contractSchemas = []) {
       out: number(r.Out),
       in: number(r.In),
       cross: number(r.Cross),
+      // **How many of the module's tables exist as DDL.** The Modules sheet carries this as a
+      // count in a `Written` column; this read `Status` instead and the Modules sheet has no
+      // Status column, so `written` was false for all 26 modules whatever the build had done.
+      //
+      // The mirror image of the note in `tools/build-schema-workbook.py`, which added the
+      // column because *"the viewer's Backend > Data view read `module.written` and the sheet had
+      // no such column, so every schema drew amber — a status nobody could act on because it was
+      // the same for all 26 whatever the state of the build."* Both halves were then written, and
+      // to different names, so the amber never moved.
+      writtenTables: number(r.Written),
       // "Derivable. Not written" also contains the word written, so the
       // negative has to be excluded before the positive is tested
-      written: /\bwritten\b/i.test(r.Status ?? '') && !/\bnot\s+written\b/i.test(r.Status ?? ''),
+      written: number(r.Written) > 0
+        || (/\bwritten\b/i.test(r.Status ?? '') && !/\bnot\s+written\b/i.test(r.Status ?? '')),
     }));
 
   // ---- link each table back to the contract schema it derives from --------
@@ -808,6 +844,15 @@ export async function buildBackend(root, contractSchemas = []) {
       // counted from the tables that name it, not read from the sheet
       unlisted: true,
     });
+    // **A store is not a missing module.** `cache:*` and `qdrant:knowledge` have no row on the
+    // Modules sheet because they are not schema modules — the block below says so, and says the
+    // colon is the package's own marker for exactly this. Warning that they are absent from a
+    // list they are defined as not belonging to is five warnings that can never be actioned,
+    // and a warning nobody can act on trains everyone to skim the ones they can.
+    //
+    // They still get a module row above, because the scope picker is built from that list and a
+    // store with no row is a table nothing can select.
+    if (name.includes(':')) continue;
     problems.push({
       severity: 'warning',
       kind: 'backend-module-not-listed',
@@ -820,7 +865,10 @@ export async function buildBackend(root, contractSchemas = []) {
   // **Five of these are not Postgres schemas and the list is used as one.**
   // `cache:answer`, `cache:embedding`, `cache:idempotency`, `cache:resolution`
   // and `qdrant:knowledge` are a Redis key space and a Qdrant collection —
-  // no DDL, no `CREATE SCHEMA`, and `backend/000-schemas.sql` creates 26.
+  // no DDL and no `CREATE SCHEMA` anywhere. Since ADR-0039 split the DDL there
+  // is no `backend/000-schemas.sql` to point at either: `control/000-schemas.sql`
+  // creates the one control schema and `tenant/000-schemas.sql` the 25-schema
+  // tenant template, which is 26 real schemas in two databases.
   //
   // The colon is the package's own marker: every real table is `schema.table`
   // and every store is `store:name`, a convention that exists precisely so a

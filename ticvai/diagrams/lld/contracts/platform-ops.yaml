@@ -1,5 +1,5 @@
 id: LLD-platform-ops
-title: platform-ops — 25 operations
+title: platform-ops — 33 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -81,6 +81,17 @@ operations:
   - control.rollout
   - control.rollout_cell
   writes: []
+- operation: getScalingPolicy
+  verb: GET
+  path: /scaling-policies
+  scope: region
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.scaling_policy
+  writes: []
 - operation: getVersionSkew
   verb: GET
   path: /migrations/version-skew
@@ -91,6 +102,40 @@ operations:
   offline: false
   reads:
   - control.migration
+  writes: []
+- operation: listArchivalJobs
+  verb: GET
+  path: /archival-jobs
+  scope: region
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.archival_job
+  writes: []
+- operation: listBackupRuns
+  verb: GET
+  path: /backup-runs
+  scope: region
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.backup_run
+  writes: []
+- operation: listDeadLetters
+  verb: GET
+  path: /dead-letters
+  scope: platform
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.dead_letter
+  - platform.outbox
   writes: []
 - operation: listEnvironments
   verb: GET
@@ -157,6 +202,17 @@ operations:
   offline: false
   reads:
   - control.upgrade_schedule
+  writes: []
+- operation: listWafRules
+  verb: GET
+  path: /waf-policies
+  scope: region
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.waf_rule
   writes: []
 - operation: pauseRollout
   verb: POST
@@ -244,6 +300,20 @@ operations:
   writes:
   - cache:idempotency
   - control.release
+- operation: replayDeadLetter
+  verb: POST
+  path: /dead-letters/{deadLetterId}/replay
+  scope: platform
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - platform.dead_letter
+  writes:
+  - cache:idempotency
+  - platform.dead_letter
+  - platform.outbox
 - operation: rollbackMigrationRun
   verb: POST
   path: /migrations/runs/{runId}/rollback
@@ -290,6 +360,30 @@ operations:
   writes:
   - cache:idempotency
   - control.upgrade_schedule
+- operation: setScalingPolicy
+  verb: PUT
+  path: /scaling-policies
+  scope: region
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.scaling_policy
+  writes:
+  - control.scaling_policy
+- operation: setWafPolicy
+  verb: PUT
+  path: /waf-policies
+  scope: region
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - control.waf_rule
+  writes:
+  - control.waf_rule
 - operation: skipRolloutCell
   verb: POST
   path: /rollouts/{rolloutId}/cells/{cellId}/skip

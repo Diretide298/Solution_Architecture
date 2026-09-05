@@ -1,0 +1,112 @@
+id: LLD-BurstEnvironment
+title: BurstEnvironment — 12 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/burst-environment.yaml
+contract: subscription
+entity: BurstEnvironment
+enum: BurstEnvironmentStatus
+enumSchema: BurstEnvironmentStatus
+enumKind: lifecycle
+owner: PlatformService
+initial:
+- requested
+terminal:
+- decommissioned
+- failed
+notes: '**An environment stood up for one on-sale and torn down after** (ADR-0035, CF-162 scenario c).
+
+  **`decommissioned` is reachable only through `reconciled`.** An environment torn down before its orders
+  reach the permanent platform has lost real money and real tickets, and no path here allows it — `decommissionBurstEnvironment`
+  returns 409 rather than deleting.
+
+  **Two transitions are time-driven rather than operation-driven**: `live -> draining` at `onSaleTo`
+  plus the grace period, and `reconciled -> decommissioned` when `autoDecommission` is set. **Teardown
+  is a mechanism, not a discipline** — $24 for a two-hour sale against $8,587 for a month left running,
+  and the risk is forgetting rather than the cost.
+
+  **`failed` is reachable from provisioning and warming only.** Once an environment is `live` it holds
+  orders, and there is no failure state that discards them — a live environment in trouble drains and
+  reconciles what it has.
+
+  '
+transitions:
+- from: requested
+  to: provisioning
+  operation: requestBurstEnvironment
+  trigger: operation
+  guard: '**Requested against the sale calendar, not against arriving demand.** Provisioning takes minutes
+    and a sale takes seconds — requesting when the load appears is requesting too late.
+
+    '
+- from: provisioning
+  to: warming
+  trigger: system
+  guard: 'Infrastructure is up. **Warming is the catalogue snapshot and the cache fill** — an environment
+    that goes live cold serves its first thousand guests from an empty cache, which is the moment it
+    is least able to afford a database round trip.
+
+    '
+- from: provisioning
+  to: failed
+  trigger: system
+  guard: Provisioning failed. **No orders exist yet, so nothing is lost.**
+- from: warming
+  to: live
+  trigger: system
+  guard: 'Snapshot taken, caches warm, health checks passing. **`snapshotTakenAt` is stamped here**
+    and it is the moment the price divergence question starts running.
+
+    '
+- from: warming
+  to: failed
+  trigger: system
+  guard: Warming failed. No orders exist yet.
+- from: live
+  to: draining
+  operation: drainBurstEnvironment
+  trigger: operation
+  guard: '**Draining is not stopping.** A guest mid-checkout is allowed to finish; a guest arriving
+    after is told the sale has ended.
+
+    '
+- from: live
+  to: draining
+  trigger: time
+  guard: '`onSaleTo` plus `graceMinutes`. **A queue does not empty at the instant the last ticket sells**,
+    which is what the grace period is for.
+
+    '
+- from: draining
+  to: reconciling
+  operation: reconcileBurstEnvironment
+  trigger: operation
+  guard: In-flight orders have completed or timed out.
+- from: reconciling
+  to: reconciling
+  operation: reconcileBurstEnvironment
+  trigger: operation
+  guard: '**Resumable, and this self-transition is why.** A reconciliation interrupted at order 18,000
+    of 30,000 continues from 18,000 rather than starting again — the monotonic sequence is what makes
+    that safe, exactly as it does for a till''s offline journal.
+
+    '
+- from: reconciling
+  to: reconciled
+  trigger: system
+  guard: 'Every order applied or rejected. **Rejections are kept in `sync.rejection`** and worked afterwards
+    — thirty thousand silently lost sales is worse than thirty thousand reported ones.
+
+    '
+- from: reconciled
+  to: decommissioned
+  operation: decommissionBurstEnvironment
+  trigger: operation
+  guard: Explicit teardown.
+- from: reconciled
+  to: decommissioned
+  trigger: time
+  guard: '`autoDecommission` is set. **The only automatic path to teardown, and it sits after reconciliation
+    rather than after the sale** — which is the whole point of the state machine.
+
+    '

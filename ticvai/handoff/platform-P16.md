@@ -9,12 +9,12 @@
 | Contracts | 8 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 102 |
+| Operations with no screen | 87 |
 | Waves | wave3 10 |
 
 ## Gaps
 
-### 102 operations with no screen here
+### 87 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,7 +24,6 @@
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `listKnowledgeCollections` | ai | GET | Collections available to this tenant |
 | `proposeTranslations` | ai | POST |  |
 | `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
@@ -38,15 +37,12 @@
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
-| `listProductVersions` | catalogue | GET | What this product used to be |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
-| `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
-| `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
 | `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
 | `setSegregationRules` | identity | PUT | Which permissions may not be held together |
 | `submitCountLines` | inventory | POST | Submit counted quantities |
@@ -57,10 +53,14 @@
 | `createForm` | marketing-crm | POST | Define a waiver, survey or capture form |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
 | `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
-| `createReferral` | marketing-crm | POST | Issue a referral code |
 | `createUrlRedirect` | marketing-crm | POST | 301, 302 and custom redirects |
 | `getJourneyPerformance` | marketing-crm | GET | Entrants, completions, goals reached |
-| … | | | 62 more |
+| `getLostItemMatches` | marketing-crm | GET | Candidate matches, scored |
+| `getSuppressionList` | marketing-crm | GET | Addresses suppressed from all sending |
+| `listMessageTriggers` | marketing-crm | GET | What fires a message, and when |
+| `listReviews` | marketing-crm | GET | List guest reviews and ratings |
+| `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
+| … | | | 47 more |
 
 ## Modules
 

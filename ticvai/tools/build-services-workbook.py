@@ -8,6 +8,7 @@
 what makes it defensible is why `shift` is not one of them and why AI is one at thirty operations.
 """
 import json
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -15,8 +16,22 @@ import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-ROOT = Path("/home/claude/ticvai-pkg")
-OUT = Path("/mnt/user-data/outputs/TICVAI_Services_and_Data_Segregation.xlsx")
+# Windows consoles are cp1252 and this tool closes by printing a unicode arrow. **The write
+# has already happened by then**, so the traceback reported a failure on a run that succeeded
+# — the most misleading shape an error can take.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+# **This was hard-coded to `/home/claude/ticvai-pkg`**, a path that exists on no machine this
+# package has ever been checked out on, so every run raised FileNotFoundError before writing
+# a byte. `build-schema-workbook.py` carried the same line and silently globbed nothing
+# instead — the loud failure was the better of the two.
+ROOT = Path(__file__).resolve().parents[1]
+# Beside the schema workbook, which is where somebody looks for it — the previous target was
+# a sandbox upload directory that does not exist outside the session that wrote it.
+OUT = ROOT / "handoff" / "TICVAI_Services_and_Data_Segregation.xlsx"
 
 HEAD = PatternFill("solid", fgColor="0B1324")
 BAND = PatternFill("solid", fgColor="F2F5F9")
@@ -273,7 +288,7 @@ def main() -> int:
          "**Nothing that takes money depends on these.** They can ship late and be down."),
         (5, "platform", "PlatformService, WhiteLabelService, ReportingService, CrossRegionService",
          "**Control is needed to provision a tenant and not to serve one.** Reporting reads the "
-         "replica. CrossCell only matters once a second region exists."),
+         "replica. CrossRegion only matters once a second region exists."),
     ]
     for i, row in enumerate(seq, 4):
         for j, val in enumerate(row, 1):

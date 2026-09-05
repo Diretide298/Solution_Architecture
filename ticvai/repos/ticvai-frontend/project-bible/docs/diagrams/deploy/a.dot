@@ -1,0 +1,23 @@
+digraph a {
+  rankdir=TB; bgcolor="transparent";
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=11 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=9 color="#5A6577"];
+  subgraph cluster_cp { label="Control plane"; style="rounded,dashed"; color="#8A6D00"; fontname="Helvetica"; fontsize=11;
+    cp [label="PlatformService\ncontrolPlane cell" fillcolor="#FFF6E0"]; }
+  subgraph cluster_a { label="Tenant A · dedicated · uae-1"; style="rounded,filled"; fillcolor="#F4F7FB"; fontname="Helvetica"; fontsize=11;
+    a1 [label="16 services × 1 replica" fillcolor="#E2EFDA"];
+    a2 [label="Postgres 2 vCPU / 4 GB\nmax_connections 200" fillcolor="#FFFFFF"];
+    a3 [label="Redis 1 GB" fillcolor="#FFFFFF"];
+    a1 -> a2; a1 -> a3; }
+  subgraph cluster_b { label="Tenant B · dedicated · uae-1"; style="rounded,filled"; fillcolor="#F4F7FB"; fontname="Helvetica"; fontsize=11;
+    b1 [label="16 services × 1" fillcolor="#E2EFDA"];
+    b2 [label="Postgres" fillcolor="#FFFFFF"]; b3 [label="Redis" fillcolor="#FFFFFF"];
+    b1 -> b2; b1 -> b3; }
+  subgraph cluster_c { label="Tenant B · dedicated · sau-1"; style="rounded,filled"; fillcolor="#FDECEC"; fontname="Helvetica"; fontsize=11;
+    c1 [label="16 services × 1" fillcolor="#E2EFDA"];
+    c2 [label="Postgres" fillcolor="#FFFFFF"]; c3 [label="Redis" fillcolor="#FFFFFF"];
+    c1 -> c2; c1 -> c3; }
+  cp -> a1 [label="provisions" style=dashed];
+  cp -> b1 [style=dashed]; cp -> c1 [style=dashed];
+  b1 -> c1 [label="pseudonymous link only\nADR-0010" style=dotted dir=both color="#8A6D00"];
+}

@@ -34,7 +34,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.

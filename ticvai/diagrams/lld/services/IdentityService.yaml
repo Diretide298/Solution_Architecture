@@ -398,7 +398,7 @@ tables:
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: identity.authz_audit
-  columns: 2
+  columns: 3
   store: postgres
   parent: null
   writtenBy: []
@@ -415,16 +415,16 @@ tables:
   - orders
   - public-api
 - table: identity.guest_session
-  columns: 1
+  columns: 2
   store: redis
-  parent: pii.subject
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.mfa_challenge
-  columns: 1
+  columns: 2
   store: postgres
-  parent: identity.principal
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
@@ -436,16 +436,16 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.mfa_recovery_code
-  columns: 1
+  columns: 2
   store: postgres
-  parent: identity.principal
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.otp_challenge
-  columns: 1
+  columns: 2
   store: postgres
-  parent: pii.subject
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
@@ -464,7 +464,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.principal_credential
-  columns: 1
+  columns: 2
   store: postgres
   parent: identity.principal
   writtenBy: []
@@ -477,7 +477,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.role_permission
-  columns: 5
+  columns: 6
   store: postgres
   parent: identity.role
   writtenBy:
@@ -485,16 +485,16 @@ tables:
   foreignWriters:
   - tenancy
 - table: identity.segregation_rule
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.session
-  columns: 1
+  columns: 2
   store: redis
-  parent: identity.principal
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
@@ -506,7 +506,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.sso_provider
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -567,6 +567,8 @@ screens:
 - P01:WEB-020 Profile & Preferences
 - P02:GST-015 Memberships
 - P02:GST-042 Simple Registration & OTP
+- P02:GST-066 Privacy & My Data
+- P02:GST-073 Security & Sign-in
 - P04:POS-001 Begin Shift
 - P04:POS-018 Safe Drop & Cash Transfer Management
 - P06:EMP-001 Sign in
@@ -578,6 +580,7 @@ screens:
 - P08:BO-054 Role Assignment
 - P08:BO-057 Training & Certification
 - P08:BO-068 Audit Log
+- P08:BO-106 People & Access Rights
 - P08:BO-142 Store Rules, Controls & Permissions
 - P09:ADM-001 Platform Login / MFA
 - P09:ADM-002 Platform Dashboard

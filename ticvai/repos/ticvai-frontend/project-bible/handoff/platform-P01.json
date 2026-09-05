@@ -7,22 +7,38 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 35,
-  "operations": 88,
-  "contracts": 11,
-  "modules": 12,
+  "screens": 46,
+  "operations": 115,
+  "contracts": 14,
+  "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 20
+  "operationsWithNoScreen": 0
  },
  "waves": {
   "wave1": 21,
-  "wave2": 10,
+  "wave2": 21,
   "wave3": 4
  },
  "modules": [
+  {
+   "module": "Engagement & Support",
+   "screens": 6,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "In-venue Services",
+   "screens": 6,
+   "waves": [
+    2
+   ]
+  },
   {
    "module": "Booking & Selection",
    "screens": 5,
@@ -47,27 +63,18 @@
    ]
   },
   {
+   "module": "Membership, Loyalty & Value",
+   "screens": 5,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
    "module": "Discovery & Browse",
    "screens": 4,
    "waves": [
     1
-   ]
-  },
-  {
-   "module": "Membership, Loyalty & Value",
-   "screens": 4,
-   "waves": [
-    2,
-    3
-   ]
-  },
-  {
-   "module": "Engagement & Support",
-   "screens": 4,
-   "waves": [
-    1,
-    2,
-    3
    ]
   },
   {
@@ -76,6 +83,21 @@
    "waves": [
     1,
     2
+   ]
+  },
+  {
+   "module": "Retail",
+   "screens": 2,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Support",
+   "screens": 2,
+   "waves": [
+    2,
+    3
    ]
   },
   {
@@ -98,61 +120,59 @@
    "waves": [
     2
    ]
-  },
-  {
-   "module": "Retail",
-   "screens": 1,
-   "waves": [
-    2
-   ]
-  },
-  {
-   "module": "Support",
-   "screens": 1,
-   "waves": [
-    3
-   ]
   }
  ],
  "contracts": [
-  {
-   "contract": "identity",
-   "operations": 22
-  },
   {
    "contract": "orders",
    "operations": 21
   },
   {
+   "contract": "identity",
+   "operations": 19
+  },
+  {
    "contract": "marketing-crm",
-   "operations": 14
+   "operations": 19
+  },
+  {
+   "contract": "fnb",
+   "operations": 9
   },
   {
    "contract": "catalogue",
-   "operations": 7
+   "operations": 9
+  },
+  {
+   "contract": "access",
+   "operations": 8
   },
   {
    "contract": "retail",
-   "operations": 6
+   "operations": 7
   },
   {
    "contract": "promotions",
    "operations": 5
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 5
   },
   {
-   "contract": "queue",
+   "contract": "white-label",
+   "operations": 4
+  },
+  {
+   "contract": "ai",
    "operations": 3
   },
   {
    "contract": "seating",
-   "operations": 2
+   "operations": 3
   },
   {
-   "contract": "white-label",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -176,7 +196,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/event-and-attraction-listing",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -190,11 +210,11 @@
   },
   {
    "id": "WEB-004",
-   "name": "Event / Attraction Detail",
+   "name": "Attraction Details",
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/discovery-and-browse/event-attraction-detail",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -217,11 +237,11 @@
   },
   {
    "id": "WEB-007",
-   "name": "Seat Map Selection",
+   "name": "Interactive Seat Selection",
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/seat-map-selection",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -271,7 +291,7 @@
   },
   {
    "id": "WEB-013",
-   "name": "Order Confirmation",
+   "name": "Booking Confirmation",
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/order-confirmation",
@@ -289,7 +309,7 @@
   },
   {
    "id": "WEB-015",
-   "name": "Virtual Waiting Room",
+   "name": "Branded Queue / Waiting Room",
    "module": "High-Demand Access",
    "wave": 2,
    "route": "/high-demand-access/virtual-waiting-room",
@@ -302,7 +322,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/login-register",
-   "operations": 22,
+   "operations": 19,
    "drawn": true
   },
   {
@@ -320,7 +340,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/my-tickets",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -329,7 +349,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/order-history",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -356,7 +376,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/membership-loyalty-and-value/membership-plans",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -365,12 +385,12 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/membership-loyalty-and-value/membership-management",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "WEB-024",
-   "name": "Loyalty & Rewards",
+   "name": "Devices, Wishlist & Consent",
    "module": "Membership, Loyalty & Value",
    "wave": 3,
    "route": "/membership-loyalty-and-value/loyalty-and-rewards",
@@ -401,7 +421,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/engagement-and-support/newsletter-subscription",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -475,131 +495,109 @@
    "route": "/multi-currency-pricing",
    "operations": 2,
    "drawn": true
+  },
+  {
+   "id": "WEB-036",
+   "name": "F&B \u2013 Browse & Order",
+   "module": "In-venue Services",
+   "wave": 2,
+   "route": "/fandb--browse-and-order",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "WEB-037",
+   "name": "Menu Item Detail",
+   "module": "In-venue Services",
+   "wave": 2,
+   "route": "/menu-item-detail",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "WEB-038",
+   "name": "F&B \u2013 Order Tracking",
+   "module": "In-venue Services",
+   "wave": 2,
+   "route": "/fandb--order-tracking",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "WEB-039",
+   "name": "Venue Map & Wait Times",
+   "module": "In-venue Services",
+   "wave": 2,
+   "route": "/venue-map-and-wait-times",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "WEB-040",
+   "name": "Virtual Queue",
+   "module": "In-venue Services",
+   "wave": 2,
+   "route": "/virtual-queue",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "WEB-041",
+   "name": "Parking \u2013 Reserve & Pay",
+   "module": "In-venue Services",
+   "wave": 2,
+   "route": "/parking--reserve-and-pay",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "WEB-042",
+   "name": "Retail & Shop and Drop",
+   "module": "Retail",
+   "wave": 2,
+   "route": "/retail-and-shop-and-drop",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "WEB-043",
+   "name": "Loyalty & Rewards",
+   "module": "Membership, Loyalty & Value",
+   "wave": 2,
+   "route": "/loyalty-and-rewards",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "WEB-044",
+   "name": "AI Concierge \u2013 Home",
+   "module": "Engagement & Support",
+   "wave": 2,
+   "route": "/ai-concierge",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "WEB-045",
+   "name": "Help Centre & Accessibility",
+   "module": "Support",
+   "wave": 2,
+   "route": "/help-centre-and-accessibility",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "WEB-046",
+   "name": "In-Venue Notifications",
+   "module": "Engagement & Support",
+   "wave": 2,
+   "route": "/in-venue-notifications",
+   "operations": 1,
+   "drawn": true
   }
  ],
  "gaps": {
-  "operationsWithNoScreen": [
-   {
-    "operation": "freezeEntitlement",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Pause a membership at the guest's request"
-   },
-   {
-    "operation": "listGuestMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
-   },
-   {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
-   },
-   {
-    "operation": "recordLostItem",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Report something lost, or hand something in"
-   },
-   {
-    "operation": "respondToInvitation",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Accept or decline"
-   },
-   {
-    "operation": "submitForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
-   },
-   {
-    "operation": "convertToTermProduct",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
-   },
-   {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
-   },
-   {
-    "operation": "transferWalletBalance",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Send balance to another guest"
-   },
-   {
-    "operation": "assignSeats",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Pick and hold the best available seats"
-   }
-  ],
+  "operationsWithNoScreen": [],
   "modulesSplitAcrossWaves": [
    {
     "module": "Booking & Selection",
@@ -619,6 +617,13 @@
    },
    {
     "module": "Membership, Loyalty & Value",
+    "waves": [
+     2,
+     3
+    ]
+   },
+   {
+    "module": "Support",
     "waves": [
      2,
      3

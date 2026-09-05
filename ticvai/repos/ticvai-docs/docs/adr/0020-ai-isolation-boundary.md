@@ -53,7 +53,7 @@ Qdrant runs per cell. **Embeddings are derived from tenant data and are tenant d
 of a guest's support case is not anonymous because it is a vector.
 
 This also makes residency automatic rather than argued: a cell in a jurisdiction keeps its
-index in that jurisdiction, and ADR-0001 (retired — see ADR-0014 and ADR-0017)'s boundary does the work without a second mechanism.
+index in that jurisdiction, and ADR-0001 (retired — the split rule is now ADR-0038, which supersedes ADR-0014 and amends ADR-0017)'s boundary does the work without a second mechanism.
 
 **ADR-0001 is superseded in part by ADR-0014** — a shared cell holds several tenants — so the cell
 is a residency boundary here and not a tenant one. ADR-0021 carries the tenant boundary.

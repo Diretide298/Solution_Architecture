@@ -1,5 +1,5 @@
 id: LLD-P02
-title: P02 Guest App — Mobile — 63 screens
+title: P02 Guest App — Mobile — 71 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: guest
@@ -21,6 +21,8 @@ why: null
 modulesUsed:
 - module: ticketing
   screens: 27
+- module: core
+  screens: 12
 - module: marketing
   screens: 7
 - module: fnb
@@ -31,8 +33,6 @@ modulesUsed:
   screens: 4
 - module: ai
   screens: 4
-- module: core
-  screens: 4
 - module: retail
   screens: 2
 - module: seating
@@ -41,31 +41,31 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 42
+  operationCalls: 44
 - service: OrderService
-  operationCalls: 38
+  operationCalls: 44
 - service: MarketingService
-  operationCalls: 20
+  operationCalls: 30
 - service: IdentityService
-  operationCalls: 20
-- service: VenueOpsService
-  operationCalls: 19
+  operationCalls: 23
 - service: FnbService
-  operationCalls: 19
+  operationCalls: 22
+- service: VenueOpsService
+  operationCalls: 21
 - service: AccessService
-  operationCalls: 14
+  operationCalls: 17
 - service: AiService
-  operationCalls: 9
+  operationCalls: 10
 - service: WhiteLabelService
   operationCalls: 6
 - service: RetailService
-  operationCalls: 4
+  operationCalls: 5
 - service: LedgerService
   operationCalls: 1
 coverage:
-  screens: 63
+  screens: 71
   inAFlow: 35
-  drawn: 63
+  drawn: 71
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -1748,3 +1748,210 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-065
   inFlows:
   - F56 A guest registers, verifies and sets preferences
+- screen: GST-066
+  name: Privacy & My Data
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - deleteGuestAccount
+  - exportSubjectData
+  - getGuestConsents
+  - updateGuestPreferences
+  - uploadGuestDocument
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-066
+  inFlows: null
+- screen: GST-067
+  name: Refunds & Resale
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createRefundRequest
+  - createResaleListing
+  - getWaiverStatus
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-067
+  inFlows: null
+- screen: GST-068
+  name: Help & My Cases
+  module: Engagement & Support
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createCase
+  - listAiConversations
+  - listCases
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-068
+  inFlows: null
+- screen: GST-069
+  name: Face Pass
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - enrolFacePass
+  - getFacePassEnrolment
+  - revokeFacePass
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - enrolmentId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-069
+  inFlows: null
+- screen: GST-070
+  name: Reserve a Table or Cabana
+  module: In-venue Services
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - bookResource
+  - createTableReservation
+  - getResourceAvailability
+  - joinRestaurantWaitlist
+  - joinWaitlist
+  - leaveWaitlist
+  - updateTableReservation
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entryId<-deepLink
+  - reservationId<-deepLink
+  - resourceId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-070
+  inFlows: null
+- screen: GST-071
+  name: Payment Methods
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - listPaymentTokens
+  - redeemLoyaltyPoints
+  - storePaymentToken
+  - transferWalletBalance
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  - walletId<-deepLink
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-071
+  inFlows: null
+- screen: GST-072
+  name: Share & Group Booking
+  module: Booking & Selection
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createReferral
+  - getGroupBooking
+  - getMyChallenges
+  - respondToInvitation
+  - shareEntitlement
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entitlementId<-deepLink
+  - groupBookingId<-deepLink
+  - subjectId<-session
+  - token<-deepLink
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-072
+  inFlows: null
+- screen: GST-073
+  name: Security & Sign-in
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createMfaChallenge
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-073
+  inFlows: null

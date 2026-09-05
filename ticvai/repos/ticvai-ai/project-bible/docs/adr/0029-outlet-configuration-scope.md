@@ -70,7 +70,7 @@ Both are now closed:
 campaign is a thing a venue *makes*, not a setting it *holds*.
 
 **Then I dropped `create` from the verb list and made it worse** — 22 operations that legitimately
-carry a scope stopped being examined, including `createMenu` and `createAdmissionProfile`.
+carry a scope stopped being examined, including `createMenu` and `createAdmissionRules`.
 **Reverted.**
 
 **The noun is the discriminator, not the verb.** `createResource`, `createVenueMap` and

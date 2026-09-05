@@ -1,0 +1,239 @@
+|  |  |
+| --- | --- |
+
+**Minutes of Meeting**
+
+*Workshop — Resource Management Configuration (Master Data, Scheduling, Staffing, Rentals **&** AI Optimization)*
+
+| **Date** | 26-August-2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Product Workshop — Resource Management Configuration | **Prepared by** | Chitrangi Mestry |
+
+**Primary Objective**
+
+To walk through the resource management module in detail — resource master data and configuration, scheduling and calendar management, resource-to-event/package assignment models, staff/personnel management and rostering, equipment and rental management, and AI-driven resource optimization — so the team can align on configuration strategy ahead of build. The wallet module was deferred to the next session.
+
+**Participants**
+
+- TICVAI Team 
+
+- Softlabs Team
+
+**Agenda**
+
+- Resource management overview — command centre, calendar and revenue view
+
+- Resource master data configuration — types, categories, profiles, attributes, hierarchy and dependency rules
+
+- Package/bundle resource association and multi-venue resource management
+
+- Resource calendar, scheduling and time-slot configuration
+
+- Resource assignment models — pre-assigned vs. dynamic assignment at time of sale
+
+- Conflict detection & resolution, multi-event planning and drag-and-drop allocation
+
+- Staff/personnel resource management — profiles, skills, certifications and availability
+
+- Workforce rostering, attendance, staffing control and AI-assisted staffing
+
+- Dynamic resource assignment for experience tickets — skill matching, shared vs. private resources
+
+- Equipment, assets and rental management
+
+- AI resource optimization, staff mobile app and analytics/reporting
+
+- Guest-facing booking behaviour and configuration Q&A
+
+- Planning for the next session (wallet module)
+
+**4. Detailed Discussion**
+
+**4.1 Resource Management Overview**
+
+- Allam introduced the resource management command centre: a calendar-based overview showing the booking status of all resources (e.g., an instructor booked for a specific lesson, date and time), filterable by resource type and by venue, with a switchable revenue view.
+
+- The overview can be viewed by day, week, month, or any custom period, giving a planner-style view of resource utilization across the business.
+
+**4.2 Resource Master Data Configuration**
+
+- Resource types: any bookable/manageable entity — rooms, staff, equipment, vehicles, etc. — configured with capacity control and a reservable flag; the command centre shows total vs. active/assigned resources and their current availability status.
+
+- Categories & subcategories: resources can be grouped hierarchically (e.g., staff → employee/operations/instructor; equipment → lighting/sound; vehicles → SUV and other vehicle types), fully configurable rather than fixed.
+
+- Resource profile: defines the resource name, category, capacity, active/inactive status, images and any category-specific details.
+
+- Custom attributes: configurable per resource (e.g., capturing a vehicle's plate number so a specific vehicle instance can be assigned to a specific booking).
+
+- Resource hierarchy & relationships: resources can be linked in a main-resource / sub-resource structure (e.g., “vehicle” as a main resource type with a list of individual vehicles linked beneath it).
+
+- **Dependency rules: **resource requirements can be defined per product (e.g., a private ski lesson requires a minimum of two resources, or requires at least one vehicle) — the system enforces these dependencies when a resource-linked product is configured or sold.
+
+- Package/bundle configuration: multiple resources can be bundled together and linked to a single product (e.g., a VIP Cabana package bundling a room plus an attendant), so the system knows all resources required when that package is booked.
+
+- Multi-venue resource management: covers how a resource that is used across multiple venues should be managed and shared.
+
+- **Confirmed: **in response to Chinmay's question, Allam confirmed that some elements of resource management configuration may be controlled at the tenant level rather than only centrally.
+
+**4.3 Resource Calendar ****&**** Scheduling**
+
+- Resource calendar: an inquiry/planning screen showing resource availability by date range (e.g., which of 10 vehicles are available between a given start and end time), filterable and searchable across resource types.
+
+- Resource schedule configuration: defines each resource's working pattern (e.g., available Monday–Friday, off on weekends) so planning and bookings respect real working availability.
+
+- **Clarified: **time slots are not created directly for resources — they are created for performances/events. Resources are then associated with those performance time slots, and once a performance is created, the system understands which resources should be available for it.
+
+**4.4 Resource Assignment Models**
+
+- **Two assignment models confirmed: **(1) pre-assigned — specific resource instances (e.g., a named vehicle, a named instructor, a specific room) are mapped directly to a time slot in advance, so a booking against that slot automatically receives the pre-assigned resources; and (2) dynamic — only the resource type and quantity are defined (e.g., “one SUV vehicle and one guide”), and the system checks availability and assigns an actual available resource automatically at the time of sale.
+
+- Reservation/blocking of a specific resource outside of a normal sale is only needed for exceptional cases (e.g., deliberately holding a resource for a future booking); in the standard flow, resources are booked automatically as a consequence of the associated package being sold — the guest does not book the resource directly.
+
+- **Confirmed: **the system must validate resource bookings and prevent the same resource from being double-booked or assigned to overlapping bookings (conflict detection and resolution).
+
+- Multi-event resource planning and drag-and-drop resource allocation allow resources to be assigned to events visually, in addition to rule-based automatic assignment.
+
+**4.5 Staff / Personnel Resource Management**
+
+- Personnel (cashiers, trainers, drivers, and other staff) are managed as a resource type, with a command-centre view of total personnel, how many are on duty, available, or on leave.
+
+- A resource profile's operational summary shows associated bookings; the same booking information is mirrored on a staff-facing employee mobile app, so staff can see their tasks/bookings for the day directly on their phone.
+
+- Skills & competency management: defines the qualifications/certifications required for a resource to be eligible for a given role (e.g., level 1/2/3 ski-instructor certification required to qualify as an advanced-level trainer).
+
+- Certification expiry management: tracks certification documents and validity periods (e.g., annual renewal), flagging when recertification is due.
+
+- Staff availability and shift templates (morning/afternoon/evening) define working patterns; the system recognizes which shift a staff member has logged into based on configured shift timings.
+
+- Leave/absence configuration covers leave types and quotas, functioning similarly to a lightweight HR module, with an option to integrate with an external HR or third-party time-and-attendance system if required.
+
+**4.6 Workforce Rostering, Attendance ****&**** Staffing Control**
+
+- A staffing dashboard shows checked-in, on-shift, on-leave, open-shift and closed-shift counts based on check-in/check-out logs, along with staffing cost tracking (including overtime).
+
+- A roster/tapping view per resource shows required vs. scheduled vs. checked-in counts for the day, surfacing discrepancies (e.g., 10 ski trainers scheduled, only 8 checked in).
+
+- Minimum staffing/coverage rules can be set per venue and day (e.g., a minimum number of instructors required per level), driven by the planner.
+
+- **Gap handling: **if a scheduled resource fails to check in, the system flags the shortfall for operations follow-up, and can use AI to recommend reassigning that resource's bookings to another available resource.
+
+- Swap requests allow a staff member going on break to request coverage from another resource; attendance exceptions/adjustments can be manually marked (active, not active, absent, or other exceptions).
+
+- A compliance/validation centre flags events where required staffing is not met (e.g., staff required but not yet checked in), and the module tracks associated labour cost.
+
+- An AI workflow layer supports staffing/resource-planning optimization on top of the above.
+
+**4.7 Dynamic Resource Assignment for Experience Tickets**
+
+- Recap: resources are bundled to an event/package (as in 4.2); when a performance is created for that event, the system checks resource availability and assigns accordingly.
+
+- Staff experience/qualification mapping: an event can require a specific qualification level (e.g., an advanced instructor only, excluding intermediate/beginner) — the system enforces this mapping rather than assigning any qualified-looking staff member.
+
+- Resource combination builder: for a given event, defines the required resource types, quantities, and whether each is mandatory or optional (e.g., an instructor, an area, and a set of equipment).
+
+- **Ticket demand ****&**** resource planning: **resource allocation can be fixed-quantity, or ratio-based/dynamic — the system can add resources dynamically as sales volume increases, based on configured rules, rather than only using a fixed pre-set number of resources.
+
+- Ratio-based example: a single tour guide can be configured to accommodate up to a defined number of guests/tickets (e.g., up to 10 tickets per tour), so the system does not require one resource per guest.
+
+- Channel-based resource assignment: configuration can determine whether resources are auto-assigned by type or specifically allocated, and this can vary by sales channel.
+
+- **Confirmed (Chinmay): **skill-based resource matching should rely on straightforward keyword/attribute matching (e.g., skill level, language) rather than a full AI-based matching system, to avoid unnecessary complexity.
+
+- Resource sharing models: a resource can be one-to-one (dedicated to a single booking) or one-to-many/shared (e.g., a meeting room with multiple bookable pods, or a shared vehicle resource booked across sequential time slots) — the system must block further sales once a shared resource's capacity or time slot is fully booked, and release it again if a booking is cancelled.
+
+- **Decision: **resource allocation should rotate across all available resources (e.g., resource 1, then 2, then 3) rather than repeatedly reusing the same resource, to avoid overburdening any single resource while others remain unused.
+
+- Priority allocation policy: the system should support automatic replacement/reassignment if an assigned resource becomes unavailable.
+
+**4.8 Equipment, Assets ****&**** Rental Management**
+
+- Rental item management (e.g., strollers, wheelchairs, towels): tracks inventory and quantity per day, records check-out and check-in of items, and updates inventory automatically on return.
+
+- Deposit handling: supports capturing a refundable deposit (with guest details) at the time of rental, and processing the refund on return.
+
+- Usage-based billing: supports calculating excess charges at return based on actual usage duration versus the period originally paid for (e.g., a wheelchair rented for one hour but used for three is charged for the additional two hours at return).
+
+- Maintenance state: an item can be marked out-of-maintenance/faulty so it is excluded from available inventory until resolved.
+
+- **Confirmed (Chinmay): **rental/equipment items can be tracked with simplified state attributes (e.g., available, rented, faulty) rather than requiring granular custom attributes for this category — agreed by Allam.
+
+- **Confirmed: **rental item and inventory data is expected to be provided by each client during onboarding, with a screen provided to update inventory and item details thereafter.
+
+**4.9 AI Optimization, Mobile App ****&**** Analytics**
+
+- AI-based resource optimization and forecasting: based on historical booking/sales data, the system can recommend staffing levels for upcoming periods (e.g., “you will need this many resources over the next week”) so leave and availability can be planned accordingly.
+
+- Employee mobile app: staff see their assigned bookings and tasks, perform check-in/check-out and shift closing, and can request a swap (e.g., for break coverage) directly from the app.
+
+- Analytics & reporting: covers total cost and revenue by resource and by event, across all resource-management activity.
+
+**4.10 Guest-Facing ****Behaviour**** ****&**** Configuration Q****&****A**
+
+- **Confirmed: **a guest always books a product or package — never a resource directly, and never a specific room/vehicle/instructor by itself — across all sales channels. The product's configuration determines which resources are associated and get booked behind the scenes.
+
+- Dynamic pricing example: a bookable resource such as a meeting room can be priced per hour, with the system calculating total price from the booked duration and blocking that room for the booked window so it cannot be double-booked by another guest.
+
+- **Raised (Aishwarya): **whether merchandise/retail purchases should complete entirely within the TICVAI platform, citing an example from another marketplace app that required downloading a separate app to complete a purchase.
+
+- **Decision: **food & beverage and retail/merchandise online sale remain optional, back-office-enabled modules, but where enabled, the entire purchase flow (browse, cart, checkout, and choice of pickup-at-venue or ship-to-guest) must complete within the TICVAI platform — guests should not be redirected to download a separate app to complete a purchase.
+
+- **Raised (Qossai): **whether a guest can choose a specific instructor when booking a private lesson (e.g., for Ski Dubai), versus one being auto-assigned.
+
+- **Decision: **instructor/resource selection will be a configurable, per-ticket-type setting — private-session ticket types can optionally allow the guest to choose a specific instructor, while group-session ticket types auto-assign an instructor without exposing the choice to the guest. Private and group sessions are modelled as two separate products with separate pricing, not variants of the same product.
+
+- Chinmay raised the related configuration question of how a customer-initiated request for a private session against a resource that normally serves shared/group sessions (e.g., requesting a private lesson with an instructor who usually runs group lessons) should be handled; resolved (Qossai/Allam) as: this is modelled as a distinct, separately configured and separately priced product, rather than an ad hoc request raised against the shared/group product.
+
+- **Question (Chitrangi): **can a guest rent a resource directly from the guest/mobile app? Allam confirmed: no — a guest books a product (e.g., a meeting room product, or an experience package), and the product's configuration determines which resources are associated and get booked; guests do not book raw resources directly.
+
+- Allam shared a reference website (a Sharjah library's meeting-room/“pod” booking flow and tiered membership plans) as an example of a simple duration-based booking flow without fixed performances/time slots, for the team to review as UX inspiration.
+
+**5. Key Decisions ****&**** Agreements**
+
+- Wallet module walkthrough deferred to the next session (tomorrow, same time).
+
+- Resource assignment will support two models — pre-assigned (mapped ahead of time) and dynamic (assigned at time of sale based on real-time availability) — both required in the system.
+
+- Guests always book a product/package; resources are never booked directly by a guest, across all sales channels.
+
+- Merchandise/F&B/retail online sale, where enabled, must complete entirely within the TICVAI platform without redirecting guests to a separate app download.
+
+- Instructor/resource selection will be a per-ticket-type configuration — enabled for private-session products, disabled (auto-assign) for group-session products — with private and group sessions modelled as two distinct, separately priced products.
+
+- Skill-based resource matching will use straightforward attribute/keyword matching (skill level, language) rather than a full AI-matching system.
+
+- Resource allocation should rotate across available resources rather than repeatedly reusing the same one, to avoid overburdening any single resource.
+
+- Rental/equipment items will be tracked with simplified state attributes (available, rented, faulty, out-of-maintenance) rather than granular custom attributes.
+
+**6. Open Items / Questions for Follow-Up**
+
+- Detailed resource-management reference document covering each configuration area discussed today — pending from Allam.
+
+- Existing hardware/ticketing-system documentation (shared earlier by Qossai), which also covers resource planning/templates but excludes staffing/check-in-out functionality — to be reviewed by the Softlabs team.
+
+- Any additional follow-up questions on the resource management module — to be compiled by Chinmay and routed to Qossai.
+
+- House of Wisdom (Sharjah) meeting-room/POD booking and membership-tier flow — to be reviewed as a UX reference.
+
+**7. Action Items**
+
+| **Action Item** | **Owner** | **Due** | **Status** |
+| --- | --- | --- | --- |
+| Share a detailed reference document covering each resource-management configuration area discussed today (types, categories, dependency rules, scheduling, staffing, rentals, AI optimization) | Allam | After this session | Open |
+| Review the existing hardware/ticketing-system documentation (shared earlier by Qossai) for its resource-planning and resource-template sections | Chinmay Parab / Softlabs Team | Before next session | Open |
+| Compile any follow-up questions on the resource management module and route them to Qossai | Chinmay Parab | This week | Open |
+| Review the House of Wisdom (Sharjah) website flow for meeting-room/POD booking and membership tiers as a UX reference | Chinmay Parab / Aishwarya More | Before next session | Open |
+| Continue wireframe work on the 4-step guest ticket-booking platform, incorporating today's resource-assignment and product/resource-separation clarifications | Aishwarya More | Ongoing | In Progress |
+| Set up and prepare for the wallet module walkthrough | Chinmay Parab / Allam | Tomorrow, same time | Open |
+
+**8. Next Steps**
+
+- Next session scheduled for tomorrow, same time, covering the wallet module.
+
+- Softlabs team to review the detailed resource-management reference document and the existing hardware/ticketing documentation ahead of the next session.
+
+- Follow-up questions on resource management to be compiled and routed to Qossai.
+
+*--- End of Minutes ---*
+
+Page 1 of 2

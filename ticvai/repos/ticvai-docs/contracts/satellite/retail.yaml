@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Retail
   version: 0.1.0
-  x-ticvai-screen-count: 18
+  x-ticvai-screen-count: 21
   x-ticvai-tier: satellite
   x-ticvai-module: "6 — Retail POS"
   x-ticvai-requirements: 78
@@ -32,7 +32,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -111,6 +111,8 @@ paths:
         schema: { type: string, format: uuid }
     post:
       operationId: transferWalletBalance
+      x-ticvai-consumed-by:
+        - "P02 GST-071 Payment Methods"
       summary: Send balance to another guest
       description: >
         BL-121. **Peer-to-peer transfer was declared on the wallet and unreachable** — a field with
@@ -435,6 +437,7 @@ paths:
       operationId: listMerchandise
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-023 Sell — Merchandise"
@@ -452,7 +455,12 @@ paths:
       tags: [merchandise]
       x-ticvai-permission: PRODUCT_VIEW
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: **servable from a local cache.** The device holds enough to answer without the 
+        network and the answer may be stale — which is correct for a catalogue and wrong for conte
+        nded state. `getSeatAvailability`, `getSeatHold` and `getPromotionUsage` are deliberately 
+        excluded - **a stale seat is a seat sold twice.**
       x-ticvai-conflict-policy: serverWins
       parameters:
         - name: outletId
@@ -566,8 +574,10 @@ paths:
       operationId: lookupMerchandise
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-023 Sell — Merchandise"
+        - "P05 KSK-017 Shop"
         - "P06 EMP-069 Barcode, RFID, Serialized Stock & Traceability"
         - "P08 BO-048 Retail Products"
         - "P08 BO-114 Variants, Attributes, Barcode & RFID Management"
@@ -1339,6 +1349,7 @@ paths:
     get:
       operationId: lookupShopAndDrop
       x-ticvai-consumed-by:
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P02 GST-062 Shop & Drop Collection"
         - "P05 KSK-011 Collect a booking"
       x-ticvai-audience: [staff, guest]
@@ -1434,6 +1445,7 @@ paths:
       operationId: reserveMerchandise
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
+        - "P01 WEB-042 Retail & Shop and Drop"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-017 Shop"
         - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"
@@ -1483,8 +1495,105 @@ paths:
             application/problem+json:
               schema: { $ref: '#/components/schemas/StockConflictProblem' }
 
+  /store-rules:
+    get:
+      operationId: listStoreRules
+      x-ticvai-consumed-by:
+        - "P08 BO-142 Store Rules, Controls & Permissions"
+      x-ticvai-audience:
+      - staff
+      summary: Rules and controls in force in the store
+      description: '**Drafted 4 September as a stub.** BO-142 *Store Rules, Controls & Permissions* had nothing of its own, so wiring `listRoles` onto BO-106 on 4 September made the two screens identical. **The collision was a symptom** - BO-142 needs store rules and there were none to give it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - retail
+      x-ticvai-permission: PRODUCT_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+      - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+      - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      responses:
+        '200':
+          description: Rules and controls in force in the store
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StoreRule'
+    put:
+      operationId: setStoreRules
+      x-ticvai-consumed-by:
+        - "P08 BO-142 Store Rules, Controls & Permissions"
+      x-ticvai-audience:
+      - staff
+      summary: Change a store rule
+      description: '**Drafted 4 September as a stub.** **A control that stops a discount is also a control that stops a sale**, so the write is separately permissioned from the read. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - retail
+      x-ticvai-permission: PRODUCT_CONFIGURE
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StoreRule'
+      responses:
+        '200':
+          description: Change a store rule
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StoreRule'
 components:
   schemas:
+    StoreRule:
+      type: object
+      x-ticvai-persistence: retail.store_rule
+      description: '**Drafted 4 September.** One rule or control in force in a store - a discount
+        limit, a refund threshold, an age check, a manager override. **A row rather than a config
+        value** because somebody has to be able to say who changed a limit and when.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        venueId:
+          type: string
+          format: uuid
+        outletId:
+          type: string
+          format: uuid
+        kind:
+          type: string
+          enum:
+          - discountLimit
+          - refundThreshold
+          - ageCheck
+          - managerOverride
+          - priceOverride
+        thresholdMinor:
+          type: integer
+        requiresPermission:
+          type: string
+          description: The permission a person needs to act past this rule.
+        enabled:
+          type: boolean
+        updatedAt:
+          type: string
+          format: date-time
     MerchandiseItem:
       x-ticvai-persistence: "retail.merchandise"
       type: object

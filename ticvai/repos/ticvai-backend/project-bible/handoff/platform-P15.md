@@ -9,12 +9,12 @@
 | Contracts | 3 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 29 |
+| Operations with no screen | 31 |
 | Waves | wave2 10 |
 
 ## Gaps
 
-### 29 operations with no screen here
+### 31 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -22,11 +22,14 @@
 |---|---|---|---|
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `clearTable` | fnb | POST | Mark a table cleared and free |
+| `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
+| `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
 | `getTableVisit` | fnb | GET | Read a visit with all its orders |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
+| `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
@@ -35,7 +38,6 @@
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
 | `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
 | `updateTable` | fnb | PUT | Change what a table is |
-| `updateTableReservation` | fnb | PATCH | Change or cancel a booking |
 | `cancelReportExecution` | reporting | DELETE | Cancel a running execution |
 | `deleteReportSchedule` | reporting | DELETE | Delete a schedule |
 | `exportReportResult` | reporting | POST | Export a completed result |

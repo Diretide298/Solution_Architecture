@@ -32,7 +32,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -74,7 +74,7 @@ info:
     Three positions shape this contract:
 
     - A cell serves exactly one tenant in one REGION (ADR-0014). Every path here operates
-      within the current cell; there is no cross-cell read. Jurisdiction is a placement
+      within the current cell; there is no cross-region read. Jurisdiction is a placement
       constraint on regions, not the split rule.
     - Region owns currency, decimal scale, time zone, date format and fiscal year.
       These inherit to every venue beneath and are not overridable at venue level.
@@ -103,9 +103,9 @@ tags:
   - name: workstation
 
 paths:
-  /scope-nodes:
+  /org-units:
     get:
-      operationId: listScopeNodes
+      operationId: listOrgUnits
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
@@ -142,12 +142,12 @@ paths:
                     properties:
                       items:
                         type: array
-                        items: { $ref: '#/components/schemas/ScopeNode' }
+                        items: { $ref: '#/components/schemas/OrgUnit' }
         '401': { $ref: '../shared/common.yaml#/components/responses/Unauthorized' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
 
     post:
-      operationId: createScopeNode
+      operationId: createOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
         - "P09 ADM-006 Tenant Hierarchy Explorer"
@@ -170,7 +170,7 @@ paths:
           description: Created
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScopeNode' }
+              schema: { $ref: '#/components/schemas/OrgUnit' }
           headers:
             X-Consistency-Token:
               schema: { type: string }
@@ -212,7 +212,7 @@ paths:
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - name: scopeNodeId
+        - name: orgUnitId
           in: query
           schema: { type: string, format: uuid }
         - name: principalId
@@ -447,6 +447,7 @@ paths:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-130 Offline Policy & Rules Configuration"
+        - "P08 BO-206 Offline Validation Policy Builder"
       summary: What a workstation may do with no network, and for how long
       description: >
         Board 5 of the client's POS set, and **one of only two things in 36 board screens the package
@@ -558,6 +559,7 @@ paths:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
         - "P04 POS-019 Shift Templates & Policies"
+        - "P08 BO-065 Venue Configuration"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-136 F&B Global Settings & Controls"
         - "P08 BO-143 Retail Global Settings & Controls"
@@ -590,14 +592,14 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/VenueSettings' }
 
-  /scope-nodes/{scopeNodeId}:
+  /org-units/{orgUnitId}:
     parameters:
-      - name: scopeNodeId
+      - name: orgUnitId
         in: path
         required: true
         schema: { type: string, format: uuid }
     get:
-      operationId: getScopeNode
+      operationId: getOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
       x-ticvai-audience: [staff]
@@ -613,11 +615,11 @@ paths:
           description: Found
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScopeNode' }
+              schema: { $ref: '#/components/schemas/OrgUnit' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
     patch:
-      operationId: updateScopeNode
+      operationId: updateOrgUnit
       x-ticvai-consumed-by:
         - "P08 BO-064 Zones & Areas"
       x-ticvai-audience: [staff]
@@ -647,7 +649,7 @@ paths:
           description: Updated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ScopeNode' }
+              schema: { $ref: '#/components/schemas/OrgUnit' }
         '403': { $ref: '../shared/common.yaml#/components/responses/Forbidden' }
         '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
 
@@ -1481,8 +1483,8 @@ components:
         its path and resolves from venue exactly as before.
       enum: [tenant, brand, region, venue, department, subDepartment, workstation, outlet]
 
-    ScopeNode:
-      x-ticvai-persistence: "platform.scope_node"
+    OrgUnit:
+      x-ticvai-persistence: "platform.org_unit"
       type: object
       required: [id, level, path, code, name, isActive]
       properties:
@@ -1578,7 +1580,7 @@ components:
 
             **A Ladies Night ticket is already gendered at the point of sale**, so the gate checks
             the entitlement the platform issued rather than the face in front of it — deterministic,
-            auditable, and already contracted through `admissionProfile`.
+            auditable, and already contracted through `admissionRules`.
 
             **And these events are staffed.** A steward at the entrance is making the judgment
             anyway, and a classifier that overrules a person who can see more than it can is a

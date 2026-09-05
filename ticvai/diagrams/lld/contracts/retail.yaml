@@ -1,5 +1,5 @@
 id: LLD-retail
-title: retail — 35 operations
+title: retail — 37 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -295,6 +295,17 @@ operations:
   reads:
   - retail.sale
   writes: []
+- operation: listStoreRules
+  verb: GET
+  path: /store-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.store_rule
+  writes: []
 - operation: listWalletTransactions
   verb: GET
   path: /wallets/{subjectId}/transactions
@@ -415,6 +426,18 @@ operations:
   - cache:idempotency
   - cache:resolution
   - retail.return_policy
+- operation: setStoreRules
+  verb: PUT
+  path: /store-rules
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.store_rule
+  writes:
+  - retail.store_rule
 - operation: suspendWallet
   verb: POST
   path: /wallets/{walletId}/suspend

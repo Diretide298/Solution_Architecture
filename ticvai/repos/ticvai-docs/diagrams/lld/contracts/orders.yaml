@@ -1,5 +1,5 @@
 id: LLD-orders
-title: orders — 78 operations
+title: orders — 167 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -10,30 +10,33 @@ operations:
   path: /carts/{cartId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
   - orders.cart
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
 - operation: addCartLine
   verb: POST
   path: /carts/{cartId}/lines
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
+  - partner
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - catalogue.performance
   - catalogue.variant
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
   - orders.cart_line
 - operation: addTip
@@ -41,7 +44,9 @@ operations:
   path: /payments/{paymentId}/tip
   scope: workstation
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -54,7 +59,8 @@ operations:
   path: /media/{mediaCode}/entitlements
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - access.entitlement
@@ -73,7 +79,9 @@ operations:
   path: /orders/{orderId}/discounts
   scope: workstation
   permission: ORDER_DISCOUNT
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -85,12 +93,43 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+- operation: approveExceptionServiceRecovery
+  verb: PUT
+  path: /exception-service-recovery
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveGroupDiscountException
+  verb: PUT
+  path: /group-discount-exception
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveListingModeration
+  verb: PUT
+  path: /listing-moderation
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: approveRefund
   verb: POST
   path: /refunds/{refundId}/approve
   scope: venue
   permission: ORDER_REFUND_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -105,7 +144,6 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
-  - guest
   - device
   offline: false
   reads:
@@ -120,7 +158,9 @@ operations:
   path: /reservations/{reservationId}
   scope: venue
   permission: ORDER_CANCEL
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -133,7 +173,9 @@ operations:
   path: /payments/{paymentId}/capture
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -142,6 +184,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.payment
+  - platform.outbox
 - operation: captureStoredValue
   verb: POST
   path: /stored-value/authorisations/{authorisationId}/capture
@@ -162,11 +205,13 @@ operations:
   path: /carts/{cartId}/checkout
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
+  - partner
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
   - orders.cart_line
   writes:
@@ -179,7 +224,8 @@ operations:
   path: /carts/{cartId}/claim
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -194,7 +240,8 @@ operations:
   path: /ticket-transfers/{transferId}/claim
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - access.entitlement
@@ -209,7 +256,8 @@ operations:
   path: /reservations/{reservationId}/convert
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -228,7 +276,6 @@ operations:
   permission: ORDER_MODIFY
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -242,7 +289,8 @@ operations:
   path: /refunds/bulk
   scope: venue
   permission: ORDER_REFUND_BULK
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -255,21 +303,35 @@ operations:
   path: /carts
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
   - pii.subject
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - orders.cart
+- operation: createListingSeller
+  verb: POST
+  path: /listing-seller
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createOrder
   verb: POST
   path: /orders
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -281,12 +343,25 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+- operation: createOrderSourceChannel
+  verb: POST
+  path: /order-source-channel
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createPayment
   verb: POST
   path: /payments
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -295,9 +370,10 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - ledger.entry
   - ledger.journal_entry
+  - ledger.posting
   - orders.payment
+  - platform.outbox
 - operation: createPaymentLink
   verb: POST
   path: /payment-links
@@ -319,7 +395,9 @@ operations:
   path: /orders/{orderId}/refunds
   scope: venue
   permission: ORDER_REFUND
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -328,15 +406,17 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - ledger.entry
   - ledger.journal_entry
+  - ledger.posting
   - orders.refund
+  - platform.outbox
 - operation: createRefundRequest
   verb: POST
   path: /refund-requests
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -367,7 +447,8 @@ operations:
   path: /reservations
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -375,12 +456,24 @@ operations:
   writes:
   - cache:idempotency
   - orders.reservation
+- operation: createUpgradeCredentialRegeneration
+  verb: POST
+  path: /upgrade-credential-regeneration
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: exchangeOrderLines
   verb: POST
   path: /orders/{orderId}/exchanges
   scope: venue
   permission: ORDER_EXCHANGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -393,22 +486,24 @@ operations:
   path: /carts/{cartId}/extend
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart
 - operation: extendReservation
   verb: POST
   path: /reservations/{reservationId}/extend
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -421,7 +516,9 @@ operations:
   path: /b2b-accounts/{accountId}/credit
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - orders.b2b_credit
@@ -431,11 +528,13 @@ operations:
   path: /carts/{cartId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
+  - partner
   offline: false
   reads:
-  - catalogue.envelope
-  - catalogue.inventory_lease
+  - catalogue.channel_capacity
+  - catalogue.inventory_hold
   - orders.cart
   - orders.cart_line
   - promotions.promotion
@@ -459,8 +558,9 @@ operations:
   path: /media/{mediaCode}/entitlements
   scope: venue
   permission: ORDER_VIEW
-  audience: null
-  offline: false
+  audience:
+  - staff
+  offline: true
   reads:
   - access.entitlement
   - access.scan_event
@@ -473,7 +573,10 @@ operations:
   path: /orders/{orderId}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: true
   reads:
   - orders.order_line
@@ -485,10 +588,12 @@ operations:
   path: /orders/{orderId}/statement
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
-  - ledger.entry
+  - ledger.posting
   - orders.payment
   - orders.refund
   - orders.sales_order
@@ -507,14 +612,15 @@ operations:
   - orders.payment_link
   - orders.reservation
   - orders.sales_order
-  - platform.scope_node
+  - platform.org_unit
   writes: []
 - operation: getRefundPolicy
   verb: GET
   path: /venues/{venueId}/refund-policy
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:resolution
@@ -526,7 +632,9 @@ operations:
   path: /reservations/{reservationId}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - orders.reservation
@@ -536,7 +644,9 @@ operations:
   path: /orders/{orderId}/hold
   scope: workstation
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -553,7 +663,10 @@ operations:
   path: /payments/{paymentId}/inquiry
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -561,6 +674,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.payment
+  - platform.outbox
 - operation: issueInvitation
   verb: POST
   path: /invitations
@@ -600,12 +714,83 @@ operations:
   path: /carts/abandoned
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - orders.cart
   - orders.cart_line
   - pii.subject_contact
+  writes: []
+- operation: listAmendmentAfterSale
+  verb: GET
+  path: /amendment-after-sale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAmendmentAfterSale2
+  verb: GET
+  path: /amendment-after-sale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBulkGroupAssisted
+  verb: GET
+  path: /bulk-group-assisted
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBuyerCheckoutInventory
+  verb: GET
+  path: /buyer-checkout-inventory
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBuyerPurchaseResale
+  verb: GET
+  path: /buyer-purchase-resale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCapacityInventoryReconciliation
+  verb: GET
+  path: /capacity-inventory-reconciliation
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCapacityReservationInventory
+  verb: GET
+  path: /capacity-reservation-inventory
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listChargebacks
   verb: GET
@@ -619,6 +804,66 @@ operations:
   - orders.chargeback
   - orders.payment
   writes: []
+- operation: listCreateListingResale
+  verb: GET
+  path: /create-listing-resale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialRevocationRegeneration
+  verb: GET
+  path: /credential-revocation-regeneration
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDepositPartialPayment
+  verb: GET
+  path: /deposit-partial-payment
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listExternalPaymentPartner
+  verb: GET
+  path: /external-payment-partner
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFeeSellerProceed
+  verb: GET
+  path: /fee-seller-proceed
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFinancialTraceability
+  verb: GET
+  path: /financial-traceability
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listFraudRules
   verb: GET
   path: /fraud-rules
@@ -629,6 +874,126 @@ operations:
   offline: false
   reads:
   - orders.fraud_rule
+  writes: []
+- operation: listGroupAmendmentCancellation
+  verb: GET
+  path: /group-amendment-cancellation
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupArrivalCheck
+  verb: GET
+  path: /group-arrival-check
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupBooking
+  verb: GET
+  path: /group-booking
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupBookingReconciliation
+  verb: GET
+  path: /group-booking-reconciliation
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupCustomerOrganization
+  verb: GET
+  path: /group-customer-organization
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupEnquiryOpportunity
+  verb: GET
+  path: /group-enquiry-opportunity
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupPaymentDeposit
+  verb: GET
+  path: /group-payment-deposit
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupRequirementAvailability
+  verb: GET
+  path: /group-requirement-availability
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupSale
+  verb: GET
+  path: /group-sale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupSale2
+  verb: GET
+  path: /group-sale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupTicketFulfillment
+  verb: GET
+  path: /group-ticket-fulfillment
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupTicketSeat
+  verb: GET
+  path: /group-ticket-seat
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listInvitationAllowances
   verb: GET
@@ -641,6 +1006,16 @@ operations:
   reads:
   - identity.principal
   - orders.invitation_allowance
+  writes: []
+- operation: listListingLifecycleExpiry
+  verb: GET
+  path: /listing-lifecycle-expiry
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listMyOrders
   verb: GET
@@ -655,26 +1030,121 @@ operations:
   - orders.sales_order
   - pii.subject
   writes: []
+- operation: listOfficialResaleMarketplace
+  verb: GET
+  path: /official-resale-marketplace
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOrderFinancialReconciliation
+  verb: GET
+  path: /order-financial-reconciliation
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOrderLifecycleTimeline
+  verb: GET
+  path: /order-lifecycle-timeline
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOrderLineProduct
+  verb: GET
+  path: /order-line-product
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOrderPaymentDetail
+  verb: GET
+  path: /order-payment-detail
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listOrderRefunds
   verb: GET
   path: /orders/{orderId}/refunds
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: true
   reads:
   - orders.refund
+  writes: []
+- operation: listOrderReservation
+  verb: GET
+  path: /order-reservation
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOrderSplitMerge
+  verb: GET
+  path: /order-split-merge
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listOrders
   verb: GET
   path: /orders
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: true
   reads:
   - orders.order_line
   - orders.sales_order
+  writes: []
+- operation: listParticipantGuestList
+  verb: GET
+  path: /participant-guest-list
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPaymentOrderFinancial
+  verb: GET
+  path: /payment-order-financial
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listPaymentProviders
   verb: GET
@@ -688,6 +1158,16 @@ operations:
   - orders.payment_provider
   - orders.payment_routing
   writes: []
+- operation: listPaymentReconciliationException
+  verb: GET
+  path: /payment-reconciliation-exception
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listPaymentTokens
   verb: GET
   path: /payment-tokens
@@ -700,32 +1180,337 @@ operations:
   reads:
   - orders.payment_token
   writes: []
+- operation: listPersonTypeProduct
+  verb: GET
+  path: /person-type-product
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listQuoteBookingConversion
+  verb: GET
+  path: /quote-booking-conversion
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listQuoteRevisionNegotiation
+  verb: GET
+  path: /quote-revision-negotiation
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRefundDisputeResale
+  verb: GET
+  path: /refund-dispute-resale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRelatedOrderTransaction
+  verb: GET
+  path: /related-order-transaction
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResale
+  verb: GET
+  path: /resale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResale2
+  verb: GET
+  path: /resale
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleConfirmationOwnership
+  verb: GET
+  path: /resale-confirmation-ownership
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleEligibilityTicket
+  verb: GET
+  path: /resale-eligibility-ticket
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleFeeCommission
+  verb: GET
+  path: /resale-fee-commission
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleFraudDuplicate
+  verb: GET
+  path: /resale-fraud-duplicate
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleInventoryAvailability
+  verb: GET
+  path: /resale-inventory-availability
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleListingSeller
+  verb: GET
+  path: /resale-listing-seller
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleMarketplace
+  verb: GET
+  path: /resale-marketplace
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleOwnership
+  verb: GET
+  path: /resale-ownership
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResalePolicyMarketplace
+  verb: GET
+  path: /resale-policy-marketplace
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResalePricingPrice
+  verb: GET
+  path: /resale-pricing-price
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResaleTicketDetail
+  verb: GET
+  path: /resale-ticket-detail
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listReservationConfirmationExpiry
+  verb: GET
+  path: /reservation-confirmation-expiry
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listReservations
   verb: GET
   path: /reservations
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - orders.reservation
+  writes: []
+- operation: listSellerSettlementPayout
+  verb: GET
+  path: /seller-settlement-payout
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listSyncRejections
   verb: GET
   path: /sync/rejections
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - sync.rejection
+  writes: []
+- operation: listTicketOwnershipTransfer
+  verb: GET
+  path: /ticket-ownership-transfer
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTicketReissueFulfillment
+  verb: GET
+  path: /ticket-reissue-fulfillment
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTicketResaleMarketplace
+  verb: GET
+  path: /ticket-resale-marketplace
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUpgradeConversion
+  verb: GET
+  path: /upgrade-conversion
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUpgradeEligibilityQualification
+  verb: GET
+  path: /upgrade-eligibility-qualification
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUpgradeException
+  verb: GET
+  path: /upgrade-exception
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUpgradeFinancialTreatment
+  verb: GET
+  path: /upgrade-financial-treatment
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUpgradeTimingUsage
+  verb: GET
+  path: /upgrade-timing-usage
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVoidReversalSame
+  verb: GET
+  path: /void-reversal-same
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWhiteLabelMarketplace
+  verb: GET
+  path: /white-label-marketplace
+  scope: venue
+  permission: ORDER_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: modifyOrder
   verb: POST
   path: /orders/{orderId}/modify
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -755,7 +1540,9 @@ operations:
   path: /b2b-accounts/{accountId}/credit/override
   scope: venue
   permission: CREDIT_OVERRIDE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -824,7 +1611,6 @@ operations:
   permission: ORDER_MODIFY
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - access.entitlement
@@ -866,21 +1652,26 @@ operations:
   path: /carts/{cartId}/lines/{lineId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
+  - partner
   offline: false
   reads:
   - cache:idempotency
   - orders.cart_line
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart_line
 - operation: reprintOrder
   verb: POST
   path: /orders/{orderId}/reprints
   scope: venue
   permission: ORDER_REPRINT
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -893,7 +1684,9 @@ operations:
   path: /orders/{orderId}/reschedule
   scope: venue
   permission: ORDER_RESCHEDULE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -933,14 +1726,16 @@ operations:
   - orders.sales_order
   writes:
   - cache:idempotency
-  - ledger.entry
+  - ledger.posting
   - orders.chargeback
 - operation: resumeOrder
   verb: POST
   path: /orders/{orderId}/resume
   scope: workstation
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -952,12 +1747,34 @@ operations:
   - orders.order_line
   - orders.payment
   - orders.sales_order
+- operation: setAfterSaleFinancial
+  verb: PUT
+  path: /after-sale-financial
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setAmendmentEligibilityPolicy
+  verb: PUT
+  path: /amendment-eligibility-policy
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setB2bCreditLimit
   verb: PUT
   path: /b2b-accounts/{accountId}/credit
   scope: venue
   permission: CREDIT_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -965,6 +1782,26 @@ operations:
   writes:
   - cache:idempotency
   - orders.b2b_credit
+- operation: setCancellationPartialPolicy
+  verb: PUT
+  path: /cancellation-partial-policy
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCustomerGuestAccount
+  verb: PUT
+  path: /customer-guest-account
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setFraudRules
   verb: PUT
   path: /fraud-rules
@@ -980,6 +1817,86 @@ operations:
   - cache:idempotency
   - cache:resolution
   - orders.fraud_rule
+- operation: setGroupBookingHandover
+  verb: PUT
+  path: /group-booking-handover
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGroupOperationalPlanning
+  verb: PUT
+  path: /group-operational-planning
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGroupPackageExperience
+  verb: PUT
+  path: /group-package-experience
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGroupQuotationProposal
+  verb: PUT
+  path: /group-quotation-proposal
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMultiPaymentSplit
+  verb: PUT
+  path: /multi-payment-split
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setOrderAmendment
+  verb: PUT
+  path: /order-amendment
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setOrderDetailTransaction
+  verb: PUT
+  path: /order-detail-transaction
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setOrderReservationStatus
+  verb: PUT
+  path: /order-reservation-statu
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setPaymentProvider
   verb: PUT
   path: /payment-providers
@@ -995,12 +1912,23 @@ operations:
   - cache:idempotency
   - orders.payment_provider
   - orders.payment_routing
+- operation: setProRataResidual
+  verb: PUT
+  path: /pro-rata-residual
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setRefundPolicy
   verb: PUT
   path: /venues/{venueId}/refund-policy
   scope: venue
   permission: REGION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1009,6 +1937,46 @@ operations:
   - cache:idempotency
   - cache:resolution
   - orders.refund_policy
+- operation: setResaleEligibilityRule
+  verb: PUT
+  path: /resale-eligibility-rule
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setResaleMarketplaceRecommendation
+  verb: PUT
+  path: /resale-marketplace-recommendation
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setReservationHoldPolicy
+  verb: PUT
+  path: /reservation-hold-policy
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setUpgradeConversionPath
+  verb: PUT
+  path: /upgrade-conversion-path
+  scope: venue
+  permission: ORDER_CREATE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: shareEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/share
@@ -1022,11 +1990,11 @@ operations:
   - access.entitlement
   - cache:idempotency
   - catalogue.entitlement_template
-  - identity.grant
+  - identity.delegated_access
   writes:
   - access.entitlement
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
 - operation: splitOrder
   verb: POST
   path: /orders/{orderId}/split
@@ -1066,7 +2034,8 @@ operations:
   path: /sync/orders
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - orders.sales_order
@@ -1077,7 +2046,8 @@ operations:
   path: /orders/{orderId}/transfer
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - access.entitlement
@@ -1092,22 +2062,26 @@ operations:
   path: /carts/{cartId}/lines/{lineId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
+  - partner
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - orders.cart_line
   writes:
   - cache:idempotency
-  - catalogue.inventory_lease
+  - catalogue.inventory_hold
   - orders.cart_line
 - operation: voidOrder
   verb: POST
   path: /orders/{orderId}/voids
   scope: venue
   permission: ORDER_VOID
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -1124,7 +2098,8 @@ operations:
   path: /payments/{paymentId}/void
   scope: venue
   permission: PAYMENT_VOID
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

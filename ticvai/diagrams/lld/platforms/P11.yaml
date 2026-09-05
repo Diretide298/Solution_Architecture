@@ -23,7 +23,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: TenancyService
-  operationCalls: 4
+  operationCalls: 5
 - service: VenueOpsService
   operationCalls: 1
 coverage:
@@ -125,6 +125,7 @@ screens:
   wave: 3
   density: compact
   operations:
+  - listAccreditationBadges
   - listApprovalRequests
   states:
   - emptyFirstRun

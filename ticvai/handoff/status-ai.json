@@ -38,7 +38,7 @@
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-01",
+ "generated": "2026-09-03",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
   "operations": 32,
@@ -46,9 +46,9 @@
   "states": 11,
   "events": 11,
   "tables": 50,
-  "screens": 32,
+  "screens": 33,
   "flows": 11,
-  "documents": 14,
+  "documents": 17,
   "openConflicts": 1
  },
  "metrics": {
@@ -97,7 +97,7 @@
   "build": 0
  },
  "waves": {
-  "wave2": 14,
+  "wave2": 15,
   "wave3": 12,
   "wave1": 6
  },
@@ -187,6 +187,11 @@
    "status": ""
   },
   {
+   "file": "docs/active/deployment-configs-costed.md",
+   "title": "Deployment architecture \u2014 four configurations, costed on AWS and GCP",
+   "status": ""
+  },
+  {
    "file": "docs/active/full-layer-audit-20aug.md",
    "title": "Full-layer audit \u2014 20 August",
    "status": ""
@@ -235,6 +240,16 @@
    "file": "docs/adr/0028-service-decomposition.md",
    "title": "ADR-0028: Sixteen services, and the data boundary decides where they split",
    "status": "Accepted \u2014 the data topology is reopened (CF-161, 24 August)"
+  },
+  {
+   "file": "docs/adr/0033-outbox-and-dead-letters.md",
+   "title": "ADR-0033: Every asynchronous handoff has an outbox and a place to fail",
+   "status": "Accepted"
+  },
+  {
+   "file": "docs/adr/0034-ai-retrieval-and-cost.md",
+   "title": "ADR-0034: The cheapest AI call is the one that never reaches a provider",
+   "status": "Accepted"
   },
   {
    "file": "docs/architecture/README.md",

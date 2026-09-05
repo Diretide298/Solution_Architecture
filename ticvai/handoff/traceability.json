@@ -9823,7 +9823,7 @@
    "verdict": "CONTRACTED",
    "contract": "access",
    "evidence": "listAdmissionRules",
-   "note": "allowedAccessPointIds and scopePath support multi-park access on one entitlement; cross-cell rights propagate under ADR-0010."
+   "note": "allowedAccessPointIds and scopePath support multi-park access on one entitlement; cross-region rights propagate under ADR-0010."
   },
   {
    "packageRef": "3.2.71",
@@ -14373,7 +14373,7 @@
    "section": "5.3",
    "domain": "F&B & Guest Management",
    "verdict": "CONTRACTED",
-   "contract": "cross-cell",
+   "contract": "cross-region",
    "evidence": "createDsarRequest",
    "note": "**DSAR with erasure \u2014 `pii.erase_subject` propagates, and `ai.removeIndexEntry` is the vector-store erasure path.** `maintenance` keeps opaque subject references so an incident record survives an erasure."
   },
@@ -35961,7 +35961,7 @@
    "section": "22.13",
    "domain": "Marketing & CRM",
    "verdict": "CONTRACTED",
-   "contract": "cross-cell",
+   "contract": "cross-region",
    "evidence": "createDsarRequest",
    "note": "**`pii.erase_subject` propagates and `ai.removeIndexEntry` is the vector-store erasure path**; `maintenance` keeps opaque subject references so an incident survives erasure."
   },
@@ -35972,7 +35972,7 @@
    "section": "22.13",
    "domain": "Marketing & CRM",
    "verdict": "CONTRACTED",
-   "contract": "cross-cell",
+   "contract": "cross-region",
    "evidence": "createDsarRequest",
    "note": "**`pii.erase_subject` propagates and `ai.removeIndexEntry` is the vector-store erasure path**; `maintenance` keeps opaque subject references so an incident survives erasure."
   },

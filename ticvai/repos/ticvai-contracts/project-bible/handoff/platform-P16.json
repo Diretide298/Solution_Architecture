@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 107
+  "operationsWithNoScreen": 87
  },
  "waves": {
   "wave3": 10
@@ -39,19 +39,19 @@
    "operations": 4
   },
   {
-   "contract": "marketing-crm",
-   "operations": 3
-  },
-  {
    "contract": "inventory",
    "operations": 3
   },
   {
-   "contract": "tenancy",
+   "contract": "marketing-crm",
+   "operations": 3
+  },
+  {
+   "contract": "identity",
    "operations": 1
   },
   {
-   "contract": "orders",
+   "contract": "tenancy",
    "operations": 1
   },
   {
@@ -59,7 +59,7 @@
    "operations": 1
   },
   {
-   "contract": "identity",
+   "contract": "orders",
    "operations": 1
   }
  ],
@@ -182,12 +182,6 @@
     "summary": "What is indexed, and how current it is"
    },
    {
-    "operation": "listKnowledgeCollections",
-    "contract": "ai",
-    "verb": "GET",
-    "summary": "Collections available to this tenant"
-   },
-   {
     "operation": "proposeTranslations",
     "contract": "ai",
     "verb": "POST",
@@ -260,34 +254,10 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
-   },
-   {
     "operation": "listDonationCampaigns",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Campaigns a guest can give to"
-   },
-   {
-    "operation": "listGuestMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listProductVersions",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "What this product used to be"
    },
    {
     "operation": "listWaitlistEntries",
@@ -324,24 +294,6 @@
     "contract": "catalogue",
     "verb": "PATCH",
     "summary": "Amend or close a campaign"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "deleteGuestAccount",
-    "contract": "identity",
-    "verb": "DELETE",
-    "summary": "Self-service account deletion"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
    },
    {
     "operation": "setPasswordPolicy",
@@ -404,12 +356,6 @@
     "summary": "Create a loyalty programme"
    },
    {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
     "operation": "createUrlRedirect",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -428,22 +374,10 @@
     "summary": "Candidate matches, scored"
    },
    {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
    },
    {
     "operation": "listMessageTriggers",
@@ -506,22 +440,10 @@
     "summary": "Why the conversation ended, and any callback"
    },
    {
-    "operation": "setConsentPurposes",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Configure consent purposes"
-   },
-   {
     "operation": "setMessageTrigger",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Fire a message from a platform event"
-   },
-   {
-    "operation": "setSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Titles, descriptions, canonicals and hreflang"
    },
    {
     "operation": "startKioskAssist",
@@ -534,18 +456,6 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "captureStoredValue",
@@ -578,12 +488,6 @@
     "summary": "Send a guest a link to pay later"
    },
    {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -594,12 +498,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "issueInvitation",
@@ -636,12 +534,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Gateways configured for this scope"
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -698,22 +590,10 @@
     "summary": "Configure a gateway and its routing"
    },
    {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
    },
    {
     "operation": "voidPayment",

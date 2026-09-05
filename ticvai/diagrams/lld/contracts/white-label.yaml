@@ -379,6 +379,7 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+  - platform.outbox
   - whitelabel.config_version
 - operation: releaseCustomDomain
   verb: DELETE

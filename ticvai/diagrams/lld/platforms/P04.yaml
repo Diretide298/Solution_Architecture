@@ -177,6 +177,7 @@ screens:
   - productId<-deepLink
   - promotionId<-deepLink
   goesTo:
+  - BO-045
   - POS-001
   - POS-003
   - POS-004
@@ -588,7 +589,8 @@ screens:
   - orderId<-deepLink
   - outletId<-deepLink
   - boxId<-session
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2c
   - Retail Board 3.dc.html#ret-3h
@@ -655,7 +657,8 @@ screens:
   - workstationId<-session
   - orderId<-deepLink
   - shiftId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-014
   inFlows: null
@@ -679,7 +682,8 @@ screens:
   entryParams:
   - workstationId<-session
   - shiftId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-015
   inFlows:
@@ -703,7 +707,8 @@ screens:
   offlineState: true
   entryParams:
   - workstationId<-session
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2b
   wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2b
@@ -728,7 +733,8 @@ screens:
   entryParams:
   - workstationId<-session
   - shiftId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2d
   wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2d
@@ -757,7 +763,8 @@ screens:
   - workstationId<-session
   - boxId<-deepLink
   - shiftId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
   - POS Board 3.dc.html#pos-3b
   wireframe: wireframes/POS Board 3.dc.html#pos-3b
@@ -784,7 +791,8 @@ screens:
   entryParams:
   - workstationId<-session
   - venueId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
   - POS Board 3.dc.html#pos-3c
   wireframe: wireframes/POS Board 3.dc.html#pos-3c

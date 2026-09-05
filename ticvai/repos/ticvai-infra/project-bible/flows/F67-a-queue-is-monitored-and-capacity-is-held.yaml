@@ -42,7 +42,7 @@ steps:
   screen: EMP-033
   action: Capacity is checked against occupancy.
   operations:
-  - listEnvelopes
+  - listChannelCapacities
   - getChannelAllocations
   - setChannelAllocations
   outcome: '**Capacity is an envelope, not a headcount.**  allocates capacity across channels — holding

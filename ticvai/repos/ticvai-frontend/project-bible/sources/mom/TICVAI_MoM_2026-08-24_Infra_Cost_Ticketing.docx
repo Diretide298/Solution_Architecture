@@ -1,0 +1,151 @@
+|  |  |
+| --- | --- |
+
+**Minutes of Meeting**
+
+*Workshop — Infrastructure Costing, Cloud Architecture **&** Database Strategy Discussion; Ticketing Configuration Walkthrough*
+
+| **Date** | 24-August-2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Technical Workshop — Infrastructure Costing, Cloud Architecture & Database Strategy; Ticketing Configuration Walkthrough | **Prepared by** | Chitrangi Mestry |
+
+**Primary Objective**
+
+To resolve the client's open questions on cloud infrastructure sizing, costing and scaling strategy, and to align on the database architecture approach (centralized vs. tenant-owned, and per-module segregation) ahead of Softlabs finalizing the platform's technical architecture; and, following that discussion, to walk the client through the proposed ticket type configuration (open-dated, group/family, membership, event, gift voucher and money card tickets) and the event/ticketing setup flow for review.
+
+**Participants**
+
+- TICVAI Team 
+
+- Softlabs Team 
+
+**Agenda**
+
+- Client Q&A on cloud infrastructure sizing, costing models and scaling strategy (AWS/Azure)
+
+- Discussion on database architecture — centralized/shared platform vs. independent tenant-owned deployments
+
+- High availability, disaster recovery and environment strategy (dev/QA/pre-prod/prod)
+
+- Security, penetration testing and multi-tenancy isolation considerations
+
+- Walkthrough of ticket type configuration (open-dated, group/family, membership, event, gift voucher, money card)
+
+- Walkthrough of event setup, seating, resource management and ticket variants
+
+- Planning for remaining workshop sessions
+
+**4. Detailed Discussion**
+
+**4.1 Infrastructure Costing ****&**** Cloud Architecture Approach**
+
+- Qossai and Allam requested clarity on infrastructure costing, since the team is finalizing decisions on architecture and components, and asked for a transparent cost model at different scale levels, covering both AWS and Azure.
+
+- Dinesh explained the architecture is being planned on a microservices basis, with each service (ticketing, order, F&B, etc.) potentially isolated at the database level, and outlined the cost/scale trade-off between a fully centralized database versus per-service databases.
+
+- **Requested: **the client asked Softlabs to document three illustrative deployment scenarios — (a) independent tenant deployment, (b) centralized/shared platform for small-to-medium tenants, and (c) dedicated infrastructure for large/mega events and flash sales — each with an architecture diagram, auto-scaling behavior and failure-handling response.
+
+**4.2 Database Architecture — Centralized vs. Tenant-Owned**
+
+- Two hosting models were distinguished: (1) a TICVAI-hosted/managed database for small-to-medium tenants and short-duration event clients, and (2) tenant/client-owned infrastructure for large enterprise clients — Qossai estimated ~90% of large clients will host their own database/infrastructure, for whom Softlabs will only need to provide minimum specification requirements.
+
+- Near-term expectation: roughly 100–200 tenants on the centralized platform, alongside independently-deployed large-tenant environments and short-duration, high-concurrency dedicated event environments (e.g., a single high-demand ticket sale reaching tens of thousands of concurrent users within a few hours).
+
+- Chinmay raised whether database segregation per microservice should be done from day one or retrofitted later.
+
+- **Decision: **Dinesh recommended segregating databases from the start, since splitting a centralized database after 2–3 years in production is significantly more difficult than starting isolated and reconciling/merging later if needed.
+
+- **Confirmed: **multiple databases can run on a single database server instance (e.g., separate DB instances within one SQL Server/Postgres/AWS RDS instance) — this does not require separate physical servers.
+
+- **Confirmed: **analytical/reporting queries will run against a separate replica database rather than the main transactional database, to avoid impacting live transaction performance.
+
+**4.3 Scaling, High Availability ****&**** Multi-Tenancy Isolation**
+
+- **Decision: **high availability does not require multi-region setup — same-region/same-zone HA is sufficient. Multi-region is reserved for disaster recovery (DR), which will be offered as an optional, client-dependent add-on rather than a default.
+
+- **Decision: **HA will be applied selectively to revenue-critical, customer-facing components (ticketing, POS, B2C front end) rather than uniformly across all modules — e.g., the finance module does not require HA.
+
+- **Key requirement (Allam): **on the centralized/shared platform, one tenant's traffic spike (e.g., an unexpected event surge) must not degrade or crash the platform for other tenants sharing the same infrastructure.
+
+- Infrastructure is expected to start minimal (sized for the first ~5 clients) and auto-scale progressively as tenant count grows — not pre-provisioned for a large future scale from day one. Continuous monitoring with scale-up triggers (e.g., around 70% utilization) was agreed as the operating approach, with a possible “reserve instance” strategy floated by Dinesh for isolating a spiking tenant temporarily.
+
+- Qossai noted that once the platform matures, the client (TICVAI) will bring on a dedicated infrastructure engineer to manage servers and scaling on an ongoing basis, working alongside Softlabs.
+
+**4.4 Security ****&**** Environment Strategy**
+
+- Standard security best practices and a web application firewall will be implemented on the infrastructure from Softlabs' side.
+
+- **Action: **a third-party security audit / penetration test covering the ticketing/client application, B2C and B2B applications, and mobile apps is required before go-live, with any identified severities to be resolved.
+
+- **Decision: **for the centralized platform, 4 environments (dev, QA, pre-prod, prod) will be maintained during the current active development phase, reducing to 3 (dev, pre-prod, prod) post-rollout; QA and dev may run as separate instances within a shared environment rather than fully separate environments. Client-owned infrastructure will continue to follow Softlabs' standard 2-environment model (pre-prod, prod).
+
+**4.5 Ticketing Configuration Walkthrough (presented by Allam)**
+
+- Walked through the end-to-end ticket configuration flow: basic information → ticket type configuration → validation → publish.
+
+- Reviewed the ticket types supported: Open-Dated ticket (no fixed visit date; used for general admission and B2B/travel-agent QR-code resale, e.g., bulk-issued tickets sold onward by travel agents), Group & Family ticket (configurable group size, with single-scan or multi-scan QR-code options), Membership/Subscription ticket (captures full guest details per member; supports renewal, upgrade and cancellation), Event ticket (requires date/time selection; supports resource management and capacity/reservation-based admission), Gift Voucher, and Money Card (e-wallet, to be discussed in a separate session).
+
+- Guest information capture (name, mobile number, nationality, visit survey, etc.) is configurable per ticket type — even an open-dated admission ticket can optionally be set up to collect this data.
+
+- Packages: multiple components (e.g., admission + F&B item + retail item, or admission + show) can be bundled with package-level pricing; a package is not required to include F&B or retail — any combination of ticket-type components can be bundled.
+
+- Reviewed event ticket setup in detail: event validity window; performances (recurring date/time slots); admission models (general admission, capacity control, reserved seating, resource control, or no admission control); seat map, section and quota-per-sales-channel configuration (shared pool or split inventory); and resource management (e.g., allocating vehicle and driver resources for an activity such as a desert safari, checked against availability before a ticket can be sold).
+
+- Reviewed supporting configuration areas: ticket variants (adult/child/senior/VIP, fully configurable), waitlist management, pre-sales/sales rules (on-sale/off-sale timing and cut-offs), entitlement and access rules (single/multi-venue, number of entries, zones, early-entry windows), fulfilment channels (email, WhatsApp, SMS), after-sales rules (upgrade, reschedule, cancellation windows), and dynamic/fixed pricing and promotions.
+
+**4.6 Workshop Planning**
+
+- Remaining product modules (continuation of ticket type/event configuration detail, resource management, wallets) will be covered in daily ~30–60 minute sessions going forward.
+
+- Qossai is finalizing the access control / facial recognition vendor selection this week, evaluating HID and Suprema (South Korea); vendor details will be shared once confirmed, expected this week or next.
+
+**5. Key Decisions ****&**** Agreements**
+
+- High availability will be applied selectively to critical, revenue-generating components (ticketing, POS, B2C); disaster recovery will be an optional, client-dependent add-on.
+
+- Database segregation per microservice/module will be implemented from the start rather than retrofitted later.
+
+- Reporting/analytics queries will run against a separate replica database, not the main transactional database.
+
+- Infrastructure will start minimal and auto-scale progressively as tenant/client count grows, based on continuous monitoring and utilization-based scale-up triggers.
+
+- 4 environments (dev, QA, pre-prod, prod) will be maintained during the current active development phase, reducing to 3 post-rollout.
+
+- A third-party security audit / penetration test (ticketing, B2C, B2B, mobile apps) is required before go-live.
+
+- Ticket configuration will support six core ticket types — Open-Dated, Group/Family, Membership/Subscription, Event, Gift Voucher, and Money Card — each with independently configurable guest-data capture.
+
+**6. Open Items / Questions for Follow-Up**
+
+- Recommended infrastructure architecture proposal (AWS and Azure component options, three deployment scenarios, auto-scaling/failure-handling diagrams, and cost model at each scale) — pending from Dinesh/Softlabs.
+
+- Pros-and-cons comparison of centralized vs. per-module database architecture — pending from Softlabs' internal session.
+
+- Rough cost-tier expectations for small/medium vs. large tenants — to be discussed once Softlabs shares its architecture/cost proposal.
+
+- Access control / facial recognition vendor selection (HID vs. Suprema) — pending from Qossai, expected this week or next.
+
+- Continuation of the ticketing configuration walkthrough (detailed event configuration session) — scheduled for the next session.
+
+**7. Action Items**
+
+| **Action Item** | **Owner** | **Due** | **Status** |
+| --- | --- | --- | --- |
+| Prepare a recommended infrastructure architecture proposal covering AWS and Azure component options, three deployment scenarios (independent/big-tenant deployment, centralized/shared platform, dedicated mega-event infrastructure), auto-scaling/failure-handling diagrams, and a transparent cost model at each scale level | Dinesh / Softlabs | Next session | Open |
+| Hold internal Softlabs session to finalize the database/hosting plan across the three deployment scenarios, including the microservice-level database segregation approach | Dinesh / Chinmay | TBC | Open |
+| Prepare a pros-and-cons comparison of centralized vs. per-module (segregated) database architecture, covering performance, reporting and offline sync | Softlabs Team | Next session | Open |
+| Share selected access control / facial recognition vendor details (HID or Suprema) once finalized | Qossai | This week / next | Open |
+| Continue the ticketing configuration walkthrough with a detailed session on event configuration | Allam | Next session (9:30) | Open |
+| Continue preparing and presenting remaining product modules (ticket types detail, resource management, wallets) in daily sessions | Allam / Qossai | Ongoing | In Progress |
+
+**8. Next Steps**
+
+- Softlabs to hold an internal session on database/hosting architecture and return with a recommended proposal and cost model.
+
+- Next workshop session scheduled for 9:30 (same time), continuing the ticketing configuration walkthrough with a detailed session on event configuration.
+
+- Daily ~30–60 minute sessions to continue covering remaining modules (ticket types detail, resource management, wallets) as quickly as possible.
+
+*--- End of Minutes ---*
+
+Page 1 of 2

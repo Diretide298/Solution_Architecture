@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 136 operations, 40 tables
+title: CatalogueService — 340 operations, 40 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 136
+  operations: 340
   inAFlow: 57
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -32,7 +32,7 @@ schemas:
   largestTable: seating.seat_hold
 operationsByContract:
 - contract: catalogue
-  count: 66
+  count: 174
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -42,6 +42,30 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 2
+  - operation: approvePricingWorkflowAuthority
+    verb: PUT
+    path: /pricing-workflow-authority
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveReviewDecision
+    verb: PUT
+    path: /review-decision
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveWorkflow
+    verb: PUT
+    path: /workflow
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: assessProductChange
     verb: POST
     path: /products/{productId}/change-impact
@@ -65,7 +89,7 @@ operationsByContract:
     permission: PERFORMANCE_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: cloneProduct
     verb: POST
     path: /products/{productId}/clone
@@ -90,6 +114,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createBulkProductCatalogue
+    verb: POST
+    path: /bulk-product-catalogue
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: createChannelCapacity
     verb: POST
     path: /channel-capacities
@@ -98,6 +130,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createChannelProfile
+    verb: POST
+    path: /channel-profile
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: createDonationCampaign
     verb: POST
     path: /donation-campaigns
@@ -122,6 +162,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createLiveDynamicPrice
+    verb: POST
+    path: /live-dynamic-price
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: createPerformances
     verb: POST
     path: /events/{eventId}/performances
@@ -258,6 +306,30 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listAutomationPolicyAutonomous
+    verb: GET
+    path: /automation-policy-autonomou
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBulkPricingUpdate
+    verb: GET
+    path: /bulk-pricing-update
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCalculationValidationReconciliation
+    verb: GET
+    path: /calculation-validation-reconciliation
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listCatalogueBundles
     verb: GET
     path: /catalogue/bundles
@@ -265,6 +337,54 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: true
     reads: 2
+    writes: 0
+  - operation: listChangeImpactAnalysis
+    verb: GET
+    path: /change-impact-analysi
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChangePropagationDependency
+    verb: GET
+    path: /change-propagation-dependency
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannel
+    verb: GET
+    path: /channel
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannel2
+    verb: GET
+    path: /channel
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelAllocationRebalancing
+    verb: GET
+    path: /channel-allocation-rebalancing
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelBasedPricing
+    verb: GET
+    path: /channel-based-pricing
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listChannelCapacities
     verb: GET
@@ -274,6 +394,126 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listChannelConnectionIntegration
+    verb: GET
+    path: /channel-connection-integration
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelCustomerSegment
+    verb: GET
+    path: /channel-customer-segment
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelExceptionIncident
+    verb: GET
+    path: /channel-exception-incident
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelGovernanceSla
+    verb: GET
+    path: /channel-governance-sla
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelLogTransaction
+    verb: GET
+    path: /channel-log-transaction
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelPerformanceCommercial
+    verb: GET
+    path: /channel-performance-commercial
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelSaleRule
+    verb: GET
+    path: /channel-sale-rule
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listChannelSaleSchedule
+    verb: GET
+    path: /channel-sale-schedule
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCommercialPricing
+    verb: GET
+    path: /commercial-pricing
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCommercialPricingStructure
+    verb: GET
+    path: /commercial-pricing-structure
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCompetitorPricingMarket
+    verb: GET
+    path: /competitor-pricing-market
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCurrencyPrecisionRounding
+    verb: GET
+    path: /currency-precision-rounding
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCustomerEligibilityRule
+    verb: GET
+    path: /customer-eligibility-rule
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCustomerSegmentProfile
+    verb: GET
+    path: /customer-segment-profile
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDemandBookingCurve
+    verb: GET
+    path: /demand-booking-curve
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listDonationCampaigns
     verb: GET
     path: /donation-campaigns
@@ -281,6 +521,54 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: true
     reads: 1
+    writes: 0
+  - operation: listDynamicPriceBand
+    verb: GET
+    path: /dynamic-price-band
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicPricingAutomation
+    verb: GET
+    path: /dynamic-pricing-automation
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicPricingGuardrail
+    verb: GET
+    path: /dynamic-pricing-guardrail
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicPricingPerformance
+    verb: GET
+    path: /dynamic-pricing-performance
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicPricingStrategy
+    verb: GET
+    path: /dynamic-pricing-strategy
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listEffectiveDateSeason
+    verb: GET
+    path: /effective-date-season
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listEntitlementTemplates
     verb: GET
@@ -298,6 +586,30 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listFeeSurcharge
+    verb: GET
+    path: /fee-surcharge
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFeeWaiverTax
+    verb: GET
+    path: /fee-waiver-tax
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGovernanceRiskMonitoring
+    verb: GET
+    path: /governance-risk-monitoring
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listGuestMemberships
     verb: GET
     path: /guest/memberships
@@ -305,6 +617,22 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 3
+    writes: 0
+  - operation: listInternalDemandBooking
+    verb: GET
+    path: /internal-demand-booking
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listInventoryCapacityChannel
+    verb: GET
+    path: /inventory-capacity-channel
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listInventoryHolds
     verb: GET
@@ -314,6 +642,62 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listLearningModelPerformance
+    verb: GET
+    path: /learning-model-performance
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listLocationVenueEvent
+    verb: GET
+    path: /location-venue-event
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMarketTourismHoliday
+    verb: GET
+    path: /market-tourism-holiday
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMarketVenueCurrency
+    verb: GET
+    path: /market-venue-currency
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMembershipLoyaltyPricing
+    verb: GET
+    path: /membership-loyalty-pricing
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listNearbyEventExhibition
+    verb: GET
+    path: /nearby-event-exhibition
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPackageBundleAdd
+    verb: GET
+    path: /package-bundle-add
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listPerformances
     verb: GET
     path: /events/{eventId}/performances
@@ -321,6 +705,38 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: true
     reads: 1
+    writes: 0
+  - operation: listPriceCalculationSequence
+    verb: GET
+    path: /price-calculation-sequence
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPriceCategoryRate
+    verb: GET
+    path: /price-category-rate
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPriceElasticityRevenue
+    verb: GET
+    path: /price-elasticity-revenue
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPriceListTemplate
+    verb: GET
+    path: /price-list-template
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listPriceLists
     verb: GET
@@ -338,6 +754,86 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 1
+  - operation: listPricing
+    verb: GET
+    path: /pricing
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingChangeImpact
+    verb: GET
+    path: /pricing-change-impact
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingCompliance
+    verb: GET
+    path: /pricing-compliance
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingDistributionSynchronization
+    verb: GET
+    path: /pricing-distribution-synchronization
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingGovernance
+    verb: GET
+    path: /pricing-governance
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingRecommendationExplainability
+    verb: GET
+    path: /pricing-recommendation-explainability
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingRollbackEmergency
+    verb: GET
+    path: /pricing-rollback-emergency
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingRule
+    verb: GET
+    path: /pricing-rule
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingRulePriority
+    verb: GET
+    path: /pricing-rule-priority
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPricingVersionBaseline
+    verb: GET
+    path: /pricing-version-baseline
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listProductCategories
     verb: GET
     path: /product-categories
@@ -345,6 +841,62 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: true
     reads: 2
+    writes: 0
+  - operation: listProductDuplicationTemplate
+    verb: GET
+    path: /product-duplication-template
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProductGovernance
+    verb: GET
+    path: /product-governance
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProductImportExport
+    verb: GET
+    path: /product-import-export
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProductLifecycle
+    verb: GET
+    path: /product-lifecycle
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProductPriceAvailability
+    verb: GET
+    path: /product-price-availability
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProductRetirementSuspension
+    verb: GET
+    path: /product-retirement-suspension
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProductTrailChange
+    verb: GET
+    path: /product-trail-change
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listProductVariants
     verb: GET
@@ -370,6 +922,118 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: listQuantityGroupVolume
+    verb: GET
+    path: /quantity-group-volume
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRealTimeChannel
+    verb: GET
+    path: /real-time-channel
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRecommendationReviewDecision
+    verb: GET
+    path: /recommendation-review-decision
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResidencyNationalityMarket
+    verb: GET
+    path: /residency-nationality-market
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRevenue
+    verb: GET
+    path: /revenue
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRevenueDemandImpact
+    verb: GET
+    path: /revenue-demand-impact
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRollbackRecovery
+    verb: GET
+    path: /rollback-recovery
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRulePriorityConflict
+    verb: GET
+    path: /rule-priority-conflict
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listSaleChannel
+    verb: GET
+    path: /sale-channel
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listScenarioModelingWhat
+    verb: GET
+    path: /scenario-modeling-what
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listSeasonalCalendarDay
+    verb: GET
+    path: /seasonal-calendar-day
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listSignalDataQuality
+    verb: GET
+    path: /signal-data-quality
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTaxFeeCalculation
+    verb: GET
+    path: /tax-fee-calculation
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTimeslotPerformanceTime
+    verb: GET
+    path: /timeslot-performance-time
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listWaitlistEntries
     verb: GET
     path: /waitlist-entries
@@ -377,6 +1041,14 @@ operationsByContract:
     permission: PRODUCT_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: listWeatherDemandImpact
+    verb: GET
+    path: /weather-demand-impact
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: offerWaitlistCapacity
     verb: POST
@@ -386,6 +1058,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: publishActivationScheduler
+    verb: PUT
+    path: /activation-scheduler
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: publishBundle
     verb: POST
     path: /catalogue/bundles
@@ -394,6 +1074,30 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: publishChannelAvailability
+    verb: PUT
+    path: /channel-availability
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: publishChannelReadinessValidation
+    verb: PUT
+    path: /channel-readiness-validation
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: publishPricingEffectiveDate
+    verb: PUT
+    path: /pricing-effective-date
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: reinstateEntitlement
     verb: POST
     path: /entitlements/{entitlementId}/reinstate
@@ -466,6 +1170,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setBookingVelocityTime
+    verb: PUT
+    path: /booking-velocity-time
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setCatalogueReview
+    verb: PUT
+    path: /catalogue-review
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setChannelAllocations
     verb: PUT
     path: /channel-capacities/{channelCapacityId}/channel-allocations
@@ -474,6 +1194,70 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setChannelFeePayment
+    verb: PUT
+    path: /channel-fee-payment
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setChannelPricingCommercial
+    verb: PUT
+    path: /channel-pricing-commercial
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setDemandOccupancyAvailability
+    verb: PUT
+    path: /demand-occupancy-availability
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setDynamicPricingStrategy
+    verb: PUT
+    path: /dynamic-pricing-strategy
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setFeeApplicabilityCharging
+    verb: PUT
+    path: /fee-applicability-charging
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setLifecycleStatuWorkflow
+    verb: PUT
+    path: /lifecycle-statu-workflow
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPriceHierarchyInheritance
+    verb: PUT
+    path: /price-hierarchy-inheritance
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPriceListMaster
+    verb: PUT
+    path: /price-list-master
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setPrices
     verb: PUT
     path: /price-lists/{priceListId}/prices
@@ -482,6 +1266,30 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setPricing
+    verb: PUT
+    path: /pricing
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPricingChangeRequest
+    verb: PUT
+    path: /pricing-change-request
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPricingExperiment
+    verb: PUT
+    path: /pricing-experiment
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setProductAttributes
     verb: PUT
     path: /products/{productId}/attributes
@@ -490,6 +1298,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setProductCatalogue
+    verb: PUT
+    path: /product-catalogue
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setProductCategories
     verb: PUT
     path: /product-categories
@@ -498,6 +1314,54 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setProductContextOwnership
+    verb: PUT
+    path: /product-context-ownership
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setProductServicePrice
+    verb: PUT
+    path: /product-service-price
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setRateStructure
+    verb: PUT
+    path: /rate-structure
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setTaxProfileJurisdiction
+    verb: PUT
+    path: /tax-profile-jurisdiction
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setTaxRuleTreatment
+    verb: PUT
+    path: /tax-rule-treatment
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulatePriceBreakdownCalculation
+    verb: PUT
+    path: /price-breakdown-calculation
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: suspendEntitlement
     verb: POST
     path: /entitlements/{entitlementId}/suspend
@@ -513,7 +1377,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: updateChannelCapacity
     verb: PATCH
     path: /channel-capacities/{channelCapacityId}
@@ -559,6 +1423,1057 @@ operationsByContract:
     path: /products/{productId}
     scope: venue
     permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+- contract: promotions
+  count: 131
+  operations:
+  - operation: analysePromotionConflicts
+    verb: GET
+    path: /promotions/{promotionId}/conflicts
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: approveCampaignWorkflow
+    verb: PUT
+    path: /campaign-workflow
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveDecision
+    verb: PUT
+    path: /decision
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: assignCoupon
+    verb: POST
+    path: /coupon-codes/{code}/assign
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createBundle
+    verb: POST
+    path: /bundles
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: createCouponCampaign
+    verb: POST
+    path: /coupon-campaigns
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createPromotion
+    verb: POST
+    path: /promotions
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createUpsellRule
+    verb: POST
+    path: /upsell-rules
+    scope: region
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: createVoucherBatch
+    verb: POST
+    path: /voucher-batches
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: deleteUpsellRule
+    verb: DELETE
+    path: /upsell-rules/{ruleId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: endPromotion
+    verb: POST
+    path: /promotions/{promotionId}/end
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: evaluatePromotions
+    verb: POST
+    path: /promotions/evaluate
+    scope: venue
+    permission: PRICE_VIEW
+    offline: true
+    reads: 3
+    writes: 1
+  - operation: generateCouponCodes
+    verb: POST
+    path: /coupon-campaigns/{campaignId}/codes
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: getBundle
+    verb: GET
+    path: /bundles/{bundleId}
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 3
+    writes: 0
+  - operation: getCouponCode
+    verb: GET
+    path: /coupon-codes/{code}
+    scope: venue
+    permission: PRICE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getPromotion
+    verb: GET
+    path: /promotions/{promotionId}
+    scope: venue
+    permission: PRICE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: getPromotionUsage
+    verb: GET
+    path: /promotions/{promotionId}/usage
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: getRecommendations
+    verb: POST
+    path: /recommendations
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 5
+    writes: 0
+  - operation: getUpsellSuggestions
+    verb: POST
+    path: /upsell-suggestions
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: true
+    reads: 3
+    writes: 1
+  - operation: listAdvancedOffer
+    verb: GET
+    path: /advanced-offer
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAdvancedOfferGuardrail
+    verb: GET
+    path: /advanced-offer-guardrail
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAllocationSplits
+    verb: GET
+    path: /allocation-splits
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listAudienceDiscoveryTargeting
+    verb: GET
+    path: /audience-discovery-targeting
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAudiencePreviewReach
+    verb: GET
+    path: /audience-preview-reach
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBehavioralTransactionTargeting
+    verb: GET
+    path: /behavioral-transaction-targeting
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBestOfferCustomer
+    verb: GET
+    path: /best-offer-customer
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBudgetConsumptionForecast
+    verb: GET
+    path: /budget-consumption-forecast
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundleAvailabilityCapacity
+    verb: GET
+    path: /bundle-availability-capacity
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundleAvailabilityChannel
+    verb: GET
+    path: /bundle-availability-channel
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundleAvailabilityForecast
+    verb: GET
+    path: /bundle-availability-forecast
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundleBogoAdvanced
+    verb: GET
+    path: /bundle-bogo-advanced
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundleCombo
+    verb: GET
+    path: /bundle-combo
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundlePricingCommercial
+    verb: GET
+    path: /bundle-pricing-commercial
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundleSellabilityDependency
+    verb: GET
+    path: /bundle-sellability-dependency
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundleValidityScheduling
+    verb: GET
+    path: /bundle-validity-scheduling
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBundles
+    verb: GET
+    path: /bundles
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCampaignCalendarTimeline
+    verb: GET
+    path: /campaign-calendar-timeline
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCampaignExperimentTest
+    verb: GET
+    path: /campaign-experiment-test
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCampaignFinancialCommercial
+    verb: GET
+    path: /campaign-financial-commercial
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCampaignGovernanceBudget
+    verb: GET
+    path: /campaign-governance-budget
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCampaignPromotionPerformance
+    verb: GET
+    path: /campaign-promotion-performance
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCapacityPoolReservation
+    verb: GET
+    path: /capacity-pool-reservation
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCartTransactionThreshold
+    verb: GET
+    path: /cart-transaction-threshold
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCheapestLowestValue
+    verb: GET
+    path: /cheapest-lowest-value
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCodeEligibilityRestriction
+    verb: GET
+    path: /code-eligibility-restriction
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCodeSecurityFraud
+    verb: GET
+    path: /code-security-fraud
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listComponentInventoryAvailability
+    verb: GET
+    path: /component-inventory-availability
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listConflict
+    verb: GET
+    path: /conflict
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listConflictDetectionResolution
+    verb: GET
+    path: /conflict-detection-resolution
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listContextLocationChannel
+    verb: GET
+    path: /context-location-channel
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCouponCampaigns
+    verb: GET
+    path: /coupon-campaigns
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCouponCodes
+    verb: GET
+    path: /coupon-campaigns/{campaignId}/codes
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listCrmCustomerSegment
+    verb: GET
+    path: /crm-customer-segment
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCustomerMembershipSegment
+    verb: GET
+    path: /customer-membership-segment
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCustomerSegmentChannel
+    verb: GET
+    path: /customer-segment-channel
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDiscountCalculationApplication
+    verb: GET
+    path: /discount-calculation-application
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDiscountCapMaximum
+    verb: GET
+    path: /discount-cap-maximum
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDiscountLimitGuardrail
+    verb: GET
+    path: /discount-limit-guardrail
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDiscountMarginProfitability
+    verb: GET
+    path: /discount-margin-profitability
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicBundle
+    verb: GET
+    path: /dynamic-bundle
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicBundle2
+    verb: GET
+    path: /dynamic-bundle
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicBundleRule
+    verb: GET
+    path: /dynamic-bundle-rule
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicComponentSubstitution
+    verb: GET
+    path: /dynamic-component-substitution
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listExecutivePromotionReporting
+    verb: GET
+    path: /executive-promotion-reporting
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGovernanceRiskLaunch
+    verb: GET
+    path: /governance-risk-launch
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listIncrementalityAttributionCannibalization
+    verb: GET
+    path: /incrementality-attribution-cannibalization
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMembershipLoyaltyGuest
+    verb: GET
+    path: /membership-loyalty-guest
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMultiBuyQuantity
+    verb: GET
+    path: /multi-buy-quantity
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listNextBestAction
+    verb: GET
+    path: /next-best-action
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOfferBasketTrace
+    verb: GET
+    path: /offer-basket-trace
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPartnerExternalProduct
+    verb: GET
+    path: /partner-external-product
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPartnerPaymentEligibility
+    verb: GET
+    path: /partner-payment-eligibility
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPaymentMethodBank
+    verb: GET
+    path: /payment-method-bank
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPercentageFixedDiscount
+    verb: GET
+    path: /percentage-fixed-discount
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionActivityVersion
+    verb: GET
+    path: /promotion-activity-version
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionAlertException
+    verb: GET
+    path: /promotion-alert-exception
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionCampaign
+    verb: GET
+    path: /promotion-campaign
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionChannel
+    verb: GET
+    path: /promotion-channel
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionDecisionTrace
+    verb: GET
+    path: /promotion-decision-trace
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionExclusionCompatibility
+    verb: GET
+    path: /promotion-exclusion-compatibility
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionHealthPerformance
+    verb: GET
+    path: /promotion-health-performance
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionLifecycleStatus
+    verb: GET
+    path: /promotion-lifecycle-statu
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionPerformance
+    verb: GET
+    path: /promotion-performance
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotionPriorityHierarchy
+    verb: GET
+    path: /promotion-priority-hierarchy
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPromotions
+    verb: GET
+    path: /promotions
+    scope: venue
+    permission: PRICE_VIEW
+    offline: true
+    reads: 1
+    writes: 0
+  - operation: listRealTimeAvailability
+    verb: GET
+    path: /real-time-availability
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRedemption
+    verb: GET
+    path: /redemption
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRedemptionCodeLookup
+    verb: GET
+    path: /redemption-code-lookup
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRedemptionConversionFunnel
+    verb: GET
+    path: /redemption-conversion-funnel
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRedemptionDiscountExposure
+    verb: GET
+    path: /redemption-discount-exposure
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRevenueAllocationCost
+    verb: GET
+    path: /revenue-allocation-cost
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRewardSelectionSubstitution
+    verb: GET
+    path: /reward-selection-substitution
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listSpecialPriceGuest
+    verb: GET
+    path: /special-price-guest
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listStackingConflict
+    verb: GET
+    path: /stacking-conflict
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTargetingConflictFrequency
+    verb: GET
+    path: /targeting-conflict-frequency
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTargetingEligibility
+    verb: GET
+    path: /targeting-eligibility
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listThresholdActionAutomatic
+    verb: GET
+    path: /threshold-action-automatic
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTimeBasedSeasonal
+    verb: GET
+    path: /time-based-seasonal
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUniqueCodeGeneration
+    verb: GET
+    path: /unique-code-generation
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUpsellCrossSell
+    verb: GET
+    path: /upsell-cross-sell
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUpsellRules
+    verb: GET
+    path: /upsell-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listUsageCapacityFrequency
+    verb: GET
+    path: /usage-capacity-frequency
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listValidityDateTime
+    verb: GET
+    path: /validity-date-time
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVolumeBulkTier
+    verb: GET
+    path: /volume-bulk-tier
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVoucherBatches
+    verb: GET
+    path: /voucher-batches
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: pausePromotion
+    verb: POST
+    path: /promotions/{promotionId}/pause
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: previewAllocationSplit
+    verb: POST
+    path: /allocation-splits/preview
+    scope: venue
+    permission: LEDGER_VIEW
+    offline: false
+    reads: 3
+    writes: 1
+  - operation: publishPromotion
+    verb: POST
+    path: /promotions/{promotionId}/publish
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: redeemVoucher
+    verb: POST
+    path: /vouchers/{voucherCode}/redeem
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setBundleComponent
+    verb: PUT
+    path: /bundle-component
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setBundleDefinition
+    verb: PUT
+    path: /bundle-definition
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setBuyGetBogo
+    verb: PUT
+    path: /buy-get-bogo
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setCampaignBudgetFinancial
+    verb: PUT
+    path: /campaign-budget-financial
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setCodeDistributionManager
+    verb: PUT
+    path: /code-distribution-manager
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setCouponPromoCode
+    verb: PUT
+    path: /coupon-promo-code
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setCrossCategoryPromotion
+    verb: PUT
+    path: /cross-category-promotion
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setEligibilityRule
+    verb: PUT
+    path: /eligibility-rule
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setFixedPriceOffer
+    verb: PUT
+    path: /fixed-price-offer
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGiftFreeProduct
+    verb: PUT
+    path: /gift-free-product
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGuestChoiceBuild
+    verb: PUT
+    path: /guest-choice-build
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPromotionRule
+    verb: PUT
+    path: /promotion-rule
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPromotionStackingRule
+    verb: PUT
+    path: /promotion-stacking-rule
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setPromotionVariants
+    verb: PUT
+    path: /promotions/{promotionId}/variants
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setRuleTestRecommendation
+    verb: PUT
+    path: /rule-test-recommendation
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulateBundlePreviewRecommendation
+    verb: PUT
+    path: /bundle-preview-recommendation
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulatePromotion
+    verb: POST
+    path: /promotions/{promotionId}/simulate
+    scope: venue
+    permission: PRICE_VIEW
+    offline: false
+    reads: 4
+    writes: 0
+  - operation: unschedulePromotion
+    verb: POST
+    path: /promotions/{promotionId}/unschedule
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: updateBundle
+    verb: PATCH
+    path: /bundles/{bundleId}
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: updatePromotion
+    verb: PATCH
+    path: /promotions/{promotionId}
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: voidCouponCode
+    verb: POST
+    path: /coupon-codes/{code}/void
+    scope: venue
+    permission: PRICE_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: voidVoucher
+    verb: POST
+    path: /vouchers/{voucherId}/void
+    scope: venue
+    permission: PRICE_CONFIGURE
     offline: false
     reads: 2
     writes: 2
@@ -845,289 +2760,6 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-- contract: promotions
-  count: 35
-  operations:
-  - operation: analysePromotionConflicts
-    verb: GET
-    path: /promotions/{promotionId}/conflicts
-    scope: venue
-    permission: PRICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: assignCoupon
-    verb: POST
-    path: /coupon-codes/{code}/assign
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createBundle
-    verb: POST
-    path: /bundles
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 4
-    writes: 4
-  - operation: createCouponCampaign
-    verb: POST
-    path: /coupon-campaigns
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createPromotion
-    verb: POST
-    path: /promotions
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createUpsellRule
-    verb: POST
-    path: /upsell-rules
-    scope: region
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: createVoucherBatch
-    verb: POST
-    path: /voucher-batches
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: deleteUpsellRule
-    verb: DELETE
-    path: /upsell-rules/{ruleId}
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: endPromotion
-    verb: POST
-    path: /promotions/{promotionId}/end
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: evaluatePromotions
-    verb: POST
-    path: /promotions/evaluate
-    scope: venue
-    permission: PRICE_VIEW
-    offline: true
-    reads: 3
-    writes: 1
-  - operation: generateCouponCodes
-    verb: POST
-    path: /coupon-campaigns/{campaignId}/codes
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: getBundle
-    verb: GET
-    path: /bundles/{bundleId}
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: true
-    reads: 3
-    writes: 0
-  - operation: getCouponCode
-    verb: GET
-    path: /coupon-codes/{code}
-    scope: venue
-    permission: PRICE_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: getPromotion
-    verb: GET
-    path: /promotions/{promotionId}
-    scope: venue
-    permission: PRICE_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: getPromotionUsage
-    verb: GET
-    path: /promotions/{promotionId}/usage
-    scope: venue
-    permission: PRICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: getRecommendations
-    verb: POST
-    path: /recommendations
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 5
-    writes: 0
-  - operation: getUpsellSuggestions
-    verb: POST
-    path: /upsell-suggestions
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: true
-    reads: 3
-    writes: 1
-  - operation: listAllocationSplits
-    verb: GET
-    path: /allocation-splits
-    scope: venue
-    permission: LEDGER_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listBundles
-    verb: GET
-    path: /bundles
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listCouponCampaigns
-    verb: GET
-    path: /coupon-campaigns
-    scope: venue
-    permission: PRICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listCouponCodes
-    verb: GET
-    path: /coupon-campaigns/{campaignId}/codes
-    scope: venue
-    permission: PRICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listPromotions
-    verb: GET
-    path: /promotions
-    scope: venue
-    permission: PRICE_VIEW
-    offline: true
-    reads: 1
-    writes: 0
-  - operation: listUpsellRules
-    verb: GET
-    path: /upsell-rules
-    scope: venue
-    permission: PRODUCT_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: listVoucherBatches
-    verb: GET
-    path: /voucher-batches
-    scope: venue
-    permission: PRICE_VIEW
-    offline: false
-    reads: 1
-    writes: 0
-  - operation: pausePromotion
-    verb: POST
-    path: /promotions/{promotionId}/pause
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: previewAllocationSplit
-    verb: POST
-    path: /allocation-splits/preview
-    scope: venue
-    permission: LEDGER_VIEW
-    offline: false
-    reads: 3
-    writes: 1
-  - operation: publishPromotion
-    verb: POST
-    path: /promotions/{promotionId}/publish
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: redeemVoucher
-    verb: POST
-    path: /vouchers/{voucherCode}/redeem
-    scope: venue
-    permission: ORDER_CREATE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: setPromotionVariants
-    verb: PUT
-    path: /promotions/{promotionId}/variants
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: simulatePromotion
-    verb: POST
-    path: /promotions/{promotionId}/simulate
-    scope: venue
-    permission: PRICE_VIEW
-    offline: false
-    reads: 4
-    writes: 0
-  - operation: unschedulePromotion
-    verb: POST
-    path: /promotions/{promotionId}/unschedule
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: updateBundle
-    verb: PATCH
-    path: /bundles/{bundleId}
-    scope: venue
-    permission: PRODUCT_CONFIGURE
-    offline: false
-    reads: 4
-    writes: 4
-  - operation: updatePromotion
-    verb: PATCH
-    path: /promotions/{promotionId}
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: voidCouponCode
-    verb: POST
-    path: /coupon-codes/{code}/void
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: voidVoucher
-    verb: POST
-    path: /vouchers/{voucherId}/void
-    scope: venue
-    permission: PRICE_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 2
 tables:
 - store: cache:idempotency
   kind: cache
@@ -1144,7 +2776,7 @@ tables:
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: catalogue.alternative_code
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1172,7 +2804,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.entitlement_template
-  columns: 33
+  columns: 34
   store: postgres
   parent: access.entitlement
   writtenBy:
@@ -1186,7 +2818,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.import_job
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1242,7 +2874,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.product_version
-  columns: 8
+  columns: 9
   store: postgres
   parent: catalogue.product
   writtenBy:
@@ -1251,7 +2883,7 @@ tables:
   foreignWriters:
   - fnb
 - table: catalogue.published_bundle
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1265,7 +2897,7 @@ tables:
   - catalogue
   foreignWriters: null
 - table: catalogue.variant_dimension
-  columns: 3
+  columns: 4
   store: postgres
   parent: null
   writtenBy:
@@ -1319,7 +2951,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.coupon_code
-  columns: 12
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -1340,7 +2972,7 @@ tables:
   - promotions
   foreignWriters: null
 - table: promotions.voucher
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -1368,7 +3000,7 @@ tables:
   - seating
   foreignWriters: null
 - table: seating.seat_block
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -1410,14 +3042,14 @@ tables:
   - seating
   foreignWriters: null
 - table: seating.section
-  columns: 4
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
   - seating
   foreignWriters: null
 - table: seating.section_row
-  columns: 4
+  columns: 5
   store: postgres
   parent: seating.section
   writtenBy: []
@@ -1483,6 +3115,7 @@ screens:
 - P02:GST-058 Resource Availability (Cabana)
 - P02:GST-059 Plan My Day – In Progress
 - P02:GST-063 Search
+- P02:GST-070 Reserve a Table or Cabana
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-003 Sell — Timed Entry
 - P04:POS-004 Sell — Seat Map
@@ -1513,10 +3146,221 @@ screens:
 - P08:BO-019 Closures & Blackouts
 - P08:BO-037 Offline Package Status
 - P08:BO-063 Opening Hours & Calendar
+- P08:BO-102 Sell
 - P08:BO-115 Category, Brand & Merchandise Hierarchy
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P08:BO-119 Cross-Sell, Upsell & Recommendation Rules
 - P08:BO-125 Product & Category Button Configuration
+- P09:ADM-048 Commercial Pricing Command Center
+- P09:ADM-049 Price List Master Configuration
+- P09:ADM-050 Price Category & Rate Type Library
+- P09:ADM-051 Rate Structure Builder
+- P09:ADM-052 Product & Service Price Assignment
+- P09:ADM-053 Package, Bundle & Add-On Pricing
+- P09:ADM-054 Market, Venue & Currency Pricing Structure
+- P09:ADM-055 Price Hierarchy & Inheritance Configuration
+- P09:ADM-056 Price List Templates, Clone & Reuse
+- P09:ADM-057 Commercial Pricing Structure Validation
+- P09:ADM-058 Pricing Rule Command Center
+- P09:ADM-059 Customer Segment & Profile Pricing Rules
+- P09:ADM-060 Membership & Loyalty Pricing Rules
+- P09:ADM-061 Residency, Nationality & Market Pricing Rules
+- P09:ADM-062 Channel-Based Pricing Rules
+- P09:ADM-063 Location, Venue & Event Pricing Rules
+- P09:ADM-064 Quantity, Group & Volume Pricing Rules
+- P09:ADM-065 Effective Date, Season & Day-Based Pricing Rules
+- P09:ADM-066 Timeslot, Performance & Time-of-Day Pricing Rules
+- P09:ADM-067 Pricing Rule Priority, Conflict Resolution & Testing
+- P09:ADM-068 Tax, Fee & Calculation Command Center
+- P09:ADM-069 Tax Profile & Jurisdiction Configuration
+- P09:ADM-070 Tax Rule & Treatment Builder
+- P09:ADM-071 Fee & Surcharge Library
+- P09:ADM-072 Fee Applicability & Charging Rule Builder
+- P09:ADM-073 Fee Waiver, Tax Exemption & Exception Rules
+- P09:ADM-074 Price Calculation Sequence & Formula Engine
+- P09:ADM-075 Currency Precision, Rounding & Monetary Rules
+- P09:ADM-076 Price Breakdown, Calculation Simulation & Explainability
+- P09:ADM-077 Calculation Validation, Reconciliation & Service Interface
+- P09:ADM-078 Pricing Governance Command Center
+- P09:ADM-079 Pricing Change Request & Workspace
+- P09:ADM-080 Bulk Pricing Update, Import & Mass Maintenance
+- P09:ADM-081 Pricing Version & Baseline Management
+- P09:ADM-082 Pricing Change Impact Analysis
+- P09:ADM-083 Pricing Approval Workflow & Authority Matrix
+- P09:ADM-084 Pricing Publication & Effective-Date Scheduler
+- P09:ADM-085 Pricing Distribution, Synchronization & Publication Monitor
+- P09:ADM-086 Pricing Rollback & Emergency Control Center
+- P09:ADM-087 Pricing History, Audit & Compliance Explorer
+- P09:ADM-088 Dynamic Pricing Strategy Command Center
+- P09:ADM-089 Dynamic Pricing Strategy Builder
+- P09:ADM-090 Demand, Occupancy & Availability Rule Builder
+- P09:ADM-091 Booking Velocity & Time-to-Event Rule Builder
+- P09:ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules
+- P09:ADM-093 Channel, Customer Segment & Location Dynamic Rules
+- P09:ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix
+- P09:ADM-095 Dynamic Pricing Guardrails & Commercial Protection
+- P09:ADM-096 Dynamic Pricing Automation Policy & Control
+- P09:ADM-097 Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
+- P09:ADM-098 AI Pricing Intelligence Command Center
+- P09:ADM-099 Internal Demand & Booking Signal Hub
+- P09:ADM-100 Weather Intelligence & Demand Impact Configuration
+- P09:ADM-101 Nearby Event, Exhibition & Local Demand Intelligence
+- P09:ADM-102 Competitor Pricing & Market Position Intelligence
+- P09:ADM-103 Market, Tourism, Holiday & Contextual Signal Hub
+- P09:ADM-104 AI Demand Forecasting & Booking Curve Studio
+- P09:ADM-105 Price Elasticity & Revenue Response Intelligence
+- P09:ADM-106 AI Pricing Recommendation & Explainability Center
+- P09:ADM-107 AI Signal Registry, Data Quality & Model Governance
+- P09:ADM-108 Revenue Optimization Command Center
+- P09:ADM-109 Pricing Simulation Studio
+- P09:ADM-110 Scenario Modeling & What-If Analysis
+- P09:ADM-111 A/B Pricing Experiment Studio
+- P09:ADM-112 Revenue & Demand Impact Forecasting
+- P09:ADM-113 AI Recommendation Review & Decision Queue
+- P09:ADM-114 Automation Policy & Autonomous Pricing Orchestrator
+- P09:ADM-115 Live Dynamic Price Execution & Deployment Monitor
+- P09:ADM-116 Dynamic Pricing Performance & Optimization Analytics
+- P09:ADM-117 AI Learning, Model Performance & Optimization Feedback
+- P09:ADM-118 Product Lifecycle Command Center
+- P09:ADM-119 Product Creation Workspace
+- P09:ADM-120 Lifecycle Status & Workflow Configuration
+- P09:ADM-121 Bulk Product Creation & Catalogue Import
+- P09:ADM-122 Product Import / Export & Environment Transfer
+- P09:ADM-123 Product Context, Ownership & Assignment
+- P09:ADM-124 Channel Publication & Availability
+- P09:ADM-125 Publication & Activation Scheduler
+- P09:ADM-126 Product Duplication & Template Library
+- P09:ADM-127 AI Catalogue Builder & Configuration Review
+- P09:ADM-128 Product Governance Command Center
+- P09:ADM-129 Approval Workflow Designer
+- P09:ADM-130 Approval Review & Decision Workspace
+- P09:ADM-131 Product Version Management
+- P09:ADM-132 Rollback & Recovery Management
+- P09:ADM-133 Change Impact Analysis
+- P09:ADM-134 Change Propagation & Dependency Control
+- P09:ADM-135 Product Retirement, Suspension & Archive
+- P09:ADM-136 Product Audit Trail & Change History
+- P09:ADM-137 Governance Risk, AI Monitoring & Control Center
+- P09:ADM-138 Promotion Command Center Dashboard
+- P09:ADM-139 Promotion & Campaign Directory
+- P09:ADM-140 Promotion Overview
+- P09:ADM-141 Promotion Lifecycle & Status Manager
+- P09:ADM-142 Campaign Calendar & Timeline
+- P09:ADM-143 Promotion Channel & Publication Monitor
+- P09:ADM-144 Promotion Alerts & Exception Center
+- P09:ADM-145 Promotion Approval Inbox
+- P09:ADM-146 Promotion Health & Performance Monitor
+- P09:ADM-147 Promotion Audit, Activity & Version History
+- P09:ADM-148 Promotion Rule Builder
+- P09:ADM-149 Percentage & Fixed Discount Configurator
+- P09:ADM-150 Cart & Transaction Threshold Rules
+- P09:ADM-151 Volume, Bulk & Tier Discount Configurator
+- P09:ADM-152 Time-Based & Seasonal Discount Rules
+- P09:ADM-153 Customer, Membership & Segment Discount Rules
+- P09:ADM-154 Payment Method, Bank & Partner Discount Rules
+- P09:ADM-155 Special Price & Guest Offer Configurator
+- P09:ADM-156 Discount Limits, Guardrails & Commercial Controls
+- P09:ADM-157 Rule Test, Simulation & AI Recommendation Workspace
+- P09:ADM-158 Coupon & Promo Code Command Center
+- P09:ADM-159 Coupon & Promo Code Builder
+- P09:ADM-160 Unique Code Generation & Batch Manager
+- P09:ADM-161 Code Eligibility & Restriction Manager
+- P09:ADM-162 Usage, Capacity & Frequency Control
+- P09:ADM-163 Validity, Date & Time Control
+- P09:ADM-164 Code Distribution & Assignment Manager
+- P09:ADM-165 Redemption Monitor & Code Lookup
+- P09:ADM-166 Code Security, Fraud & Exception Center
+- P09:ADM-167 Redemption Analytics, Audit & AI Optimization
+- P09:ADM-168 Advanced Offer Command Center
+- P09:ADM-169 Buy X Get Y / BOGO Rule Builder
+- P09:ADM-170 Multi-Buy & Quantity Offer Configurator
+- P09:ADM-171 Cheapest / Lowest-Value Item Promotion
+- P09:ADM-172 Fixed-Price & “N for X” Offer Builder
+- P09:ADM-173 Gift, Free Product & Added-Value Offer Builder
+- P09:ADM-174 Cross-Category Promotion Builder
+- P09:ADM-175 Reward Selection, Substitution & Customer Choice
+- P09:ADM-176 Advanced Offer Guardrails & Conflict Controls
+- P09:ADM-177 Offer Simulation, Basket Trace & AI Optimization
+- P09:ADM-178 Bundle & Combo Command Center
+- P09:ADM-179 Bundle Definition & Setup
+- P09:ADM-180 Bundle Component Builder
+- P09:ADM-181 Guest Choice & Build-Your-Own Bundle Designer
+- P09:ADM-182 Bundle Pricing & Commercial Model
+- P09:ADM-183 Bundle Availability, Capacity & Validation
+- P09:ADM-184 Bundle Validity, Scheduling & Redemption Rules
+- P09:ADM-185 Partner & External Product Bundle Manager
+- P09:ADM-186 Revenue Allocation, Cost & Settlement Rules
+- P09:ADM-187 Bundle Preview, Simulation & AI Recommendation
+- P09:ADM-188 Dynamic Bundle Operations Command Center
+- P09:ADM-189 Component Inventory & Availability Matrix
+- P09:ADM-190 Bundle Sellability & Dependency Rule Engine
+- P09:ADM-191 Capacity Pool & Reservation Manager
+- P09:ADM-192 Dynamic Component Substitution Engine
+- P09:ADM-193 Dynamic Bundle Rule & Composition Engine
+- P09:ADM-194 Real-Time Availability & Checkout Validation
+- P09:ADM-195 Bundle Availability by Channel, Venue & Partner
+- P09:ADM-196 Bundle Availability Forecast, Alerts & Recovery
+- P09:ADM-197 Dynamic Bundle Simulation & AI Optimization
+- P09:ADM-198 Targeting & Eligibility Command Center
+- P09:ADM-199 Eligibility Rule Builder
+- P09:ADM-200 CRM & Customer Segment Manager
+- P09:ADM-201 Membership, Loyalty & Guest Eligibility
+- P09:ADM-202 Behavioral & Transaction Targeting
+- P09:ADM-203 Context, Location, Channel & Time Targeting
+- P09:ADM-204 Partner, B2B & Payment Eligibility
+- P09:ADM-205 Audience Preview, Reach & Eligibility Simulator
+- P09:ADM-206 Targeting Conflict, Frequency & Exclusion Controls
+- P09:ADM-207 AI Audience Discovery & Targeting Optimization
+- P09:ADM-208 Stacking & Conflict Command Center
+- P09:ADM-209 Promotion Priority & Hierarchy Manager
+- P09:ADM-210 Promotion Stacking Rule Builder
+- P09:ADM-211 Promotion Exclusion & Compatibility Matrix
+- P09:ADM-212 Discount Calculation & Application Sequence
+- P09:ADM-213 Best Offer & Customer Benefit Resolver
+- P09:ADM-214 Discount Cap & Maximum Benefit Controller
+- P09:ADM-215 Conflict Detection & Resolution Center
+- P09:ADM-216 Promotion Decision Trace & Transaction Explainer
+- P09:ADM-217 Conflict Simulation & AI Optimization
+- P09:ADM-218 Campaign Governance & Budget Command Center
+- P09:ADM-219 Campaign Budget & Financial Limit Setup
+- P09:ADM-220 Redemption, Discount & Exposure Limit Manager
+- P09:ADM-221 Budget Consumption & Forecast Monitor
+- P09:ADM-222 Threshold Actions & Automatic Suspension
+- P09:ADM-223 Campaign Approval Workflow Designer
+- P09:ADM-224 Approval Inbox & Decision Workspace
+- P09:ADM-225 Campaign Financial & Commercial Simulator
+- P09:ADM-226 Campaign Experiment & A/B Test Manager
+- P09:ADM-227 Governance Audit, AI Risk & Launch Readiness
+- P09:ADM-228 Promotion Performance Command Center
+- P09:ADM-229 Campaign & Promotion Performance Explorer
+- P09:ADM-230 Redemption, Conversion & Funnel Analytics
+- P09:ADM-231 Discount, Margin & Profitability Analytics
+- P09:ADM-232 Bundle, BOGO & Advanced Offer Analytics
+- P09:ADM-233 Upsell, Cross-Sell & Attach-Rate Analytics
+- P09:ADM-234 Customer, Segment, Channel & Partner Analytics
+- P09:ADM-235 Incrementality, Attribution & Cannibalization Analysis
+- P09:ADM-236 AI Optimization & Next-Best-Action Center
+- P09:ADM-237 Executive Promotion Intelligence & Reporting Studio
+- P09:ADM-258 Sales Channel Command Center
+- P09:ADM-259 Channel Creation & Profile Configuration
+- P09:ADM-260 Product & Catalogue Assignment
+- P09:ADM-261 Channel Pricing & Commercial Profile Assignment
+- P09:ADM-262 Inventory, Capacity & Channel Allocation
+- P09:ADM-263 Channel Sales Schedule & Availability Windows
+- P09:ADM-264 Customer & Eligibility Rules by Channel
+- P09:ADM-265 Channel Sales Rules, Limits & Restrictions
+- P09:ADM-266 Channel Fees, Payment & Fulfillment Configuration
+- P09:ADM-267 Channel Publication, Readiness & AI Validation
+- P09:ADM-268 Channel Operations Command Center
+- P09:ADM-269 Channel Connection & Integration Manager
+- P09:ADM-270 Product, Price & Availability Synchronization
+- P09:ADM-271 Real-Time Channel Availability & Inventory Monitor
+- P09:ADM-272 Channel Allocation & Rebalancing Operations
+- P09:ADM-273 Channel Exceptions, Incidents & Recovery
+- P09:ADM-274 Channel Performance & Commercial Analytics
+- P09:ADM-275 Channel Audit, Logs & Transaction Traceability
+- P09:ADM-276 Channel Governance, SLA & Partner Control
+- P09:ADM-277 AI Channel Optimization & Intelligence Center
 - P10:PTR-005 Inventory & Allocation View
 - P10:PTR-006 Product Catalog (B2B Pricing)
 - P10:PTR-007 Availability Search

@@ -1,16 +1,17 @@
 id: LLD-subscription
-title: subscription — 55 operations
+title: subscription — 112 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
-service: ControlService
+service: PlatformService
 operations:
 - operation: addLicenceAddOn
   verb: POST
   path: /tenants/{tenantId}/licences/add-ons
   scope: tenant
   permission: PLATFORM_TENANT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -18,12 +19,43 @@ operations:
   writes:
   - cache:idempotency
   - control.licence_add_on
+- operation: approveBookingLimitCommercial
+  verb: PUT
+  path: /booking-limit-commercial
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: approveMembershipProductValidation
+  verb: PUT
+  path: /membership-product-validation
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approvePartnerStatuLifecycle
+  verb: PUT
+  path: /partner-statu-lifecycle
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
 - operation: cancelDecommission
   verb: POST
   path: /cells/{cellId}/cancel-decommission
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -36,7 +68,8 @@ operations:
   path: /invoices/{invoiceId}/cancel
   scope: tenant
   permission: PLATFORM_BILLING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -49,7 +82,8 @@ operations:
   path: /subscriptions/{subscriptionId}/cancel
   scope: tenant
   permission: PLATFORM_BILLING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -63,7 +97,8 @@ operations:
   path: /partner-agreements
   scope: tenant
   permission: PARTNER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -73,6 +108,18 @@ operations:
   - approvals.request
   - cache:idempotency
   - control.partner_agreement
+- operation: createPartnerQuote
+  verb: POST
+  path: /partner-quotes
+  scope: tenant
+  permission: PARTNER_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads:
+  - subscription.partner_quote
+  writes:
+  - subscription.partner_quote
 - operation: createPartnerUser
   verb: POST
   path: /partners/{partnerId}/users
@@ -86,7 +133,7 @@ operations:
   - cache:idempotency
   - control.partner_agreement
   - identity.principal
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - control.partner_user
@@ -95,33 +142,36 @@ operations:
   path: /plans
   scope: tenant
   permission: PLATFORM_PLAN_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
   writes:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
 - operation: createPlanVersion
   verb: POST
   path: /plans/{planId}
   scope: tenant
   permission: PLATFORM_PLAN_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
   writes:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
 - operation: createTenant
   verb: POST
   path: /tenants
   scope: tenant
   permission: PLATFORM_TENANT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -129,12 +179,25 @@ operations:
   writes:
   - cache:idempotency
   - control.tenant
+- operation: decommissionBurstEnvironment
+  verb: POST
+  path: /burst-environments/{burstEnvironmentId}/decommission
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes:
+  - cache:idempotency
+  - platform.outbox
 - operation: decommissionCell
   verb: POST
   path: /cells/{cellId}/decommission
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -147,7 +210,8 @@ operations:
   path: /invoices/{invoiceId}/dispute
   scope: tenant
   permission: PLATFORM_BILLING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -155,12 +219,24 @@ operations:
   writes:
   - cache:idempotency
   - control.invoice
+- operation: drainBurstEnvironment
+  verb: POST
+  path: /burst-environments/{burstEnvironmentId}/drain
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes:
+  - cache:idempotency
 - operation: executeTenantMigration
   verb: POST
   path: /tenant-migrations/{migrationId}/execute
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -179,8 +255,8 @@ operations:
   reads:
   - cache:idempotency
   - control.partner_agreement
-  - ledger.entry
   - ledger.legal_entity
+  - ledger.posting
   - orders.sales_order
   writes:
   - cache:idempotency
@@ -189,7 +265,8 @@ operations:
   path: /tenants/{tenantId}/invoices
   scope: tenant
   permission: PLATFORM_BILLING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -202,7 +279,8 @@ operations:
   path: /cells/{cellId}
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.cell
@@ -213,7 +291,8 @@ operations:
   path: /cells/{cellId}/capacity
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.cell
@@ -223,7 +302,8 @@ operations:
   path: /cells/{cellId}/health
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.cell
@@ -233,7 +313,9 @@ operations:
   path: /partner-agreements/{agreementId}/commission-statement
   scope: tenant
   permission: PARTNER_VIEW
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - control.partner_agreement
@@ -246,7 +328,8 @@ operations:
   path: /tenants/{tenantId}/entitlement-usage
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - access.entitlement
@@ -258,17 +341,19 @@ operations:
   path: /plans/{planId}
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
-  - control.plan
+  - control.subscription_plan
   writes: []
 - operation: getSubscription
   verb: GET
   path: /tenants/{tenantId}/subscription
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.subscription
@@ -278,7 +363,8 @@ operations:
   path: /tenants/{tenantId}
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.cell
@@ -290,19 +376,21 @@ operations:
   path: /tenants/{tenantId}/licences
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - control.licence_add_on
-  - control.plan
   - control.subscription
+  - control.subscription_plan
   writes: []
 - operation: getUsageMetering
   verb: GET
   path: /tenants/{tenantId}/usage
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.subscription
@@ -313,7 +401,8 @@ operations:
   path: /cell-clusters
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -321,12 +410,24 @@ operations:
   writes:
   - cache:idempotency
   - control.cell_cluster
+- operation: listBurstEnvironments
+  verb: GET
+  path: /burst-environments
+  scope: tenant
+  permission: PLATFORM_CELL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.performance
+  writes: []
 - operation: listCellClusters
   verb: GET
   path: /cell-clusters
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.cell_cluster
@@ -336,7 +437,8 @@ operations:
   path: /cells/{cellId}/jobs
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.cell_job
@@ -353,15 +455,338 @@ operations:
   - catalogue.product
   - control.channel_listing
   writes: []
+- operation: listCommercialAgreement
+  verb: GET
+  path: /commercial-agreement
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listCommercialAgreementHealth
+  verb: GET
+  path: /commercial-agreement-health
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listCommercialAllocationQuota
+  verb: GET
+  path: /commercial-allocation-quota
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listCommissionCalculationSettlement
+  verb: GET
+  path: /commission-calculation-settlement
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listCommissionMarginIncentive
+  verb: GET
+  path: /commission-margin-incentive
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listCreditLimitExposure
+  verb: GET
+  path: /credit-limit-exposure
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listDepositGuaranteeFinancial
+  verb: GET
+  path: /deposit-guarantee-financial
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listMember
+  verb: GET
+  path: /member
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMemberExceptionOverride
+  verb: GET
+  path: /member-exception-override
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMemberLifecycleCase
+  verb: GET
+  path: /member-lifecycle-case
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipActivationCredential
+  verb: GET
+  path: /membership-activation-credential
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipAnnualPass
+  verb: GET
+  path: /membership-annual-pass
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipCommercialPricing
+  verb: GET
+  path: /membership-commercial-pricing
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipFreezeSuspension
+  verb: GET
+  path: /membership-freeze-suspension
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipRenewalRetention
+  verb: GET
+  path: /membership-renewal-retention
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipUpgradeDowngrade
+  verb: GET
+  path: /membership-upgrade-downgrade
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipUsageVisit
+  verb: GET
+  path: /membership-usage-visit
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartner
+  verb: GET
+  path: /partner
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartner2
+  verb: GET
+  path: /partner
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerAccessRole
+  verb: GET
+  path: /partner-access-role
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
 - operation: listPartnerAgreements
   verb: GET
   path: /partner-agreements
   scope: tenant
   permission: PARTNER_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - control.partner_agreement
+  writes: []
+- operation: listPartnerCancellationRefund
+  verb: GET
+  path: /partner-cancellation-refund
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerContactUser
+  verb: GET
+  path: /partner-contact-user
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerDisputeCase
+  verb: GET
+  path: /partner-dispute-case
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerDocumentationCompliance
+  verb: GET
+  path: /partner-documentation-compliance
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerOnboardingApplication
+  verb: GET
+  path: /partner-onboarding-application
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerOrderBooking
+  verb: GET
+  path: /partner-order-booking
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerPerformanceScorecard
+  verb: GET
+  path: /partner-performance-scorecard
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerProfileReadiness
+  verb: GET
+  path: /partner-profile-readiness
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerQuotes
+  verb: GET
+  path: /partner-quotes
+  scope: tenant
+  permission: PARTNER_VIEW
+  audience:
+  - partner
+  offline: false
+  reads:
+  - subscription.partner_quote
+  writes: []
+- operation: listPartnerReconciliationException
+  verb: GET
+  path: /partner-reconciliation-exception
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerRelationship
+  verb: GET
+  path: /partner-relationship
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerStatementAccount
+  verb: GET
+  path: /partner-statement-account
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
   writes: []
 - operation: listPartnerUsers
   verb: GET
@@ -381,17 +806,39 @@ operations:
   path: /plans
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
-  - control.plan
+  - control.subscription_plan
+  writes: []
+- operation: listRenewalAuto
+  verb: GET
+  path: /renewal-auto
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listReservationHoldRelease
+  verb: GET
+  path: /reservation-hold-release
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
   writes: []
 - operation: listSubscriptionInvoices
   verb: GET
   path: /tenants/{tenantId}/invoices
   scope: tenant
   permission: PLATFORM_BILLING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.invoice
@@ -401,7 +848,8 @@ operations:
   path: /tenants/{tenantId}/cells
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.cell
@@ -411,7 +859,8 @@ operations:
   path: /tenant-migrations
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.tenant_migration
@@ -421,10 +870,21 @@ operations:
   path: /tenants
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - control.tenant
+  writes: []
+- operation: listTerritoryMarketDistribution
+  verb: GET
+  path: /territory-market-distribution
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - partner
+  offline: false
+  reads: []
   writes: []
 - operation: listVenueTypeTemplates
   verb: GET
@@ -433,17 +893,27 @@ operations:
   permission: TENANT_VIEW
   audience:
   - staff
-  - public
   offline: false
   reads:
   - control.venue_type_template
+  writes: []
+- operation: listVisitAdmissionEntitlement
+  verb: GET
+  path: /visit-admission-entitlement
+  scope: tenant
+  permission: PLATFORM_TENANT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: planTenantMigration
   verb: POST
   path: /tenant-migrations
   scope: tenant
   permission: PLATFORM_CELL_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -456,12 +926,13 @@ operations:
   path: /tenants/{tenantId}/subscription/preview
   scope: tenant
   permission: PLATFORM_TENANT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
   - control.subscription
+  - control.subscription_plan
   - platform.tenant
   writes:
   - cache:idempotency
@@ -470,7 +941,8 @@ operations:
   path: /tenants/{tenantId}/cells
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -483,7 +955,8 @@ operations:
   path: /tenants/{tenantId}/reactivate
   scope: tenant
   permission: PLATFORM_TENANT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -491,12 +964,30 @@ operations:
   writes:
   - cache:idempotency
   - control.tenant
+- operation: reconcileBurstEnvironment
+  verb: POST
+  path: /burst-environments/{burstEnvironmentId}/reconcile
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - orders.sales_order
+  writes:
+  - cache:idempotency
+  - orders.order_line
+  - orders.payment
+  - orders.sales_order
+  - platform.outbox
+  - sync.rejection
 - operation: recordInvoicePayment
   verb: POST
   path: /invoices/{invoiceId}/payment
   scope: tenant
   permission: PLATFORM_BILLING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -510,7 +1001,8 @@ operations:
   path: /usage-records
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - service
   offline: false
   reads:
   - ai.interaction
@@ -524,7 +1016,8 @@ operations:
   path: /partner-registrations
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -537,7 +1030,8 @@ operations:
   path: /tenants/{tenantId}/licences/add-ons
   scope: tenant
   permission: PLATFORM_TENANT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -546,12 +1040,26 @@ operations:
   - cache:idempotency
   - control.licence_add_on
   - control.subscription
+- operation: requestBurstEnvironment
+  verb: POST
+  path: /burst-environments
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - catalogue.performance
+  - control.cell
+  writes:
+  - cache:idempotency
 - operation: resolveInvoiceDispute
   verb: POST
   path: /invoices/{invoiceId}/resolve-dispute
   scope: tenant
   permission: PLATFORM_BILLING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -564,7 +1072,8 @@ operations:
   path: /tenant-migrations/{migrationId}/rollback
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -572,6 +1081,16 @@ operations:
   writes:
   - cache:idempotency
   - control.tenant_migration
+- operation: setAgreementContractTerm
+  verb: PUT
+  path: /agreement-contract-term
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
 - operation: setChannelListing
   verb: PUT
   path: /channel-listings
@@ -582,18 +1101,119 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - catalogue.envelope
+  - catalogue.channel_capacity
   - catalogue.price_list
   - catalogue.product
   writes:
   - cache:idempotency
   - control.channel_listing
+- operation: setFamilyHouseholdDependent
+  verb: PUT
+  path: /family-household-dependent
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMemberMembershipAccount
+  verb: PUT
+  path: /member-membership-account
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMembershipEligibilityQualification
+  verb: PUT
+  path: /membership-eligibility-qualification
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMembershipEntitlementAdmission
+  verb: PUT
+  path: /membership-entitlement-admission
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMembershipProductTier
+  verb: PUT
+  path: /membership-product-tier
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPartnerBrandVenue
+  verb: PUT
+  path: /partner-brand-venue
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: setPartnerProfileOrganization
+  verb: PUT
+  path: /partner-profile-organization
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: setPartnerRateNet
+  verb: PUT
+  path: /partner-rate-net
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: setPaymentTermBilling
+  verb: PUT
+  path: /payment-term-billing
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - partner
+  offline: false
+  reads: []
+  writes: []
+- operation: setRenewalAutoMembership
+  verb: PUT
+  path: /renewal-auto-membership
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setSubscription
   verb: PUT
   path: /tenants/{tenantId}/subscription
   scope: tenant
   permission: PLATFORM_TENANT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -601,19 +1221,30 @@ operations:
   writes:
   - cache:idempotency
   - control.subscription
+- operation: setValidityActivationExpiry
+  verb: PUT
+  path: /validity-activation-expiry
+  scope: tenant
+  permission: PLATFORM_CELL_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: settleAiUsage
   verb: POST
   path: /ai-usage/settle
   scope: tenant
   permission: PLATFORM_BILLING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - ai.interaction
   - ai.policy
   - cache:idempotency
-  - control.plan
   - control.subscription
+  - control.subscription_plan
   writes:
   - cache:idempotency
   - control.usage_record
@@ -623,11 +1254,11 @@ operations:
   scope: tenant
   permission: TENANT_VIEW
   audience:
-  - public
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - control.plan
+  - control.subscription_plan
   - control.venue_type_template
   writes:
   - cache:idempotency
@@ -637,7 +1268,8 @@ operations:
   path: /tenants/{tenantId}/suspend
   scope: tenant
   permission: PLATFORM_TENANT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -645,12 +1277,14 @@ operations:
   writes:
   - cache:idempotency
   - control.tenant
+  - platform.outbox
 - operation: terminateTenant
   verb: POST
   path: /tenants/{tenantId}/terminate
   scope: tenant
   permission: PLATFORM_TENANT_TERMINATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -665,7 +1299,8 @@ operations:
   path: /cells/{cellId}
   scope: tenant
   permission: PLATFORM_CELL_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -678,7 +1313,8 @@ operations:
   path: /partner-agreements/{agreementId}
   scope: tenant
   permission: PARTNER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -692,7 +1328,8 @@ operations:
   path: /tenants/{tenantId}
   scope: tenant
   permission: PLATFORM_TENANT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

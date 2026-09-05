@@ -740,7 +740,7 @@
     "catalogue"
    ],
    "what": "No purchase eligibility rules.",
-   "why": "Age, height, residency, nationality, loyalty status, customer profile and geography. admissionProfileId governs where an entitlement admits, not who may buy it. promotions.evaluatePromotions gates a discount, not a sale.",
+   "why": "Age, height, residency, nationality, loyalty status, customer profile and geography. admissionRulesId governs where an entitlement admits, not who may buy it. promotions.evaluatePromotions gates a discount, not a sale.",
    "fix": null,
    "blockedOnSections": [],
    "blockedOnConflicts": [],
@@ -1833,14 +1833,14 @@
     "orders"
    ],
    "what": "Transaction rules are not per-product. A ticket type cannot state its own refund, exchange or transfer eligibility.",
-   "why": "`AdmissionProfile` covers usage rules well \u2014 validation window, max duration, re-entry limits, permitted access points. `getRefundPolicy` and `setRefundPolicy` are venue-scoped. A non-refundable promotional ticket and a flexible full-price ticket sold at the same venue cannot differ.",
+   "why": "`AdmissionRules` covers usage rules well \u2014 validation window, max duration, re-entry limits, permitted access points. `getRefundPolicy` and `setRefundPolicy` are venue-scoped. A non-refundable promotional ticket and a flexible full-price ticket sold at the same venue cannot differ.",
    "fix": "Attach a transaction-rule set to the product or the entitlement template.",
    "blockedOnSections": [],
    "blockedOnConflicts": [],
    "blockedNote": "Ready, and larger than first written. 2.12.4 and 2.12.12 both make refund and exchange eligibility configurable by ticket status and access level, and getRefundPolicy remains venue-scoped.",
    "blockedOnDomains": [],
    "closed": "2026-08-18",
-   "closedBy": "AdmissionProfile.perProductRules. **Rules were per profile and a ticket type could not state its own**, so an annual pass allowing one entry per day and a single ticket allowing one entry ever needed two profiles. minimumGapMinutes rather than a boolean: **a guest returning from lunch in forty minutes is normal, and the same scan twice in ten seconds is a card passed back over a fence.**"
+   "closedBy": "AdmissionRules.perProductRules. **Rules were per profile and a ticket type could not state its own**, so an annual pass allowing one entry per day and a single ticket allowing one entry ever needed two profiles. minimumGapMinutes rather than a boolean: **a guest returning from lunch in forty minutes is normal, and the same scan twice in ten seconds is a card passed back over a fence.**"
   },
   {
    "id": "BL-060",
@@ -4005,7 +4005,7 @@
     "assets"
    ],
    "what": "No store for guest photos, avatars, IDs or signed documents.",
-   "why": "`assets` is the tenant media library \u2014 banners, product images, work-order evidence. **A guest ID scan, a signed waiver or a profile photo is personal data with a different retention posture, a different residency question under ADR-0009, and an erasure obligation** that `cross-cell.createDsarRequest` would have to reach. Putting them in the tenant library would make a DSAR delete a banner or miss a passport.",
+   "why": "`assets` is the tenant media library \u2014 banners, product images, work-order evidence. **A guest ID scan, a signed waiver or a profile photo is personal data with a different retention posture, a different residency question under ADR-0009, and an erasure obligation** that `cross-region.createDsarRequest` would have to reach. Putting them in the tenant library would make a DSAR delete a banner or miss a passport.",
    "fix": "A guest document store with retention and erasure, separate from the tenant media library.",
    "blockedOnSections": [],
    "blockedOnConflicts": [
@@ -4513,11 +4513,11 @@
    "lane": "deferred",
    "status": "done",
    "contracts": [
-    "cross-cell",
+    "cross-region",
     "marketing-crm"
    ],
    "candidateHomes": [
-    "cross-cell"
+    "cross-region"
    ],
    "what": "No subject-access export of one guest's data.",
    "why": "**DSAR is well built** \u2014 `createDsarRequest` with `pii.erase_subject` propagating and `ai.removeIndexEntry` as the vector-store path \u2014 and it covers erasure. **The access half is thinner**: 7.3.10 asks for a guest's data exported in PDF, Excel, CSV or JSON, which `reporting.exportReportResult` does not serve because a report is a population and a subject access request is one person across every contract.",

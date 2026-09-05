@@ -43,7 +43,7 @@ Everything below was designed assuming TICVAI can reach the cell.
 
 All three are commercial as much as technical. **CF-61.**
 
-**Do on-premise venues participate in cross-cell entitlements?** Redeeming a pass issued
+**Do on-premise venues participate in cross-region entitlements?** Redeeming a pass issued
 elsewhere needs the issuing cell reachable at that moment. Honest default: no.
 Local-then-reconcile carries a double-redemption risk that needs a decision rather than an
 assumption.

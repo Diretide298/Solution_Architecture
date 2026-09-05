@@ -44,8 +44,8 @@ steps:
   action: They join a virtual queue rather than stand in it.
   operations:
   - joinQueue
-  - getQueueEntry
-  outcome: '**The point of the whole feature**: the guest walks away and the place is kept. `redeemQueueEntry`
+  - getWaitingGuest
+  outcome: '**The point of the whole feature**: the guest walks away and the place is kept. `redeemWaitingGuest`
     at the attraction closes it.'
   crossesDevice: true
 - step: 4

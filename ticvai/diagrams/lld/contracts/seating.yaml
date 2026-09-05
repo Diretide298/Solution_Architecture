@@ -27,7 +27,6 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - cache:idempotency

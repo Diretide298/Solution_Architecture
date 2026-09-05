@@ -35,7 +35,7 @@ The amendment below is retained for the record and is no longer the operative ru
 | **Within a jurisdiction** | **Available, not default.** Two regions in the same country share a cell unless placement says otherwise | Load, latency or client preference |
 
 Region already carries a `placement` attribute, so splitting within a jurisdiction is a
-configuration change rather than a redesign. ADR-0010 supplies the cross-cell machinery, so
+configuration change rather than a redesign. ADR-0010 supplies the cross-region machinery, so
 a tenant split this way loses no capability.
 
 **Default is one cell per tenant per jurisdiction**, because splitting within a jurisdiction
@@ -43,7 +43,7 @@ costs and buys little:
 
 | Cost of splitting within a jurisdiction | |
 |---|---|
-| Cross-region features become cross-cell | A pass valid at two venues in the same country stops being a single order and becomes a delegated redemption |
+| Cross-region features become cross-region | A pass valid at two venues in the same country stops being a single order and becomes a delegated redemption |
 | Guest identity fragments domestically | Two records plus a link, where one record would do |
 | Cost floor multiplies | One per region rather than one per country |
 | Migration and backup targets multiply | Same |

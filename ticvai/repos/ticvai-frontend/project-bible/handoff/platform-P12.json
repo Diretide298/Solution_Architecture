@@ -7,26 +7,53 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 8,
-  "operations": 33,
-  "contracts": 4,
-  "modules": 1,
+  "screens": 28,
+  "operations": 55,
+  "contracts": 7,
+  "modules": 5,
   "undrawn": 0,
-  "operationsWithNoScreen": 58
+  "operationsWithNoScreen": 82
  },
  "waves": {
   "wave2": 2,
-  "wave3": 6
+  "wave3": 26
  },
  "modules": [
   {
-   "module": "TODO",
-   "screens": 8,
+   "module": "Support",
+   "screens": 20,
    "waves": [
-    2,
+    3
+   ]
+  },
+  {
+   "module": "Access & Availability",
+   "screens": 2,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Overview",
+   "screens": 2,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Conversations",
+   "screens": 2,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Knowledge & Responses",
+   "screens": 2,
+   "waves": [
     3
    ]
   }
@@ -34,18 +61,30 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 16
-  },
-  {
-   "contract": "reporting",
-   "operations": 8
+   "operations": 35
   },
   {
    "contract": "identity",
    "operations": 8
   },
   {
+   "contract": "reporting",
+   "operations": 8
+  },
+  {
+   "contract": "white-label",
+   "operations": 1
+  },
+  {
+   "contract": "ai",
+   "operations": 1
+  },
+  {
    "contract": "finance",
+   "operations": 1
+  },
+  {
+   "contract": "queue",
    "operations": 1
   }
  ],
@@ -53,7 +92,7 @@
   {
    "id": "SUP-001",
    "name": "Agent Login",
-   "module": "TODO",
+   "module": "Access & Availability",
    "wave": 3,
    "route": "/general/agent-login",
    "operations": 8,
@@ -62,7 +101,7 @@
   {
    "id": "SUP-002",
    "name": "Agent Dashboard",
-   "module": "TODO",
+   "module": "Overview",
    "wave": 3,
    "route": "/general/agent-dashboard",
    "operations": 9,
@@ -71,7 +110,7 @@
   {
    "id": "SUP-003",
    "name": "Availability & Routing Settings",
-   "module": "TODO",
+   "module": "Access & Availability",
    "wave": 3,
    "route": "/general/availability-and-routing-settings",
    "operations": 1,
@@ -80,7 +119,7 @@
   {
    "id": "SUP-004",
    "name": "Conversation Queue",
-   "module": "TODO",
+   "module": "Conversations",
    "wave": 2,
    "route": "/general/conversation-queue",
    "operations": 10,
@@ -89,7 +128,7 @@
   {
    "id": "SUP-005",
    "name": "Live Chat Workspace",
-   "module": "TODO",
+   "module": "Conversations",
    "wave": 2,
    "route": "/general/live-chat-workspace",
    "operations": 11,
@@ -98,16 +137,16 @@
   {
    "id": "SUP-006",
    "name": "Knowledge Base Search",
-   "module": "TODO",
+   "module": "Knowledge & Responses",
    "wave": 3,
    "route": "/general/knowledge-base-search",
-   "operations": 0,
+   "operations": 2,
    "drawn": true
   },
   {
    "id": "SUP-007",
    "name": "Canned Response Management",
-   "module": "TODO",
+   "module": "Knowledge & Responses",
    "wave": 3,
    "route": "/general/canned-response-management",
    "operations": 2,
@@ -116,15 +155,255 @@
   {
    "id": "SUP-008",
    "name": "Agent Performance & SLA View",
-   "module": "TODO",
+   "module": "Overview",
    "wave": 3,
    "route": "/general/agent-performance-and-sla-view",
    "operations": 10,
+   "drawn": true
+  },
+  {
+   "id": "SUP-009",
+   "name": "Customer Service Command Center",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/customer-service-command-center-sup-009",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-010",
+   "name": "Customer 360\u00b0 Service Profile",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/customer-360-service-profile-sup-010",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-011",
+   "name": "Unified Interaction & Communication History",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/unified-interaction-communication-history-sup-011",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-012",
+   "name": "Case Creation, Classification & Intelligent Routing",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/case-creation-classification-intelligent-routing-sup-012",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-013",
+   "name": "Case Investigation & Resolution Workspace",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/case-investigation-resolution-workspace-sup-013",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-014",
+   "name": "Order, Booking & Ticket Service Workspace",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/order-booking-ticket-service-workspace-sup-014",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-015",
+   "name": "Refund, Compensation & Service Exception Workspace",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/refund-compensation-service-exception-workspace-sup-015",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-016",
+   "name": "Escalation, Collaboration & Internal Resolution",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/escalation-collaboration-internal-resolution-sup-016",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-017",
+   "name": "Case Resolution, Closure & Customer Feedback",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/case-resolution-closure-customer-feedback-sup-017",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-018",
+   "name": "AI Customer Service Copilot & Knowledge Workspace",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/ai-customer-service-copilot-knowledge-workspace-sup-018",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-019",
+   "name": "Contact Center Operations Command Center",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/contact-center-operations-command-center-sup-019",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-020",
+   "name": "Queue Configuration & Management",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/queue-configuration-management-sup-020",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-021",
+   "name": "Intelligent Routing, Skills & Assignment Engine",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/intelligent-routing-skills-assignment-engine-sup-021",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-022",
+   "name": "SLA Policy & Service-Level Management",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/sla-policy-service-level-management-sup-022",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-023",
+   "name": "Agent Workload, Availability & Workforce Control",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/agent-workload-availability-workforce-control-sup-023",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-024",
+   "name": "Escalation & Critical Case Monitor",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/escalation-critical-case-monitor-sup-024",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-025",
+   "name": "Quality Management & Agent Evaluation",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/quality-management-agent-evaluation-sup-025",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-026",
+   "name": "Customer Satisfaction, Feedback & Voice of Customer",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/customer-satisfaction-feedback-voice-of-customer-sup-026",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-027",
+   "name": "Service Analytics & Root-Cause Intelligence",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/service-analytics-root-cause-intelligence-sup-027",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "SUP-028",
+   "name": "AI Contact Center Intelligence & Automation Studio",
+   "module": "Support",
+   "wave": 3,
+   "route": "/support/ai-contact-center-intelligence-automation-studio-sup-028",
+   "operations": 1,
    "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
+   {
+    "operation": "createKnowledgeCollection",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Create a collection"
+   },
+   {
+    "operation": "generateVenueLayout",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Draft a seat map from an uploaded plan"
+   },
+   {
+    "operation": "ingestKnowledgeDocument",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Add a document"
+   },
+   {
+    "operation": "listIndexSources",
+    "contract": "ai",
+    "verb": "GET",
+    "summary": "What is indexed, and how current it is"
+   },
+   {
+    "operation": "proposeTranslations",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": ""
+   },
+   {
+    "operation": "proposeWalkways",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Find walkable space in a drawing that has no vectors"
+   },
+   {
+    "operation": "reindexSource",
+    "contract": "ai",
+    "verb": "POST",
+    "summary": "Rebuild a source"
+   },
+   {
+    "operation": "removeIndexEntry",
+    "contract": "ai",
+    "verb": "DELETE",
+    "summary": "Remove one record from the index"
+   },
+   {
+    "operation": "setIndexSource",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": "Declare a source indexed"
+   },
+   {
+    "operation": "setSuggestionProvider",
+    "contract": "ai",
+    "verb": "PUT",
+    "summary": ""
+   },
    {
     "operation": "calculateTax",
     "contract": "finance",
@@ -148,6 +427,12 @@
     "contract": "finance",
     "verb": "GET",
     "summary": "Every money source against the ledger, in one view"
+   },
+   {
+    "operation": "ingestFxRates",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Pull rates from the configured provider"
    },
    {
     "operation": "listInterEntityObligations",
@@ -186,28 +471,16 @@
     "summary": "Revalue monetary balances at close"
    },
    {
+    "operation": "setFxProvider",
+    "contract": "finance",
+    "verb": "PUT",
+    "summary": "Which provider serves which purpose"
+   },
+   {
     "operation": "validateRecognitionSchedules",
     "contract": "finance",
     "verb": "POST",
     "summary": "Find product kinds claimed by more than one schedule"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "deleteGuestAccount",
-    "contract": "identity",
-    "verb": "DELETE",
-    "summary": "Self-service account deletion"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
    },
    {
     "operation": "setPasswordPolicy",
@@ -264,12 +537,6 @@
     "summary": "Create a loyalty programme"
    },
    {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
     "operation": "createUrlRedirect",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -288,22 +555,10 @@
     "summary": "Candidate matches, scored"
    },
    {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
    },
    {
     "operation": "listMessageTriggers",
@@ -366,22 +621,10 @@
     "summary": "Why the conversation ended, and any callback"
    },
    {
-    "operation": "setConsentPurposes",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Configure consent purposes"
-   },
-   {
     "operation": "setMessageTrigger",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Fire a message from a platform event"
-   },
-   {
-    "operation": "setSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Titles, descriptions, canonicals and hreflang"
    },
    {
     "operation": "startKioskAssist",
@@ -396,16 +639,16 @@
     "summary": "Sign a waiver, answer a survey, capture details"
    },
    {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
+    "operation": "overrideWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit against a failed redemption"
    },
    {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
+    "operation": "redeemWaitingGuest",
+    "contract": "queue",
     "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
+    "summary": "Admit a party at the ride"
    },
    {
     "operation": "cancelReportExecution",
@@ -472,17 +715,129 @@
     "contract": "reporting",
     "verb": "PATCH",
     "summary": "Amend, pause or resume a schedule"
-   }
-  ],
-  "modulesSplitAcrossWaves": [
+   },
    {
-    "module": "TODO",
-    "waves": [
-     2,
-     3
-    ]
+    "operation": "createBanner",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a banner"
+   },
+   {
+    "operation": "createContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Author a block of content"
+   },
+   {
+    "operation": "createContentPage",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a content page"
+   },
+   {
+    "operation": "createPromoBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a promotional block"
+   },
+   {
+    "operation": "deleteBanner",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a banner"
+   },
+   {
+    "operation": "deleteContentPage",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a content page"
+   },
+   {
+    "operation": "deletePromoBlock",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a promotional block"
+   },
+   {
+    "operation": "getFeatureToggles",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read tenant feature toggles"
+   },
+   {
+    "operation": "getModuleEnablement",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read module enablement"
+   },
+   {
+    "operation": "getNavigation",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read navigation"
+   },
+   {
+    "operation": "publishContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Publish now, or schedule it"
+   },
+   {
+    "operation": "setFeatureToggles",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set feature toggles"
+   },
+   {
+    "operation": "setFooter",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Footer columns, legal links and social"
+   },
+   {
+    "operation": "setHeader",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Configure the header"
+   },
+   {
+    "operation": "setMaintenanceMode",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or clear maintenance mode"
+   },
+   {
+    "operation": "setModuleEnablement",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or disable modules"
+   },
+   {
+    "operation": "setNavigation",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set main and overflow navigation"
+   },
+   {
+    "operation": "updateBanner",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend or activate a banner"
+   },
+   {
+    "operation": "updateContentPage",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Amend a content page"
+   },
+   {
+    "operation": "updatePromoBlock",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend a promotional block"
    }
   ],
+  "modulesSplitAcrossWaves": [],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []
  }

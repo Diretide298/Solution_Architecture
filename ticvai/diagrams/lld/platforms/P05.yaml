@@ -495,7 +495,8 @@ screens:
   entryParams:
   - outletId<-KSK-016
   - cartId<-session
-  goesTo: []
+  goesTo:
+  - KSK-016
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-017
   wireframe: wireframes/Kiosk Board 2.dc.html#KSK-017

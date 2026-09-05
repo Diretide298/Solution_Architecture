@@ -1,0 +1,87 @@
+contract: marketing-crm
+entity: JourneyEntrant
+enum: JourneyEntrant.status
+enumSchema: JourneyEntrant
+enumKind: lifecycle
+owner: MarketingService
+initial:
+- active
+terminal:
+- completed
+- exited
+- suppressed
+notes: '**A guest inside a journey, at a step.**
+
+  **`suppressed` is terminal and distinct from `exited`.** A guest who opted out mid-journey did not
+  finish it and did not leave it — they were stopped, and collapsing the two makes a completion rate
+  that falls for a compliance reason look like a content problem.
+
+  **`paused` is not terminal and does not evict.** Pausing a journey holds its entrants where they are;
+  **a half-finished recovery sequence that restarts sends the first message twice**, which is the failure
+  the pause exists to avoid.
+
+  **Suppression is checked at send, not only at entry.** `marketing.suppression` is *who must not be
+  contacted, whatever a campaign says* — an entrant who was contactable on Monday and opted out on Tuesday
+  must not receive Wednesday''s step.
+
+
+  🔴 **`pauseJourney` does not exist.** `activateJourney` has no inverse, so the `paused` state is reachable
+  in this model and not in the API. **The state model is right and the contract is short an operation**
+  — a campaign somebody needs to stop mid-flight is the ordinary reason to want one.'
+transitions:
+- from: active
+  to: active
+  operation: getJourneyPerformance
+  trigger: system
+  guard: '**The step advance, and it is a self-transition because the status does not change.** `stepEnteredAt`
+    moves and `nextActionAt` is recomputed — a delay step counts from the former.
+
+    '
+- from: active
+  to: paused
+  trigger: system
+  guard: 'The journey was paused. **Entrants stay where they are** rather than being evicted.
+
+
+    🔴 **No operation pauses a journey.** `activateJourney` exists and its inverse does not — so a journey
+    can be started and not stopped, which is a real gap rather than a modelling convenience. Marked
+    `system` because nothing in the contract reaches this transition today.'
+- from: paused
+  to: active
+  operation: activateJourney
+  trigger: operation
+  guard: 'Resumed from the step they were on. **Not from the beginning** — that is the whole reason
+    pausing does not evict.
+
+    '
+- from: active
+  to: completed
+  trigger: system
+  guard: The last step ran.
+- from: active
+  to: exited
+  trigger: system
+  guard: 'An exit condition matched — the guest bought the thing the journey was recovering, or the
+    audience no longer selects them. **A good outcome, and it should not be counted against the journey.**
+
+    '
+- from: paused
+  to: exited
+  trigger: system
+  guard: An exit condition matched while paused. **Evaluated even when nothing is sending.**
+- from: active
+  to: suppressed
+  operation: recordConsent
+  trigger: operation
+  guard: 'The guest withdrew consent, or `marketing.suppression` now matches them. **Terminal, and it
+    stops the journey immediately** rather than at the next step boundary.
+
+    '
+- from: paused
+  to: suppressed
+  operation: recordConsent
+  trigger: operation
+  guard: 'A paused journey still suppresses. **A guest who opts out should not be waiting in a queue
+    for somebody to resume it.**
+
+    '

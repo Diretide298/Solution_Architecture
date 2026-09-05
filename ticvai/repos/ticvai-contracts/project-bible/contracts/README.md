@@ -13,8 +13,8 @@ Spec-first. Hand-authored here; servers and clients are generated. Never the rev
 | `spine/finance.yaml` | **37** | Chart of accounts, ERP mapping, tax engine with compound tax, revenue recognition, deferred revenue, journals with approval, ledger, trial balance, price variance, settlement, fiscal periods, financial reporting | **12 Aug deep-dive · CF-38** |
 | `spine/orders.yaml` | **31** | Orders, payments with inquiry recovery, refunds with venue policy, **modification, exchange, reschedule, ticket transfer with claim, order statement, B2B credit**, reservations, offline sync | **CF-36, CF-38, ADR-0013** |
 | `spine/shift.yaml` | 10 | Shift lifecycle, blind close-out, cash lift, variance | C01 · 12 Aug §1, §19 |
-| `spine/access.yaml` | **19** | Validation, override, lookup, offline sync, turnstile mode, cross-cell rights, access points, admission profiles, blacklist, **group validation**, **geofencing** | C09 · ADR-0010 |
-| `spine/cross-cell.yaml` | **16** | Guest links, redemption delegation, wallet authorisation, DSAR fan-out | **ADR-0010, ADR-0014** |
+| `spine/access.yaml` | **19** | Validation, override, lookup, offline sync, turnstile mode, cross-region rights, access points, admission profiles, blacklist, **group validation**, **geofencing** | C09 · ADR-0010 |
+| `spine/cross-region.yaml` | **16** | Guest links, redemption delegation, wallet authorisation, DSAR fan-out | **ADR-0010, ADR-0014** |
 | `spine/catalogue.yaml` | **45** | Products with **lifecycle and approval**, variants, pricing with **copy and uplift**, events, performances with **cancellation**, envelopes, channel allocations, signed bundles, inventory leases, **entitlement templates**, **alternative codes** | C20, C84, C85 · **ADR-0013** |
 
 Every operation declares `x-ticvai-permission`, `x-ticvai-scope-level`,

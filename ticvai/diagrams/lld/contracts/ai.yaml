@@ -1,5 +1,5 @@
 id: LLD-ai
-title: ai — 30 operations
+title: ai — 31 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -178,6 +178,17 @@ operations:
   offline: false
   reads:
   - ai.provider
+  writes: []
+- operation: listIndexFailures
+  verb: GET
+  path: /index-failures
+  scope: tenant
+  permission: AI_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - ai.index_failure
   writes: []
 - operation: listIndexJobs
   verb: GET

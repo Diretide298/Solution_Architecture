@@ -1,5 +1,5 @@
 id: LLD-RetailService
-title: RetailService — 35 operations, 14 tables
+title: RetailService — 37 operations, 15 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -8,20 +8,20 @@ why: Merchandise, wallets and gift cards. Modest at 35 operations, and separate 
 scale: Follows the sale. Nothing unusual.
 ifDown: Down means the shop stops; the gates and the restaurant do not.
 coverage:
-  operations: 35
+  operations: 37
   inAFlow: 15
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: retail
-  tables: 14
+  tables: 15
   stores:
   - postgres
-  largestTable: retail.merchandise
+  largestTable: retail.shop_and_drop
 operationsByContract:
 - contract: retail
-  count: 35
+  count: 37
   operations:
   - operation: activateGiftCard
     verb: POST
@@ -199,6 +199,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listStoreRules
+    verb: GET
+    path: /store-rules
+    scope: venue
+    permission: PRODUCT_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listWalletTransactions
     verb: GET
     path: /wallets/{subjectId}/transactions
@@ -271,6 +279,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setStoreRules
+    verb: PUT
+    path: /store-rules
+    scope: venue
+    permission: PRODUCT_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: suspendWallet
     verb: POST
     path: /wallets/{walletId}/suspend
@@ -326,7 +342,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.gift_card
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -347,7 +363,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.reservation_line
-  columns: 4
+  columns: 5
   store: postgres
   parent: retail.reservation
   writtenBy: []
@@ -360,7 +376,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.return_line
-  columns: 8
+  columns: 9
   store: postgres
   parent: retail.return
   writtenBy: []
@@ -380,7 +396,7 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.sale_line
-  columns: 12
+  columns: 13
   store: postgres
   parent: retail.sale
   writtenBy: []
@@ -393,10 +409,17 @@ tables:
   - retail
   foreignWriters: null
 - table: retail.shop_and_drop_line
-  columns: 7
+  columns: 8
   store: postgres
   parent: retail.shop_and_drop
   writtenBy: []
+  foreignWriters: null
+- table: retail.store_rule
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - retail
   foreignWriters: null
 - table: retail.wallet
   columns: 9
@@ -430,6 +453,7 @@ screens:
 - P02:GST-011 Wallet Overview
 - P02:GST-026 Retail / Merchandise
 - P02:GST-062 Shop & Drop Collection
+- P02:GST-071 Payment Methods
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-005 Payment
 - P04:POS-007 Close Shift
@@ -445,6 +469,7 @@ screens:
 - P08:BO-048 Retail Products
 - P08:BO-114 Variants, Attributes, Barcode & RFID Management
 - P08:BO-116 Merchandising & Product Presentation
+- P08:BO-142 Store Rules, Controls & Permissions
 flows:
 - F17 A guest buys merchandise and collects later
 - F34 A retail sale, from scan to return

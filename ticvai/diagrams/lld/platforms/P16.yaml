@@ -124,7 +124,8 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - FnB Board 6.dc.html#fnb-6b
   - Retail Board 6.dc.html#ret-6l
@@ -155,7 +156,8 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - FnB Board 4.dc.html#fnb-4k
   - FnB Board 6.dc.html#fnb-6c
@@ -189,7 +191,8 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - FnB Board 6.dc.html#fnb-6d
   - Retail Board 6.dc.html#ret-6c
@@ -219,7 +222,8 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - FnB Board 6.dc.html#fnb-6e
   - Retail Board 6.dc.html#ret-6f
@@ -251,7 +255,8 @@ screens:
   - countId<-deepLink
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - FnB Board 6.dc.html#fnb-6f
   - Retail Board 6.dc.html#ret-6d
@@ -284,7 +289,8 @@ screens:
   - dashboardId<-deepLink
   - reportId<-deepLink
   - segmentId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - Retail Board 6.dc.html#ret-6e
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-007
@@ -311,7 +317,8 @@ screens:
   - venueId<-session
   - domain<-session
   - dashboardId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - FnB Board 6.dc.html#fnb-6h
   - Retail Board 6.dc.html#ret-6g
@@ -346,7 +353,8 @@ screens:
   - alertId<-deepLink
   - reportId<-deepLink
   - actionId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - FnB Board 5.dc.html#fnb-5k
   - FnB Board 6.dc.html#fnb-6j
@@ -378,7 +386,8 @@ screens:
   entryParams:
   - venueId<-session
   - suggestionId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
   - POS Board 6.dc.html#pos-6f
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-010

@@ -776,7 +776,7 @@ def main() -> int:
             {"order": 4, "tier": "engagement",
              "rule": "**Can ship late and be down.**"},
             {"order": 5, "tier": "platform",
-             "rule": ("Control provisions a tenant rather than serving one. CrossCell only matters "
+             "rule": ("Control provisions a tenant rather than serving one. CrossRegion only matters "
                       "once a second region exists.")},
         ],
         "canBeDownWithoutStoppingASale": [

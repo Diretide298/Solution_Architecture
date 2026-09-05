@@ -7,13 +7,13 @@ about: '**Where configuration lives.** A venue operator does not have one set of
   top breaks a venue that needed to differ.
 
 
-  `platform.scope_node` is the answer. A node has a `level`, a `parent_id` and a materialised `path`;
+  `platform.org_unit` is the answer. A node has a `level`, a `parent_id` and a materialised `path`;
   **configuration resolves by walking that path upward until something answers.**'
 decisions:
 - docs/adr/0011-hierarchy-is-binding.md
 - docs/adr/0018-configuration-scope.md
 spine:
-  table: platform.scope_node
+  table: platform.org_unit
   columns:
   - id
   - level
@@ -34,8 +34,8 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 247
-  configurations: 26
+  operations: 307
+  configurations: 27
   configuredBy:
   - claimCustomDomain
   - createDashboard
@@ -68,17 +68,17 @@ levels:
 - level: region
   branch: organisational
   parent: brand
-  operations: 46
-  configurations: 8
+  operations: 54
+  configurations: 11
   configuredBy:
   - createSeatMapTemplate
   - createUpsellRule
   - listAiProviders
   - setAccountMappings
   - setAiProvider
+  - setFxProvider
   - setFxRate
-  - setWalletAllocationPolicy
-  - updateRegionSettings
+  - setScalingPolicy
   owns:
   - Currency and decimal scale
   - Tax authority
@@ -91,12 +91,12 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 675
-  configurations: 25
+  operations: 1215
+  configurations: 43
   configuredBy:
   - configureQueueFeed
   - configureWorkstation
-  - createAdmissionProfile
+  - createAdmissionRules
   - createDonationCampaign
   - createEntitlementTemplate
   - createResource

@@ -1,10 +1,11 @@
 # ADR-0014: Cell Per Region
 
-**Status:** Accepted
+**Status:** Superseded by [ADR-0038](0038-cell-is-a-region-database-per-tenant.md) — a cell is a
+region and holds many tenants. *Cell per region* survives; `Cell = Tenant × Region` does not.
 **Date:** 13 August 2026
 **Supersedes:** the ADR-0001 (retired — see ADR-0014 and ADR-0017) default of one cell per tenant per jurisdiction
 **Closes:** CF-32
-**Elevates:** ADR-0010 cross-cell machinery from exception path to normal path
+**Elevates:** ADR-0010 cross-region machinery from exception path to normal path
 
 ---
 
@@ -81,7 +82,7 @@ So the jurisdiction rule is not removed — it moves from being the *split rule*
 
 | | |
 |---|---|
-| **ADR-0010 machinery moves to Wave 1** | Guest Link Registry, redemption delegation, cross-cell wallet authorisation. These are no longer edge cases — a two-region tenant needs them on day one |
+| **ADR-0010 machinery moves to Wave 1** | Guest Link Registry, redemption delegation, cross-region wallet authorisation. These are no longer edge cases — a two-region tenant needs them on day one |
 | **Guest Link Registry is core, not compliance scaffolding** | Every multi-region guest-app has a link, whether or not a border is crossed |
 | **Cross-cell testing is mandatory in CI** | The reference fixture already carries three regions. Cross-cell paths are now default-path tests |
 
@@ -99,7 +100,7 @@ So the jurisdiction rule is not removed — it moves from being the *split rule*
 |---|---|
 | **Cost floor per region** | `shared` placement — multiple regions' databases on one cluster |
 | **Guest identity fragments within a country** | Guest Link Registry handles it. Now exercised continuously rather than rarely |
-| **A pass across two regions in one country becomes a cross-cell redemption** | Same machinery, same code path, now well-tested. Latency is on wallet authorisation only; entitlement redemption stays local |
+| **A pass across two regions in one country becomes a cross-region redemption** | Same machinery, same code path, now well-tested. Latency is on wallet authorisation only; entitlement redemption stays local |
 | **More migration and backup targets** | Migration orchestrator fans out regardless. Linear, parallelisable |
 | **Cross-region reporting always needs the warehouse** | It already did, for cross-jurisdiction tenants |
 
@@ -109,10 +110,10 @@ So the jurisdiction rule is not removed — it moves from being the *split rule*
 
 My earlier recommendation weighed cost against blast radius and concluded region-splitting
 was rarely worth it. That analysis was right on its own terms and wrong on the terms that
-matter: it treated the cross-cell path as a liability to be avoided rather than a capability
+matter: it treated the cross-region path as a liability to be avoided rather than a capability
 to be exercised.
 
-Under jurisdiction-only splitting, most tenants sit entirely within one cell, the cross-cell
+Under jurisdiction-only splitting, most tenants sit entirely within one cell, the cross-region
 code runs almost never, and the first real exercise of it is a guest-app at a gate in another
 country. That is the failure mode ADR-0013 was written to eliminate.
 
@@ -122,7 +123,7 @@ country. That is the failure mode ADR-0013 was written to eliminate.
 
 | Rejected | Why |
 |---|---|
-| Cell per jurisdiction, region split optional | Conditional rule; cross-cell path rarely exercised; jurisdiction availability becomes an architectural blocker |
+| Cell per jurisdiction, region split optional | Conditional rule; cross-region path rarely exercised; jurisdiction availability becomes an architectural blocker |
 | Cell per tenant | Fails residency outright |
 | Cell per venue | Breaks cross-venue passes, wallets, memberships and consolidated reporting within a single region |
 | **Cell per region** | **Accepted** |
@@ -137,7 +138,7 @@ brands, a brand spanning jurisdictions, two currencies with different decimal sc
 sibling venue isolation.
 
 Under this decision it also exercises **three cells**, which makes it a better fixture than
-it was: cross-cell paths are now default-path tests rather than a special case bolted on.
+it was: cross-region paths are now default-path tests rather than a special case bolted on.
 
 No client deployment topology is implied by it, and none should be inferred.
 

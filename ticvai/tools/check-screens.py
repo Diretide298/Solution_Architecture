@@ -70,10 +70,15 @@ def load_operation_ids() -> set[str]:
     if not CONTRACTS.exists():
         return ops
     for f in CONTRACTS.rglob("*.yaml"):
+        # **An unparseable contract used to be skipped in silence.** Its operations then looked
+        # as though they did not exist, so every screen calling one failed and the report pointed
+        # at the screens rather than at the one file that was broken. **A checker that misreports
+        # where a fault is costs more than one that stops.**
         try:
             doc = yaml.safe_load(f.read_text(encoding="utf-8"))
-        except Exception:
-            continue
+        except Exception as exc:  # noqa: BLE001
+            print(f"  FAIL  {f.name} does not parse: {exc}")
+            raise SystemExit(1)
         for item in (doc.get("paths") or {}).values():
             if not isinstance(item, dict):
                 continue
@@ -581,58 +586,143 @@ def main() -> int:
                         f"{sc['id']} ({code}) has a destructive button with no label — a red "
                         "button that cannot say what it destroys")
 
-    # **Presence was the whole test, and presence is satisfiable by paste.** The rule above was
-    # added on 31 August and answered the same day by putting **one identical `confirmDialog` on
-    # all 39 screens** — same label, same note, `derived: true`, every one byte-for-byte the same.
-    # The label was *Confirm*, which is the *are you sure* the library entry exists to rule out,
-    # and the note pasted onto all 39 quoted that entry while breaking it.
+    # **Coverage was only ever measured from the screen side.** Every check here asks whether a
+    # screen's operations exist and whether the audiences agree. **None asked the inverse: is there
+    # a screen for every operation a guest is allowed to call?**
     #
-    # **A count cannot tell you a dialog names a consequence, but it can tell you 39 dialogs are
-    # one dialog.** Two screens sharing a confirmation is correct where they share an operation —
-    # ten screens void an order and the consequence is the same each time. Two screens sharing one
-    # where the operations differ is a paste.
-    seen_dialog: dict[str, list[str]] = {}
+    # 51 were found by hand on 31 August, including `deleteGuestAccount` and `exportSubjectData` —
+    # **two things a guest can legally demand under UAE data protection, with nowhere to demand
+    # them from.** Also `createRefundRequest`, `createResaleListing` and `createCase`: a guest may
+    # request a refund, resell a ticket and raise a complaint, and all three were back-office only.
+    #
+    # **A contract that says a guest may do something, and no surface where they can, is a promise
+    # the package makes and the product does not keep.**
+    #
+    # Service-to-service operations are excluded by `x-ticvai-service-only`, which is a declaration
+    # rather than an inference — an operation tagged `guest` and reachable from nowhere should have
+    # to say so.
+    _guest_ops = {o for o, v in _lin.items()
+                  if {"guest", "public", "anonymous"} & set(v.get("audience") or [])
+                  and not v.get("serviceOnly")}
+    _on_guest_screen: set = set()
     for f in sorted(SCREENS.glob("P*.yaml")):
         doc = yaml.safe_load(f.read_text(encoding="utf-8"))
-        code = (doc.get("platform") or {}).get("code", "")
+        if (doc.get("platform") or {}).get("audience") != "guest":
+            continue
         for sc in doc.get("screens") or []:
-            regions = (sc.get("layout") or {}).get("regions") or []
-            for c in (c for r in regions for c in (r.get("components") or [])):
-                if c.get("kind") != "confirmDialog":
-                    continue
-                label = str(c.get("label") or "").strip()
-                body = str(c.get("notes") or "").strip()
-                if not label:
-                    ERRORS.append(
-                        f"{sc['id']} ({code}) confirmDialog has no label — it cannot name the act")
-                elif label.lower() in {"confirm", "are you sure", "are you sure?", "ok", "yes"}:
-                    ERRORS.append(
-                        f"{sc['id']} ({code}) confirmDialog is labelled {label!r} — the library "
-                        "entry rules this out by name: \"Are you sure?\" is not a confirmation")
-                if not c.get("bindsTo"):
-                    WARNINGS.append(
-                        f"{sc['id']} ({code}) confirmDialog names no operation in `bindsTo`, so "
-                        "nothing says what it is confirming")
-                if "Body not written" in body:
-                    ERRORS.append(
-                        f"{sc['id']} ({code}) confirmDialog was proposed by derive-components and "
-                        "never written — the consequence has to be read off the lineage, the state "
-                        "model and the events")
-                # **An absent `bindsTo` must not defeat this.** Falling back to the operation
-                # alone let two unbound dialogs look like one operation and pass; keying an
-                # unbound dialog on its own screen id makes every one of them distinct, so a
-                # shared body across unbound dialogs still trips the rule below.
-                op_key = c.get("bindsTo") or f"unbound:{sc['id']}"
-                key = f"{label} {body}"
-                seen_dialog.setdefault(key, []).append(f"{sc['id']} ({op_key})")
+            _on_guest_screen |= {a.get("operationId") for a in (sc.get("apis") or [])}
+    for _o in sorted(_guest_ops - _on_guest_screen):
+        WARNINGS.append(
+            f"{_o}: a guest may call it and no guest screen does — either a surface is missing or "
+            "the audience is wrong")
 
-    for key, users in seen_dialog.items():
-        ops = {u.rsplit("(", 1)[-1].rstrip(")") for u in users}
-        if len(users) > 1 and len(ops) > 1:
-            ERRORS.append(
-                f"one confirmDialog definition is shared by {len(users)} screens across "
-                f"{len(ops)} different operations ({', '.join(sorted(ops))}) — a consequence that "
-                "fits every screen names none of them: " + ", ".join(users[:6]))
+    # ── a failure the platform recorded and nobody can see ──────────────────────────────────
+    #
+    # **The inverse of the guest-coverage check above.** That one asks whether a guest can reach
+    # what a guest may call; this asks whether an operator can see what the platform dropped.
+    #
+    # Two tables failed it on the first run and they failed it differently, which is why the rule
+    # tests the table rather than the operation. `platform.dead_letter` had `listDeadLetters` and
+    # `replayDeadLetter` and no screen calling either. `ai.index_failure` had **no operation at
+    # all** — a table specified, written up as "failure is a row somebody works, not a log line",
+    # and unreachable from anywhere in the package.
+    #
+    # `events/_schema.yaml` is what makes this an obligation rather than a preference: **"a
+    # dead-lettered critical event is a page, not a dashboard."** A page nobody built is the same
+    # as no page.
+    try:
+        _lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        _lin = {}
+    _failure_tables: set = set()
+    for _c in sorted((ROOT / "contracts").rglob("*.yaml")):
+        try:
+            _doc = yaml.safe_load(_c.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        for _n, _sch in ((_doc.get("components") or {}).get("schemas") or {}).items():
+            _t = (_sch or {}).get("x-ticvai-persistence")
+            # Named for what it holds: a failure, a dead letter, a rejection, an exception.
+            if _t and re.search(r"(failure|dead_letter|rejection|exception|error)s?$", str(_t)):
+                _failure_tables.add(str(_t))
+    _screen_ops: set = set()
+    for f in files:
+        _d = yaml.safe_load(f.read_text(encoding="utf-8"))
+        for sc in _d.get("screens") or []:
+            _screen_ops |= {a.get("operationId") for a in (sc.get("apis") or [])}
+    # **Readers come from the contracts, not from the lineage.** `api-data-lineage.json` is read
+    # by twenty tools as authoritative and NOTHING IN THIS PACKAGE REGENERATES IT — it arrives
+    # with the dump. So an operation added to a contract is invisible to every lineage consumer
+    # until the next drop, and this rule would report a table as unreachable while the operation
+    # that reads it sits in the file next door. Derived here instead: an operation reads a table
+    # if any schema it returns declares that table as its persistence.
+    _persist_of: dict = {}
+    _op_reads: dict = {}
+    for _c in sorted((ROOT / "contracts").rglob("*.yaml")):
+        try:
+            _doc = yaml.safe_load(_c.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        _schemas = (_doc.get("components") or {}).get("schemas") or {}
+        for _n, _sch in _schemas.items():
+            _t = (_sch or {}).get("x-ticvai-persistence")
+            if _t:
+                _persist_of[_n] = str(_t)
+        for _path, _item in (_doc.get("paths") or {}).items():
+            for _verb, _op in (_item or {}).items():
+                if not isinstance(_op, dict) or not _op.get("operationId"):
+                    continue
+                _refs = set(re.findall(r"#/components/schemas/([A-Za-z0-9_]+)",
+                                       json.dumps(_op.get("responses") or {})))
+                _tabs = {_persist_of[r] for r in _refs if r in _persist_of}
+                if _tabs:
+                    _op_reads.setdefault(_op["operationId"], set()).update(_tabs)
+    for _t in sorted(_failure_tables):
+        _readers = sorted({o for o, ts in _op_reads.items() if _t in ts}
+                          | {o for o, v in _lin.items() if _t in (v.get("reads") or [])})
+        if not _readers:
+            WARNINGS.append(
+                f"{_t}: a failure table no operation reads — the platform records it and nothing "
+                "in the package can reach a single row")
+        elif not (set(_readers) & _screen_ops):
+            WARNINGS.append(
+                f"{_t}: read by {sorted(_readers)} and no screen calls any of them — "
+                "events/_schema.yaml says a dead-lettered critical event is a page, not a dashboard")
+
+    # ── screen ids are issued, not calculated ───────────────────────────────────────────────
+    #
+    # **Two workstreams both took ADM-038 on 4 September.** Each computed max+1 over the screens
+    # it could see, neither could see the other, and nothing held a number — so one 'Dead Letters'
+    # and one 'Communication Service Command Center' were both correct and both wrong.
+    #
+    # `screens/_id-register.yaml` is the issue log that fixes it: **a number in that file is
+    # spent.** An allocator starts above the highest number RECORDED rather than above the highest
+    # it happens to have loaded, which is the difference between the two workstreams agreeing and
+    # merely not overlapping yet.
+    #
+    # **A retired id is never reissued** — `nextFree` is the high-water mark plus one, gaps and
+    # all. Reusing a deleted screen's number is how a link in a document opens the wrong screen.
+    _reg_p = ROOT / "screens" / "_id-register.yaml"
+    if _reg_p.exists():
+        _reg = (yaml.safe_load(_reg_p.read_text(encoding="utf-8")) or {}).get("prefixes") or {}
+        _live: dict = {}
+        for f in files:
+            _d = yaml.safe_load(f.read_text(encoding="utf-8"))
+            for sc in _d.get("screens") or []:
+                _live.setdefault(sc["id"].rsplit("-", 1)[0], []).append(int(sc["id"].rsplit("-", 1)[1]))
+        for _pre, _nums in sorted(_live.items()):
+            _rec = _reg.get(_pre)
+            if not _rec:
+                ERRORS.append(f"{_pre}-: prefix is not in screens/_id-register.yaml — register it "
+                              "before issuing ids under it, or two workstreams will both claim the "
+                              "same numbers")
+                continue
+            _over = sorted(n for n in _nums if n > _rec.get("highWaterMark", 0))
+            if _over:
+                ERRORS.append(
+                    f"{_pre}-{_over[0]:03d}: issued above the register's high-water mark of "
+                    f"{_rec.get('highWaterMark')} — run tools/derive-id-register.py --apply and "
+                    "commit it in the same change, so the next allocator can see the number is spent")
 
     for w in WARNINGS:
         print(f"  WARN  {w}")

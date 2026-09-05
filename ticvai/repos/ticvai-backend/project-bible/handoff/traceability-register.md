@@ -48,13 +48,13 @@ support.
 | Contract | Ops | Origin |
 |---|---|---|
 | **`platform-ops`** | 24 | **A workshop on 30 July.** Release management, rollouts, migrations, environments. Minuted, contracted, never a requirement |
-| **`cross-cell`** | 16 | **ADR-0001 and CF-31.** Multi-region entitlement propagation, guest links, DSAR across cells. Derived from an architecture decision, not from the matrix |
+| **`cross-region`** | 16 | **ADR-0001 and CF-31.** Multi-region entitlement propagation, guest links, DSAR across cells. Derived from an architecture decision, not from the matrix |
 
 **40 operations, roughly 6% of the platform.**
 
 ### Why each is defensible, and why that is not enough
 
-**`cross-cell` follows from a decision the client made.** Data residency forces separate cells
+**`cross-region` follows from a decision the client made.** Data residency forces separate cells
 per jurisdiction (ADR-0001), and a membership valid across them has to be propagated somehow.
 The matrix asks for cross-venue membership (CF-31) without saying how, so the operations are
 downstream of a requirement even though no requirement names them.
@@ -69,7 +69,7 @@ client is paying for and has never seen itemised.
 requirements**, and take it to the client as an addition rather than leaving it as an
 assumption. It is not new work; it is work already done that nobody agreed to.
 
-**`cross-cell` we propose leaving as-is**, cited to ADR-0001 and CF-31 in its module header,
+**`cross-region` we propose leaving as-is**, cited to ADR-0001 and CF-31 in its module header,
 because it genuinely derives from a requirement even though it does not restate one.
 
 ## How this stays true

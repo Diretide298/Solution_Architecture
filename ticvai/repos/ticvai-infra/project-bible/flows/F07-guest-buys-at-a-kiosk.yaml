@@ -55,7 +55,7 @@ steps:
   action: Chooses a session
   operations:
   - getAvailability
-  - acquireLease
+  - acquireInventoryHold
   outcome: Capacity is leased before payment
 - step: 6
   screen: KSK-006

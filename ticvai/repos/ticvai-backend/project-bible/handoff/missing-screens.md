@@ -17,7 +17,7 @@ approvals, finance and inventory, which were the three worst.
 | `marketing-crm` | `/segments` | 4 |
 | `subscription` | `/tenant-migrations` | 4 |
 | `ai` | `/index-sources` | 4 |
-| `cross-cell` | `/wallet-authorisations` | 3 |
+| `cross-region` | `/wallet-authorisations` | 3 |
 | `tenancy` | `/workstations` | 3 |
 | `games` | `/games` | 3 |
 | `ai` | `/collections` | 3 |
@@ -37,7 +37,7 @@ approvals, finance and inventory, which were the three worst.
 | `ai` | `/generate` | 2 |
 | `ai` | `/policy` | 2 |
 | `tenancy` | `/regions` | 2 |
-| `cross-cell` | `/wallet-allocations` | 2 |
+| `cross-region` | `/wallet-allocations` | 2 |
 | `subscription` | `/cell-clusters` | 2 |
 | `ai` | `/providers` | 2 |
 | `promotions` | `/allocation-splits` | 2 |

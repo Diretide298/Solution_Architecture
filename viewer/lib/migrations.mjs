@@ -176,10 +176,23 @@ export async function buildMigrations(root) {
     return empty;
   }
 
+  // **One level down, since ADR-0039 split the DDL into two databases.** derive-ddl now writes
+  // `backend/control/*.sql` and `backend/tenant/*.sql`, and a flat listing found neither —
+  // the whole Migrations view emptied out while `backend/` held 33 files.
+  //
+  // The subdirectory stays in the name (`tenant/010-orders.sql`) because that is the answer to
+  // *which database is this table in*, and dropping it would make two files called
+  // `000-schemas.sql` indistinguishable.
   const sqlFiles = entries
     .filter((e) => e.isFile() && /\.sql$/i.test(e.name))
-    .map((e) => e.name)
-    .sort();
+    .map((e) => e.name);
+  for (const d of entries.filter((e) => e.isDirectory())) {
+    const inner = await readdir(path.join(dir, d.name), { withFileTypes: true }).catch(() => []);
+    for (const e of inner) {
+      if (e.isFile() && /\.sql$/i.test(e.name)) sqlFiles.push(`${d.name}/${e.name}`);
+    }
+  }
+  sqlFiles.sort();
   if (!sqlFiles.length) return empty;
 
   const tables = {};

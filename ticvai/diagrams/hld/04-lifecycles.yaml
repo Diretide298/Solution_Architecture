@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 123
-  drawn: 122
+  files: 125
+  drawn: 124
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 122 state models and 29 events
+title: 124 state models and 29 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -162,6 +162,24 @@ stateModels:
   - verifyWorkOrder
   guarded: 10
   ref: diagrams/lld/lifecycles/asset.yaml
+- entity: BurstEnvironment
+  contract: subscription
+  owner: PlatformService
+  service: PlatformService
+  states: null
+  transitions: 12
+  initial:
+  - requested
+  terminal:
+  - decommissioned
+  - failed
+  operations:
+  - decommissionBurstEnvironment
+  - drainBurstEnvironment
+  - reconcileBurstEnvironment
+  - requestBurstEnvironment
+  guarded: 12
+  ref: diagrams/lld/lifecycles/burst-environment.yaml
 - entity: Campaign
   contract: marketing-crm
   owner: marketing
@@ -445,7 +463,7 @@ stateModels:
   guarded: 8
   ref: diagrams/lld/lifecycles/coupon.yaml
 - entity: CrossRegionEntitlement
-  contract: cross-cell
+  contract: cross-region
   owner: CrossRegionService
   service: CrossRegionService
   states: null
@@ -529,8 +547,8 @@ stateModels:
   guarded: 6
   ref: diagrams/lld/lifecycles/developer-account.yaml
 - entity: DSAR request
-  contract: cross-cell
-  owner: cross-cell
+  contract: cross-region
+  owner: cross-region
   service: CrossRegionService
   states: null
   transitions: 4
@@ -820,6 +838,24 @@ stateModels:
   - reverseJournalEntry
   guarded: 5
   ref: diagrams/lld/lifecycles/journal.yaml
+- entity: JourneyEntrant
+  contract: marketing-crm
+  owner: MarketingService
+  service: MarketingService
+  states: null
+  transitions: 8
+  initial:
+  - active
+  terminal:
+  - completed
+  - exited
+  - suppressed
+  operations:
+  - activateJourney
+  - getJourneyPerformance
+  - recordConsent
+  guarded: 8
+  ref: diagrams/lld/lifecycles/journey-entrant.yaml
 - entity: Marketing journey
   contract: marketing-crm
   owner: marketing-crm
@@ -1957,8 +1993,8 @@ stateModels:
   guarded: 7
   ref: diagrams/lld/lifecycles/waitlist-entry.yaml
 - entity: Cross-cell wallet authorisation
-  contract: cross-cell
-  owner: cross-cell
+  contract: cross-region
+  owner: cross-region
   service: CrossRegionService
   states: null
   transitions: 7

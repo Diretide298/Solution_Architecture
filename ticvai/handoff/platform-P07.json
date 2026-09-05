@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "handheld",
  "offlineCapable": true,
- "generated": "2026-09-01",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 11,
@@ -15,7 +15,7 @@
   "contracts": 5,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 40
+  "operationsWithNoScreen": 31
  },
  "waves": {
   "wave1": 11
@@ -39,11 +39,11 @@
    "operations": 7
   },
   {
-   "contract": "orders",
+   "contract": "cross-region",
    "operations": 2
   },
   {
-   "contract": "cross-cell",
+   "contract": "orders",
    "operations": 2
   },
   {
@@ -155,64 +155,34 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "enrolFacePass",
-    "contract": "access",
-    "verb": "POST",
-    "summary": "Register a facial profile against an entitlement"
-   },
-   {
-    "operation": "getFacePassEnrolment",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Whether a pass has a face registered, and when"
-   },
-   {
-    "operation": "revokeFacePass",
-    "contract": "access",
-    "verb": "DELETE",
-    "summary": "Remove a facial profile"
-   },
-   {
     "operation": "authoriseWalletSpend",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "POST",
     "summary": "Hold funds against the guest's home-cell balance"
    },
    {
     "operation": "captureWalletAuthorisation",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "POST",
     "summary": "Capture a held amount"
    },
    {
     "operation": "getWalletAllocation",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "GET",
     "summary": "The consuming cell's bounded offline allocation"
    },
    {
     "operation": "releaseWalletAuthorisation",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "POST",
     "summary": "Release a hold without capturing"
    },
    {
     "operation": "setWalletAllocationPolicy",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "PUT",
     "summary": "Set the allocation cap policy"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
    },
    {
     "operation": "setPasswordPolicy",
@@ -245,16 +215,16 @@
     "summary": "Turn a visit into a membership or season pass"
    },
    {
+    "operation": "createCart",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Start a cart"
+   },
+   {
     "operation": "createPaymentLink",
     "contract": "orders",
     "verb": "POST",
     "summary": "Send a guest a link to pay later"
-   },
-   {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
    },
    {
     "operation": "createReservation",
@@ -267,12 +237,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "issueInvitation",
@@ -309,12 +273,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Gateways configured for this scope"
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -371,22 +329,10 @@
     "summary": "Configure a gateway and its routing"
    },
    {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
    },
    {
     "operation": "voidPayment",

@@ -3,7 +3,7 @@
 **Status:** Proposed · 17 August 2026
 **Supersedes:** the "tenant isolation is partition-level, never filter-level" rule as it applied to Qdrant
 **Relates to:** ADR-0001 (cells — **superseded in part by ADR-0014**), ADR-0014 (cell per region),
-ADR-0017 (placement), ADR-0020 (AI isolation), CF-97
+ADR-0017 (placement — amended by ADR-0038, which makes a cell a region holding many tenant databases), ADR-0020 (AI isolation), CF-97
 
 ---
 

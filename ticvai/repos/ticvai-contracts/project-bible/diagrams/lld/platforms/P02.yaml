@@ -1,5 +1,5 @@
 id: LLD-P02
-title: P02 Guest App — Mobile — 63 screens
+title: P02 Guest App — Mobile — 71 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: guest
@@ -21,6 +21,8 @@ why: null
 modulesUsed:
 - module: ticketing
   screens: 27
+- module: core
+  screens: 12
 - module: marketing
   screens: 7
 - module: fnb
@@ -31,8 +33,6 @@ modulesUsed:
   screens: 4
 - module: ai
   screens: 4
-- module: core
-  screens: 4
 - module: retail
   screens: 2
 - module: seating
@@ -41,39 +41,37 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: CatalogueService
-  operationCalls: 36
+  operationCalls: 44
 - service: OrderService
-  operationCalls: 35
+  operationCalls: 44
+- service: MarketingService
+  operationCalls: 30
 - service: IdentityService
   operationCalls: 23
-- service: MarketingService
-  operationCalls: 19
-- service: VenueOpsService
-  operationCalls: 16
 - service: FnbService
-  operationCalls: 16
+  operationCalls: 22
+- service: VenueOpsService
+  operationCalls: 21
 - service: AccessService
-  operationCalls: 10
+  operationCalls: 17
 - service: AiService
-  operationCalls: 7
+  operationCalls: 10
 - service: WhiteLabelService
   operationCalls: 6
 - service: RetailService
-  operationCalls: 4
-- service: CrossCellService
-  operationCalls: 1
+  operationCalls: 5
 - service: LedgerService
   operationCalls: 1
 coverage:
-  screens: 63
+  screens: 71
   inAFlow: 35
-  drawn: 63
+  drawn: 71
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
 - screen: GST-001
   name: Home – Default
-  module: TODO
+  module: Discovery & Browse
   requiresModule: marketing
   wave: 1
   density: comfortable
@@ -100,7 +98,7 @@ screens:
   inFlows: null
 - screen: GST-002
   name: Explore Categories
-  module: TODO
+  module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -123,14 +121,16 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-002
   inFlows: null
 - screen: GST-003
-  name: Attractions List
-  module: TODO
+  name: Event & Attraction Listing
+  module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: comfortable
   operations:
   - getWaitTimes
+  - listPerformances
   - listProducts
+  - searchCatalogue
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -139,7 +139,8 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - eventId<-deepLink
   goesTo:
   - GST-001
   - GST-002
@@ -150,7 +151,7 @@ screens:
   - F21 A ride queue fills and a guest is redirected
 - screen: GST-004
   name: Attraction Details
-  module: TODO
+  module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -158,6 +159,7 @@ screens:
   - getAvailability
   - getProduct
   - getWaitTimes
+  - listPerformances
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -167,6 +169,7 @@ screens:
   offlineState: true
   entryParams:
   - productId<-deepLink
+  - eventId<-deepLink
   goesTo:
   - GST-001
   - GST-002
@@ -176,7 +179,7 @@ screens:
   inFlows: null
 - screen: GST-005
   name: What's On
-  module: TODO
+  module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -197,12 +200,13 @@ screens:
   - GST-001
   - GST-002
   - GST-003
-  boardFrames: null
-  wireframe: wireframes/P02 Guest App.dc.html#gst-005
+  boardFrames:
+  - Guest Mobile Board 1.dc.html#gm-1b
+  wireframe: wireframes/Guest Mobile Board 1.dc.html#gm-1b
   inFlows: null
 - screen: GST-006
   name: Event / Exhibition Details
-  module: TODO
+  module: Discovery & Browse
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -228,7 +232,7 @@ screens:
   inFlows: null
 - screen: GST-007
   name: Select Date & Time
-  module: TODO
+  module: Booking & Selection
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -253,7 +257,7 @@ screens:
   inFlows: null
 - screen: GST-008
   name: Tickets & Add-ons
-  module: TODO
+  module: Booking & Selection
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -277,7 +281,7 @@ screens:
   inFlows: null
 - screen: GST-009
   name: Review & Payment
-  module: TODO
+  module: Cart & Checkout
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -308,12 +312,13 @@ screens:
   - F11 Guest orders food to a lounger
 - screen: GST-010
   name: Booking Confirmation
-  module: TODO
+  module: Cart & Checkout
   requiresModule: ticketing
   wave: 1
   density: comfortable
   operations:
   - getOrder
+  - reprintOrder
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -332,7 +337,7 @@ screens:
   inFlows: null
 - screen: GST-011
   name: Wallet Overview
-  module: TODO
+  module: Membership, Loyalty & Value
   requiresModule: retail
   wave: 2
   density: comfortable
@@ -359,12 +364,15 @@ screens:
   - F53 A guest earns, sees and spends loyalty
 - screen: GST-012
   name: My Tickets
-  module: TODO
+  module: Account & Self-Service
   requiresModule: access
   wave: 1
   density: comfortable
   operations:
   - getEntitlement
+  - getEntitlementCredential
+  - getEntitlementHistory
+  - listEntitlements
   - listMyEntitlements
   - transferOrderTickets
   states:
@@ -387,7 +395,7 @@ screens:
   - F50 A guest arrives, parks, and gets in
 - screen: GST-013
   name: Ticket Details
-  module: TODO
+  module: Account & Self-Service
   requiresModule: access
   wave: 1
   density: comfortable
@@ -415,12 +423,13 @@ screens:
   - F50 A guest arrives, parks, and gets in
 - screen: GST-014
   name: Ticket Transfer
-  module: TODO
+  module: Ticketing
   requiresModule: ticketing
   wave: 2
   density: comfortable
   operations:
   - claimTicketTransfer
+  - listOrders
   - transferOrderTickets
   states:
   - emptyFirstRun
@@ -441,15 +450,15 @@ screens:
   - F55 A guest buys on the web and transfers to a friend
 - screen: GST-015
   name: Memberships
-  module: TODO
+  module: Membership, Loyalty & Value
   requiresModule: ticketing
   wave: 2
   density: comfortable
   operations:
-  - getGuestLink
   - getMyMemberships
   - grantDelegation
   - listDelegations
+  - listGuestMemberships
   - listProducts
   states:
   - emptyFirstRun
@@ -471,7 +480,7 @@ screens:
   - F19 A membership works in another country
 - screen: GST-016
   name: My Reservations
-  module: TODO
+  module: Ticketing
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -498,7 +507,7 @@ screens:
   - F52 A guest books a cabana and uses it
 - screen: GST-017
   name: Reservation Details
-  module: TODO
+  module: Ticketing
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -524,7 +533,7 @@ screens:
   - F52 A guest books a cabana and uses it
 - screen: GST-018
   name: Add to Calendar / Reminders
-  module: TODO
+  module: Account & Self-Service
   requiresModule: ticketing
   wave: 3
   density: comfortable
@@ -549,8 +558,8 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-018
   inFlows: null
 - screen: GST-019
-  name: Order History (Wallet)
-  module: TODO
+  name: Order History
+  module: Account & Self-Service
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -558,6 +567,7 @@ screens:
   - getOrder
   - listMyOrders
   - listOrders
+  - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoResults
@@ -576,7 +586,7 @@ screens:
   inFlows: null
 - screen: GST-020
   name: Saved Items / Wishlist
-  module: TODO
+  module: Account & Self-Service
   requiresModule: marketing
   wave: 3
   density: comfortable
@@ -604,7 +614,7 @@ screens:
   - F53 A guest earns, sees and spends loyalty
 - screen: GST-021
   name: Interactive Map
-  module: TODO
+  module: In-venue Services
   requiresModule: seating
   wave: 2
   density: comfortable
@@ -616,6 +626,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -626,15 +637,16 @@ screens:
   - GST-001
   - GST-002
   - GST-003
-  boardFrames: null
-  wireframe: wireframes/P02 Guest App.dc.html#gst-021
+  boardFrames:
+  - Seat Board 4.dc.html#seat-4b
+  wireframe: wireframes/Seat Board 4.dc.html#seat-4b
   inFlows:
   - F25 A guest rents a cabana
   - F26 A venue maps its site
   - F48 A guest finds it, queues for it, and eats
 - screen: GST-022
   name: Attraction Wait Times
-  module: TODO
+  module: In-venue Services
   requiresModule: queue
   wave: 2
   density: comfortable
@@ -658,13 +670,14 @@ screens:
   - F21 A ride queue fills and a guest is redirected
   - F48 A guest finds it, queues for it, and eats
 - screen: GST-023
-  name: Virtual Queue / Join Queue
-  module: TODO
+  name: Virtual Queue
+  module: In-venue Services
   requiresModule: queue
   wave: 3
   density: comfortable
   operations:
-  - getQueueEntry
+  - getWaitTimes
+  - getWaitingGuest
   - joinQueue
   - leaveQueue
   states:
@@ -685,17 +698,19 @@ screens:
   - F48 A guest finds it, queues for it, and eats
 - screen: GST-024
   name: F&B – Browse & Order
-  module: TODO
+  module: In-venue Services
   requiresModule: fnb
   wave: 2
   density: comfortable
   operations:
   - claimLocationSession
+  - claimTableSession
   - createGuestFnbOrder
   - getGuestMenu
   - getGuestOrderStatus
   - listDeliveryLocations
   - listDiningOutlets
+  - listModifierGroups
   states:
   - emptyFirstRun
   - emptyNoResults
@@ -719,7 +734,7 @@ screens:
   - F48 A guest finds it, queues for it, and eats
 - screen: GST-025
   name: F&B – Order Tracking
-  module: TODO
+  module: In-venue Services
   requiresModule: fnb
   wave: 2
   density: comfortable
@@ -747,7 +762,7 @@ screens:
   - F48 A guest finds it, queues for it, and eats
 - screen: GST-026
   name: Retail / Merchandise
-  module: TODO
+  module: Retail
   requiresModule: games
   wave: 2
   density: comfortable
@@ -774,12 +789,13 @@ screens:
   - F18 A guest plays an arcade game
 - screen: GST-027
   name: Parking – Reserve & Pay
-  module: TODO
+  module: In-venue Services
   requiresModule: access
   wave: 3
   density: comfortable
   operations:
   - createParkingEntitlement
+  - listParkingFacilities
   - updateParkingEntitlement
   states:
   - emptyFirstRun
@@ -799,7 +815,7 @@ screens:
   - F50 A guest arrives, parks, and gets in
 - screen: GST-028
   name: Parking – Reservation Confirmed
-  module: TODO
+  module: In-venue Services
   requiresModule: access
   wave: 3
   density: comfortable
@@ -824,7 +840,7 @@ screens:
   - F50 A guest arrives, parks, and gets in
 - screen: GST-029
   name: Venue Info & Services
-  module: TODO
+  module: In-venue Services
   requiresModule: fnb
   wave: 2
   density: comfortable
@@ -848,7 +864,7 @@ screens:
   inFlows: null
 - screen: GST-030
   name: In-Venue Notifications
-  module: TODO
+  module: Engagement & Support
   requiresModule: fnb
   wave: 2
   density: comfortable
@@ -872,12 +888,15 @@ screens:
   - F48 A guest finds it, queues for it, and eats
 - screen: GST-031
   name: AI Concierge – Home
-  module: TODO
+  module: Engagement & Support
   requiresModule: fnb
   wave: 2
   density: comfortable
   operations:
+  - createAiConversation
   - getGuestMenu
+  - handoverToAgent
+  - requestSuggestion
   - sendAiMessage
   states:
   - emptyFirstRun
@@ -900,7 +919,7 @@ screens:
   inFlows: null
 - screen: GST-032
   name: AI Concierge – Chat
-  module: TODO
+  module: Engagement & Support
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -934,7 +953,7 @@ screens:
   inFlows: null
 - screen: GST-033
   name: AI Concierge – Contextual Help
-  module: TODO
+  module: Engagement & Support
   requiresModule: ai
   wave: 2
   density: comfortable
@@ -958,7 +977,7 @@ screens:
   inFlows: null
 - screen: GST-034
   name: Lost & Found
-  module: TODO
+  module: Support
   requiresModule: fnb
   wave: 2
   density: comfortable
@@ -985,7 +1004,7 @@ screens:
   - F54 Something goes wrong in the venue
 - screen: GST-035
   name: Feedback & Ratings
-  module: TODO
+  module: Engagement & Support
   requiresModule: marketing
   wave: 3
   density: comfortable
@@ -1009,13 +1028,15 @@ screens:
   inFlows: null
 - screen: GST-036
   name: Loyalty & Rewards
-  module: TODO
+  module: Membership, Loyalty & Value
   requiresModule: marketing
   wave: 2
   density: comfortable
   operations:
+  - evaluatePromotions
   - getLoyaltyPosition
   - listLoyaltyProgrammes
+  - listPromotions
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1034,7 +1055,7 @@ screens:
   - F53 A guest earns, sees and spends loyalty
 - screen: GST-037
   name: Offers & Promotions
-  module: TODO
+  module: Promotions
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -1061,7 +1082,7 @@ screens:
   - F53 A guest earns, sees and spends loyalty
 - screen: GST-038
   name: Digital Companion Mode
-  module: TODO
+  module: In-venue Services
   requiresModule: queue
   wave: 3
   density: comfortable
@@ -1086,7 +1107,7 @@ screens:
   inFlows: null
 - screen: GST-039
   name: Profile
-  module: TODO
+  module: Account & Self-Service
   requiresModule: marketing
   wave: 1
   density: comfortable
@@ -1111,7 +1132,7 @@ screens:
   - F56 A guest registers, verifies and sets preferences
 - screen: GST-040
   name: Help & Support
-  module: TODO
+  module: Engagement & Support
   requiresModule: marketing
   wave: 2
   density: comfortable
@@ -1140,7 +1161,7 @@ screens:
   - F54 Something goes wrong in the venue
 - screen: GST-041
   name: Checkout Entry
-  module: TODO
+  module: Cart & Checkout
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -1164,14 +1185,13 @@ screens:
   inFlows: null
 - screen: GST-042
   name: Simple Registration & OTP
-  module: TODO
+  module: Account & Self-Service
   requiresModule: core
   wave: 1
   density: comfortable
   operations:
   - completeSsoAuthorization
   - enrolMfaMethod
-  - getCurrentSession
   - getGuestSession
   - guestLogout
   - guestSocialLogin
@@ -1180,12 +1200,10 @@ screens:
   - listMfaMethods
   - listSsoProviders
   - login
-  - logout
   - refreshToken
   - registerGuest
   - removeMfaMethod
   - requestGuestOtp
-  - selectRole
   - startSsoAuthorization
   - verifyGuestOtp
   - verifyMfaChallenge
@@ -1210,7 +1228,7 @@ screens:
   - F56 A guest registers, verifies and sets preferences
 - screen: GST-043
   name: Arabic / RTL Experience
-  module: TODO
+  module: System States
   requiresModule: core
   wave: 1
   density: comfortable
@@ -1231,7 +1249,7 @@ screens:
   inFlows: null
 - screen: GST-044
   name: Multi-Currency & Pricing
-  module: TODO
+  module: Ticketing
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -1255,7 +1273,7 @@ screens:
   inFlows: null
 - screen: GST-045
   name: Ticket Delivery & Sharing
-  module: TODO
+  module: Account & Self-Service
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -1278,19 +1296,22 @@ screens:
   inFlows: null
 - screen: GST-046
   name: Branded Queue / Waiting Room
-  module: TODO
+  module: High-Demand Access
   requiresModule: queue
   wave: 1
   density: comfortable
   operations:
   - getWaitTimes
+  - getWaitingGuest
+  - joinQueue
   states:
   - emptyFirstRun
   - error
   - loading
   - offline
   offlineState: true
-  entryParams: []
+  entryParams:
+  - entryId<-deepLink
   goesTo:
   - GST-001
   - GST-002
@@ -1300,7 +1321,7 @@ screens:
   inFlows: null
 - screen: GST-047
   name: Maintenance / Upgrade Page
-  module: TODO
+  module: System States
   requiresModule: core
   wave: 1
   density: comfortable
@@ -1322,7 +1343,7 @@ screens:
   inFlows: null
 - screen: GST-048
   name: Upsell / Cross-Sell
-  module: TODO
+  module: Booking & Selection
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -1347,7 +1368,7 @@ screens:
   inFlows: null
 - screen: GST-049
   name: Interactive Seat Selection
-  module: TODO
+  module: Booking & Selection
   requiresModule: seating
   wave: 2
   density: comfortable
@@ -1368,12 +1389,13 @@ screens:
   - GST-001
   - GST-002
   - GST-003
-  boardFrames: null
-  wireframe: wireframes/P02 Guest App.dc.html#gst-049
+  boardFrames:
+  - Seat Board 4.dc.html#seat-4a
+  wireframe: wireframes/Seat Board 4.dc.html#seat-4a
   inFlows: null
 - screen: GST-050
   name: Resource Booking – Cabana
-  module: TODO
+  module: Booking & Selection
   requiresModule: ticketing
   wave: 3
   density: comfortable
@@ -1400,7 +1422,7 @@ screens:
   - F52 A guest books a cabana and uses it
 - screen: GST-051
   name: Plan Your Adventure – Start
-  module: TODO
+  module: Engagement & Support
   requiresModule: queue
   wave: 3
   density: comfortable
@@ -1425,7 +1447,7 @@ screens:
   - F49 A guest plans a day and follows it
 - screen: GST-052
   name: Suggested Itineraries
-  module: TODO
+  module: Engagement & Support
   requiresModule: ai
   wave: 3
   density: comfortable
@@ -1452,7 +1474,7 @@ screens:
   - F49 A guest plans a day and follows it
 - screen: GST-053
   name: Build Your Own Itinerary
-  module: TODO
+  module: Engagement & Support
   requiresModule: ticketing
   wave: 3
   density: comfortable
@@ -1480,7 +1502,7 @@ screens:
   - F49 A guest plans a day and follows it
 - screen: GST-054
   name: AI Optimized Itinerary
-  module: TODO
+  module: Engagement & Support
   requiresModule: ai
   wave: 3
   density: comfortable
@@ -1509,7 +1531,7 @@ screens:
   - F49 A guest plans a day and follows it
 - screen: GST-055
   name: Dynamic QR Ticket
-  module: TODO
+  module: Account & Self-Service
   requiresModule: ticketing
   wave: 1
   density: comfortable
@@ -1533,7 +1555,7 @@ screens:
   - F50 A guest arrives, parks, and gets in
 - screen: GST-056
   name: Bundle Package
-  module: TODO
+  module: Booking & Selection
   requiresModule: ticketing
   wave: 2
   density: comfortable
@@ -1560,7 +1582,7 @@ screens:
   inFlows: null
 - screen: GST-057
   name: Accessibility Information
-  module: TODO
+  module: Discovery & Browse
   requiresModule: core
   wave: 2
   density: comfortable
@@ -1583,7 +1605,7 @@ screens:
   inFlows: null
 - screen: GST-058
   name: Resource Availability (Cabana)
-  module: TODO
+  module: Booking & Selection
   requiresModule: ticketing
   wave: 3
   density: comfortable
@@ -1608,7 +1630,7 @@ screens:
   - F52 A guest books a cabana and uses it
 - screen: GST-059
   name: Plan My Day – In Progress
-  module: TODO
+  module: Engagement & Support
   requiresModule: ai
   wave: 3
   density: comfortable
@@ -1641,6 +1663,7 @@ screens:
   density: comfortable
   operations:
   - getGuestMenu
+  - listModifierGroups
   states:
   - emptyFirstRun
   - error
@@ -1725,3 +1748,210 @@ screens:
   wireframe: wireframes/P02 Guest App.dc.html#gst-065
   inFlows:
   - F56 A guest registers, verifies and sets preferences
+- screen: GST-066
+  name: Privacy & My Data
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - deleteGuestAccount
+  - exportSubjectData
+  - getGuestConsents
+  - updateGuestPreferences
+  - uploadGuestDocument
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-066
+  inFlows: null
+- screen: GST-067
+  name: Refunds & Resale
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createRefundRequest
+  - createResaleListing
+  - getWaiverStatus
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-067
+  inFlows: null
+- screen: GST-068
+  name: Help & My Cases
+  module: Engagement & Support
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createCase
+  - listAiConversations
+  - listCases
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-068
+  inFlows: null
+- screen: GST-069
+  name: Face Pass
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - enrolFacePass
+  - getFacePassEnrolment
+  - revokeFacePass
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - enrolmentId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-069
+  inFlows: null
+- screen: GST-070
+  name: Reserve a Table or Cabana
+  module: In-venue Services
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - bookResource
+  - createTableReservation
+  - getResourceAvailability
+  - joinRestaurantWaitlist
+  - joinWaitlist
+  - leaveWaitlist
+  - updateTableReservation
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entryId<-deepLink
+  - reservationId<-deepLink
+  - resourceId<-deepLink
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-070
+  inFlows: null
+- screen: GST-071
+  name: Payment Methods
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - listPaymentTokens
+  - redeemLoyaltyPoints
+  - storePaymentToken
+  - transferWalletBalance
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  - walletId<-deepLink
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-071
+  inFlows: null
+- screen: GST-072
+  name: Share & Group Booking
+  module: Booking & Selection
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createReferral
+  - getGroupBooking
+  - getMyChallenges
+  - respondToInvitation
+  - shareEntitlement
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - entitlementId<-deepLink
+  - groupBookingId<-deepLink
+  - subjectId<-session
+  - token<-deepLink
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-072
+  inFlows: null
+- screen: GST-073
+  name: Security & Sign-in
+  module: Account & Self-Service
+  requiresModule: core
+  wave: 2
+  density: comfortable
+  operations:
+  - createMfaChallenge
+  states:
+  - emptyFirstRun
+  - emptyNoResults
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - subjectId<-session
+  goesTo:
+  - GST-039
+  boardFrames: null
+  wireframe: wireframes/P02 Guest App.dc.html#gst-073
+  inFlows: null

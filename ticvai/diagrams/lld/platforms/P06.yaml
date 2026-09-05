@@ -43,11 +43,11 @@ servicesCalled:
 - service: VenueOpsService
   operationCalls: 87
 - service: OrderService
-  operationCalls: 68
+  operationCalls: 69
 - service: FnbService
   operationCalls: 44
 - service: TenancyService
-  operationCalls: 33
+  operationCalls: 35
 - service: AccessService
   operationCalls: 23
 - service: InventoryService
@@ -1021,6 +1021,7 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - getCurrentShift
   - listRotaAssignments
   - requestShiftSwap
   states:
@@ -1049,6 +1050,7 @@ screens:
   density: comfortable
   operations:
   - listRotaAssignments
+  - listShiftSwapRequests
   - requestShiftSwap
   states:
   - emptyFirstRun
@@ -1343,6 +1345,7 @@ screens:
   wave: 3
   density: comfortable
   operations:
+  - listTrainingRecords
   - semanticSearch
   states:
   - emptyFirstRun
@@ -1524,7 +1527,8 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4a
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4a
@@ -1549,7 +1553,8 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4b
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4b
@@ -1573,7 +1578,8 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4c
@@ -1596,7 +1602,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4d
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4d
@@ -1619,7 +1626,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4e
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4e
@@ -1642,7 +1650,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4f
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4f
@@ -1667,7 +1676,8 @@ screens:
   entryParams:
   - venueId<-session
   - subjectId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4g
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4g
@@ -1774,7 +1784,8 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4c
@@ -1800,7 +1811,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4d
   - FnB Board 4.dc.html#fnb-4e
@@ -1856,7 +1868,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4f
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4f
@@ -1880,7 +1893,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4g
   wireframe: wireframes/FnB Board 4.dc.html#fnb-4g
@@ -1908,7 +1922,8 @@ screens:
   - venueId<-session
   - receiptId<-EMP-003
   - transferId<-deepLink
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 5.dc.html#fnb-5g
   wireframe: wireframes/FnB Board 5.dc.html#fnb-5g
@@ -1938,7 +1953,8 @@ screens:
   entryParams:
   - venueId<-session
   - countId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - Retail Board 4.dc.html#ret-4f
   wireframe: wireframes/Retail Board 4.dc.html#ret-4f
@@ -1967,7 +1983,8 @@ screens:
   - venueId<-session
   - outletId<-EMP-003
   - actionId<-deepLink
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - FnB Board 5.dc.html#fnb-5e
   wireframe: wireframes/FnB Board 5.dc.html#fnb-5e
@@ -1993,7 +2010,8 @@ screens:
   entryParams:
   - venueId<-session
   - outletId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - Retail Board 4.dc.html#ret-4h
   wireframe: wireframes/Retail Board 4.dc.html#ret-4h
@@ -2017,7 +2035,8 @@ screens:
   offlineState: true
   entryParams:
   - venueId<-session
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - Retail Board 4.dc.html#ret-4j
   wireframe: wireframes/Retail Board 4.dc.html#ret-4j
@@ -2043,7 +2062,8 @@ screens:
   entryParams:
   - venueId<-session
   - alertId<-EMP-003
-  goesTo: []
+  goesTo:
+  - EMP-003
   boardFrames:
   - Inventory Board 1.dc.html#inv-10
   wireframe: wireframes/Inventory Board 1.dc.html#inv-10

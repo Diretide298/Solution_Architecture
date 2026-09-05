@@ -36,7 +36,7 @@ The 12 Aug decision block contradicts itself on this — one bullet says front-e
 ## Resolution model
 
 ```
-Grant = (principal, permission, scope_node, effect)
+Grant = (principal, permission, org_unit, effect)
 effect ∈ { allow, deny }
 ```
 

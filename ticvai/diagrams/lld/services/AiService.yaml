@@ -1,5 +1,5 @@
 id: LLD-AiService
-title: AiService — 30 operations, 15 tables
+title: AiService — 31 operations, 16 tables
 generatedBy: tools/derive-diagrams.py
 tier: engagement
 index: diagrams/hld/02-services.yaml
@@ -10,25 +10,25 @@ why: '**Separate at any size, and not because of size.** ADR-0020 makes it a har
 scale: Latency-tolerant, cost-sensitive, token-metered. Different hardware from everything else.
 ifDown: Down degrades suggestions and the concierge. **Nothing that takes money depends on it.**
 coverage:
-  operations: 30
+  operations: 31
   inAFlow: 17
   percent: 57%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: ai
-  tables: 15
+  tables: 16
   stores:
   - postgres
   - postgres-analytical
-  largestTable: ai.interaction
+  largestTable: ai.policy
 - schema: qdrant
   tables: 0
   stores: []
   largestTable: —
 operationsByContract:
 - contract: ai
-  count: 30
+  count: 31
   operations:
   - operation: createAiConversation
     verb: POST
@@ -114,6 +114,14 @@ operationsByContract:
     verb: GET
     path: /providers
     scope: region
+    permission: AI_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listIndexFailures
+    verb: GET
+    path: /index-failures
+    scope: tenant
     permission: AI_CONFIGURE
     offline: false
     reads: 1
@@ -307,7 +315,7 @@ tables:
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: ai.chunk_ref
-  columns: 1
+  columns: 2
   store: postgres
   parent: null
   writtenBy: []
@@ -320,11 +328,17 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.index_entry
-  columns: 1
+  columns: 2
   store: postgres
   parent: null
   writtenBy:
   - ai
+  foreignWriters: null
+- table: ai.index_failure
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 - table: ai.index_job
   columns: 14
@@ -364,7 +378,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.layout_draft
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
@@ -378,7 +392,7 @@ tables:
   - ai
   foreignWriters: null
 - table: ai.policy
-  columns: 16
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -434,6 +448,7 @@ screens:
 - P02:GST-052 Suggested Itineraries
 - P02:GST-054 AI Optimized Itinerary
 - P02:GST-059 Plan My Day – In Progress
+- P02:GST-068 Help & My Cases
 - P05:KSK-015 Assistant
 - P06:EMP-019 AI assistant — home
 - P06:EMP-020 AI assistant — answer
@@ -446,6 +461,7 @@ screens:
 - P08:BO-117 Product Import, Governance & AI Configuration Assistant
 - P09:ADM-004 Platform Audit Log
 - P09:ADM-037 AI Provider & Credentials
+- P12:SUP-006 Knowledge Base Search
 - P16:ANL-001 Executive Command Center
 - P16:ANL-009 AI Assistant & Action Center
 - P16:ANL-010 Suggestions & Advice

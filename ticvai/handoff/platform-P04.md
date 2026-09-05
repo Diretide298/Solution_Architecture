@@ -9,20 +9,18 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 188 |
+| Operations with no screen | 170 |
 | Waves | wave1 21 · wave2 3 |
 
 ## Gaps
 
-### 188 operations with no screen here
+### 170 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `enrolFacePass` | access | POST | Register a facial profile against an entitlement |
-| `getFacePassEnrolment` | access | GET | Whether a pass has a face registered, and when |
-| `revokeFacePass` | access | DELETE | Remove a facial profile |
+| `issueAccreditationBadge` | approvals | POST | Issue a badge |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -30,7 +28,6 @@
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
-| `listProductVersions` | catalogue | GET | What this product used to be |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
@@ -60,7 +57,10 @@
 | `getTableVisit` | fnb | GET | Read a visit with all its orders |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
-| … | | | 148 more |
+| `requestBill` | fnb | POST | The party asked to pay |
+| `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
+| `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
+| … | | | 130 more |
 
 ### 2 modules split across waves
 

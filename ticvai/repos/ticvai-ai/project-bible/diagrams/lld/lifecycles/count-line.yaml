@@ -1,0 +1,81 @@
+id: LLD-CountLine
+title: CountLine — 6 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/count-line.yaml
+entity: CountLine
+contract: inventory
+enum: CountLine.status
+enumKind: inline
+enumSchema: CountLine
+enumProperty: status
+owner: InventoryService
+description: 'One counted item on a stock count, between somebody writing a number and the venue accepting
+  it.
+
+
+  **The recount is the point.** A count with no way to challenge a line is a count that posts whatever
+  the first person wrote.'
+initial:
+- entered
+terminal:
+- accepted
+- rejected
+states:
+- name: entered
+  description: A number exists. **Not yet compared to the expected quantity** — the variance is computed
+    on submission, not on entry, so a counter is never influenced by what the system expected.
+- name: recountRequested
+  description: The variance was large enough to question. **Requested by the system or a supervisor**,
+    and the original number is kept — a recount that overwrites the first count loses the evidence that
+    there was a discrepancy.
+- name: recounted
+  description: A second number exists. **Both are held.** Two counts that agree is a different fact
+    from one count nobody checked.
+- name: accepted
+  description: Posted. **This is the number that becomes a movement** and adjusts the level.
+- name: rejected
+  description: Not posted. **The line is excluded from the count** — a scale that was broken, an item
+    counted in the wrong location. The count completes without it and says so.
+transitions:
+- from: entered
+  to: accepted
+  trigger: accept
+  operation: submitCountLines
+  guard: '**Variance within tolerance.** The threshold is venue configuration, not a constant — a warehouse
+    and a bar have different ideas of a large discrepancy.'
+- from: entered
+  to: recountRequested
+  trigger: requestRecount
+  operation: requestRecount
+  guard: '**Variance outside tolerance, or a supervisor asking.** Both routes exist because a number
+    can look wrong to a person and pass a threshold.'
+- from: recountRequested
+  to: recounted
+  trigger: recount
+  operation: enterCountLine
+  guard: '**A different person, where the venue requires it.** A recount by whoever counted first is
+    the same count twice.'
+- from: recounted
+  to: accepted
+  trigger: accept
+  operation: submitCountLines
+  guard: '**The recount is the number that posts**, and the original stays visible beside it.'
+- from: recounted
+  to: rejected
+  trigger: reject
+  operation: submitCountLines
+  guard: Both counts are unusable. **A reason is required** — this is the state that explains a gap
+    in the count sheet.
+- from: entered
+  to: rejected
+  trigger: reject
+  operation: submitCountLines
+  guard: 'Rejected without a recount. **Rare and worth recording**: the item was not countable at all.'
+openQuestions: null
+notes: '**Nothing deletes a count line.** A rejected line is visible in the count with its reason, because
+  a count sheet with silent gaps is a count nobody can audit.
+
+
+  **`recountRequested` is not a failure state.** It is the mechanism working — CF-130 settled that a
+  variance is a question, not an error.'

@@ -34,7 +34,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -116,6 +116,7 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
+        - "P12 SUP-020 Queue Configuration & Management"
       x-ticvai-audience: [staff, guest]
       x-ticvai-audience-note: >
         24 August: widened to include guest. A guest needs to see which queues exist before join

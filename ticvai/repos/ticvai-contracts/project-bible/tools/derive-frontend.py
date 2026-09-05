@@ -22,6 +22,14 @@ from pathlib import Path
 
 import yaml
 
+# Windows consoles are cp1252 and this tool closes by printing a unicode arrow. **The write
+# has already happened by then**, so the traceback reported a failure on a run that succeeded
+# — the most misleading shape an error can take.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
 ROOT = Path(__file__).resolve().parents[1]
 SCREENS = ROOT / "screens"
 FRONTEND = ROOT / "frontend"

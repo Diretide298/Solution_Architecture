@@ -11,24 +11,24 @@ Every number below is counted from the files in this package, not from memory.
 
 | | | Against |
 |---|---|---|
-| **API operations** | **753** | Every unblocked module. 267 spine, 470 satellite |
-| API schemas | 607 | Across 25 files |
+| **API operations** | **1,626** | Every unblocked module. 267 spine, 470 satellite |
+| API schemas | 607 | Across 30 files |
 | Permissions | 128 | Every operation declares one or an `x-ticvai-auth` model |
-| **Tables designed** | **278** | 2,025 columns |
-| **Tables written as DDL** | **0** | Deliberate — see below |
-| Relationships | 499 | 272 of 380 tables carry one; the six that do not are correct |
-| Screens defined | **364** | Across 15 platforms, all linked to a board |
-| **Screens specified — states written** | **364** | Of 364 |
-| Screens with operations declared | 318 | Of 364 |
-| Operations reaching a screen | 568 | Of 737 |
-| State models | **76** | Of 77 lifecycles — **all modelled** |
-| Domain events | 26 | Publisher, consumers, idempotency keys |
-| User flows | **23** | 137 branches. Every contract and platform touched |
-| ADRs | 24 | |
+| **Tables designed** | **386** | 3,911 columns |
+| **Tables written as DDL** | **386** | `backend/*.sql`, 0 foreign keys. Never executed |
+| Relationships | 975 | 362 of 386 tables carry one; the twelve that do not are correct |
+| Screens defined | **1,091** | Across 15 platforms, all linked to a board |
+| **Screens specified — states written** | **500** | Of 500 |
+| Screens with operations declared | 486 | Of 500 |
+| Operations reaching a screen | 779 | Of 1,032 |
+| State models | **124** | Every one carries transitions — **all modelled** |
+| Domain events | 29 | Publisher, consumers, idempotency keys |
+| User flows | **94** | 284 branches. Every contract and platform touched |
+| ADRs | 39 | |
 | **Requirements covered by a contract** | **2,778 of 2,990 (93%)** | The remaining 212 are workshop-blocked |
 | **Requirements with an artefact** | **1,848 of 2,072 (89%)** | 12 of 15 classes closed |
 | Configuration levels decided | 321 of 321 | |
-| Validators | **7** | Plus two generators |
+| Validators | **10** | Run by `tools/refresh.sh`, plus the generators |
 
 ## What does not exist
 

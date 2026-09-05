@@ -77,6 +77,7 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.work_order
+  - platform.outbox
 - operation: createAsset
   verb: POST
   path: /assets
@@ -481,3 +482,4 @@ operations:
   writes:
   - cache:idempotency
   - maintenance.work_order
+  - platform.outbox

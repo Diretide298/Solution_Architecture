@@ -40,8 +40,8 @@ steps:
   screen: PTR-020
   action: Sub-Agent Management.
   operations:
-  - listGrants
-  - createGrant
+  - listDelegatedAccess
+  - createDelegatedAccess
   outcome: 3 operations, 3 of them previously unwalked.
   crossesDevice: true
 branches:

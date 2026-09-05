@@ -1,5 +1,5 @@
 id: LLD-fnb
-title: fnb — 96 operations
+title: fnb — 99 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -10,7 +10,8 @@ operations:
   path: /fnb-orders/{orderId}/accept
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -23,7 +24,8 @@ operations:
   path: /fnb-orders/{orderId}
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -86,7 +88,8 @@ operations:
   path: /fnb-orders/{orderId}/cancel
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -114,7 +117,8 @@ operations:
   path: /location-sessions
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -127,7 +131,8 @@ operations:
   path: /table-sessions
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -140,7 +145,8 @@ operations:
   path: /tables/{tableId}/clear
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -148,12 +154,28 @@ operations:
   writes:
   - cache:idempotency
   - fnb.table
+- operation: closeCorrectiveAction
+  verb: POST
+  path: /food-safety/corrective-actions/{actionId}/close
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.corrective_action
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
 - operation: closeTableVisit
   verb: POST
   path: /table-visits/{visitId}/close
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -216,7 +238,8 @@ operations:
   path: /fnb-orders
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -229,7 +252,8 @@ operations:
   path: /guest-orders
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -245,7 +269,8 @@ operations:
   path: /menus
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -262,7 +287,8 @@ operations:
   path: /modifier-groups
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -289,7 +315,8 @@ operations:
   path: /table-reservations
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -312,6 +339,21 @@ operations:
   - inventory.movement
   writes:
   - cache:idempotency
+- operation: escalateCorrectiveAction
+  verb: POST
+  path: /food-safety/corrective-actions/{actionId}/escalate
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.corrective_action
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
 - operation: fireCourse
   verb: POST
   path: /kitchen-tickets/{ticketId}/fire
@@ -331,7 +373,8 @@ operations:
   path: /table-visits/{visitId}/bill
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - fnb.fnb_order
@@ -343,7 +386,8 @@ operations:
   path: /fnb-orders/{orderId}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - fnb.fnb_order
@@ -353,7 +397,8 @@ operations:
   path: /table-sessions/{sessionId}/bill
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - fnb.fnb_order
@@ -365,8 +410,9 @@ operations:
   path: /outlets/{outletId}/guest-menu
   scope: venue
   permission: null
-  audience: null
-  offline: false
+  audience:
+  - guest
+  offline: true
   reads:
   - fnb.modifier_group
   writes: []
@@ -375,7 +421,8 @@ operations:
   path: /guest-orders/{orderId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - fnb.delivery_location
@@ -400,7 +447,8 @@ operations:
   path: /menus/{menuId}
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - fnb.menu
@@ -425,7 +473,8 @@ operations:
   path: /outlets/{outletId}/tables
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - fnb.table
@@ -435,7 +484,8 @@ operations:
   path: /table-visits/{visitId}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - fnb.fnb_order
@@ -488,8 +538,9 @@ operations:
   path: /venues/{venueId}/delivery-locations
   scope: venue
   permission: null
-  audience: null
-  offline: false
+  audience:
+  - guest
+  offline: true
   reads:
   - fnb.delivery_location
   writes: []
@@ -498,7 +549,8 @@ operations:
   path: /venues/{venueId}/dining
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - fnb.fnb_order
@@ -510,7 +562,8 @@ operations:
   path: /fnb-orders
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - fnb.fnb_order
@@ -520,7 +573,8 @@ operations:
   path: /kitchen/stations
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - fnb.kitchen_station
@@ -530,7 +584,8 @@ operations:
   path: /kitchen/tickets
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - fnb.kitchen_ticket
@@ -540,8 +595,9 @@ operations:
   path: /menus
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
-  offline: false
+  audience:
+  - staff
+  offline: true
   reads:
   - fnb.menu
   - fnb.menu_section
@@ -551,8 +607,10 @@ operations:
   path: /modifier-groups
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
-  offline: false
+  audience:
+  - staff
+  - guest
+  offline: true
   reads:
   - fnb.modifier_group
   writes: []
@@ -574,7 +632,8 @@ operations:
   path: /recipes
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - fnb.recipe
@@ -584,7 +643,8 @@ operations:
   path: /table-reservations
   scope: venue
   permission: FNB_OPERATE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - fnb.table
@@ -631,7 +691,7 @@ operations:
   reads:
   - cache:idempotency
   - fnb.temperature_log
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - fnb.corrective_action
@@ -657,7 +717,8 @@ operations:
   path: /table-visits/{visitId}/merge
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -718,7 +779,8 @@ operations:
   path: /table-visits
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -760,7 +822,8 @@ operations:
   path: /kitchen/tickets/{ticketId}/prioritise
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -843,12 +906,28 @@ operations:
   writes:
   - cache:idempotency
   - fnb.kitchen_ticket
+- operation: recordCorrectiveAction
+  verb: POST
+  path: /food-safety/corrective-actions/{actionId}/action
+  scope: venue
+  permission: INCIDENT_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - fnb.corrective_action
+  - identity.principal
+  writes:
+  - cache:idempotency
+  - fnb.corrective_action
 - operation: recordOrderHandover
   verb: POST
   path: /guest-orders/{orderId}/delivery
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -862,7 +941,8 @@ operations:
   path: /outlets/{outletId}/waste
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -907,7 +987,8 @@ operations:
   path: /table-visits/{visitId}/request-bill
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -975,7 +1056,8 @@ operations:
   path: /table-reservations/{reservationId}/seat
   scope: venue
   permission: FNB_OPERATE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -1050,7 +1132,8 @@ operations:
   path: /menu-items/{itemId}/availability
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -1076,7 +1159,8 @@ operations:
   path: /kitchen/stations
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1089,7 +1173,8 @@ operations:
   path: /kitchen/tickets/{ticketId}/status
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -1097,12 +1182,14 @@ operations:
   writes:
   - cache:idempotency
   - fnb.kitchen_ticket
+  - platform.outbox
 - operation: setMenuSections
   verb: PUT
   path: /menus/{menuId}/sections
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1119,7 +1206,8 @@ operations:
   path: /recipes
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1191,7 +1279,8 @@ operations:
   path: /outlets/{outletId}/tables
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1219,7 +1308,8 @@ operations:
   path: /table-visits/{visitId}/bill/split
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -1263,7 +1353,8 @@ operations:
   path: /menus/{menuId}
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1296,7 +1387,8 @@ operations:
   path: /table-reservations/{reservationId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -1309,7 +1401,8 @@ operations:
   path: /table-visits/{visitId}
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency

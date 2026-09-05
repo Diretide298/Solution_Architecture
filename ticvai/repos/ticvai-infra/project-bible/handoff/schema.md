@@ -36,7 +36,7 @@ Every table follows these. They are not per-table decisions.
 | `orders.payment` | `catalogue.event` |
 | `orders.refund` | `identity.principal` |
 | `orders.shift`, `orders.cash_movement` | `identity.role`, `identity.grant` |
-| `access.scan_event` | `platform.scope_node` |
+| `access.scan_event` | `platform.org_unit` |
 | `ledger.journal_entry` | `pii.subject` |
 | `fnb.order`, `retail.order` | `access.access_point` |
 
@@ -51,7 +51,7 @@ prices, guests and entitlement definitions are shared; transactions are not.
 |---|---|
 | Extensions | `ltree` `pgcrypto` `pg_stat_statements` `vector` |
 | Schemas | 8, with per-module roles and default privileges |
-| `platform.scope_node` | 7-level tree, GiST index on `path` |
+| `platform.org_unit` | 7-level tree, GiST index on `path` |
 | `platform.region_settings` | Country, currency, **scale**, timezone, fiscal year, placement |
 | `platform.in_scope(ltree)` | RLS predicate — target at or beneath a granted path |
 | `platform.outbox` | Publication atomic with the state change |
@@ -75,9 +75,9 @@ reference.
 | `catalogue` | `bundle` `bundle_delta` | **C102.** Version, signature, content hash |
 | `catalogue` | `lease` `lease_unit` | **C103.** TTL, holder, sub-lease parent |
 | `orders` | `sales_order` `order_line` `payment` `refund` `void` `reservation` `shift` `deposit_box` `cash_movement` | All partitioned |
-| `access` | `access_point` `admission_profile` `scan_event` `blacklist` `offline_package` | |
+| `access` | `access_point` `admission_rules` `scan_event` `blacklist` `offline_package` | |
 | `ledger` | `account` `journal_entry` `journal_line` `tax_code` `recognition_schedule` `allocation_split` `legal_entity` `fiscal_period` `settlement` `price_variance` | `price_variance` pending **CF-38** |
-| `platform` | `guest_link` `redemption_right` `wallet_allocation` | **Cross-cell. Wave 1 per ADR-0014** |
+| `platform` | `guest_link` `cross_region_entitlement` `wallet_allocation` | **Cross-cell. Wave 1 per ADR-0014** |
 | `pii` | `subject` `subject_contact` `subject_document` `consent` | Erasable |
 
 ---

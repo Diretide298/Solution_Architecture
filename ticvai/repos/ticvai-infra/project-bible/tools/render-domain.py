@@ -9,10 +9,19 @@ can never disagree.
 """
 
 from __future__ import annotations
+import sys
 
 import argparse
 import json
 from pathlib import Path
+
+# Windows consoles are cp1252 and this tool closes by printing a unicode arrow. **The write
+# has already happened by then**, so the traceback reported a failure on a run that succeeded
+# — the most misleading shape an error can take.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 ROOT = Path(__file__).resolve().parents[1]
 HANDOFF = ROOT / "handoff"
@@ -184,7 +193,7 @@ def main() -> int:
     data = json.loads(src.read_text(encoding="utf-8"))
     out = Path(args.out) if args.out else HANDOFF / f"{args.domain}-index.md"
     out.write_text(render(data), encoding="utf-8")
-    print(f"{args.domain}: {out.relative_to(ROOT)} ({len(out.read_text(encoding="utf-8").splitlines())} lines)")
+    print(f"{args.domain}: {out.relative_to(ROOT)} ({len(out.read_text(encoding='utf-8').splitlines())} lines)")
     return 0
 
 

@@ -104,7 +104,7 @@ operationsByContract:
     permission: PRODUCT_CONFIGURE
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createInventoryItem
     verb: POST
     path: /inventory-items
@@ -166,7 +166,7 @@ operationsByContract:
     path: /stock-counts/{countId}/variance
     scope: venue
     permission: PRODUCT_VIEW
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: getInventoryItem
@@ -254,7 +254,7 @@ operationsByContract:
     path: /requisitions
     scope: venue
     permission: PRODUCT_VIEW
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: listSerialisedItems
@@ -320,7 +320,7 @@ operationsByContract:
     permission: LEDGER_POST
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: receiveStockTransfer
     verb: POST
     path: /stock-transfers/{transferId}/receive
@@ -426,6 +426,20 @@ operationsByContract:
     reads: 2
     writes: 4
 tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: inventory.count
   columns: 16
   store: postgres
@@ -447,7 +461,7 @@ tables:
   - inventory
   foreignWriters: null
 - table: inventory.goods_receipt_line
-  columns: 9
+  columns: 10
   store: postgres
   parent: inventory.goods_receipt
   writtenBy: []
@@ -478,27 +492,27 @@ tables:
   - fnb
   - retail
 - table: inventory.purchase_order
-  columns: 20
+  columns: 22
   store: postgres
   parent: null
   writtenBy:
   - inventory
   foreignWriters: null
 - table: inventory.purchase_order_line
-  columns: 9
+  columns: 10
   store: postgres
   parent: inventory.purchase_order
   writtenBy: []
   foreignWriters: null
 - table: inventory.quotation
-  columns: 11
+  columns: 12
   store: postgres
   parent: inventory.requisition
   writtenBy:
   - inventory
   foreignWriters: null
 - table: inventory.quotation_line
-  columns: 5
+  columns: 6
   store: postgres
   parent: inventory.quotation
   writtenBy: []
@@ -513,7 +527,7 @@ tables:
   foreignWriters:
   - maintenance
 - table: inventory.requisition_line
-  columns: 9
+  columns: 10
   store: postgres
   parent: inventory.requisition
   writtenBy: []
@@ -531,27 +545,27 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: inventory.stock_level
-  columns: 1
+  columns: 2
   store: derived
-  parent: inventory.item
+  parent: null
   writtenBy: []
   foreignWriters: null
 - table: inventory.supplier
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - inventory
   foreignWriters: null
 - table: inventory.transfer
-  columns: 9
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
   - inventory
   foreignWriters: null
 - table: inventory.transfer_line
-  columns: 7
+  columns: 8
   store: postgres
   parent: inventory.transfer
   writtenBy: []
@@ -592,6 +606,7 @@ screens:
 - P08:BO-081 Inventory Items
 - P08:BO-082 Stock Movements
 - P08:BO-083 Suppliers
+- P08:BO-105 Stock & Supply
 - P08:BO-114 Variants, Attributes, Barcode & RFID Management
 - P08:BO-137 Recipe Consumption & Theoretical Inventory
 - P08:BO-138 Production Execution & Batch Management

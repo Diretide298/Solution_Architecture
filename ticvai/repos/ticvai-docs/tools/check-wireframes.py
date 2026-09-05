@@ -22,6 +22,7 @@ Checks:
 
 Run: python3 tools/check-wireframes.py
 """
+import json
 import re
 import sys
 from pathlib import Path
@@ -68,7 +69,11 @@ def main() -> int:
         return 0
 
     files = {f.name: f for f in BOARDS.glob("*.html")}
-    anchors = {n: set(re.findall(r'<div id="([a-z0-9-]+)"', f.read_text(errors="replace")))
+    # **Case- and element-agnostic.** The pattern was `<div id="[a-z0-9-]+"` — lowercase, and only
+    # on a div. The Kiosk pack arrived 31 August anchoring on `KSK-001` in uppercase, and every one
+    # of its nine frames read as a click that does nothing. **The board was right and the check was
+    # wrong**, which is the worse of the two failures because it sends somebody to fix a good file.
+    anchors = {n: set(re.findall(r'(?<![-\\w])id="([A-Za-z0-9_-]+)"', f.read_text(errors="replace")))
                for n, f in files.items()}
     screen_anchors = {n: {a.upper() for a in v if re.fullmatch(r"[a-z]{2,5}-\d{3}", a)}
                       for n, v in anchors.items()}
@@ -151,7 +156,15 @@ def main() -> int:
         code = doc["platform"]["code"]
         for ref in (doc["platform"].get("designReferences") or []):
             if not (ROOT / ref["path"]).exists():
-                ERRORS.append(f"{code}: design reference '{ref['path']}' does not exist")
+                # **A design reference is a client file under `sources/`, and `sources/` is 117 MB of
+                # PDFs that a working package legitimately ships without.** Failing here made an
+                # extracted package look broken when it was only smaller.
+                #
+                # **An absent folder is a warning; an absent file inside a present folder is an error.**
+                # The first is a packaging choice, the second is a reference to something deleted or
+                # renamed — and only the second is a defect.
+                (WARNINGS if not (ROOT / "sources").exists() else ERRORS).append(
+                    f"{code}: design reference '{ref['path']}' does not exist")
         for s in doc["screens"]:
             dr = (s.get("wireframe") or {}).get("designReference")
             if dr and not (ROOT / dr).exists():
@@ -200,13 +213,134 @@ def main() -> int:
             _b = (_s.get("wireframe") or {}).get("board")
             if _b:
                 referenced.add(_b.split("#")[0].split("/")[-1])
+    # **`boardFrames` is a reference too, and this check only counted `wireframe.board`.**
+    # `FnB Board 1`, `3`, `6` and `POS Board 6` were reported as orphans while 35 of their frames
+    # were claimed by screens through `boardFrames` — the join existed in one direction and the
+    # check read the other. **Same shape as `access.validated`**, where three transitions emitted an
+    # event and none declared it.
+    #
+    # A screen owning a frame is pointing at the board that frame lives on, whether or not it also
+    # renders from it.
+    _frame_prefix = {}
+    for _bf in sorted(BOARDS.glob("*.dc.html")):
+        for _id in set(re.findall(r'id="([^"]+)"', _bf.read_text(encoding="utf-8"))):
+            _frame_prefix.setdefault(_id.lower(), _bf.name)
+    for _f2 in sorted(SCREENS.glob("P*.yaml")):
+        for _s2 in (yaml.safe_load(_f2.read_text(encoding="utf-8")).get("screens") or []):
+            for _fr in (_s2.get("boardFrames") or []):
+                _owner = _frame_prefix.get(str(_fr).lower())
+                if _owner:
+                    referenced.add(_owner)
+
+    # **The manifest is what tells a stranger from a client pack.** Read once, above both loops:
+    # the orphan check needs it to skip, and the unrecognised check needs it to report.
+    _mf = BOARDS / "manifest.json"
+    _known: set = set()
+    _m: dict = {}
+    if _mf.exists():
+        _m = json.loads(_mf.read_text(encoding="utf-8"))
+        _known = (set(_m.get("generated") or []) | set(_m.get("clientPacks") or [])
+                  | set(_m.get("indexes") or []))
+
+    # **An index points at boards and nothing points at it — that is what an index is.**
+    # Exempting by filename missed `TICVAI Wireframe Boards.dc.html`, which is the generated
+    # index and carries no frames of its own. **The role is the test, not the name**: a file
+    # with links out and no anchors in is a contents page.
+    #
+    # **A board the manifest cannot account for is skipped here.** It gets its own warning saying
+    # it is a stranger, and reporting it twice — once as unreferenced, once as unrecognised —
+    # buries the stronger message under the weaker one.
     for _f in sorted(BOARDS.glob("*.dc.html")):
-        if _f.name not in referenced and "Index" not in _f.name:
+        if _mf.exists() and _f.name not in _known:
+            continue
+        _txt = _f.read_text(encoding="utf-8")
+        _is_index = not set(re.findall(r'id="([^"]+)"', _txt)) and 'href=' in _txt
+        if _f.name not in referenced and "Index" not in _f.name and not _is_index:
             WARNINGS.append(f"{_f.name}: on disk and nothing points at it. Either a screen "
                             "declares it or it should not ship")
 
 
-    for w in WARNINGS[:20]:
+    # **`wireframe.status` describes the file being pointed at, not where the design came from.**
+    # P15 and P16 were repointed from the client pack to their own generated boards on 24 August
+    # and kept `designed` — **claiming a client had drawn a board this package generates**, on
+    # twenty screens. `derivedFrom` is where the pack frame is recorded; the two are different
+    # facts and only one of them is about the file.
+    #
+    # A generated board is named after its platform. **The join is the filename**, which is the
+    # same convention the anchor check relies on.
+    for _f in sorted(SCREENS.glob("P*.yaml")):
+        _d = yaml.safe_load(_f.read_text(encoding="utf-8"))
+        _code = (_d.get("platform") or {}).get("code", "")
+        for _s in _d.get("screens") or []:
+            _w = _s.get("wireframe") or {}
+            _b = str(_w.get("board") or "")
+            if not _b or not _w.get("status"):
+                continue
+            _generated = _b.split("/")[-1].startswith(_code + " ")
+            if _generated and _w["status"] == "designed":
+                WARNINGS.append(
+                    f"{_s['id']}: status 'designed' but the board is {_b.split('/')[-1]}, which "
+                    "this package generates — status describes the file, derivedFrom describes "
+                    "where the design came from")
+            if not _generated and _w["status"] == "generated":
+                WARNINGS.append(
+                    f"{_s['id']}: status 'generated' but the board is {_b.split('/')[-1]}, which "
+                    "is a client pack")
+
+
+    # **A screen drawn by a client pack is still drawn by the generator, and that is correct.**
+    # 20 screens moved onto Seat and Dashboards boards on 26 August; `derive-wireframes.py` keeps
+    # writing their frames because it draws every screen on its platform. **`generatedFallback`
+    # records the board they came from**, so a reader can see both and a regeneration cannot
+    # silently take the drawn one away.
+    #
+    # **The failure this guards is the reverse**: a screen pointing at a drawn board whose
+    # generated fallback has stopped existing. That happens when a platform is renamed, and it is
+    # how `P08 Staff Web Back Office` outlived its replacement.
+    for _f in sorted(SCREENS.glob("P*.yaml")):
+        _d = yaml.safe_load(_f.read_text(encoding="utf-8"))
+        for _s in (_d.get("screens") or []):
+            _w = _s.get("wireframe") or {}
+            _gf = _w.get("generatedFallback")
+            if not _gf:
+                continue
+            _fn = _gf.split("#")[0].split("/")[-1]
+            if not (BOARDS / _fn).exists():
+                WARNINGS.append(
+                    f"{_s['id']}: generatedFallback names {_fn}, which is not on disk — the board "
+                    "was renamed or removed after this screen was repointed at a drawn one")
+
+
+    # **A board this package cannot account for is a board somebody will count.** On 31 August a
+    # consumer reported 811 unclaimed frames against a real 359 — the gap was eight boards
+    # superseded by a rename on the 26th and nine belonging to other products entirely. **A
+    # worklist wrong by 55% is worse than none**, because it gets planned against.
+    #
+    # **Reported, never deleted.** `derive-wireframes.py` removes only boards it wrote itself; a
+    # stranger might be a client pack arriving before its screens, and deleting somebody else's
+    # file to make a count tidy is the wrong trade.
+    # **Read the manifest's own `unrecognised` list rather than inferring from absence.** Inferring
+    # meant a board added after the last `derive-wireframes.py` run counted as known, which is the
+    # opposite of what this check is for — the newest file is the one most likely to be a stranger.
+    _strangers = set(_m.get("unrecognised") or []) if _mf.exists() else set()
+    if _strangers:
+        for _f in sorted(BOARDS.glob("*.dc.html")):
+            if _f.name not in _strangers:
+                continue
+            _n = len(re.findall(r'(?<![-\w])id="([A-Za-z0-9_-]+)"',
+                                _f.read_text(encoding="utf-8", errors="replace")))
+            WARNINGS.append(
+                f"{_f.name}: not generated by this package and not a known client pack "
+                f"({_n} anchors). **Anything counting this folder will count it** — most often a "
+                "board superseded by a rename, or one belonging to another product")
+
+
+    # **Show the strangers first, then the rest.** Truncating at 20 buried the one warning that
+    # says a file does not belong under nineteen saying a board is unreferenced — and the buried
+    # one is why a consumer counted 811 frames against a real 359.
+    _first = [w for w in WARNINGS if "known client pack" in w]
+    _rest = [w for w in WARNINGS if w not in _first]
+    for w in (_first + _rest)[:20]:
         print(f"  WARN  {w}")
     for e in ERRORS:
         print(f"  FAIL  {e}")

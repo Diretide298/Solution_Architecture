@@ -1,0 +1,138 @@
+# **Variant C - shard the lease.** The only variant that attacks the actual wall.
+#
+# **acquireInventoryHold serialises on one row per performance.** Every buyer wants the same row,
+# so replicas queue rather than parallelise - and this is the one thing more Catalogue replicas
+# cannot fix.
+#
+# **Sixteen sub-pools per performance.** A buyer who does not care which seat takes any shard with
+# capacity, so sixteen buyers proceed where one did. **A buyer choosing a specific seat still
+# serialises** - they are contending for a seat, not for capacity, and no sharding changes that.
+#
+# **The cost is reconciliation.** Sixteen sub-pools sum to the performance capacity and each can
+# be exhausted separately, so the last seats fragment: fifteen shards empty and one holding four
+# is a performance that looks sold out to most buyers. **Rebalancing is the hard part and this
+# variant does not implement it** - it is here to find the throughput ceiling, not to ship.
+#
+# **Measure**: holds acquired per second on a single hot performance. **This is the number.**
+# If it does not move, the ceiling is Postgres row locking itself and no application change helps.
+# **Matched to the baseline on 31 August.** synchronous_commit removed from the server
+# command and databases split per service (ADR-0036). **Three variants still carried the
+# ADR-0036 is superseded by ADR-0038 - one database per tenant, so a burst cell is one
+# database. The line above is kept as the reasoning this variant forked from.
+# old settings after the baseline was corrected** - and a variant differing from the
+# baseline in anything but its named lever is a comparison that measures the wrong thing.
+#
+# **The database topology, and it is the same in all seven configs** (ADR-0038, ADR-0039):
+#
+#     postgres instance  =  region  =  the cell
+#       |
+#       +-- control database          once per instance: cells, tenants, licences, rollouts
+#       +-- database per tenant       25 schemas -> tables -> venue_id partitions
+#
+#     services   shared across tenants, scaled on need and traffic, and routed per request
+#                to a tenant database by tenant id
+#
+# One tenant, one event — the burst cell of ADR-0035, as amended 3 September.
+#
+# **A service is not deployed per tenant.** It holds a small pool to the control database to
+# resolve a tenant to its database name, then a pool per tenant database opened on that tenant's
+# first request — so `PG_POOL_MIN/MAX` below are per tenant, which is exactly how ADR-0038
+# amended ADR-0032's pooling: 20 connections across 25 concurrent tenants is
+# `max_connections` in full.
+#
+# **Every service used to point at one `ticvai` database.** That was the arrangement ADR-0038
+# replaced, and it was still here in all seven configs after the ADR was accepted.
+
+
+services:
+  postgres-hot:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ticvai
+      POSTGRES_PASSWORD: ticvai
+      POSTGRES_DB: control
+      TICVAI_TENANTS: acme:11111111-1111-1111-1111-111111111111
+    volumes:
+    - ../backend/control:/docker-entrypoint-initdb.d:ro
+    - ../backend/initdb-provision.sh:/docker-entrypoint-initdb.d/zzz-provision.sh:ro
+    - ../backend:/opt/ticvai:ro
+    command: postgres -c max_connections=800 -c shared_buffers=8GB
+    deploy:
+      resources:
+        limits:
+          cpus: '16'
+          memory: 32G
+  redis:
+    image: redis:7-alpine
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 16G
+  pgbouncer:
+    image: edoburu/pgbouncer:latest
+    environment:
+      DB_HOST: postgres-hot
+      DB_USER: ticvai
+      DB_PASSWORD: ticvai
+      POOL_MODE: transaction
+      MAX_CLIENT_CONN: '5000'
+      DEFAULT_POOL_SIZE: '80'
+    depends_on:
+    - postgres-hot
+  catalogueservice:
+    build: ../services/CatalogueService
+    environment:
+      PG_CONTROL_DSN: postgres://ticvai:ticvai@pgbouncer:5432/control
+      PG_TENANT_DSN_TEMPLATE: postgres://ticvai:ticvai@pgbouncer:5432/{database}
+      TENANT_HEADER: x-ticvai-tenant
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '8'
+      PG_POOL_MAX: '40'
+      BURST_LEASE_SHARDS: '16'
+    depends_on:
+    - pgbouncer
+    - redis
+    deploy:
+      replicas: 8
+      resources:
+        limits:
+          cpus: '4'
+          memory: 2G
+  orderservice:
+    build: ../services/OrderService
+    environment:
+      PG_CONTROL_DSN: postgres://ticvai:ticvai@pgbouncer:5432/control
+      PG_TENANT_DSN_TEMPLATE: postgres://ticvai:ticvai@pgbouncer:5432/{database}
+      TENANT_HEADER: x-ticvai-tenant
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '8'
+      PG_POOL_MAX: '40'
+      BURST_LEASE_SHARDS: '16'
+    depends_on:
+    - pgbouncer
+    - redis
+    deploy:
+      replicas: 5
+      resources:
+        limits:
+          cpus: '4'
+          memory: 2G
+  identityservice:
+    build: ../services/IdentityService
+    environment:
+      PG_CONTROL_DSN: postgres://ticvai:ticvai@pgbouncer:5432/control
+      PG_TENANT_DSN_TEMPLATE: postgres://ticvai:ticvai@pgbouncer:5432/{database}
+      TENANT_HEADER: x-ticvai-tenant
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '8'
+      PG_POOL_MAX: '40'
+    depends_on:
+    - pgbouncer
+    - redis
+    deploy:
+      replicas: 2
+      resources:
+        limits:
+          cpus: '2'
+          memory: 1G

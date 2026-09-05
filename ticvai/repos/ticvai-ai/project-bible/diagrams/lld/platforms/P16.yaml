@@ -97,9 +97,9 @@ screens:
   - ANL-009
   - ANL-010
   boardFrames:
-  - FNB-6A
-  - POS-6A
-  - RET-6A
+  - FnB Board 6.dc.html#fnb-6a
+  - POS Board 6.dc.html#pos-6a
+  - Retail Board 6.dc.html#ret-6a
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-001
   inFlows: null
 - screen: ANL-002
@@ -124,10 +124,11 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - FNB-6B
-  - RET-6L
+  - FnB Board 6.dc.html#fnb-6b
+  - Retail Board 6.dc.html#ret-6l
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-002
   inFlows: null
 - screen: ANL-003
@@ -155,15 +156,16 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - FNB-4K
-  - FNB-6C
-  - FNB-6G
-  - POS-6B
-  - POS-6C
-  - POS-6D
-  - RET-6B
+  - FnB Board 4.dc.html#fnb-4k
+  - FnB Board 6.dc.html#fnb-6c
+  - FnB Board 6.dc.html#fnb-6g
+  - POS Board 6.dc.html#pos-6b
+  - POS Board 6.dc.html#pos-6c
+  - POS Board 6.dc.html#pos-6d
+  - Retail Board 6.dc.html#ret-6b
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-003
   inFlows: null
 - screen: ANL-004
@@ -189,10 +191,11 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - FNB-6D
-  - RET-6C
+  - FnB Board 6.dc.html#fnb-6d
+  - Retail Board 6.dc.html#ret-6c
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-004
   inFlows:
   - F82 A month is analysed from incrementality to a scheduled report
@@ -219,10 +222,11 @@ screens:
   - domain<-session
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - FNB-6E
-  - RET-6F
+  - FnB Board 6.dc.html#fnb-6e
+  - Retail Board 6.dc.html#ret-6f
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-005
   inFlows:
   - F82 A month is analysed from incrementality to a scheduled report
@@ -251,11 +255,12 @@ screens:
   - countId<-deepLink
   - dashboardId<-deepLink
   - reportId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - FNB-6F
-  - RET-6D
-  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-006
+  - FnB Board 6.dc.html#fnb-6f
+  - Retail Board 6.dc.html#ret-6d
+  wireframe: wireframes/Retail Board 6.dc.html#ret-6d
   inFlows:
   - F82 A month is analysed from incrementality to a scheduled report
 - screen: ANL-007
@@ -284,9 +289,10 @@ screens:
   - dashboardId<-deepLink
   - reportId<-deepLink
   - segmentId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - RET-6E
+  - Retail Board 6.dc.html#ret-6e
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-007
   inFlows:
   - F82 A month is analysed from incrementality to a scheduled report
@@ -311,10 +317,11 @@ screens:
   - venueId<-session
   - domain<-session
   - dashboardId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - FNB-6H
-  - RET-6G
+  - FnB Board 6.dc.html#fnb-6h
+  - Retail Board 6.dc.html#ret-6g
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-008
   inFlows: null
 - screen: ANL-009
@@ -346,14 +353,15 @@ screens:
   - alertId<-deepLink
   - reportId<-deepLink
   - actionId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - FNB-5K
-  - FNB-6J
-  - FNB-6K
-  - POS-6E
-  - RET-5K
-  - RET-6K
+  - FnB Board 5.dc.html#fnb-5k
+  - FnB Board 6.dc.html#fnb-6j
+  - FnB Board 6.dc.html#fnb-6k
+  - POS Board 6.dc.html#pos-6e
+  - Retail Board 5.dc.html#ret-5k
+  - Retail Board 6.dc.html#ret-6k
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-009
   inFlows:
   - F77 A promotion is built, bundled, published and measured
@@ -378,8 +386,9 @@ screens:
   entryParams:
   - venueId<-session
   - suggestionId<-deepLink
-  goesTo: []
+  goesTo:
+  - ANL-001
   boardFrames:
-  - POS-6F
+  - POS Board 6.dc.html#pos-6f
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-010
   inFlows: null

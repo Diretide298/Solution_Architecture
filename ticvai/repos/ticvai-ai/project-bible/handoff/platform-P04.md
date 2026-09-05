@@ -9,31 +9,25 @@
 | Contracts | 18 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 185 |
+| Operations with no screen | 170 |
 | Waves | wave1 21 · wave2 3 |
 
 ## Gaps
 
-### 185 operations with no screen here
+### 170 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `enrolFacePass` | access | POST | Register a facial profile against an entitlement |
-| `getFacePassEnrolment` | access | GET | Whether a pass has a face registered, and when |
-| `revokeFacePass` | access | DELETE | Remove a facial profile |
+| `issueAccreditationBadge` | approvals | POST | Issue a badge |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
 | `commitCatalogueImport` | catalogue | POST | Apply a parsed catalogue import |
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
-| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
-| `listGuestMemberships` | catalogue | GET | A guest's memberships, benefits and history |
-| `listProductVersions` | catalogue | GET | What this product used to be |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
@@ -44,23 +38,29 @@
 | `disputeObligation` | finance | POST | One entity disagrees with the amount |
 | `getForeignTenderReport` | finance | GET | What was taken in which currency |
 | `getUnifiedReconciliation` | finance | GET | Every money source against the ledger, in one view |
+| `ingestFxRates` | finance | POST | Pull rates from the configured provider |
 | `listInterEntityObligations` | finance | GET | What one entity owes another |
 | `recordDeposit` | finance | POST | Money taken before the sale is complete |
 | `recordSettlement` | finance | POST | One entity paid another |
 | `recordWriteOff` | finance | POST | Write off an uncollectable balance |
 | `resolveObligationDispute` | finance | POST | Agree what is actually owed |
 | `runFxRevaluation` | finance | POST | Revalue monetary balances at close |
+| `setFxProvider` | finance | PUT | Which provider serves which purpose |
 | `validateRecognitionSchedules` | finance | POST | Find product kinds claimed by more than one schedule |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
 | `clearTable` | fnb | POST | Mark a table cleared and free |
+| `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
 | `createTable` | fnb | POST | A table as a thing, not an inference |
+| `escalateCorrectiveAction` | fnb | POST | Escalate a finding |
 | `getTableVisit` | fnb | GET | Read a visit with all its orders |
 | `rebalanceStationLoad` | fnb | POST | Move work between stations mid-service |
+| `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
-| … | | | 145 more |
+| `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
+| … | | | 130 more |
 
 ### 2 modules split across waves
 

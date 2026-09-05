@@ -1,0 +1,7772 @@
+{
+ "screens": 500,
+ "signatures": 381,
+ "duplicates": 105,
+ "clusters": {
+  "GST-003,WEB-002": [
+   "GST-003",
+   "WEB-002"
+  ],
+  "GST-004,WEB-004": [
+   "GST-004",
+   "WEB-004"
+  ],
+  "KSK-005,WEB-006": [
+   "KSK-005",
+   "WEB-006"
+  ],
+  "GST-049,WEB-007": [
+   "GST-049",
+   "WEB-007"
+  ],
+  "GST-048,WEB-008": [
+   "GST-048",
+   "WEB-008"
+  ],
+  "GST-020,WEB-009": [
+   "GST-020",
+   "WEB-009"
+  ],
+  "GST-010,WEB-013": [
+   "GST-010",
+   "WEB-013"
+  ],
+  "GST-046,WEB-015": [
+   "GST-046",
+   "WEB-015"
+  ],
+  "WEB-017,WEB-024,WEB-027": [
+   "WEB-017",
+   "WEB-024",
+   "WEB-027"
+  ],
+  "GST-012,WEB-018": [
+   "GST-012",
+   "WEB-018"
+  ],
+  "GST-019,WEB-019": [
+   "GST-019",
+   "WEB-019"
+  ],
+  "GST-047,WEB-025,WEB-028,WEB-029": [
+   "GST-047",
+   "WEB-025",
+   "WEB-028",
+   "WEB-029"
+  ],
+  "GST-014,WEB-030": [
+   "GST-014",
+   "WEB-030"
+  ],
+  "GST-016,WEB-031": [
+   "GST-016",
+   "WEB-031"
+  ],
+  "GST-037,WEB-032": [
+   "GST-037",
+   "WEB-032"
+  ],
+  "KSK-017,WEB-033": [
+   "KSK-017",
+   "WEB-033"
+  ],
+  "GST-034,WEB-034": [
+   "GST-034",
+   "WEB-034"
+  ],
+  "GST-044,WEB-035": [
+   "GST-044",
+   "WEB-035"
+  ],
+  "GST-024,WEB-036": [
+   "GST-024",
+   "WEB-036"
+  ],
+  "GST-061,WEB-037": [
+   "GST-061",
+   "WEB-037"
+  ],
+  "GST-025,WEB-038": [
+   "GST-025",
+   "WEB-038"
+  ],
+  "GST-023,WEB-040": [
+   "GST-023",
+   "WEB-040"
+  ],
+  "GST-027,WEB-041": [
+   "GST-027",
+   "WEB-041"
+  ],
+  "GST-036,WEB-043": [
+   "GST-036",
+   "WEB-043"
+  ],
+  "GST-031,WEB-044": [
+   "GST-031",
+   "WEB-044"
+  ],
+  "GST-030,WEB-046": [
+   "GST-030",
+   "WEB-046"
+  ],
+  "GST-002,KSK-003": [
+   "GST-002",
+   "KSK-003"
+  ],
+  "GST-008,GST-045,GST-055,KSK-010,KSK-012": [
+   "GST-008",
+   "GST-045",
+   "GST-055",
+   "KSK-010",
+   "KSK-012"
+  ],
+  "ACC-006,GST-022": [
+   "ACC-006",
+   "GST-022"
+  ],
+  "BO-022,BO-026,BO-047,EMP-014,POS-006,PTR-008,PTR-015": [
+   "BO-022",
+   "BO-026",
+   "BO-047",
+   "EMP-014",
+   "POS-006",
+   "PTR-008",
+   "PTR-015"
+  ],
+  "BO-039,BO-040,BO-041,BO-042,EMP-009": [
+   "BO-039",
+   "BO-040",
+   "BO-041",
+   "BO-042",
+   "EMP-009"
+  ],
+  "BO-034,EMP-010,EMP-015,SCN-007,SCN-008,SCN-009,SCN-013,SCN-015": [
+   "BO-034",
+   "EMP-010",
+   "EMP-015",
+   "SCN-007",
+   "SCN-008",
+   "SCN-009",
+   "SCN-013",
+   "SCN-015"
+  ],
+  "EMP-017,SCN-014": [
+   "EMP-017",
+   "SCN-014"
+  ],
+  "EMP-004,EMP-005": [
+   "EMP-004",
+   "EMP-005"
+  ],
+  "BO-066,EMP-007,EMP-037,EMP-038,EMP-039,EMP-047": [
+   "BO-066",
+   "EMP-007",
+   "EMP-037",
+   "EMP-038",
+   "EMP-039",
+   "EMP-047"
+  ],
+  "EMP-019,EMP-020": [
+   "EMP-019",
+   "EMP-020"
+  ],
+  "BO-017,EMP-033": [
+   "BO-017",
+   "EMP-033"
+  ],
+  "EMP-035,PTR-012": [
+   "EMP-035",
+   "PTR-012"
+  ],
+  "EMP-021,EMP-022,EMP-023": [
+   "EMP-021",
+   "EMP-022",
+   "EMP-023"
+  ],
+  "BO-056,EMP-024": [
+   "BO-056",
+   "EMP-024"
+  ],
+  "BO-072,EMP-026": [
+   "BO-072",
+   "EMP-026"
+  ],
+  "EMP-028,PTR-021": [
+   "EMP-028",
+   "PTR-021"
+  ],
+  "EMP-040,EMP-041": [
+   "EMP-040",
+   "EMP-041"
+  ],
+  "BO-114,EMP-069": [
+   "BO-114",
+   "EMP-069"
+  ],
+  "BO-141,EMP-070": [
+   "BO-141",
+   "EMP-070"
+  ],
+  "SCN-002,SCN-016": [
+   "SCN-002",
+   "SCN-016"
+  ],
+  "BO-015,BO-016,BO-019": [
+   "BO-015",
+   "BO-016",
+   "BO-019"
+  ],
+  "BO-025,PTR-014": [
+   "BO-025",
+   "PTR-014"
+  ],
+  "BO-029,BO-059,BO-061,PTR-018": [
+   "BO-029",
+   "BO-059",
+   "BO-061",
+   "PTR-018"
+  ],
+  "BO-031,CMS-004": [
+   "BO-031",
+   "CMS-004"
+  ],
+  "BO-051,BO-070,PTR-016": [
+   "BO-051",
+   "BO-070",
+   "PTR-016"
+  ],
+  "ADM-020,BO-053,PTR-003": [
+   "ADM-020",
+   "BO-053",
+   "PTR-003"
+  ],
+  "ADM-021,BO-054": [
+   "ADM-021",
+   "BO-054"
+  ],
+  "BO-062,BO-065": [
+   "BO-062",
+   "BO-065"
+  ],
+  "BO-101,BO-102,BO-103,BO-104,BO-105,BO-106,BO-107,BO-108": [
+   "BO-101",
+   "BO-102",
+   "BO-103",
+   "BO-104",
+   "BO-105",
+   "BO-106",
+   "BO-107",
+   "BO-108"
+  ],
+  "BO-134,KIT-005": [
+   "BO-134",
+   "KIT-005"
+  ],
+  "ADM-001,SUP-001": [
+   "ADM-001",
+   "SUP-001"
+  ],
+  "ADM-013,ADM-014,ADM-030,ADM-032,ADM-033,ADM-034": [
+   "ADM-013",
+   "ADM-014",
+   "ADM-030",
+   "ADM-032",
+   "ADM-033",
+   "ADM-034"
+  ],
+  "ADM-022,ADM-023": [
+   "ADM-022",
+   "ADM-023"
+  ],
+  "ADM-024,ADM-026,ADM-035,ADM-036": [
+   "ADM-024",
+   "ADM-026",
+   "ADM-035",
+   "ADM-036"
+  ],
+  "PTR-011,PTR-017": [
+   "PTR-011",
+   "PTR-017"
+  ],
+  "ACC-002,ACC-005": [
+   "ACC-002",
+   "ACC-005"
+  ],
+  "ANL-008,KIT-010": [
+   "ANL-008",
+   "KIT-010"
+  ]
+ },
+ "nearPairs": [
+  [
+   "WEB-016",
+   "GST-042",
+   0.947
+  ],
+  [
+   "POS-006",
+   "BO-023",
+   0.933
+  ],
+  [
+   "POS-006",
+   "BO-051",
+   0.929
+  ],
+  [
+   "POS-006",
+   "BO-070",
+   0.929
+  ],
+  [
+   "POS-006",
+   "PTR-016",
+   0.929
+  ],
+  [
+   "EMP-001",
+   "EMP-042",
+   0.8
+  ],
+  [
+   "EMP-010",
+   "BO-035",
+   0.875
+  ],
+  [
+   "EMP-014",
+   "BO-023",
+   0.933
+  ],
+  [
+   "EMP-014",
+   "BO-051",
+   0.929
+  ],
+  [
+   "EMP-014",
+   "BO-070",
+   0.929
+  ],
+  [
+   "EMP-014",
+   "PTR-016",
+   0.929
+  ],
+  [
+   "EMP-015",
+   "BO-035",
+   0.875
+  ],
+  [
+   "EMP-004",
+   "EMP-006",
+   0.938
+  ],
+  [
+   "EMP-005",
+   "EMP-006",
+   0.938
+  ],
+  [
+   "EMP-050",
+   "EMP-026",
+   0.8
+  ],
+  [
+   "EMP-050",
+   "BO-072",
+   0.8
+  ],
+  [
+   "SCN-007",
+   "BO-035",
+   0.875
+  ],
+  [
+   "SCN-008",
+   "BO-035",
+   0.875
+  ],
+  [
+   "SCN-009",
+   "BO-035",
+   0.875
+  ],
+  [
+   "SCN-013",
+   "BO-035",
+   0.875
+  ],
+  [
+   "SCN-015",
+   "BO-035",
+   0.875
+  ],
+  [
+   "BO-004",
+   "BO-038",
+   0.818
+  ],
+  [
+   "BO-015",
+   "BO-063",
+   0.846
+  ],
+  [
+   "BO-016",
+   "BO-063",
+   0.846
+  ],
+  [
+   "BO-019",
+   "BO-063",
+   0.846
+  ],
+  [
+   "BO-022",
+   "BO-023",
+   0.933
+  ],
+  [
+   "BO-022",
+   "BO-051",
+   0.929
+  ],
+  [
+   "BO-022",
+   "BO-070",
+   0.929
+  ],
+  [
+   "BO-022",
+   "PTR-016",
+   0.929
+  ],
+  [
+   "BO-023",
+   "BO-026",
+   0.933
+  ],
+  [
+   "BO-023",
+   "BO-047",
+   0.933
+  ],
+  [
+   "BO-023",
+   "BO-051",
+   0.867
+  ],
+  [
+   "BO-023",
+   "BO-070",
+   0.867
+  ],
+  [
+   "BO-023",
+   "PTR-008",
+   0.933
+  ],
+  [
+   "BO-023",
+   "PTR-015",
+   0.933
+  ],
+  [
+   "BO-023",
+   "PTR-016",
+   0.867
+  ],
+  [
+   "BO-026",
+   "BO-051",
+   0.929
+  ],
+  [
+   "BO-026",
+   "BO-070",
+   0.929
+  ],
+  [
+   "BO-026",
+   "PTR-016",
+   0.929
+  ],
+  [
+   "BO-029",
+   "BO-058",
+   0.818
+  ],
+  [
+   "BO-029",
+   "SUP-008",
+   0.9
+  ],
+  [
+   "BO-034",
+   "BO-035",
+   0.875
+  ],
+  [
+   "BO-047",
+   "BO-051",
+   0.929
+  ],
+  [
+   "BO-047",
+   "BO-070",
+   0.929
+  ],
+  [
+   "BO-047",
+   "PTR-016",
+   0.929
+  ],
+  [
+   "BO-051",
+   "PTR-002",
+   0.812
+  ],
+  [
+   "BO-051",
+   "PTR-008",
+   0.929
+  ],
+  [
+   "BO-051",
+   "PTR-015",
+   0.929
+  ],
+  [
+   "BO-058",
+   "BO-059",
+   0.818
+  ],
+  [
+   "BO-058",
+   "BO-061",
+   0.818
+  ],
+  [
+   "BO-058",
+   "PTR-018",
+   0.818
+  ],
+  [
+   "BO-059",
+   "SUP-008",
+   0.9
+  ],
+  [
+   "BO-061",
+   "SUP-008",
+   0.9
+  ],
+  [
+   "BO-070",
+   "PTR-002",
+   0.812
+  ],
+  [
+   "BO-070",
+   "PTR-008",
+   0.929
+  ],
+  [
+   "BO-070",
+   "PTR-015",
+   0.929
+  ],
+  [
+   "ADM-002",
+   "ADM-010",
+   0.857
+  ],
+  [
+   "ADM-007",
+   "ADM-011",
+   0.818
+  ],
+  [
+   "PTR-002",
+   "PTR-016",
+   0.812
+  ],
+  [
+   "PTR-008",
+   "PTR-016",
+   0.929
+  ],
+  [
+   "PTR-015",
+   "PTR-016",
+   0.929
+  ],
+  [
+   "PTR-018",
+   "SUP-008",
+   0.9
+  ]
+ ],
+ "noOperations": [
+  "GST-043",
+  "KSK-001",
+  "KSK-014",
+  "EMP-044",
+  "EMP-045",
+  "BO-067",
+  "PTR-019",
+  "ACC-001",
+  "ACC-003",
+  "ACC-004",
+  "ACC-008",
+  "SUP-006",
+  "CMS-013",
+  "CMS-017"
+ ],
+ "singlePlatformOperations": {
+  "abandonCart": [
+   "P01"
+  ],
+  "abandonPeriodClose": [
+   "P08"
+  ],
+  "acceptFnbOrder": [
+   "P08"
+  ],
+  "acceptVenueLabelProposals": [
+   "P08"
+  ],
+  "acknowledgePurchaseOrder": [
+   "P08"
+  ],
+  "addBlacklistEntry": [
+   "P08"
+  ],
+  "adjustDepositBoxFloat": [
+   "P04"
+  ],
+  "allocateBlockedSeats": [
+   "P10"
+  ],
+  "allocateDepositBox": [
+   "P04"
+  ],
+  "amendFnbOrder": [
+   "P08"
+  ],
+  "applyMenuActions": [
+   "P08"
+  ],
+  "applyMigration": [
+   "P09"
+  ],
+  "approveJournalEntry": [
+   "P08"
+  ],
+  "approveRefund": [
+   "P08"
+  ],
+  "approveRequisition": [
+   "P08"
+  ],
+  "authoriseStoredValue": [
+   "P08"
+  ],
+  "beginPeriodClose": [
+   "P08"
+  ],
+  "buildProductionPlan": [
+   "P08"
+  ],
+  "bulkUpdateProducts": [
+   "P08"
+  ],
+  "cancelDecommission": [
+   "P09"
+  ],
+  "cancelFnbOrder": [
+   "P08"
+  ],
+  "cancelPerformance": [
+   "P08"
+  ],
+  "cancelPurchaseOrder": [
+   "P08"
+  ],
+  "cancelRequisition": [
+   "P08"
+  ],
+  "cancelStockCount": [
+   "P08"
+  ],
+  "certifyIntegration": [
+   "P14"
+  ],
+  "chaseStation": [
+   "P15"
+  ],
+  "checkInResource": [
+   "P08"
+  ],
+  "checkOutResource": [
+   "P08"
+  ],
+  "claimCart": [
+   "P01"
+  ],
+  "claimConversation": [
+   "P12"
+  ],
+  "claimCustomDomain": [
+   "P09"
+  ],
+  "closeConversation": [
+   "P12"
+  ],
+  "closeFiscalPeriod": [
+   "P08"
+  ],
+  "closePurchaseOrderShort": [
+   "P08"
+  ],
+  "closeTableVisit": [
+   "P06"
+  ],
+  "closeTransferShort": [
+   "P08"
+  ],
+  "compItem": [
+   "P06"
+  ],
+  "compareQuotations": [
+   "P08"
+  ],
+  "completeProductionRun": [
+   "P08"
+  ],
+  "completeUpload": [
+   "P13"
+  ],
+  "configureQueueFeed": [
+   "P08"
+  ],
+  "consumeCrossRegionEntitlement": [
+   "P07"
+  ],
+  "createAccessPoint": [
+   "P08"
+  ],
+  "createAccount": [
+   "P08"
+  ],
+  "createAdmissionRules": [
+   "P08"
+  ],
+  "createApiClient": [
+   "P14"
+  ],
+  "createApprovalDelegation": [
+   "P08"
+  ],
+  "createApprovalRequest": [
+   "P04"
+  ],
+  "createBulkRefund": [
+   "P08"
+  ],
+  "createBundle": [
+   "P08"
+  ],
+  "createCampaign": [
+   "P08"
+  ],
+  "createCollection": [
+   "P13"
+  ],
+  "createCostCenter": [
+   "P08"
+  ],
+  "createCouponCampaign": [
+   "P08"
+  ],
+  "createDashboard": [
+   "P09"
+  ],
+  "createDelegatedAccess": [
+   "P10"
+  ],
+  "createEntitlementTemplate": [
+   "P08"
+  ],
+  "createEvent": [
+   "P08"
+  ],
+  "createInspectionTemplate": [
+   "P06"
+  ],
+  "createInventoryItem": [
+   "P08"
+  ],
+  "createJournalEntry": [
+   "P08"
+  ],
+  "createJourney": [
+   "P08"
+  ],
+  "createLegalEntity": [
+   "P08"
+  ],
+  "createMaintenancePlan": [
+   "P08"
+  ],
+  "createMerchandise": [
+   "P08"
+  ],
+  "createMessageTemplate": [
+   "P12"
+  ],
+  "createMfaChallenge": [
+   "P02"
+  ],
+  "createOutlet": [
+   "P08"
+  ],
+  "createPartnerAgreement": [
+   "P09"
+  ],
+  "createPerformances": [
+   "P08"
+  ],
+  "createPlan": [
+   "P09"
+  ],
+  "createPlanVersion": [
+   "P09"
+  ],
+  "createPurchaseOrder": [
+   "P08"
+  ],
+  "createQueue": [
+   "P08"
+  ],
+  "createRecognitionSchedule": [
+   "P08"
+  ],
+  "createReferral": [
+   "P02"
+  ],
+  "createRelease": [
+   "P09"
+  ],
+  "createReportSchedule": [
+   "P08"
+  ],
+  "createResaleListing": [
+   "P02"
+  ],
+  "createResource": [
+   "P08"
+  ],
+  "createRetailReturn": [
+   "P04"
+  ],
+  "createRetailSale": [
+   "P04"
+  ],
+  "createSaleBoard": [
+   "P08"
+  ],
+  "createSandbox": [
+   "P14"
+  ],
+  "createSeatBlock": [
+   "P10"
+  ],
+  "createSegment": [
+   "P16"
+  ],
+  "createStockLocation": [
+   "P08"
+  ],
+  "createSupplier": [
+   "P08"
+  ],
+  "createTaxCode": [
+   "P08"
+  ],
+  "createTaxExemption": [
+   "P08"
+  ],
+  "createUpload": [
+   "P13"
+  ],
+  "createVenueMap": [
+   "P08"
+  ],
+  "createWebhookSubscription": [
+   "P14"
+  ],
+  "decideProposedAction": [
+   "P16"
+  ],
+  "decommissionCell": [
+   "P09"
+  ],
+  "deleteDelegatedAccess": [
+   "P10"
+  ],
+  "deleteGuestAccount": [
+   "P02"
+  ],
+  "deleteMediaAsset": [
+   "P13"
+  ],
+  "deployConfigurationProfile": [
+   "P08"
+  ],
+  "deprecateApiVersion": [
+   "P14"
+  ],
+  "endKioskAssist": [
+   "P05"
+  ],
+  "enrolFacePass": [
+   "P02"
+  ],
+  "escalateApprovalRequest": [
+   "P08"
+  ],
+  "exportSubjectData": [
+   "P02"
+  ],
+  "extendCart": [
+   "P01"
+  ],
+  "extendSeatHold": [
+   "P04"
+  ],
+  "forceReleaseInventoryHold": [
+   "P08"
+  ],
+  "generateConfiguration": [
+   "P08"
+  ],
+  "generateCouponCodes": [
+   "P08"
+  ],
+  "getAccount": [
+   "P08"
+  ],
+  "getAiPolicy": [
+   "P08"
+  ],
+  "getAiUsage": [
+   "P08"
+  ],
+  "getAppIcons": [
+   "P09"
+  ],
+  "getApprovalAnalytics": [
+   "P08"
+  ],
+  "getB2bCredit": [
+   "P10"
+  ],
+  "getBill": [
+   "P06"
+  ],
+  "getBundle": [
+   "P02"
+  ],
+  "getCampaign": [
+   "P08"
+  ],
+  "getCampaignPerformance": [
+   "P08"
+  ],
+  "getCell": [
+   "P09"
+  ],
+  "getCellCapacity": [
+   "P09"
+  ],
+  "getCellHealth": [
+   "P09"
+  ],
+  "getCommissionStatement": [
+   "P10"
+  ],
+  "getConversation": [
+   "P12"
+  ],
+  "getCouponCode": [
+   "P01"
+  ],
+  "getDeferredRevenue": [
+   "P08"
+  ],
+  "getDueMaintenance": [
+   "P08"
+  ],
+  "getEvent": [
+   "P08"
+  ],
+  "getExpiringRights": [
+   "P13"
+  ],
+  "getFacePassEnrolment": [
+   "P02"
+  ],
+  "getFonts": [
+   "P13"
+  ],
+  "getGameCard": [
+   "P02"
+  ],
+  "getGiftCard": [
+   "P01"
+  ],
+  "getGroupBooking": [
+   "P02"
+  ],
+  "getHomepageLayout": [
+   "P13"
+  ],
+  "getInventoryItem": [
+   "P08"
+  ],
+  "getJournalEntry": [
+   "P08"
+  ],
+  "getMessageStatus": [
+   "P10"
+  ],
+  "getMigrationRun": [
+   "P09"
+  ],
+  "getMyChallenges": [
+   "P02"
+  ],
+  "getOrgUnit": [
+   "P08"
+  ],
+  "getOutletStock": [
+   "P08"
+  ],
+  "getPaymentLink": [
+   "P01"
+  ],
+  "getPlan": [
+   "P09"
+  ],
+  "getProductionRun": [
+   "P08"
+  ],
+  "getPurchaseOrder": [
+   "P08"
+  ],
+  "getQueueFeedHealth": [
+   "P08"
+  ],
+  "getRecommendations": [
+   "P08"
+  ],
+  "getRefundPolicy": [
+   "P08"
+  ],
+  "getRelease": [
+   "P09"
+  ],
+  "getReleaseReadiness": [
+   "P09"
+  ],
+  "getRetailSale": [
+   "P04"
+  ],
+  "getRollout": [
+   "P09"
+  ],
+  "getSeatHold": [
+   "P04"
+  ],
+  "getSessionManifest": [
+   "P08"
+  ],
+  "getSuggestedRequisitions": [
+   "P08"
+  ],
+  "getSupplierPerformance": [
+   "P08"
+  ],
+  "getTrialBalance": [
+   "P08"
+  ],
+  "getVenueMapLive": [
+   "P06"
+  ],
+  "getVersionSkew": [
+   "P09"
+  ],
+  "getWaiverStatus": [
+   "P02"
+  ],
+  "getWorkstation": [
+   "P08"
+  ],
+  "grantDelegation": [
+   "P02"
+  ],
+  "identifyGuest": [
+   "P04"
+  ],
+  "importProductCatalogue": [
+   "P08"
+  ],
+  "importVenueGeometry": [
+   "P08"
+  ],
+  "issueGameCard": [
+   "P04"
+  ],
+  "issueWalletPass": [
+   "P02"
+  ],
+  "joinWaitlist": [
+   "P02"
+  ],
+  "launchCampaign": [
+   "P08"
+  ],
+  "leaveWaitlist": [
+   "P02"
+  ],
+  "list86Events": [
+   "P15"
+  ],
+  "listAccountMappings": [
+   "P08"
+  ],
+  "listAccounts": [
+   "P08"
+  ],
+  "listAdmissionRules": [
+   "P08"
+  ],
+  "listAiInteractions": [
+   "P09"
+  ],
+  "listAiProviders": [
+   "P09"
+  ],
+  "listApiVersions": [
+   "P14"
+  ],
+  "listApprovalDelegations": [
+   "P08"
+  ],
+  "listApprovalMatrices": [
+   "P08"
+  ],
+  "listAuditRecords": [
+   "P08"
+  ],
+  "listBanners": [
+   "P13"
+  ],
+  "listCampaigns": [
+   "P08"
+  ],
+  "listCellJobs": [
+   "P09"
+  ],
+  "listChannelListings": [
+   "P08"
+  ],
+  "listCollections": [
+   "P13"
+  ],
+  "listConversations": [
+   "P12"
+  ],
+  "listCostCenters": [
+   "P08"
+  ],
+  "listCouponCampaigns": [
+   "P08"
+  ],
+  "listCouponCodes": [
+   "P08"
+  ],
+  "listCustomDomains": [
+   "P09"
+  ],
+  "listDashboards": [
+   "P09"
+  ],
+  "listDelegatedAccess": [
+   "P10"
+  ],
+  "listDelegations": [
+   "P02"
+  ],
+  "listDenominations": [
+   "P04"
+  ],
+  "listDepositBoxes": [
+   "P04"
+  ],
+  "listEntitlementTemplates": [
+   "P08"
+  ],
+  "listEnvironments": [
+   "P09"
+  ],
+  "listEvents": [
+   "P08"
+  ],
+  "listFiscalPeriods": [
+   "P08"
+  ],
+  "listGames": [
+   "P08"
+  ],
+  "listGoodsReceipts": [
+   "P08"
+  ],
+  "listIndexJobs": [
+   "P08"
+  ],
+  "listInspectionTemplates": [
+   "P06"
+  ],
+  "listInspections": [
+   "P06"
+  ],
+  "listIntegrationListings": [
+   "P14"
+  ],
+  "listInventoryItems": [
+   "P08"
+  ],
+  "listJournalEntries": [
+   "P08"
+  ],
+  "listJourneys": [
+   "P08"
+  ],
+  "listLedgerEntries": [
+   "P08"
+  ],
+  "listLegalEntities": [
+   "P08"
+  ],
+  "listLostItems": [
+   "P08"
+  ],
+  "listMaintenancePlans": [
+   "P08"
+  ],
+  "listMessageTemplates": [
+   "P12"
+  ],
+  "listMigrations": [
+   "P09"
+  ],
+  "listPaymentTokens": [
+   "P02"
+  ],
+  "listPlans": [
+   "P09"
+  ],
+  "listPolicies": [
+   "P09"
+  ],
+  "listPriceVariances": [
+   "P08"
+  ],
+  "listProductCategories": [
+   "P08"
+  ],
+  "listProductionRuns": [
+   "P08"
+  ],
+  "listPromoBlocks": [
+   "P13"
+  ],
+  "listProposedActions": [
+   "P16"
+  ],
+  "listPurchaseOrders": [
+   "P08"
+  ],
+  "listQueueFeeds": [
+   "P08"
+  ],
+  "listRecipes": [
+   "P08"
+  ],
+  "listRecognitionSchedules": [
+   "P08"
+  ],
+  "listReleases": [
+   "P09"
+  ],
+  "listReportExecutions": [
+   "P08"
+  ],
+  "listResources": [
+   "P08"
+  ],
+  "listRetailSales": [
+   "P04"
+  ],
+  "listRollouts": [
+   "P09"
+  ],
+  "listSandboxes": [
+   "P14"
+  ],
+  "listSeatBlocks": [
+   "P10"
+  ],
+  "listStockCounts": [
+   "P08"
+  ],
+  "listStockTransfers": [
+   "P08"
+  ],
+  "listSuppliers": [
+   "P08"
+  ],
+  "listSupportNotices": [
+   "P09"
+  ],
+  "listTableReservations": [
+   "P06"
+  ],
+  "listTaxCodes": [
+   "P08"
+  ],
+  "listTaxExemptions": [
+   "P08"
+  ],
+  "listUpgradeSchedules": [
+   "P09"
+  ],
+  "listVenueMaps": [
+   "P08"
+  ],
+  "listWebhookDeliveries": [
+   "P14"
+  ],
+  "listWebhookSubscriptions": [
+   "P14"
+  ],
+  "loadGameCredits": [
+   "P04"
+  ],
+  "logColdChain": [
+   "P06"
+  ],
+  "logKitchenException": [
+   "P15"
+  ],
+  "logTemperature": [
+   "P06"
+  ],
+  "logout": [
+   "P06"
+  ],
+  "lookupInventoryItem": [
+   "P08"
+  ],
+  "lookupRetailSale": [
+   "P04"
+  ],
+  "matchLostItem": [
+   "P08"
+  ],
+  "mergeTableVisits": [
+   "P06"
+  ],
+  "moveTableVisit": [
+   "P06"
+  ],
+  "notifyWaitlistParty": [
+   "P06"
+  ],
+  "openTableVisit": [
+   "P06"
+  ],
+  "overrideCreditLimit": [
+   "P10"
+  ],
+  "pauseCampaign": [
+   "P08"
+  ],
+  "pauseRollout": [
+   "P09"
+  ],
+  "pauseWorkOrder": [
+   "P06"
+  ],
+  "payByLink": [
+   "P01"
+  ],
+  "planMigration": [
+   "P09"
+  ],
+  "planProductionRun": [
+   "P08"
+  ],
+  "previewSegment": [
+   "P16"
+  ],
+  "printOrderLabel": [
+   "P15"
+  ],
+  "promoteRelease": [
+   "P09"
+  ],
+  "propagateCrossRegionEntitlement": [
+   "P09"
+  ],
+  "proposeVenueLabels": [
+   "P08"
+  ],
+  "publishBundle": [
+   "P08"
+  ],
+  "publishMenu": [
+   "P08"
+  ],
+  "publishSupportNotice": [
+   "P09"
+  ],
+  "publishVenueMap": [
+   "P08"
+  ],
+  "quoteWaitTime": [
+   "P06"
+  ],
+  "reassignServer": [
+   "P06"
+  ],
+  "recallKitchenTicket": [
+   "P15"
+  ],
+  "receiveStockTransfer": [
+   "P08"
+  ],
+  "reconcileRedemptions": [
+   "P09"
+  ],
+  "recordDeviceHeartbeat": [
+   "P08"
+  ],
+  "recordGamePlay": [
+   "P08"
+  ],
+  "recordQuotation": [
+   "P08"
+  ],
+  "recordSuggestionOutcome": [
+   "P16"
+  ],
+  "recordWorkOrderParts": [
+   "P06"
+  ],
+  "recordWorkOrderTime": [
+   "P06"
+  ],
+  "recountStockCount": [
+   "P08"
+  ],
+  "refireItem": [
+   "P15"
+  ],
+  "registerDeveloper": [
+   "P14"
+  ],
+  "registerEnvironment": [
+   "P09"
+  ],
+  "registerGuestDevice": [
+   "P01"
+  ],
+  "rejectJournal": [
+   "P08"
+  ],
+  "rejectRelease": [
+   "P09"
+  ],
+  "rejectRequisition": [
+   "P08"
+  ],
+  "rejectWorkOrder": [
+   "P06"
+  ],
+  "releaseCustomDomain": [
+   "P09"
+  ],
+  "releaseProductionPlan": [
+   "P08"
+  ],
+  "releaseSeatBlock": [
+   "P10"
+  ],
+  "releaseSeatHold": [
+   "P04"
+  ],
+  "releaseStoredValue": [
+   "P08"
+  ],
+  "removeBlacklistEntry": [
+   "P08"
+  ],
+  "reopenPeriod": [
+   "P08"
+  ],
+  "reorderSessionManifest": [
+   "P08"
+  ],
+  "replayEvents": [
+   "P14"
+  ],
+  "reprintReceipt": [
+   "P04"
+  ],
+  "resetSandbox": [
+   "P14"
+  ],
+  "respondToInvitation": [
+   "P02"
+  ],
+  "resubmitApprovalRequest": [
+   "P08"
+  ],
+  "resumeWorkOrder": [
+   "P06"
+  ],
+  "returnRequisition": [
+   "P08"
+  ],
+  "reverseJournalEntry": [
+   "P08"
+  ],
+  "reviewPriceVariance": [
+   "P08"
+  ],
+  "revokeApiCredential": [
+   "P14"
+  ],
+  "revokeApprovalDelegation": [
+   "P08"
+  ],
+  "revokeFacePass": [
+   "P02"
+  ],
+  "revokeGuestDevice": [
+   "P01"
+  ],
+  "rollbackMenu": [
+   "P08"
+  ],
+  "rollbackMigrationRun": [
+   "P09"
+  ],
+  "rollbackRollout": [
+   "P09"
+  ],
+  "rotateApiCredential": [
+   "P14"
+  ],
+  "runRecognition": [
+   "P08"
+  ],
+  "scheduleMenuPublish": [
+   "P08"
+  ],
+  "scheduleTenantUpgrade": [
+   "P09"
+  ],
+  "searchMedia": [
+   "P13"
+  ],
+  "seatTableReservation": [
+   "P06"
+  ],
+  "semanticSearch": [
+   "P06"
+  ],
+  "sendPurchaseOrder": [
+   "P08"
+  ],
+  "sendTransactionalMessage": [
+   "P10"
+  ],
+  "setAccessPointGeofence": [
+   "P08"
+  ],
+  "setAccountMappings": [
+   "P08"
+  ],
+  "setAgentAvailability": [
+   "P12"
+  ],
+  "setAiCredential": [
+   "P09"
+  ],
+  "setAiPolicy": [
+   "P08"
+  ],
+  "setAiProvider": [
+   "P09"
+  ],
+  "setApiLicensing": [
+   "P14"
+  ],
+  "setAppIcons": [
+   "P09"
+  ],
+  "setApprovalMatrix": [
+   "P08"
+  ],
+  "setB2bCreditLimit": [
+   "P10"
+  ],
+  "setChannelListing": [
+   "P08"
+  ],
+  "setConfigurationProfile": [
+   "P08"
+  ],
+  "setConnectivityThresholds": [
+   "P08"
+  ],
+  "setCourseRules": [
+   "P15"
+  ],
+  "setDailyCount": [
+   "P06"
+  ],
+  "setDeveloperMembers": [
+   "P14"
+  ],
+  "setFaqs": [
+   "P09"
+  ],
+  "setFonts": [
+   "P13"
+  ],
+  "setFxRate": [
+   "P08"
+  ],
+  "setHomepageLayout": [
+   "P13"
+  ],
+  "setOfflinePolicy": [
+   "P08"
+  ],
+  "setParkingFacility": [
+   "P08"
+  ],
+  "setPathClosure": [
+   "P08"
+  ],
+  "setPolicy": [
+   "P09"
+  ],
+  "setProductCategories": [
+   "P08"
+  ],
+  "setRecipe": [
+   "P08"
+  ],
+  "setRefundPolicy": [
+   "P08"
+  ],
+  "setResourceQualifications": [
+   "P08"
+  ],
+  "setReturnPolicy": [
+   "P08"
+  ],
+  "setRolePermissions": [
+   "P08"
+  ],
+  "setServiceStage": [
+   "P06"
+  ],
+  "setSubstitutionRules": [
+   "P08"
+  ],
+  "setVenuePoint": [
+   "P08"
+  ],
+  "settleDeposit": [
+   "P08"
+  ],
+  "shareEntitlement": [
+   "P02"
+  ],
+  "simulatePromotion": [
+   "P08"
+  ],
+  "splitBill": [
+   "P06"
+  ],
+  "startWorkOrder": [
+   "P06"
+  ],
+  "stopCampaign": [
+   "P08"
+  ],
+  "storePaymentToken": [
+   "P02"
+  ],
+  "submitInspection": [
+   "P06"
+  ],
+  "submitIntegrationListing": [
+   "P14"
+  ],
+  "syncGamePlays": [
+   "P08"
+  ],
+  "testAiProvider": [
+   "P09"
+  ],
+  "testQueueFeed": [
+   "P08"
+  ],
+  "testSendCampaign": [
+   "P08"
+  ],
+  "transferConversation": [
+   "P12"
+  ],
+  "transferOrderItems": [
+   "P06"
+  ],
+  "transferTableVisit": [
+   "P06"
+  ],
+  "transferWalletBalance": [
+   "P02"
+  ],
+  "unscheduleCampaign": [
+   "P08"
+  ],
+  "updateAccessPoint": [
+   "P08"
+  ],
+  "updateAccount": [
+   "P08"
+  ],
+  "updateAdmissionRules": [
+   "P08"
+  ],
+  "updateCampaign": [
+   "P08"
+  ],
+  "updateCellTier": [
+   "P09"
+  ],
+  "updateDashboard": [
+   "P09"
+  ],
+  "updateEvent": [
+   "P08"
+  ],
+  "updateGame": [
+   "P08"
+  ],
+  "updateGuestPreferences": [
+   "P02"
+  ],
+  "updateInventoryItem": [
+   "P08"
+  ],
+  "updateMediaAsset": [
+   "P13"
+  ],
+  "updateMerchandise": [
+   "P08"
+  ],
+  "updateMyProfile": [
+   "P01"
+  ],
+  "updateOrgUnit": [
+   "P08"
+  ],
+  "updateOutlet": [
+   "P08"
+  ],
+  "updatePartnerAgreement": [
+   "P09"
+  ],
+  "updateQueue": [
+   "P08"
+  ],
+  "updateRequisitionLines": [
+   "P08"
+  ],
+  "updateRotaAssignment": [
+   "P08"
+  ],
+  "updateSaleBoard": [
+   "P08"
+  ],
+  "updateSupplier": [
+   "P08"
+  ],
+  "updateTableReservation": [
+   "P02"
+  ],
+  "updateTableVisit": [
+   "P06"
+  ],
+  "updateTaxCode": [
+   "P08"
+  ],
+  "updateWorkOrder": [
+   "P06"
+  ],
+  "uploadGuestDocument": [
+   "P02"
+  ],
+  "validateTenantConfig": [
+   "P13"
+  ],
+  "validateVenueMapGraph": [
+   "P08"
+  ],
+  "verifyAllergens": [
+   "P08"
+  ],
+  "verifyCustomDomain": [
+   "P09"
+  ],
+  "verifyGuestEmail": [
+   "P01"
+  ],
+  "voidCouponCode": [
+   "P08"
+  ],
+  "withdrawApprovalRequest": [
+   "P08"
+  ],
+  "withdrawFromDepositBox": [
+   "P04"
+  ],
+  "withdrawRelease": [
+   "P09"
+  ]
+ },
+ "packTriage": [
+  {
+   "packId": "ACC-1",
+   "title": "Access Control Command Center",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "WEB-039",
+   "matchName": "Venue Map & Wait Times",
+   "score": 0.125,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2",
+   "title": "Venue & Park Access Structure",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "BO-103",
+   "matchName": "Access & Venue",
+   "score": 0.114,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3",
+   "title": "Access Area & Zone Builder",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "BO-064",
+   "matchName": "Zones & Areas",
+   "score": 0.138,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4",
+   "title": "Attraction Access Configuration",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "BO-064",
+   "matchName": "Zones & Areas",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5",
+   "title": "Access Point Directory",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "BO-064",
+   "matchName": "Zones & Areas",
+   "score": 0.124,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6",
+   "title": "Gate & Lane Configuration",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "SCN-008",
+   "matchName": "Manual entry",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7",
+   "title": "Access Control Graphical Map Designer",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "BO-093",
+   "matchName": "Map Import & Labelling",
+   "score": 0.175,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-8",
+   "title": "Access Location Grouping",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9",
+   "title": "Operating Calendar & Special Access Days",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "BO-015",
+   "matchName": "Session Calendar",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10",
+   "title": "Topology Validation & Publication",
+   "module": "Access Control Module",
+   "board": "1",
+   "match": "SCN-003",
+   "matchName": "Ready to scan",
+   "score": 0.146,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.1",
+   "title": "Access Rule Command Center",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "GST-038",
+   "matchName": "Digital Companion Mode",
+   "score": 0.085,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.2",
+   "title": "Visual Access Rule Builder",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.116,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.3",
+   "title": "Entry, Exit & Re-entry Rules",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "BO-001",
+   "matchName": "Queue Directory",
+   "score": 0.079,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.4",
+   "title": "Anti-Passback & Journey Sequence",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "GST-045",
+   "matchName": "Ticket Delivery & Sharing",
+   "score": 0.129,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.5",
+   "title": "Access Validity & Time Rules",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "BO-019",
+   "matchName": "Closures & Blackouts",
+   "score": 0.084,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.6",
+   "title": "Entitlement Consumption Engine",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "ACC-008",
+   "matchName": "Credential Register",
+   "score": 0.107,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.7",
+   "title": "Multi-Park & Crossover Rules",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "PTR-016",
+   "matchName": "Voucher / Ticket Download",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.8",
+   "title": "Guest, Companion & Eligibility Rules",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.108,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.9",
+   "title": "Group Admission & Quantity Validation",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "BO-038",
+   "matchName": "Reconciliation Queue",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-2.10",
+   "title": "Rule Simulation, Conflict Check & Publication",
+   "module": "Access Control Module",
+   "board": "2",
+   "match": "BO-035",
+   "matchName": "Override Audit",
+   "score": 0.128,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3.1",
+   "title": "Digital Credential Security Command Center",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.114,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3.2",
+   "title": "Dynamic QR Security Profile Builder",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "DEV-003",
+   "matchName": "Clients & Credentials",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3.3",
+   "title": "Credential Activation & Display Rules",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "SCN-002",
+   "matchName": "Access point & direction",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3.4",
+   "title": "Device Binding & Session Security",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "ACC-008",
+   "matchName": "Credential Register",
+   "score": 0.147,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3.5",
+   "title": "BLE Beacon & Geofence Configuration",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "BO-064",
+   "matchName": "Zones & Areas",
+   "score": 0.168,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-3.6",
+   "title": "Credential Transfer & Rebinding",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "GST-014",
+   "matchName": "Ticket Transfer",
+   "score": 0.135,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3.7",
+   "title": "Credential Revocation & Lifecycle Events",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "GST-055",
+   "matchName": "Dynamic QR Ticket",
+   "score": 0.152,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-3.8",
+   "title": "Offline Cryptographic Validation Profile",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "SCN-003",
+   "matchName": "Ready to scan",
+   "score": 0.151,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-3.9",
+   "title": "Embedded Entitlement Payload Designer",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "SCN-007",
+   "matchName": "Group admission",
+   "score": 0.147,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-3.10",
+   "title": "Credential Security Simulation, Audit & Publication",
+   "module": "Access Control Module",
+   "board": "3",
+   "match": "EMP-015",
+   "matchName": "Group scan",
+   "score": 0.104,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.1",
+   "title": "Media & Credential Command Center",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.2",
+   "title": "Media Type & Technology Library",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "POS-003",
+   "matchName": "Sell \u2014 Timed Entry",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.3",
+   "title": "Virtual Credential & Media Association",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "GST-069",
+   "matchName": "Face Pass",
+   "score": 0.103,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.4",
+   "title": "Verification Method Selection & Locking",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.5",
+   "title": "Media Issuance & Encoding Profile",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "BO-114",
+   "matchName": "Variants, Attributes, Barcode & RFID Management",
+   "score": 0.098,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.6",
+   "title": "Media Swap & Replacement",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "BO-027",
+   "matchName": "Reissue & Media Replacement",
+   "score": 0.173,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-4.7",
+   "title": "RFID & NFC Configuration",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "BO-032",
+   "matchName": "Admission Profiles",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.8",
+   "title": "External & Partner Credential Mapping",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "PTR-019",
+   "matchName": "API Credentials & Integration",
+   "score": 0.092,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-4.9",
+   "title": "Hotel, Wallet & External Media Integration",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "GST-046",
+   "matchName": "Branded Queue / Waiting Room",
+   "score": 0.156,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-4.10",
+   "title": "Media Compatibility, Testing & Publication",
+   "module": "Access Control Module",
+   "board": "4",
+   "match": "SCN-009",
+   "matchName": "Ticket lookup",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.1",
+   "title": "Biometric Access Command Center",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "GST-045",
+   "matchName": "Ticket Delivery & Sharing",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.2",
+   "title": "Biometric Verification Profile Builder",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "BO-032",
+   "matchName": "Admission Profiles",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.3",
+   "title": "Face Pass Enrollment Configuration",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "GST-069",
+   "matchName": "Face Pass",
+   "score": 0.174,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-5.4",
+   "title": "Biometric Consent & Guardian Management",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "GST-069",
+   "matchName": "Face Pass",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.5",
+   "title": "Face Tag Temporary Enrollment",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "GST-069",
+   "matchName": "Face Pass",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.6",
+   "title": "Face Matching & Verification Thresholds",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "BO-034",
+   "matchName": "Scan Activity",
+   "score": 0.061,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.7",
+   "title": "Face Change, Re-enrollment & Identity Protection",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "GST-069",
+   "matchName": "Face Pass",
+   "score": 0.156,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-5.8",
+   "title": "Biometric Validation at Gate",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "GST-069",
+   "matchName": "Face Pass",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.9",
+   "title": "Biometric Lifecycle, Retention & Deletion",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "ADM-001",
+   "matchName": "Platform Login / MFA",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-5.10",
+   "title": "Biometric Simulation, Audit & Publication",
+   "module": "Access Control Module",
+   "board": "5",
+   "match": "SCN-013",
+   "matchName": "Offline journal",
+   "score": 0.097,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.1",
+   "title": "Device & Gate Command Center",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "BO-127",
+   "matchName": "Hardware & Peripherals Management",
+   "score": 0.134,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.2",
+   "title": "Device Type & Hardware Library",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "SCN-016",
+   "matchName": "Gate mode",
+   "score": 0.078,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.3",
+   "title": "Physical Device Registration & Provisioning",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "BO-127",
+   "matchName": "Hardware & Peripherals Management",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.4",
+   "title": "Turnstile & Lane Behavior Configuration",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "SCN-007",
+   "matchName": "Group admission",
+   "score": 0.098,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.5",
+   "title": "Validation Outcome & Guest Feedback Designer",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "ADM-004",
+   "matchName": "Platform Audit Log",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.6",
+   "title": "Reader, Scanner & Peripheral Configuration",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "BO-127",
+   "matchName": "Hardware & Peripherals Management",
+   "score": 0.222,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "ACC-6.7",
+   "title": "Handheld & Mobile Access Device Configuration",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "BO-064",
+   "matchName": "Zones & Areas",
+   "score": 0.144,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.8",
+   "title": "Gate Modes, Free Spin & Emergency Controls",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "EMP-050",
+   "matchName": "Post-incident restore",
+   "score": 0.089,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.9",
+   "title": "Device Software, Content & Remote Configuration",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "PTR-004",
+   "matchName": "Notifications",
+   "score": 0.089,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-6.10",
+   "title": "Hardware Compatibility, Health, Testing & Deployment",
+   "module": "Access Control Module",
+   "board": "6",
+   "match": "BO-127",
+   "matchName": "Hardware & Peripherals Management",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.1",
+   "title": "Offline & Edge Operations Command Center",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "BO-132",
+   "matchName": "Offline Transaction Monitor & Sync Queue",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.2",
+   "title": "Edge Node & Local Processing Configuration",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "BO-064",
+   "matchName": "Zones & Areas",
+   "score": 0.141,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.3",
+   "title": "Offline Validation Policy Builder",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "SCN-003",
+   "matchName": "Ready to scan",
+   "score": 0.164,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-7.4",
+   "title": "Edge Package & Data Distribution",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "BO-142",
+   "matchName": "Store Rules, Controls & Permissions",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.5",
+   "title": "Offline Credential & Revocation Cache",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "GST-014",
+   "matchName": "Ticket Transfer",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.6",
+   "title": "Offline Entitlement & Usage Ledger",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "GST-012",
+   "matchName": "My Tickets",
+   "score": 0.102,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.7",
+   "title": "Connectivity Failure & Degraded Mode Policy",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "BO-131",
+   "matchName": "Connectivity & Auto-Switch Settings",
+   "score": 0.184,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "ACC-7.8",
+   "title": "Reconnection, Synchronization & Conflict Resolution",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "BO-035",
+   "matchName": "Override Audit",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.9",
+   "title": "Offline Simulation & Resilience Testing",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "DEV-003",
+   "matchName": "Clients & Credentials",
+   "score": 0.141,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-7.10",
+   "title": "Edge Security, Audit & Deployment",
+   "module": "Access Control Module",
+   "board": "7",
+   "match": "BO-060",
+   "matchName": "Attendance & Footfall",
+   "score": 0.129,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.1",
+   "title": "Guest Journey Command Center",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.2",
+   "title": "Group & B2B Admission Profile Builder",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "BO-086",
+   "matchName": "Approval Matrix",
+   "score": 0.15,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-8.3",
+   "title": "Group Leader & Fast B2B Validation",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "SCN-013",
+   "matchName": "Offline journal",
+   "score": 0.116,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.4",
+   "title": "Group Attendance & Partial Entry Manager",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "POS-005",
+   "matchName": "Payment",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.5",
+   "title": "Family, Child, POD & Companion Journey",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "ACC-003",
+   "matchName": "Application Review & Submit",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.6",
+   "title": "Re-entry & Temporary Exit Journey",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "BO-060",
+   "matchName": "Attendance & Footfall",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.7",
+   "title": "Multi-Park & Crossover Journey Orchestrator",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.072,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.8",
+   "title": "Fast Pass & Attraction Access Journey",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "BO-086",
+   "matchName": "Approval Matrix",
+   "score": 0.092,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.9",
+   "title": "Special Event, Free View & Alternative Admission",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "GST-031",
+   "matchName": "AI Concierge \u2013 Home",
+   "score": 0.107,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-8.10",
+   "title": "Journey Simulation, Audit & Publication",
+   "module": "Access Control Module",
+   "board": "8",
+   "match": "SCN-007",
+   "matchName": "Group admission",
+   "score": 0.116,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.1",
+   "title": "Live Access Operations Command Center",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "GST-046",
+   "matchName": "Branded Queue / Waiting Room",
+   "score": 0.186,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "ACC-9.2",
+   "title": "Podium Operations Console",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "SCN-016",
+   "matchName": "Gate mode",
+   "score": 0.17,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-9.3",
+   "title": "Ticket & Credential Investigation Console",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "GST-023",
+   "matchName": "Virtual Queue",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.4",
+   "title": "Validation Exception & Reason Code Manager",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "BO-086",
+   "matchName": "Approval Matrix",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.5",
+   "title": "Manual Override & Supervisor Approval",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "BO-035",
+   "matchName": "Override Audit",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.6",
+   "title": "Credential Disable, Blacklist & Whitelist Operations",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "EMP-032",
+   "matchName": "Manual wait entry",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.7",
+   "title": "Live Gate Mode & Lane Control",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "SCN-016",
+   "matchName": "Gate mode",
+   "score": 0.136,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.8",
+   "title": "Queue, Throughput & Lane Optimization",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "BO-001",
+   "matchName": "Queue Directory",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.9",
+   "title": "Operational Incident & Exception Workspace",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "BO-035",
+   "matchName": "Override Audit",
+   "score": 0.097,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-9.10",
+   "title": "Operations Audit, Shift Handover & Control Summary",
+   "module": "Access Control Module",
+   "board": "9",
+   "match": "SCN-016",
+   "matchName": "Gate mode",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.1",
+   "title": "Dynamic Access Policy Command Center",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "ACC-005",
+   "matchName": "Accreditation Badge",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.2",
+   "title": "Access Attribute Catalog",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "GST-004",
+   "matchName": "Attraction Details",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.3",
+   "title": "Visual Dynamic Policy Builder",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "GST-038",
+   "matchName": "Digital Companion Mode",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.4",
+   "title": "Context, Time, Event & Capacity Policy Builder",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "GST-004",
+   "matchName": "Attraction Details",
+   "score": 0.152,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ACC-10.5",
+   "title": "Identity, Membership & Accreditation Policies",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "EMP-001",
+   "matchName": "Sign in",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.6",
+   "title": "Policy Scope, Hierarchy & Inheritance",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "ADM-006",
+   "matchName": "Tenant Hierarchy Explorer",
+   "score": 0.142,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.7",
+   "title": "Authorization Governance & Temporary Access",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "BO-086",
+   "matchName": "Approval Matrix",
+   "score": 0.145,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.8",
+   "title": "Policy Evaluation Architecture & Offline Distribution",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "BO-067",
+   "matchName": "Integrations",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.9",
+   "title": "Policy Simulation, Conflict & Impact Analysis",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "SCN-007",
+   "matchName": "Group admission",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-10.10",
+   "title": "Policy Approval, Audit, Analytics & AI Optimization",
+   "module": "Access Control Module",
+   "board": "10",
+   "match": "WEB-010",
+   "matchName": "Shopping Cart",
+   "score": 0.092,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.1",
+   "title": "Access Security & Fraud Command Center",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "GST-046",
+   "matchName": "Branded Queue / Waiting Room",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.2",
+   "title": "Fraud Detection Rule & Signal Library",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "SUP-001",
+   "matchName": "Agent Login",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.3",
+   "title": "Credential Sharing & Concurrent Usage Detection",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "ACC-008",
+   "matchName": "Credential Register",
+   "score": 0.126,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.4",
+   "title": "Unified Identity & Credential Lock Manager",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "ADM-021",
+   "matchName": "Platform Role Management",
+   "score": 0.122,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.5",
+   "title": "Biometric & Identity Integrity Monitoring",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "CMS-020",
+   "matchName": "Change Log",
+   "score": 0.072,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.6",
+   "title": "Relationship & Companion Fraud Monitoring",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "WEB-037",
+   "matchName": "Menu Item Detail",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.7",
+   "title": "Access Risk Scoring & Decision Engine",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.071,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.8",
+   "title": "Real-Time Security Response & Playbook Builder",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "SUP-006",
+   "matchName": "Knowledge Base Search",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.9",
+   "title": "Security Investigation & Evidence Workspace",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "EMP-029",
+   "matchName": "Guest assistance",
+   "score": 0.145,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-11.10",
+   "title": "Security Analytics, AI Detection & Governance",
+   "module": "Access Control Module",
+   "board": "11",
+   "match": "BO-060",
+   "matchName": "Attendance & Footfall",
+   "score": 0.089,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.1",
+   "title": "Access Monitoring & Analytics Command Center",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "ANL-001",
+   "matchName": "Executive Command Center",
+   "score": 0.103,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.2",
+   "title": "Live Venue Occupancy & People Counting",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "GST-004",
+   "matchName": "Attraction Details",
+   "score": 0.18,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "ACC-12.3",
+   "title": "Graphical Access Map & Live Gate Performance",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "EMP-030",
+   "matchName": "Venue map",
+   "score": 0.188,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "ACC-12.4",
+   "title": "Attendance & Admission Analytics",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "BO-060",
+   "matchName": "Attendance & Footfall",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.5",
+   "title": "Entry, Exit, Re-entry & Crossover Analytics",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "BO-130",
+   "matchName": "Offline Policy & Rules Configuration",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.6",
+   "title": "Throughput, Queue & Validation Performance Analytics",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "ADM-015",
+   "matchName": "API Rate Limit & Quota Management",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.7",
+   "title": "Validation Outcome & Rejection Analytics",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "BO-035",
+   "matchName": "Override Audit",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.8",
+   "title": "Guest Dwell Time, Length of Stay & Attraction Flow",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "BO-012",
+   "matchName": "Membership Products",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.9",
+   "title": "Access Reports, Scheduled Reporting & Data Export",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "PTR-019",
+   "matchName": "API Credentials & Integration",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ACC-12.10",
+   "title": "AI Access Intelligence, Forecasting & Executive Insights",
+   "module": "Access Control Module",
+   "board": "12",
+   "match": "BO-060",
+   "matchName": "Attendance & Footfall",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.1.1",
+   "title": "Partner Management Command Center",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "PTR-019",
+   "matchName": "API Credentials & Integration",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.1.2",
+   "title": "Partner Profile & Organization Setup",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "PTR-020",
+   "matchName": "Sub-Agent Management",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.1.3",
+   "title": "Partner Onboarding & Application Workflow",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "ACC-004",
+   "matchName": "Application Status Tracking",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.1.4",
+   "title": "Partner Contacts & User Administration",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "SUP-001",
+   "matchName": "Agent Login",
+   "score": 0.188,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "B2B-8.1.5",
+   "title": "Territory, Market & Distribution Rights",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "PTR-020",
+   "matchName": "Sub-Agent Management",
+   "score": 0.167,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "B2B-8.1.6",
+   "title": "Partner Brand, Venue & Business Scope Assignment",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.085,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.1.7",
+   "title": "Partner Documentation & Compliance Repository",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "PTR-011",
+   "matchName": "Quote Management",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.1.8",
+   "title": "Partner Access, Roles & Permission Profile",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "PTR-020",
+   "matchName": "Sub-Agent Management",
+   "score": 0.189,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "B2B-8.1.9",
+   "title": "Partner Approval, Status & Lifecycle Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "PTR-013",
+   "matchName": "Credit Limit & Balance",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.1.10",
+   "title": "Partner 360\u00b0 Profile, Readiness & AI Review",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "1",
+   "match": "PTR-001",
+   "matchName": "Partner Login / MFA",
+   "score": 0.12,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.1",
+   "title": "Commercial Agreement Command Center",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "PTR-001",
+   "matchName": "Partner Login / MFA",
+   "score": 0.134,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.2",
+   "title": "Agreement & Contract Terms Builder",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "PTR-017",
+   "matchName": "Commission Statement",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.3",
+   "title": "Partner Rate & Net Pricing Configuration",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "POS-014",
+   "matchName": "Sales Exceptions, Controls & Operational Actions",
+   "score": 0.114,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.4",
+   "title": "Commission, Margin & Incentive Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "PTR-017",
+   "matchName": "Commission Statement",
+   "score": 0.153,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "B2B-8.2.5",
+   "title": "Credit Limit & Exposure Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "PTR-013",
+   "matchName": "Credit Limit & Balance",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.6",
+   "title": "Deposit, Guarantee & Financial Security Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "PTR-001",
+   "matchName": "Partner Login / MFA",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.7",
+   "title": "Payment Terms, Billing & Account Configuration",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "BO-075",
+   "matchName": "Account Mapping",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.8",
+   "title": "Commercial Allocation, Quota & Commitment Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "BO-017",
+   "matchName": "Capacity Management",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.2.9",
+   "title": "Booking Limits, Commercial Exceptions & Approval",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "ADM-008",
+   "matchName": "Subscription & Plan Management",
+   "score": 0.151,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "B2B-8.2.10",
+   "title": "Commercial Agreement 360\u00b0, Health & AI Review",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "2",
+   "match": "PTR-013",
+   "matchName": "Credit Limit & Balance",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.3.1",
+   "title": "Partner Operations Command Center",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-013",
+   "matchName": "Credit Limit & Balance",
+   "score": 0.157,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "B2B-8.3.2",
+   "title": "Partner Orders & Booking Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-013",
+   "matchName": "Credit Limit & Balance",
+   "score": 0.107,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.3.3",
+   "title": "Reservations, Holds & Release Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "BO-018",
+   "matchName": "Allocation & Holds",
+   "score": 0.099,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.3.4",
+   "title": "Partner Cancellations, Refunds & Amendments",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-011",
+   "matchName": "Quote Management",
+   "score": 0.152,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "B2B-8.3.5",
+   "title": "Partner Statement & Account Activity",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-017",
+   "matchName": "Commission Statement",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.3.6",
+   "title": "Partner Reconciliation & Exception Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-014",
+   "matchName": "Settlement & Payment History",
+   "score": 0.148,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.3.7",
+   "title": "Commission Calculation & Settlement Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-011",
+   "matchName": "Quote Management",
+   "score": 0.223,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "B2B-8.3.8",
+   "title": "Partner Disputes, Cases & Service Management",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-021",
+   "matchName": "Support & Contact",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.3.9",
+   "title": "Partner Performance Scorecard & Risk Monitoring",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "PTR-013",
+   "matchName": "Credit Limit & Balance",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "B2B-8.3.10",
+   "title": "Partner AI Intelligence & Relationship Optimization",
+   "module": "B2B, Reseller & OTA Partner Management",
+   "board": "3",
+   "match": "GST-039",
+   "matchName": "Profile",
+   "score": 0.085,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "COM-12.1.1",
+   "title": "Communication Service Command Center",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "PTR-004",
+   "matchName": "Notifications",
+   "score": 0.15,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "COM-12.1.2",
+   "title": "Channel & Provider Configuration",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "PTR-004",
+   "matchName": "Notifications",
+   "score": 0.161,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "COM-12.1.3",
+   "title": "Sender Identity, Domain & Brand Configuration",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "ADM-021",
+   "matchName": "Platform Role Management",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "COM-12.1.4",
+   "title": "System Transactional Template Registry",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "CMS-009",
+   "matchName": "Navigation & Menus",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "COM-12.1.5",
+   "title": "Business Event & Notification Trigger Mapping",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "ADM-036",
+   "matchName": "Platform Notification Broadcast",
+   "score": 0.146,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "COM-12.1.6",
+   "title": "Routing, Priority, Throttling & Fallback Rules",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "ADM-015",
+   "matchName": "API Rate Limit & Quota Management",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "COM-12.1.7",
+   "title": "Consent, Preference & Communication Policy Enforcement",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "COM-12.1.8",
+   "title": "Delivery Queue, Failure & Retry Management",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "DEV-005",
+   "matchName": "Webhooks",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "COM-12.1.9",
+   "title": "Provider Health, Usage & Cost Monitoring",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "ADM-015",
+   "matchName": "API Rate Limit & Quota Management",
+   "score": 0.187,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "COM-12.1.10",
+   "title": "AI Delivery Optimization & Communication Platform Diagnostics",
+   "module": "Communication & Notification Platform Services",
+   "board": "1",
+   "match": "ADM-015",
+   "matchName": "API Rate Limit & Quota Management",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.1.1",
+   "title": "Customer Service Command Center",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "SUP-004",
+   "matchName": "Conversation Queue",
+   "score": 0.145,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.1.2",
+   "title": "Customer 360\u00b0 Service Profile",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "GST-039",
+   "matchName": "Profile",
+   "score": 0.144,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.1.3",
+   "title": "Unified Interaction & Communication History",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "SUP-002",
+   "matchName": "Agent Dashboard",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.1.4",
+   "title": "Case Creation, Classification & Intelligent Routing",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "GST-034",
+   "matchName": "Lost & Found",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.1.5",
+   "title": "Case Investigation & Resolution Workspace",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "SUP-004",
+   "matchName": "Conversation Queue",
+   "score": 0.179,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "CUS-10.1.6",
+   "title": "Order, Booking & Ticket Service Workspace",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "WEB-013",
+   "matchName": "Booking Confirmation",
+   "score": 0.155,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "CUS-10.1.7",
+   "title": "Refund, Compensation & Service Exception Workspace",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "BO-130",
+   "matchName": "Offline Policy & Rules Configuration",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.1.8",
+   "title": "Escalation, Collaboration & Internal Resolution",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "EMP-047",
+   "matchName": "Emergency mode",
+   "score": 0.084,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.1.9",
+   "title": "Case Resolution, Closure & Customer Feedback",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "WEB-026",
+   "matchName": "Survey & Feedback",
+   "score": 0.153,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "CUS-10.1.10",
+   "title": "AI Customer Service Copilot & Knowledge Workspace",
+   "module": "Customer Service",
+   "board": "1",
+   "match": "SUP-005",
+   "matchName": "Live Chat Workspace",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.1",
+   "title": "Contact Center Operations Command Center",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "SUP-005",
+   "matchName": "Live Chat Workspace",
+   "score": 0.133,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.2",
+   "title": "Queue Configuration & Management",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "SUP-005",
+   "matchName": "Live Chat Workspace",
+   "score": 0.102,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.3",
+   "title": "Intelligent Routing, Skills & Assignment Engine",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "SUP-003",
+   "matchName": "Availability & Routing Settings",
+   "score": 0.12,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.4",
+   "title": "SLA Policy & Service-Level Management",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "EMP-031",
+   "matchName": "Queue monitor",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.5",
+   "title": "Agent Workload, Availability & Workforce Control",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "SUP-005",
+   "matchName": "Live Chat Workspace",
+   "score": 0.136,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.6",
+   "title": "Escalation & Critical Case Monitor",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "SUP-008",
+   "matchName": "Agent Performance & SLA View",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.7",
+   "title": "Quality Management & Agent Evaluation",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "GST-037",
+   "matchName": "Offers & Promotions",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.8",
+   "title": "Customer Satisfaction, Feedback & Voice of Customer",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "GST-035",
+   "matchName": "Feedback & Ratings",
+   "score": 0.155,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "CUS-10.2.9",
+   "title": "Service Analytics & Root-Cause Intelligence",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "GST-045",
+   "matchName": "Ticket Delivery & Sharing",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "CUS-10.2.10",
+   "title": "AI Contact Center Intelligence & Automation Studio",
+   "module": "Customer Service",
+   "board": "2",
+   "match": "GST-068",
+   "matchName": "Help & My Cases",
+   "score": 0.128,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.1",
+   "title": "Group Sales Command Center",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "WEB-006",
+   "matchName": "Date & Session Selection",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.2",
+   "title": "Group Enquiry & Opportunity Capture",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "WEB-037",
+   "matchName": "Menu Item Detail",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.3",
+   "title": "Group Customer & Organization Profile",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "BO-083",
+   "matchName": "Suppliers",
+   "score": 0.083,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.4",
+   "title": "Group Requirements, Availability & Capacity Planner",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.104,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.5",
+   "title": "Group Package & Experience Builder",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.6",
+   "title": "Group Quotation Builder & Proposal Generation",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "GST-044",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.7",
+   "title": "Quote Revision, Negotiation & Version Management",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "PTR-011",
+   "matchName": "Quote Management",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.8",
+   "title": "Group Discount, Exception & Approval Workflow",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "PTR-011",
+   "matchName": "Quote Management",
+   "score": 0.108,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.1.9",
+   "title": "Quote-to-Booking Conversion & Confirmation",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "PTR-011",
+   "matchName": "Quote Management",
+   "score": 0.159,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "GRO-9.1.10",
+   "title": "Group Booking 360\u00b0 & Handover Workspace",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "1",
+   "match": "GST-070",
+   "matchName": "Reserve a Table or Cabana",
+   "score": 0.092,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.1",
+   "title": "Group Booking Operations Command Center",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "GST-022",
+   "matchName": "Attraction Wait Times",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.2",
+   "title": "Group Operational Planning & Task Workspace",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "BO-112",
+   "matchName": "Production Planning & Production Sheets",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.3",
+   "title": "Participants, Guest Lists & Group Structure",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "BO-093",
+   "matchName": "Map Import & Labelling",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.4",
+   "title": "Group Payment, Deposit & Balance Management",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "GST-071",
+   "matchName": "Payment Methods",
+   "score": 0.102,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.5",
+   "title": "Group Ticket, Seat & Entitlement Allocation",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "BO-017",
+   "matchName": "Capacity Management",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.6",
+   "title": "Group Ticket Fulfillment & Distribution",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "GST-038",
+   "matchName": "Digital Companion Mode",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.7",
+   "title": "Group Arrival, Check-In & Admission Operations",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "SCN-013",
+   "matchName": "Offline journal",
+   "score": 0.085,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.8",
+   "title": "Group Amendments, Cancellation & Refund Operations",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "GST-058",
+   "matchName": "Resource Availability (Cabana)",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.9",
+   "title": "Group Booking Reconciliation, Closure & Performance",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "GST-026",
+   "matchName": "Retail / Merchandise",
+   "score": 0.12,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "GRO-9.2.10",
+   "title": "Group Sales Analytics & AI Intelligence Center",
+   "module": "Group Sales   Corporate Booking Management",
+   "board": "2",
+   "match": "BO-013",
+   "matchName": "Channel & Distribution",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.1",
+   "title": "Membership & Annual Pass Command Center",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "ADM-008",
+   "matchName": "Subscription & Plan Management",
+   "score": 0.124,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.2",
+   "title": "Membership Product & Tier Builder",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.078,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.3",
+   "title": "Membership Eligibility & Qualification Rule Builder",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "PTR-003",
+   "matchName": "Profile & Company Details",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.4",
+   "title": "Validity, Activation & Expiry Configuration",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "BO-002",
+   "matchName": "Queue Configuration",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.5",
+   "title": "Membership Entitlement & Admission Benefit Builder",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "ACC-008",
+   "matchName": "Credential Register",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.6",
+   "title": "Membership Usage, Visit & Consumption Rules",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "GST-070",
+   "matchName": "Reserve a Table or Cabana",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.7",
+   "title": "Family, Household & Dependent Membership Configuration",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.8",
+   "title": "Membership Commercial, Pricing & Channel Association",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "POS-002",
+   "matchName": "Sell \u2014 Ticket Catalogue",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.9",
+   "title": "Renewal, Auto-Renewal & Membership Continuity Configuration",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "WEB-043",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.1.10",
+   "title": "Membership Product Validation, Approval, Publication & Versioning",
+   "module": "Membership   Annual Pass Management",
+   "board": "1",
+   "match": "WEB-043",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.1",
+   "title": "Member Operations Command Center",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "BO-098",
+   "matchName": "Qualifications",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.2",
+   "title": "Member 360\u00b0 Membership Account Workspace",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "GST-012",
+   "matchName": "My Tickets",
+   "score": 0.097,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.3",
+   "title": "Membership Activation, Assignment & Credential Management",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "EMP-069",
+   "matchName": "Barcode, RFID, Serialized Stock & Traceability",
+   "score": 0.068,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.4",
+   "title": "Visit, Admission & Entitlement Usage Monitor",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.141,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.5",
+   "title": "Membership Freeze, Suspension & Reactivation Management",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "PTR-010",
+   "matchName": "Cart & Quote",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.6",
+   "title": "Membership Upgrade, Downgrade & Product Migration Operations",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "BO-075",
+   "matchName": "Account Mapping",
+   "score": 0.089,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.7",
+   "title": "Renewal Operations & Auto-Renewal Management",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "BO-131",
+   "matchName": "Connectivity & Auto-Switch Settings",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.8",
+   "title": "Member Exceptions, Overrides & Service Recovery",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.9",
+   "title": "Member Lifecycle History, Audit & Case Timeline",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.12,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "MEM-13.2.10",
+   "title": "Membership Analytics, Renewal Intelligence & AI Retention Center",
+   "module": "Membership   Annual Pass Management",
+   "board": "2",
+   "match": "WEB-043",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.102,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.1",
+   "title": "Order & Reservation Command Center",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "BO-101",
+   "matchName": "Orders & Money",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.2",
+   "title": "Order Detail & Transaction Workspace",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "POS-014",
+   "matchName": "Sales Exceptions, Controls & Operational Actions",
+   "score": 0.132,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.3",
+   "title": "Reservation & Hold Policy Configuration",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "GST-017",
+   "matchName": "Reservation Details",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.4",
+   "title": "Order & Reservation Status Lifecycle Configuration",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "POS-014",
+   "matchName": "Sales Exceptions, Controls & Operational Actions",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.5",
+   "title": "Order Creation & Source/Channel Configuration",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "PTR-020",
+   "matchName": "Sub-Agent Management",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.6",
+   "title": "Customer, Guest & Account Assignment",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "WEB-011",
+   "matchName": "Guest Details & Attendee Forms",
+   "score": 0.157,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ORD-12.1.7",
+   "title": "Order Line, Product & Entitlement Composition",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.116,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.8",
+   "title": "Capacity Reservation & Inventory Commitment",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "GST-017",
+   "matchName": "Reservation Details",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.9",
+   "title": "Reservation Confirmation, Expiry & Fulfillment Readiness",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "GST-028",
+   "matchName": "Parking \u2013 Reservation Confirmed",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.1.10",
+   "title": "Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
+   "module": "Order   Reservation Management",
+   "board": "1",
+   "match": "POS-004",
+   "matchName": "Sell \u2014 Seat Map",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.1",
+   "title": "Amendment & After-Sales Command Center",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "POS-014",
+   "matchName": "Sales Exceptions, Controls & Operational Actions",
+   "score": 0.134,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.2",
+   "title": "Order Amendment Workspace",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "GST-017",
+   "matchName": "Reservation Details",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.3",
+   "title": "Amendment Eligibility & Policy Rule Builder",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "GST-049",
+   "matchName": "Interactive Seat Selection",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.4",
+   "title": "Cancellation & Partial Cancellation Policy Configuration",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.155,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "ORD-12.2.5",
+   "title": "Refund Policy & Refund Calculation Configuration",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.6",
+   "title": "Void, Reversal & Same-Day Correction Management",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "SCN-007",
+   "matchName": "Group admission",
+   "score": 0.075,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.7",
+   "title": "Ticket Reissue & Fulfillment Regeneration",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "BO-027",
+   "matchName": "Reissue & Media Replacement",
+   "score": 0.137,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.8",
+   "title": "After-Sales Financial Settlement & Adjustment Workspace",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "POS-011",
+   "matchName": "Returns, Refunds & Exchanges",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.9",
+   "title": "Approval, Exception & Service Recovery Management",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.2.10",
+   "title": "Amendment History, Audit & After-Sales Analytics",
+   "module": "Order   Reservation Management",
+   "board": "2",
+   "match": "BO-043",
+   "matchName": "Daily Reconciliation",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.1",
+   "title": "Payment & Order Financial Command Center",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "BO-077",
+   "matchName": "FX Rates & Variances",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.2",
+   "title": "Order Payment Detail & Transaction Ledger",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "BO-082",
+   "matchName": "Stock Movements",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.3",
+   "title": "Multi-Payment, Split Tender & Payment Allocation Configuration",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "EMP-059",
+   "matchName": "Table Order, Bill & Payment Management",
+   "score": 0.144,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.4",
+   "title": "Deposit, Partial Payment & Outstanding Balance Management",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.5",
+   "title": "Order Split, Merge & Transaction Relationship Management",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "BO-074",
+   "matchName": "Chart of Accounts",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.6",
+   "title": "Related Order & Transaction Relationship Explorer",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "POS-006",
+   "matchName": "Held Orders",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.7",
+   "title": "External Payment, Partner & Settlement Reference Mapping",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "BO-025",
+   "matchName": "Chargebacks & Disputes",
+   "score": 0.144,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.8",
+   "title": "Payment Reconciliation & Exception Management",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "BO-025",
+   "matchName": "Chargebacks & Disputes",
+   "score": 0.183,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "ORD-12.3.9",
+   "title": "Financial Traceability, Control & Audit Explorer",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "POS-014",
+   "matchName": "Sales Exceptions, Controls & Operational Actions",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "ORD-12.3.10",
+   "title": "Order Financial Analytics & AI Reconciliation Intelligence",
+   "module": "Order   Reservation Management",
+   "board": "3",
+   "match": "BO-043",
+   "matchName": "Daily Reconciliation",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.1.1",
+   "title": "Commercial Pricing Command Center",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.155,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRI-10.1.2",
+   "title": "Price List Master Configuration",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.152,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRI-10.1.3",
+   "title": "Price Category & Rate Type Library",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "CMS-012",
+   "matchName": "RTL Preview",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.1.4",
+   "title": "Rate Structure Builder",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.186,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRI-10.1.5",
+   "title": "Product & Service Price Assignment",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.145,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.1.6",
+   "title": "Package, Bundle & Add-On Pricing",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.114,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.1.7",
+   "title": "Market, Venue & Currency Pricing Structure",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.195,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRI-10.1.8",
+   "title": "Price Hierarchy & Inheritance Configuration",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "PTR-009",
+   "matchName": "Group / Bulk Booking",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.1.9",
+   "title": "Price List Templates, Clone & Reuse",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "BO-009",
+   "matchName": "Pricing Rules",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.1.10",
+   "title": "Commercial Pricing Structure Validation",
+   "module": "Pricing   Revenue Management",
+   "board": "1",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.108,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.1",
+   "title": "Pricing Rule Command Center",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "BO-078",
+   "matchName": "Requisitions",
+   "score": 0.099,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.2",
+   "title": "Customer Segment & Profile Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "GST-039",
+   "matchName": "Profile",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.3",
+   "title": "Membership & Loyalty Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.196,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRI-10.2.4",
+   "title": "Residency, Nationality & Market Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "GST-039",
+   "matchName": "Profile",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.5",
+   "title": "Channel-Based Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.6",
+   "title": "Location, Venue & Event Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "GST-006",
+   "matchName": "Event / Exhibition Details",
+   "score": 0.165,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRI-10.2.7",
+   "title": "Quantity, Group & Volume Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "PTR-007",
+   "matchName": "Availability Search",
+   "score": 0.134,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.8",
+   "title": "Effective Date, Season & Day-Based Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.142,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.9",
+   "title": "Timeslot, Performance & Time-of-Day Pricing Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.2.10",
+   "title": "Pricing Rule Priority, Conflict Resolution & Testing",
+   "module": "Pricing   Revenue Management",
+   "board": "2",
+   "match": "BO-045",
+   "matchName": "Menu Management",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.1",
+   "title": "Tax, Fee & Calculation Command Center",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "BO-075",
+   "matchName": "Account Mapping",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.2",
+   "title": "Tax Profile & Jurisdiction Configuration",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "BO-125",
+   "matchName": "Product & Category Button Configuration",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.3",
+   "title": "Tax Rule & Treatment Builder",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "BO-075",
+   "matchName": "Account Mapping",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.4",
+   "title": "Fee & Surcharge Library",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "GST-057",
+   "matchName": "Accessibility Information",
+   "score": 0.102,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.5",
+   "title": "Fee Applicability & Charging Rule Builder",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "GST-045",
+   "matchName": "Ticket Delivery & Sharing",
+   "score": 0.126,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.6",
+   "title": "Fee Waiver, Tax Exemption & Exception Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "BO-142",
+   "matchName": "Store Rules, Controls & Permissions",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.7",
+   "title": "Price Calculation Sequence & Formula Engine",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "GST-056",
+   "matchName": "Bundle Package",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.8",
+   "title": "Currency Precision, Rounding & Monetary Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.9",
+   "title": "Price Breakdown, Calculation Simulation & Explainability",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.3.10",
+   "title": "Calculation Validation, Reconciliation & Service Interface",
+   "module": "Pricing   Revenue Management",
+   "board": "3",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.135,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.1",
+   "title": "Pricing Governance Command Center",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "BO-117",
+   "matchName": "Product Import, Governance & AI Configuration Assistant",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.2",
+   "title": "Pricing Change Request & Workspace",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.12,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.3",
+   "title": "Bulk Pricing Update, Import & Mass Maintenance",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "BO-009",
+   "matchName": "Pricing Rules",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.4",
+   "title": "Pricing Version & Baseline Management",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "BO-070",
+   "matchName": "Work Orders",
+   "score": 0.099,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.5",
+   "title": "Pricing Change Impact Analysis",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "POS-003",
+   "matchName": "Sell \u2014 Timed Entry",
+   "score": 0.114,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.6",
+   "title": "Pricing Approval Workflow & Authority Matrix",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "BO-085",
+   "matchName": "Approval Request",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.7",
+   "title": "Pricing Publication & Effective-Date Scheduler",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "GST-062",
+   "matchName": "Shop & Drop Collection",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.8",
+   "title": "Pricing Distribution, Synchronization & Publication Monitor",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "BO-072",
+   "matchName": "Incident Log",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.9",
+   "title": "Pricing Rollback & Emergency Control Center",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "KSK-011",
+   "matchName": "Collect a booking",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.4.10",
+   "title": "Pricing History, Audit & Compliance Explorer",
+   "module": "Pricing   Revenue Management",
+   "board": "4",
+   "match": "WEB-010",
+   "matchName": "Shopping Cart",
+   "score": 0.083,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.1",
+   "title": "Dynamic Pricing Strategy Command Center",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "BO-001",
+   "matchName": "Queue Directory",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.2",
+   "title": "Dynamic Pricing Strategy Builder",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "BO-095",
+   "matchName": "Resources",
+   "score": 0.099,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.3",
+   "title": "Demand, Occupancy & Availability Rule Builder",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "PTR-007",
+   "matchName": "Availability Search",
+   "score": 0.158,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRI-10.5.4",
+   "title": "Booking Velocity & Time-to-Event Rule Builder",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.138,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.5",
+   "title": "Seasonal, Calendar, Day & Timeslot Dynamic Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "BO-016",
+   "matchName": "Session Template",
+   "score": 0.066,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.6",
+   "title": "Channel, Customer Segment & Location Dynamic Rules",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "PTR-011",
+   "matchName": "Quote Management",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.7",
+   "title": "Dynamic Price Bands, Ladders & Adjustment Matrix",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "PTR-006",
+   "matchName": "Product Catalog (B2B Pricing)",
+   "score": 0.085,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.8",
+   "title": "Dynamic Pricing Guardrails & Commercial Protection",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.074,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.9",
+   "title": "Dynamic Pricing Automation Policy & Control",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "BO-078",
+   "matchName": "Requisitions",
+   "score": 0.076,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.5.10",
+   "title": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
+   "module": "Pricing   Revenue Management",
+   "board": "5",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.099,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.1",
+   "title": "AI Pricing Intelligence Command Center",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.2",
+   "title": "Internal Demand & Booking Signal Hub",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "PTR-007",
+   "matchName": "Availability Search",
+   "score": 0.147,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.3",
+   "title": "Weather Intelligence & Demand Impact Configuration",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "BO-098",
+   "matchName": "Qualifications",
+   "score": 0.057,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.4",
+   "title": "Nearby Event, Exhibition & Local Demand Intelligence",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "GST-006",
+   "matchName": "Event / Exhibition Details",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.5",
+   "title": "Competitor Pricing & Market Position Intelligence",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "GST-056",
+   "matchName": "Bundle Package",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.6",
+   "title": "Market, Tourism, Holiday & Contextual Signal Hub",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "BO-088",
+   "matchName": "Approval Analytics",
+   "score": 0.073,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.7",
+   "title": "AI Demand Forecasting & Booking Curve Studio",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.8",
+   "title": "Price Elasticity & Revenue Response Intelligence",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "ANL-007",
+   "matchName": "Guest & Conversion Intelligence",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.9",
+   "title": "AI Pricing Recommendation & Explainability Center",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "WEB-014",
+   "matchName": "Pay for a Booking",
+   "score": 0.072,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.6.10",
+   "title": "AI Signal Registry, Data Quality & Model Governance",
+   "module": "Pricing   Revenue Management",
+   "board": "6",
+   "match": "GST-072",
+   "matchName": "Share & Group Booking",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.1",
+   "title": "Revenue Optimization Command Center",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "BO-077",
+   "matchName": "FX Rates & Variances",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.2",
+   "title": "Pricing Simulation Studio",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "BO-009",
+   "matchName": "Pricing Rules",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.3",
+   "title": "Scenario Modeling & What-If Analysis",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "GST-005",
+   "matchName": "What's On",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.4",
+   "title": "A/B Pricing Experiment Studio",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "BO-114",
+   "matchName": "Variants, Attributes, Barcode & RFID Management",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.5",
+   "title": "Revenue & Demand Impact Forecasting",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "POS-019",
+   "matchName": "Shift Templates & Policies",
+   "score": 0.084,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.6",
+   "title": "AI Recommendation Review & Decision Queue",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "BO-084",
+   "matchName": "Approval Inbox",
+   "score": 0.125,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.7",
+   "title": "Automation Policy & Autonomous Pricing Orchestrator",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "BO-142",
+   "matchName": "Store Rules, Controls & Permissions",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.8",
+   "title": "Live Dynamic Price Execution & Deployment Monitor",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "ADM-029",
+   "matchName": "Deployment Monitor",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.9",
+   "title": "Dynamic Pricing Performance & Optimization Analytics",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "ANL-010",
+   "matchName": "Suggestions & Advice",
+   "score": 0.122,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-10.7.10",
+   "title": "AI Learning, Model Performance & Optimization Feedback",
+   "module": "Pricing   Revenue Management",
+   "board": "7",
+   "match": "KSK-001",
+   "matchName": "Attract Loop",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.1",
+   "title": "Privacy & Consent Configuration Command Center",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.172,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRI-17.1.2",
+   "title": "Data Processing Purpose & Lawful Basis Registry",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "WEB-011",
+   "matchName": "Guest Details & Attendee Forms",
+   "score": 0.081,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.3",
+   "title": "Consent Purpose & Consent Type Builder",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "BO-121",
+   "matchName": "Personalized Offers & Guest Engagement",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.4",
+   "title": "Communication Preference & Marketing Permission Configuration",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.5",
+   "title": "Cookie, Tracking & Digital Technology Registry",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "CMS-017",
+   "matchName": "Domain & Certificate",
+   "score": 0.135,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.6",
+   "title": "Cookie Banner & Preference Center Designer",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "ADM-016",
+   "matchName": "White-Label Branding Management",
+   "score": 0.144,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.7",
+   "title": "Consent Capture Point & Customer Journey Configuration",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.24,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRI-17.1.8",
+   "title": "Privacy Notice, Policy & Terms Version Management",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "WEB-046",
+   "matchName": "In-Venue Notifications",
+   "score": 0.092,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.9",
+   "title": "Minor, Guardian & Age-Based Privacy Configuration",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "ACC-004",
+   "matchName": "Application Status Tracking",
+   "score": 0.104,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.1.10",
+   "title": "Privacy Configuration Testing, Approval & Publication",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "1",
+   "match": "BO-068",
+   "matchName": "Audit Log",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.1",
+   "title": "Privacy Operations Command Center",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "WEB-011",
+   "matchName": "Guest Details & Attendee Forms",
+   "score": 0.128,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.2",
+   "title": "Customer Privacy, Consent & Preference 360\u00b0",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.3",
+   "title": "Consent Evidence, History & Withdrawal Management",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.147,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.4",
+   "title": "Data Subject / Customer Privacy Request Management",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "WEB-016",
+   "matchName": "Login / Register",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.5",
+   "title": "Data Discovery, Access, Export & Correction Workspace",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "GST-002",
+   "matchName": "Explore Categories",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.6",
+   "title": "Deletion, Anonymization & Restriction Operations",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "GST-039",
+   "matchName": "Profile",
+   "score": 0.097,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.7",
+   "title": "Data Retention, Expiry & Legal Hold Operations",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.8",
+   "title": "Privacy Compliance, Exception & Investigation Workspace",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "ADM-004",
+   "matchName": "Platform Audit Log",
+   "score": 0.064,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.9",
+   "title": "Privacy Audit, Evidence & Compliance Reporting",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRI-17.2.10",
+   "title": "Privacy Analytics & AI Compliance Intelligence",
+   "module": "Privacy  Consent   Preference Management",
+   "board": "2",
+   "match": "GST-065",
+   "matchName": "Newsletter & Preferences",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Product Lifecycle Command Center",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "GST-056",
+   "matchName": "Bundle Package",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Product Creation Workspace",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "BO-012",
+   "matchName": "Membership Products",
+   "score": 0.089,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Lifecycle Status & Workflow Configuration",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "BO-142",
+   "matchName": "Store Rules, Controls & Permissions",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Bulk Product Creation & Catalogue Import",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "BO-117",
+   "matchName": "Product Import, Governance & AI Configuration Assistant",
+   "score": 0.195,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Product Import / Export & Environment Transfer",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "BO-117",
+   "matchName": "Product Import, Governance & AI Configuration Assistant",
+   "score": 0.167,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Product Context, Ownership & Assignment",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "CMS-016",
+   "matchName": "Site Settings",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Channel Publication & Availability",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "CMS-012",
+   "matchName": "RTL Preview",
+   "score": 0.082,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Publication & Activation Scheduler",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "ADM-025",
+   "matchName": "Tenant Upgrade Scheduler",
+   "score": 0.167,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Product Duplication & Template Library",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.124,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "AI Catalogue Builder & Configuration Review",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "1",
+   "match": "BO-117",
+   "matchName": "Product Import, Governance & AI Configuration Assistant",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.1",
+   "title": "Product Governance Command Center",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "BO-085",
+   "matchName": "Approval Request",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.2",
+   "title": "Approval Workflow Designer",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "ADM-023",
+   "matchName": "Staging Promotion & Approval",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.3",
+   "title": "Approval Review & Decision Workspace",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "BO-085",
+   "matchName": "Approval Request",
+   "score": 0.175,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-2.4",
+   "title": "Product Version Management",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "CMS-015",
+   "matchName": "Version History",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.5",
+   "title": "Rollback & Recovery Management",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "CMS-015",
+   "matchName": "Version History",
+   "score": 0.141,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.6",
+   "title": "Change Impact Analysis",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "POS-003",
+   "matchName": "Sell \u2014 Timed Entry",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.7",
+   "title": "Change Propagation & Dependency Control",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.114,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.8",
+   "title": "Product Retirement, Suspension & Archive",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "ADM-036",
+   "matchName": "Platform Notification Broadcast",
+   "score": 0.18,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-2.9",
+   "title": "Product Audit Trail & Change History",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "CMS-013",
+   "matchName": "SEO & Metadata",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2.10",
+   "title": "Governance Risk, AI Monitoring & Control Center",
+   "module": "Product Lifecycle   Catalogue Governance",
+   "board": "2",
+   "match": "ADM-026",
+   "matchName": "End-of-Support Notice Management",
+   "score": 0.122,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Promotion Command Center Dashboard",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.141,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Promotion & Campaign Directory",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.145,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Promotion Overview",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Promotion Lifecycle & Status Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "BO-085",
+   "matchName": "Approval Request",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Campaign Calendar & Timeline",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "EMP-054",
+   "matchName": "Reservation Calendar & Timeline",
+   "score": 0.137,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Promotion Channel & Publication Monitor",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "DEV-005",
+   "matchName": "Webhooks",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Promotion Alerts & Exception Center",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Promotion Approval Inbox",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "BO-084",
+   "matchName": "Approval Inbox",
+   "score": 0.187,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Promotion Health & Performance Monitor",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Promotion Audit, Activity & Version History",
+   "module": "Promotions   Bundles Management",
+   "board": "1",
+   "match": "POS-002",
+   "matchName": "Sell \u2014 Ticket Catalogue",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Promotion Rule Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.17,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Percentage & Fixed Discount Configurator",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "EMP-018",
+   "matchName": "Offline package",
+   "score": 0.086,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Cart & Transaction Threshold Rules",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Volume, Bulk & Tier Discount Configurator",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "BO-009",
+   "matchName": "Pricing Rules",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Time-Based & Seasonal Discount Rules",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.122,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Customer, Membership & Segment Discount Rules",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Payment Method, Bank & Partner Discount Rules",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "GST-071",
+   "matchName": "Payment Methods",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Special Price & Guest Offer Configurator",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "BO-026",
+   "matchName": "Group Bookings",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Discount Limits, Guardrails & Commercial Controls",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "PTR-007",
+   "matchName": "Availability Search",
+   "score": 0.12,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Rule Test, Simulation & AI Recommendation Workspace",
+   "module": "Promotions   Bundles Management",
+   "board": "2",
+   "match": "BO-118",
+   "matchName": "Campaign & Audience Management",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Coupon & Promo Code Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Coupon & Promo Code Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Unique Code Generation & Batch Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "BO-054",
+   "matchName": "Role Assignment",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Code Eligibility & Restriction Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "GST-015",
+   "matchName": "Memberships",
+   "score": 0.184,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Usage, Capacity & Frequency Control",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.118,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Validity, Date & Time Control",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "EMP-054",
+   "matchName": "Reservation Calendar & Timeline",
+   "score": 0.083,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Code Distribution & Assignment Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "BO-107",
+   "matchName": "Guests & Marketing",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Redemption Monitor & Code Lookup",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Code Security, Fraud & Exception Center",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "POS-003",
+   "matchName": "Sell \u2014 Timed Entry",
+   "score": 0.073,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Redemption Analytics, Audit & AI Optimization",
+   "module": "Promotions   Bundles Management",
+   "board": "3",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Advanced Offer Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "KSK-009",
+   "matchName": "Ticket issued",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Buy X Get Y / BOGO Rule Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "BO-070",
+   "matchName": "Work Orders",
+   "score": 0.114,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Multi-Buy & Quantity Offer Configurator",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "POS-023",
+   "matchName": "Sell \u2014 Merchandise",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Cheapest / Lowest-Value Item Promotion",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "GST-058",
+   "matchName": "Resource Availability (Cabana)",
+   "score": 0.108,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Fixed-Price & \u201cN for X\u201d Offer Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "POS-008",
+   "matchName": "Reports",
+   "score": 0.128,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Gift, Free Product & Added-Value Offer Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Cross-Category Promotion Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "WEB-008",
+   "matchName": "Add-ons & Upsell",
+   "score": 0.159,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Reward Selection, Substitution & Customer Choice",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.166,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Advanced Offer Guardrails & Conflict Controls",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "GST-037",
+   "matchName": "Offers & Promotions",
+   "score": 0.122,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Offer Simulation, Basket Trace & AI Optimization",
+   "module": "Promotions   Bundles Management",
+   "board": "4",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Bundle & Combo Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.174,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Bundle Definition & Setup",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "BO-121",
+   "matchName": "Personalized Offers & Guest Engagement",
+   "score": 0.131,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Bundle Component Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "WEB-021",
+   "matchName": "Wallet & Gift Cards",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Guest Choice & Build-Your-Own Bundle Designer",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "GST-053",
+   "matchName": "Build Your Own Itinerary",
+   "score": 0.184,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Bundle Pricing & Commercial Model",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "GST-056",
+   "matchName": "Bundle Package",
+   "score": 0.155,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Bundle Availability, Capacity & Validation",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "PTR-007",
+   "matchName": "Availability Search",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Bundle Validity, Scheduling & Redemption Rules",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Partner & External Product Bundle Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "PTR-017",
+   "matchName": "Commission Statement",
+   "score": 0.092,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Revenue Allocation, Cost & Settlement Rules",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "BO-074",
+   "matchName": "Chart of Accounts",
+   "score": 0.149,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Bundle Preview, Simulation & AI Recommendation",
+   "module": "Promotions   Bundles Management",
+   "board": "5",
+   "match": "POS-002",
+   "matchName": "Sell \u2014 Ticket Catalogue",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Dynamic Bundle Operations Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "BO-140",
+   "matchName": "Product Availability, 86 & Operational Food Safety",
+   "score": 0.076,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Component Inventory & Availability Matrix",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "WEB-006",
+   "matchName": "Date & Session Selection",
+   "score": 0.133,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Bundle Sellability & Dependency Rule Engine",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "WEB-029",
+   "matchName": "Error / Sold Out / Maintenance",
+   "score": 0.098,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Capacity Pool & Reservation Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "BO-013",
+   "matchName": "Channel & Distribution",
+   "score": 0.103,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Dynamic Component Substitution Engine",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "BO-014",
+   "matchName": "Catalogue Publishing",
+   "score": 0.088,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Dynamic Bundle Rule & Composition Engine",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.16,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Real-Time Availability & Checkout Validation",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "GST-058",
+   "matchName": "Resource Availability (Cabana)",
+   "score": 0.145,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Bundle Availability by Channel, Venue & Partner",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "GST-056",
+   "matchName": "Bundle Package",
+   "score": 0.155,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Bundle Availability Forecast, Alerts & Recovery",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "GST-056",
+   "matchName": "Bundle Package",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Dynamic Bundle Simulation & AI Optimization",
+   "module": "Promotions   Bundles Management",
+   "board": "6",
+   "match": "SUP-003",
+   "matchName": "Availability & Routing Settings",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Targeting & Eligibility Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "BO-121",
+   "matchName": "Personalized Offers & Guest Engagement",
+   "score": 0.178,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Eligibility Rule Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.175,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "CRM & Customer Segment Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.104,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Membership, Loyalty & Guest Eligibility",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Behavioral & Transaction Targeting",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "POS-008",
+   "matchName": "Reports",
+   "score": 0.132,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Context, Location, Channel & Time Targeting",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "GST-022",
+   "matchName": "Attraction Wait Times",
+   "score": 0.162,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Partner, B2B & Payment Eligibility",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "WEB-021",
+   "matchName": "Wallet & Gift Cards",
+   "score": 0.16,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Audience Preview, Reach & Eligibility Simulator",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.086,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Targeting Conflict, Frequency & Exclusion Controls",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "BO-121",
+   "matchName": "Personalized Offers & Guest Engagement",
+   "score": 0.108,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "AI Audience Discovery & Targeting Optimization",
+   "module": "Promotions   Bundles Management",
+   "board": "7",
+   "match": "BO-121",
+   "matchName": "Personalized Offers & Guest Engagement",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Stacking & Conflict Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "GST-037",
+   "matchName": "Offers & Promotions",
+   "score": 0.098,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Promotion Priority & Hierarchy Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.136,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Promotion Stacking Rule Builder",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "WEB-032",
+   "matchName": "Offers & Promotions",
+   "score": 0.175,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Promotion Exclusion & Compatibility Matrix",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.069,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Discount Calculation & Application Sequence",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "ACC-004",
+   "matchName": "Application Status Tracking",
+   "score": 0.081,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Best Offer & Customer Benefit Resolver",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "WEB-032",
+   "matchName": "Offers & Promotions",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Discount Cap & Maximum Benefit Controller",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.103,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Conflict Detection & Resolution Center",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "GST-044",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.069,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Promotion Decision Trace & Transaction Explainer",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "GST-037",
+   "matchName": "Offers & Promotions",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Conflict Simulation & AI Optimization",
+   "module": "Promotions   Bundles Management",
+   "board": "8",
+   "match": "EMP-031",
+   "matchName": "Queue monitor",
+   "score": 0.078,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Campaign Governance & Budget Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "GST-038",
+   "matchName": "Digital Companion Mode",
+   "score": 0.081,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Campaign Budget & Financial Limit Setup",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "PTR-005",
+   "matchName": "Inventory & Allocation View",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Redemption, Discount & Exposure Limit Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "GST-036",
+   "matchName": "Loyalty & Rewards",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Budget Consumption & Forecast Monitor",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "BO-005",
+   "matchName": "Queue Monitor",
+   "score": 0.078,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Threshold Actions & Automatic Suspension",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "BO-086",
+   "matchName": "Approval Matrix",
+   "score": 0.104,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Campaign Approval Workflow Designer",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "PTR-008",
+   "matchName": "Booking Creation",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Approval Inbox & Decision Workspace",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "BO-084",
+   "matchName": "Approval Inbox",
+   "score": 0.196,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Campaign Financial & Commercial Simulator",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "Campaign Experiment & A/B Test Manager",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "BO-118",
+   "matchName": "Campaign & Audience Management",
+   "score": 0.139,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Governance Audit, AI Risk & Launch Readiness",
+   "module": "Promotions   Bundles Management",
+   "board": "9",
+   "match": "BO-010",
+   "matchName": "Promotions & Coupons",
+   "score": 0.079,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-1",
+   "title": "Promotion Performance Command Center",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "BO-118",
+   "matchName": "Campaign & Audience Management",
+   "score": 0.107,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-2",
+   "title": "Campaign & Promotion Performance Explorer",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.072,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-3",
+   "title": "Redemption, Conversion & Funnel Analytics",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "BO-121",
+   "matchName": "Personalized Offers & Guest Engagement",
+   "score": 0.196,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-4",
+   "title": "Discount, Margin & Profitability Analytics",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "ANL-005",
+   "matchName": "Cost, Margin & Profitability",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-5",
+   "title": "Bundle, BOGO & Advanced Offer Analytics",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.119,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-6",
+   "title": "Upsell, Cross-Sell & Attach-Rate Analytics",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "BO-119",
+   "matchName": "Cross-Sell, Upsell & Recommendation Rules",
+   "score": 0.2,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "PRO-7",
+   "title": "Customer, Segment, Channel & Partner Analytics",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "BO-118",
+   "matchName": "Campaign & Audience Management",
+   "score": 0.149,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-8",
+   "title": "Incrementality, Attribution & Cannibalization Analysis",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "POS-002",
+   "matchName": "Sell \u2014 Ticket Catalogue",
+   "score": 0.074,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-9",
+   "title": "AI Optimization & Next-Best-Action Center",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "BO-118",
+   "matchName": "Campaign & Audience Management",
+   "score": 0.107,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "PRO-10",
+   "title": "Executive Promotion Intelligence & Reporting Studio",
+   "module": "Promotions   Bundles Management",
+   "board": "10",
+   "match": "BO-118",
+   "matchName": "Campaign & Audience Management",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.1",
+   "title": "Rules & Workflow Command Center",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "CMS-014",
+   "matchName": "Publishing Workflow",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.2",
+   "title": "Visual Business Rule Builder",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "BO-124",
+   "matchName": "Layout & Journey Builder",
+   "score": 0.1,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.3",
+   "title": "Conditions, Decision Logic & Decision Tables",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "GST-070",
+   "matchName": "Reserve a Table or Cabana",
+   "score": 0.074,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.4",
+   "title": "Visual Workflow Designer",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "ADM-036",
+   "matchName": "Platform Notification Broadcast",
+   "score": 0.098,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.5",
+   "title": "Approval Matrix & Multi-Level Approval Configuration",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "BO-084",
+   "matchName": "Approval Inbox",
+   "score": 0.078,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.6",
+   "title": "Roles, Authority, Delegation & Approval Limits",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "BO-087",
+   "matchName": "Approval Delegations",
+   "score": 0.186,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "RUL-13.1.7",
+   "title": "SLA, Escalation, Reminder & Timeout Rules",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.122,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.8",
+   "title": "Trigger, Action & Cross-Module Orchestration Configuration",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "PTR-013",
+   "matchName": "Credit Limit & Balance",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.9",
+   "title": "Workflow Testing, Simulation & Impact Analysis",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "BO-138",
+   "matchName": "Production Execution & Batch Management",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.1.10",
+   "title": "Versioning, Governance, Approval & Publication",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "1",
+   "match": "ADM-036",
+   "matchName": "Platform Notification Broadcast",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.1",
+   "title": "Workflow Operations Command Center",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "ADM-015",
+   "matchName": "API Rate Limit & Quota Management",
+   "score": 0.115,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.2",
+   "title": "Unified Approval Inbox & Decision Workspace",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "BO-085",
+   "matchName": "Approval Request",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.3",
+   "title": "Workflow Instance Monitor & Process Timeline",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "BO-028",
+   "matchName": "Refund Approval Queue",
+   "score": 0.103,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.4",
+   "title": "Workflow Exception, Failure & Recovery Center",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "EMP-070",
+   "matchName": "Inventory Exceptions, AI Replenishment & Action Center",
+   "score": 0.083,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.5",
+   "title": "SLA, Escalation & Bottleneck Monitor",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "BO-084",
+   "matchName": "Approval Inbox",
+   "score": 0.109,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.6",
+   "title": "Automation Execution & Autonomous Action Monitor",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "BO-131",
+   "matchName": "Connectivity & Auto-Switch Settings",
+   "score": 0.061,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.7",
+   "title": "Cross-Module Orchestration Monitor",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "GST-022",
+   "matchName": "Attraction Wait Times",
+   "score": 0.09,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.8",
+   "title": "Workflow Analytics & Process Performance",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "BO-088",
+   "matchName": "Approval Analytics",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.9",
+   "title": "Process Optimization & Automation Opportunity Center",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "BO-088",
+   "matchName": "Approval Analytics",
+   "score": 0.104,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "RUL-13.2.10",
+   "title": "AI Workflow Intelligence & Autonomous Governance Center",
+   "module": "Rules  Workflow  Approval   Automation Engine",
+   "board": "2",
+   "match": "BO-084",
+   "matchName": "Approval Inbox",
+   "score": 0.086,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.1.1",
+   "title": "Sales Channel Command Center",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "GST-044",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.107,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.1.2",
+   "title": "Channel Creation & Profile Configuration",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "POS-016",
+   "matchName": "Till Configuration",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.1.3",
+   "title": "Product & Catalogue Assignment",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "BO-117",
+   "matchName": "Product Import, Governance & AI Configuration Assistant",
+   "score": 0.175,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "SAL-4.1.4",
+   "title": "Channel Pricing & Commercial Profile Assignment",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.205,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "SAL-4.1.5",
+   "title": "Inventory, Capacity & Channel Allocation",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "BO-013",
+   "matchName": "Channel & Distribution",
+   "score": 0.166,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "SAL-4.1.6",
+   "title": "Channel Sales Schedule & Availability Windows",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "BO-019",
+   "matchName": "Closures & Blackouts",
+   "score": 0.171,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "SAL-4.1.7",
+   "title": "Customer & Eligibility Rules by Channel",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.128,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.1.8",
+   "title": "Channel Sales Rules, Limits & Restrictions",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "PTR-002",
+   "matchName": "Partner Dashboard",
+   "score": 0.105,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.1.9",
+   "title": "Channel Fees, Payment & Fulfillment Configuration",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.197,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "SAL-4.1.10",
+   "title": "Channel Publication, Readiness & AI Validation",
+   "module": "Sales Channel Management",
+   "board": "1",
+   "match": "BO-013",
+   "matchName": "Channel & Distribution",
+   "score": 0.126,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.2.1",
+   "title": "Channel Operations Command Center",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "BO-132",
+   "matchName": "Offline Transaction Monitor & Sync Queue",
+   "score": 0.102,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.2.2",
+   "title": "Channel Connection & Integration Manager",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "DEV-008",
+   "matchName": "Programme Administration",
+   "score": 0.124,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.2.3",
+   "title": "Product, Price & Availability Synchronization",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "BO-001",
+   "matchName": "Queue Directory",
+   "score": 0.081,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.2.4",
+   "title": "Real-Time Channel Availability & Inventory Monitor",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "WEB-006",
+   "matchName": "Date & Session Selection",
+   "score": 0.162,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "SAL-4.2.5",
+   "title": "Channel Allocation & Rebalancing Operations",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "BO-013",
+   "matchName": "Channel & Distribution",
+   "score": 0.17,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "SAL-4.2.6",
+   "title": "Channel Exceptions, Incidents & Recovery",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "DEV-005",
+   "matchName": "Webhooks",
+   "score": 0.126,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.2.7",
+   "title": "Channel Performance & Commercial Analytics",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "WEB-035",
+   "matchName": "Multi-Currency & Pricing",
+   "score": 0.151,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "SAL-4.2.8",
+   "title": "Channel Audit, Logs & Transaction Traceability",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "ADM-004",
+   "matchName": "Platform Audit Log",
+   "score": 0.154,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "SAL-4.2.9",
+   "title": "Channel Governance, SLA & Partner Control",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "ADM-015",
+   "matchName": "API Rate Limit & Quota Management",
+   "score": 0.099,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "SAL-4.2.10",
+   "title": "AI Channel Optimization & Intelligence Center",
+   "module": "Sales Channel Management",
+   "board": "2",
+   "match": "BO-013",
+   "matchName": "Channel & Distribution",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.1",
+   "title": "Resale Marketplace Command Center",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "BO-077",
+   "matchName": "FX Rates & Variances",
+   "score": 0.146,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.2",
+   "title": "Resale Eligibility Rule Configuration",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "POS-010",
+   "matchName": "Add to Existing Ticket",
+   "score": 0.131,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.3",
+   "title": "Resale Policy & Marketplace Settings",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "DEV-007",
+   "matchName": "Marketplace Listing",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.4",
+   "title": "Listing Creation & Seller Configuration",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.108,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.5",
+   "title": "Resale Pricing & Price Guardrails",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.6",
+   "title": "Resale Fees, Commission & Seller Proceeds",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "ADM-011",
+   "matchName": "Licence & Seat Management",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.7",
+   "title": "Listing Approval & Moderation",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "BO-077",
+   "matchName": "FX Rates & Variances",
+   "score": 0.102,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.8",
+   "title": "Resale Inventory & Availability Management",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "PTR-005",
+   "matchName": "Inventory & Allocation View",
+   "score": 0.084,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.9",
+   "title": "Listing Lifecycle, Expiry & Cancellation",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "GST-014",
+   "matchName": "Ticket Transfer",
+   "score": 0.085,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.1.10",
+   "title": "AI Resale Configuration & Marketplace Recommendations",
+   "module": "Ticket Resale Marketplace",
+   "board": "1",
+   "match": "GST-013",
+   "matchName": "Ticket Details",
+   "score": 0.081,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.1",
+   "title": "Resale Operations Command Center",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.2",
+   "title": "Buyer Purchase & Resale Order Management",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "WEB-021",
+   "matchName": "Wallet & Gift Cards",
+   "score": 0.126,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.3",
+   "title": "Ticket Ownership Transfer Management",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "GST-012",
+   "matchName": "My Tickets",
+   "score": 0.172,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "TIC-3.2.4",
+   "title": "Credential Revocation & Regeneration",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "WEB-017",
+   "matchName": "My Account Dashboard",
+   "score": 0.092,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.5",
+   "title": "Resale Fraud & Duplicate Sale Protection",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "GST-039",
+   "matchName": "Profile",
+   "score": 0.072,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.6",
+   "title": "Capacity & Inventory Reconciliation",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "WEB-006",
+   "matchName": "Date & Session Selection",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.7",
+   "title": "Seller Settlement & Payout Management",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "BO-021",
+   "matchName": "Order Search",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.8",
+   "title": "Refunds, Disputes & Resale Exceptions",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "BO-025",
+   "matchName": "Chargebacks & Disputes",
+   "score": 0.125,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.9",
+   "title": "Resale Audit & Ownership History",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "BO-142",
+   "matchName": "Store Rules, Controls & Permissions",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.2.10",
+   "title": "Resale Analytics & AI Intelligence",
+   "module": "Ticket Resale Marketplace",
+   "board": "2",
+   "match": "BO-120",
+   "matchName": "Omnichannel Commerce & Journey Configuration",
+   "score": 0.103,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.1",
+   "title": "My Tickets & Resale Marketplace Entry",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "GST-042",
+   "matchName": "Simple Registration & OTP",
+   "score": 0.128,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.2",
+   "title": "Resale Eligibility & Ticket Selection",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "GST-049",
+   "matchName": "Interactive Seat Selection",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.3",
+   "title": "Create Listing & Resale Price Selection",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.4",
+   "title": "Fees, Seller Proceeds & Listing Confirmation",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "BO-142",
+   "matchName": "Store Rules, Controls & Permissions",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.5",
+   "title": "My Resale Listings & Seller Dashboard",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "GST-067",
+   "matchName": "Refunds & Resale",
+   "score": 0.112,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.6",
+   "title": "Official Resale Marketplace & Buyer Discovery",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "GST-014",
+   "matchName": "Ticket Transfer",
+   "score": 0.134,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.7",
+   "title": "Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "POS-004",
+   "matchName": "Sell \u2014 Seat Map",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.8",
+   "title": "Buyer Checkout, Inventory Hold & Secure Payment",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "ADM-009",
+   "matchName": "Tenant Billing & Invoicing",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-3.3.9",
+   "title": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.157,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "TIC-3.3.10",
+   "title": "White-Label Marketplace Deployment & Experience Architecture",
+   "module": "Ticket Resale Marketplace",
+   "board": "3",
+   "match": "CMS-012",
+   "matchName": "RTL Preview",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.1",
+   "title": "Upgrade & Conversion Command Center",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "BO-085",
+   "matchName": "Approval Request",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.2",
+   "title": "Upgrade & Conversion Path Builder",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "GST-021",
+   "matchName": "Interactive Map",
+   "score": 0.111,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.3",
+   "title": "Upgrade Eligibility & Qualification Rules",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "POS-002",
+   "matchName": "Sell \u2014 Ticket Catalogue",
+   "score": 0.126,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.4",
+   "title": "Upgrade Timing, Usage & Ticket Status Rules",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.5",
+   "title": "Upgrade Financial Treatment & Price Difference Rules",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "PTR-002",
+   "matchName": "Partner Dashboard",
+   "score": 0.101,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.6",
+   "title": "Pro-Rata, Residual Value & Entitlement Credit Configuration",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.106,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.7",
+   "title": "Person-Type, Product & Entitlement Conversion Rules",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "BO-084",
+   "matchName": "Approval Inbox",
+   "score": 0.085,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.8",
+   "title": "Bulk, Group & Assisted Upgrade Operations",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "EMP-060",
+   "matchName": "Reservation & Table Performance",
+   "score": 0.123,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.9",
+   "title": "Upgrade Execution, Credential Regeneration & Channel Controls",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "GST-067",
+   "matchName": "Refunds & Resale",
+   "score": 0.11,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-11.1.10",
+   "title": "Upgrade History, Exception Management & Audit Explorer",
+   "module": "Ticket Upgrade, Exchange & Conversion",
+   "board": "1",
+   "match": "WEB-003",
+   "matchName": "Search Results",
+   "score": 0.084,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.1",
+   "title": "Virtual Ticket Command Center",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "EMP-036",
+   "matchName": "Issue media",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.2",
+   "title": "Virtual Ticket Identity & Master Record Configuration",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "POS-002",
+   "matchName": "Sell \u2014 Ticket Catalogue",
+   "score": 0.089,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.3",
+   "title": "Virtual Ticket Status & Lifecycle Model",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "GST-014",
+   "matchName": "Ticket Transfer",
+   "score": 0.127,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.4",
+   "title": "Media Type & Credential Technology Registry",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.104,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.5",
+   "title": "Multi-Media Binding & Association Rules",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.14,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.6",
+   "title": "Credential Identity, Token & Reference Mapping",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "BO-012",
+   "matchName": "Membership Products",
+   "score": 0.084,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.7",
+   "title": "Entitlement & Cross-Media Synchronization Rules",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "WEB-023",
+   "matchName": "Membership Management",
+   "score": 0.133,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.8",
+   "title": "Media Activation, Priority & Fallback Rules",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "POS-010",
+   "matchName": "Add to Existing Ticket",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.1.9",
+   "title": "Media Replacement, Revocation & Rebinding Rules",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "BO-027",
+   "matchName": "Reissue & Media Replacement",
+   "score": 0.183,
+   "verdict": "check first \u2014 close match"
+  },
+  {
+   "packId": "TIC-15.1.10",
+   "title": "Virtual Ticket Architecture Testing, Governance & Audit",
+   "module": "Ticket Media   Credential Management",
+   "board": "1",
+   "match": "BO-060",
+   "matchName": "Attendance & Footfall",
+   "score": 0.083,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.1",
+   "title": "Media Design Studio Command Center",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.125,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.2",
+   "title": "Digital QR & Barcode Ticket Designer",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "POS-019",
+   "matchName": "Shift Templates & Policies",
+   "score": 0.087,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.3",
+   "title": "PDF, Printable & POS Ticket Designer",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "KSK-010",
+   "matchName": "Print failure",
+   "score": 0.126,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.4",
+   "title": "Apple Wallet Pass Designer",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.134,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.5",
+   "title": "Google Wallet Pass Designer",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.6",
+   "title": "RFID, NFC, Card & Wristband Media Designer",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "EMP-069",
+   "matchName": "Barcode, RFID, Serialized Stock & Traceability",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.7",
+   "title": "Digital Card, Membership & Wearable Designer",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "EMP-069",
+   "matchName": "Barcode, RFID, Serialized Stock & Traceability",
+   "score": 0.091,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.8",
+   "title": "Dynamic Fields, Data Mapping & Content Builder",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "CMS-008",
+   "matchName": "Content Blocks",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.9",
+   "title": "Branding, Localization & Template Inheritance",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "EMP-045",
+   "matchName": "Arabic / RTL",
+   "score": 0.132,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.2.10",
+   "title": "Multi-Media Preview, Testing, Approval & Publication",
+   "module": "Ticket Media   Credential Management",
+   "board": "2",
+   "match": "BO-109",
+   "matchName": "Menu Builder & POS Layout Designer",
+   "score": 0.121,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.1",
+   "title": "Credential Operations Command Center",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.172,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "TIC-15.3.2",
+   "title": "Virtual Ticket & Credential 360\u00b0 Workspace",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.142,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.3",
+   "title": "Credential Generation & Issuance Monitor",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "GST-025",
+   "matchName": "F&B \u2013 Order Tracking",
+   "score": 0.089,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.4",
+   "title": "Credential Delivery & Distribution Operations",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.137,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.5",
+   "title": "Media Binding, Activation & Assignment Operations",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "POS-010",
+   "matchName": "Add to Existing Ticket",
+   "score": 0.141,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.6",
+   "title": "Credential Replacement, Reissue, Revocation & Recovery",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "BO-027",
+   "matchName": "Reissue & Media Replacement",
+   "score": 0.152,
+   "verdict": "check against the named screen"
+  },
+  {
+   "packId": "TIC-15.3.7",
+   "title": "Failed Generation, Delivery & Credential Exception Management",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "SUP-004",
+   "matchName": "Conversation Queue",
+   "score": 0.093,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.8",
+   "title": "Credential Usage & Cross-Media Traceability",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "BO-072",
+   "matchName": "Incident Log",
+   "score": 0.098,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.9",
+   "title": "Credential Security, Audit & Operational Evidence",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "BO-027",
+   "matchName": "Reissue & Media Replacement",
+   "score": 0.072,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "TIC-15.3.10",
+   "title": "Ticket Media Analytics & AI Operations Intelligence",
+   "module": "Ticket Media   Credential Management",
+   "board": "3",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.095,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.1",
+   "title": "Waiver & Consent Command Center",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "ADM-008",
+   "matchName": "Subscription & Plan Management",
+   "score": 0.117,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.2",
+   "title": "Waiver Template Library & Master Setup",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "ACC-006",
+   "matchName": "Reviewer Queue",
+   "score": 0.13,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.3",
+   "title": "Digital Waiver & Form Builder",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "GST-040",
+   "matchName": "Help & Support",
+   "score": 0.096,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.4",
+   "title": "Dynamic Fields, Questions & Conditional Logic",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.107,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.5",
+   "title": "Signatory, Signature & Guardian Rule Configuration",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "DEV-002",
+   "matchName": "Register & Organisation",
+   "score": 0.077,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.6",
+   "title": "Product, Event & Experience Association",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.15,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.7",
+   "title": "Waiver Trigger, Eligibility & Completion Rules",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.108,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.8",
+   "title": "Versioning, Effective Dates & Legal Change Control",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "BO-085",
+   "matchName": "Approval Request",
+   "score": 0.08,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.9",
+   "title": "Localization, Branding & Customer Experience Configuration",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "CMS-009",
+   "matchName": "Navigation & Menus",
+   "score": 0.145,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.1.10",
+   "title": "Waiver Approval, Testing & Publication Workspace",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "1",
+   "match": "GST-062",
+   "matchName": "Shop & Drop Collection",
+   "score": 0.074,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.1",
+   "title": "Waiver Operations Command Center",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "GST-007",
+   "matchName": "Select Date & Time",
+   "score": 0.103,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.2",
+   "title": "Participant Waiver Status & Tracking",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "ACC-004",
+   "matchName": "Application Status Tracking",
+   "score": 0.12,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.3",
+   "title": "Digital Signing & Collection Operations",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "GST-018",
+   "matchName": "Add to Calendar / Reminders",
+   "score": 0.094,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.4",
+   "title": "Minor, Guardian & Group Consent Management",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "WEB-020",
+   "matchName": "Profile & Preferences",
+   "score": 0.073,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.5",
+   "title": "Waiver Verification & Validation Workspace",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "GST-061",
+   "matchName": "Menu Item Detail",
+   "score": 0.065,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.6",
+   "title": "Missing, Expired & Invalid Waiver Management",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "GST-051",
+   "matchName": "Plan Your Adventure \u2013 Start",
+   "score": 0.086,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.7",
+   "title": "On-Site Waiver & Exception Handling",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "GST-008",
+   "matchName": "Tickets & Add-ons",
+   "score": 0.122,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.8",
+   "title": "Compliance Evidence, Audit & Waiver Repository",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "SUP-007",
+   "matchName": "Canned Response Management",
+   "score": 0.086,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.9",
+   "title": "Waiver Analytics, Compliance & Operational Insights",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "GST-023",
+   "matchName": "Virtual Queue",
+   "score": 0.113,
+   "verdict": "no near match"
+  },
+  {
+   "packId": "WAI-11.2.10",
+   "title": "AI Waiver Compliance & Risk Intelligence Center",
+   "module": "Waiver, Consent & Digital Form Management",
+   "board": "2",
+   "match": "GST-038",
+   "matchName": "Digital Companion Mode",
+   "score": 0.099,
+   "verdict": "no near match"
+  }
+ ]
+}

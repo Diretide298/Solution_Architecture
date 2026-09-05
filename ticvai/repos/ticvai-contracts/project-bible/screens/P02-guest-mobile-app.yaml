@@ -1,8 +1,3 @@
-# P02 — Guest Mobile App
-# Generated from handoff/page-inventory.md, then corrected against the client
-# hierarchy v2.1 and the contracts. Offline-capable: every screen declares an
-# offline state.
-
 platform:
   code: P02
   audience: guest
@@ -18,7 +13,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 63
+  screenCount: 71
   app: guest-app
   appStatus: scaffolded
   packages:
@@ -51,7 +46,7 @@ platform:
 screens:
 - id: GST-001
   name: Home – Default
-  module: TODO
+  module: Discovery & Browse
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 1
   layout:
@@ -63,8 +58,15 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      The screen this app sits on. Everything else is entered from here and returns to it.'
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -113,9 +115,10 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: marketing
+  statesDerived: true
 - id: GST-002
   name: Explore Categories
-  module: TODO
+  module: Discovery & Browse
   purpose: Find explore categories for this venue.
   wave: 1
   layout:
@@ -127,9 +130,22 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find explore categories for this venue.'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -160,9 +176,10 @@ screens:
     trigger: onLoad
   density: comfortable
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-003
-  name: Attractions List
-  module: TODO
+  name: Event & Attraction Listing
+  module: Discovery & Browse
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 1
   layout:
@@ -174,9 +191,22 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find the right one quickly, and act on it without opening it.'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -197,11 +227,15 @@ screens:
     - GST-002
     - GST-004
     fromFlows: true
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform
-    navigation removed 24 August**: BO-005. **A till does not navigate to a back office and a guest
-    app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
-    rather than a screen pretending there is a link.'
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
+    removed 24 August**: BO-005. **A till does not navigate to a back office and a guest app does not
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
+    than a screen pretending there is a link. **Renamed 31 August** from *Attractions List*. **A guest
+    surface is one product with two renderings** — a screen named differently on web and app is two screens
+    to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added listPerformances,
+    searchCatalogue. **A guest does not know which surface they are on** — the same named screen on web
+    and app now calls the same guest-callable operations.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -211,11 +245,27 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
+  - operationId: searchCatalogue
+    contract: catalogue
+    purpose: Find something by name
+    trigger: onLoad
   density: comfortable
   requiresModule: ticketing
+  statesDerived: true
+  entryState:
+    params:
+    - name: eventId
+      from: deepLink
+    coldEntry: '**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that
+      no longer resolves did nothing wrong; the screen says what happened and offers the list it came
+      from.'
 - id: GST-004
   name: Attraction Details
-  module: TODO
+  module: Discovery & Browse
   purpose: See attraction details for this venue.
   wave: 1
   layout:
@@ -227,8 +277,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      See attraction details for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -248,8 +309,10 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
+    31 August**: added listPerformances. **A guest does not know which surface they are on** — the same
+    named screen on web and app now calls the same guest-callable operations.'
   apis:
   - operationId: getProduct
     contract: catalogue
@@ -263,17 +326,24 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
+  - operationId: listPerformances
+    contract: catalogue
+    purpose: List performances of an event
+    trigger: onLoad
   density: comfortable
   entryState:
     params:
     - name: productId
       from: deepLink
-    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
-      successor exists, and the catalogue where none does.'
+    - name: eventId
+      from: deepLink
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
+      exists, and the catalogue where none does.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-005
   name: What's On
-  module: TODO
+  module: Discovery & Browse
   purpose: Find what's on for this venue.
   wave: 1
   layout:
@@ -285,14 +355,28 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find what''s on for this venue.'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
-    board: wireframes/P02 Guest App.dc.html#gst-005
+    status: designed
+    board: wireframes/Guest Mobile Board 1.dc.html#gm-1b
+    generatedFallback: wireframes/P02 Guest App.dc.html#gst-005
   capability: C84
   implementation:
     app: guest-app
@@ -307,8 +391,13 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Drawn 31 August**
+    — `Guest Mobile Board 1.dc.html` frame `gm-1b`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *What''s On* matched at 1.0. **A cross-platform title match
+    was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
+    goes wrong quietly.'
   apis:
   - operationId: listPerformances
     contract: catalogue
@@ -323,11 +412,18 @@ screens:
     params:
     - name: eventId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `eventId`.'
   requiresModule: ticketing
+  statesDerived: true
+  boardFrames:
+  - Guest Mobile Board 1.dc.html#gm-1b
 - id: GST-006
   name: Event / Exhibition Details
-  module: TODO
+  module: Discovery & Browse
   purpose: See event / exhibition details for this venue.
   wave: 1
   layout:
@@ -339,8 +435,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      See event / exhibition details for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -382,9 +489,10 @@ screens:
       event. **A shared product link after the product retired.** Shows what replaced it where a successor
       exists, and the catalogue where none does.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-007
   name: Select Date & Time
-  module: TODO
+  module: Booking & Selection
   purpose: See select date & time for this venue.
   wave: 1
   layout:
@@ -397,7 +505,13 @@ screens:
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -405,8 +519,8 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-007
   capability: C02
   openQuestions:
-  - Inventory cites `GET /performances, POST /leases` — no matching operation. Written before the contracts
-    existed.
+  - Inventory cites `GET /performances, POST /inventory-holds` — no matching operation. Written before
+    the contracts existed.
   implementation:
     app: guest-app
     route: /general/select-date-and-time
@@ -436,11 +550,16 @@ screens:
     params:
     - name: eventId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `eventId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-008
   name: Tickets & Add-ons
-  module: TODO
+  module: Booking & Selection
   purpose: Find tickets & add-ons for this venue.
   wave: 1
   layout:
@@ -453,7 +572,9 @@ screens:
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -487,13 +608,13 @@ screens:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-009
   name: Review & Payment
-  module: TODO
+  module: Cart & Checkout
   purpose: Check what you are buying and pay for it.
   wave: 1
   layout:
@@ -506,7 +627,13 @@ screens:
   states:
     loading: Order summary, then the payment methods this venue accepts
     emptyFirstRun: —
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not reach the gateway. The order is held, not lost** — and a payment whose outcome
       is unknown goes to `inquirePaymentStatus` rather than being retried, because retrying an unknown
       charge is how a guest is charged twice'
@@ -551,16 +678,16 @@ screens:
     - GST-002
     - GST-003
     fromFlows: true
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **`createPayment`
-    added 18 August** — the guest app''s payment screen did not declare the operation that takes a payment,
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **`createPayment` added
+    18 August** — the guest app''s payment screen did not declare the operation that takes a payment,
     and F11 routed food payment through the AI concierge instead. **Card only, so tender currency equals
-    base currency**; a foreign card is converted by the guest''s own issuer at their rate, which is
-    not ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens
-    it linked to moved out of the back office when the client board was adopted. **Cross-platform navigation
+    base currency**; a foreign card is converted by the guest''s own issuer at their rate, which is not
+    ours and is not recorded as ours. **Navigation repointed to P15 on 20 August** — the F&B screens it
+    linked to moved out of the back office when the client board was adopted. **Cross-platform navigation
     removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app does not
-    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
-    rather than a screen pretending there is a link.'
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
+    than a screen pretending there is a link.'
   density: comfortable
   entryState:
     params:
@@ -570,13 +697,13 @@ screens:
       from: deepLink
     - name: paymentId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-010
   name: Booking Confirmation
-  module: TODO
+  module: Cart & Checkout
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 1
   layout:
@@ -588,7 +715,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Confirm it worked, and give them what they need to prove it.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -604,6 +736,10 @@ screens:
     contract: orders
     purpose: Read an order
     trigger: onLoad
+  - operationId: reprintOrder
+    contract: orders
+    purpose: Reprint or resend tickets
+    trigger: onAction
   implementation:
     app: guest-app
     route: /general/booking-confirmation
@@ -617,23 +753,24 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **Wired 24
-    August from review**: getOrder. **The operations existed and this screen could not call them** —
-    reviewers reported them as missing APIs, which is what an unreachable operation looks like from
-    a wireframe.'
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Wired 24 August from
+    review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported
+    them as missing APIs, which is what an unreachable operation looks like from a wireframe. **Cross-surface
+    parity, 31 August**: added reprintOrder. **A guest does not know which surface they are on** — the
+    same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-011
   name: Wallet Overview
-  module: TODO
+  module: Membership, Loyalty & Value
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -646,8 +783,16 @@ screens:
   states:
     loading: Terminal or gateway state, shown plainly
     emptyFirstRun: —
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `retail` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -688,9 +833,10 @@ screens:
       from: GST-001
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: retail
+  statesDerived: true
 - id: GST-012
   name: My Tickets
-  module: TODO
+  module: Account & Self-Service
   purpose: Find my tickets for this venue.
   wave: 1
   layout:
@@ -703,7 +849,9 @@ screens:
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -738,10 +886,25 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+  - operationId: getEntitlementCredential
+    contract: access
+    purpose: The thing that gets scanned
+    trigger: onLoad
+  - operationId: getEntitlementHistory
+    contract: access
+    purpose: Every scan, freeze, share and reissue against it
+    trigger: onLoad
+  - operationId: listEntitlements
+    contract: access
+    purpose: Every entitlement this guest holds, including expired
+    trigger: onLoad
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. My Tickets. **Declared
     only `transferOrderTickets` until 20 August** — a guest could give a ticket away and could not read
-    one. Raised by Pranay. **Rewired on the 20 August review.**
+    one. Raised by Pranay. **Rewired on the 20 August review.** **Cross-surface parity, 31 August**: added
+    getEntitlementCredential, getEntitlementHistory, listEntitlements. **The same screen on web and app
+    was calling different operations** — one side could do something the other could not, and nothing
+    recorded the difference as deliberate.'
   density: comfortable
   entryState:
     params:
@@ -750,13 +913,14 @@ screens:
     - name: orderId
       from: deepLink
     coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
-      used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A
-      guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded
-      or the performance passed, says which and offers the order list rather than an error.'
+      used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A guest
+      opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or
+      the performance passed, says which and offers the order list rather than an error.'
   requiresModule: access
+  statesDerived: true
 - id: GST-013
   name: Ticket Details
-  module: TODO
+  module: Account & Self-Service
   purpose: Find ticket details for this venue.
   wave: 1
   layout:
@@ -819,13 +983,13 @@ screens:
     - name: orderId
       from: deepLink
     coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
-      used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A
-      guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded
-      or the performance passed, says which and offers the order list rather than an error.'
+      used, transferred — because *not found* to somebody holding a ticket is the wrong answer. **A guest
+      opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or
+      the performance passed, says which and offers the order list rather than an error.'
   requiresModule: access
 - id: GST-014
   name: Ticket Transfer
-  module: TODO
+  module: Ticketing
   purpose: Work with ticket transfer for this venue.
   wave: 2
   layout:
@@ -860,8 +1024,10 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
+    31 August**: added listOrders. **The same screen on web and app was calling different operations**
+    — one side could do something the other could not, and nothing recorded the difference as deliberate.'
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -871,6 +1037,10 @@ screens:
     contract: orders
     purpose: Claim transferred tickets
     trigger: onAction
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
+    trigger: onLoad
   density: comfortable
   entryState:
     params:
@@ -878,13 +1048,12 @@ screens:
       from: deepLink
     - name: transferId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
 - id: GST-015
   name: Memberships
-  module: TODO
+  module: Membership, Loyalty & Value
   purpose: Find memberships for this venue.
   wave: 2
   layout:
@@ -896,8 +1065,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find memberships for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -937,26 +1117,30 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: getGuestLink
-    contract: cross-cell
-    purpose: Read a guest link
+  - operationId: listGuestMemberships
+    contract: catalogue
+    purpose: A guest's memberships, benefits and history
     trigger: onLoad
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. Membership.
-    **`listDelegations` and `grantDelegation` are the member list and add-member** Pranay asked for
-    — CF-132 built them as delegated authority rather than a household table. **Rewired on the 20 August
-    review.** **`getGuestLink` restored** — F19 step 1 calls it from here and my rewire dropped it.
-    **A membership that works in another country resolves through the guest link**, and the flow checker
-    caught what the screen edit did not. **Cross-platform navigation removed 24 August**: ADM-003. **A
-    till does not navigate to a back office and a guest app does not navigate to either** — those are
-    device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending
-    there is a link. **Wired 24 August from review**: getSubscription, listSubscriptionInvoices. **The
-    operations existed and this screen could not call them** — reviewers reported them as missing APIs,
-    which is what an unreachable operation looks like from a wireframe. **`getSubscription` and `listSubscriptionInvoices`
-    removed the same day they were wired.** `check-screens` refused them: **both carry a staff permission
-    and this is a guest surface.** The reviewer asked for `GET /memberships/current` — a guest-scoped
-    read that does not exist. **That is the correct finding and the wiring was the wrong fix**: it is
-    a new operation, not a missing link.'
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. Membership. **`listDelegations`
+    and `grantDelegation` are the member list and add-member** Pranay asked for — CF-132 built them as
+    delegated authority rather than a household table. **Rewired on the 20 August review.** **`getGuestLink`
+    restored** — F19 step 1 calls it from here and my rewire dropped it. **A membership that works in
+    another country resolves through the guest link**, and the flow checker caught what the screen edit
+    did not. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate to a
+    back office and a guest app does not navigate to either** — those are device handovers, and a flow
+    declares them with `crossesDevice` rather than a screen pretending there is a link. **Wired 24 August
+    from review**: getSubscription, listSubscriptionInvoices. **The operations existed and this screen
+    could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
+    looks like from a wireframe. **`getSubscription` and `listSubscriptionInvoices` removed the same day
+    they were wired.** `check-screens` refused them: **both carry a staff permission and this is a guest
+    surface.** The reviewer asked for `GET /memberships/current` — a guest-scoped read that does not exist.
+    **That is the correct finding and the wiring was the wrong fix**: it is a new operation, not a missing
+    link. **`getGuestLink` is `service` audience** — a cross-region pseudonymous lookup (ADR-0010), not
+    something a membership screen calls. Removed 24 August. **`getMyMemberships` and `listGuestMemberships`
+    wired 24 August**, replacing `getGuestLink`. A guest reading their own membership calls a guest operation;
+    **`getGuestLink` is the cross-region pseudonymous lookup a service makes on their behalf** (ADR-0010),
+    and F19 was walking it from a guest screen.'
   density: comfortable
   entryState:
     params:
@@ -964,11 +1148,16 @@ screens:
       from: deepLink
     - name: subjectId
       from: GST-001
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `guestLinkId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-016
   name: My Reservations
-  module: TODO
+  module: Ticketing
   purpose: Find my reservations for this venue.
   wave: 2
   layout:
@@ -980,8 +1169,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find my reservations for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1021,11 +1221,16 @@ screens:
     params:
     - name: reservationId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `reservationId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-017
   name: Reservation Details
-  module: TODO
+  module: Ticketing
   purpose: See reservation details for this venue.
   wave: 2
   layout:
@@ -1037,8 +1242,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      See reservation details for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1074,11 +1290,16 @@ screens:
     params:
     - name: reservationId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `reservationId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-018
   name: Add to Calendar / Reminders
-  module: TODO
+  module: Account & Self-Service
   purpose: Find add to calendar / reminders for this venue.
   wave: 3
   layout:
@@ -1090,8 +1311,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `issueWalletPass`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Find add to calendar / reminders for
+      this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1135,13 +1367,13 @@ screens:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-019
-  name: Order History (Wallet)
-  module: TODO
+  name: Order History
+  module: Account & Self-Service
   purpose: Find order history (wallet) for this venue.
   wave: 2
   layout:
@@ -1154,7 +1386,9 @@ screens:
   states:
     loading: Terminal or gateway state, shown plainly
     emptyFirstRun: —
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
     error: '**Declined reads differently from unresolved.** An unresolved payment inquires rather than
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -1175,6 +1409,10 @@ screens:
     contract: orders
     purpose: The orders this guest placed
     trigger: onLoad
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
     app: guest-app
     route: /general/order-history-wallet
@@ -1188,24 +1426,28 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. Order History. **`transferOrderTickets`
     was the only declared operation**, which is not history. Raised by Pranay. **Rewired on the 20 August
     review.** **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this
     guest screen — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**,
-    or a guest is one parameter away from somebody else’s.
+    or a guest is one parameter away from somebody else’s. **Renamed 31 August** from *Order History (Wallet)*.
+    **A guest surface is one product with two renderings** — a screen named differently on web and app
+    is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added
+    transferOrderTickets. **A guest does not know which surface they are on** — the same named screen
+    on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-020
   name: Saved Items / Wishlist
-  module: TODO
+  module: Account & Self-Service
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -1217,8 +1459,15 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `addToWishlist`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Find the right one quickly, and act
+      on it without opening it.'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1254,10 +1503,9 @@ screens:
     purpose: Remove a saved item
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device
-    and consent operations removed 20 August** — Pranay asked why they were here, and the answer is
-    that seven operations were attached in bulk to three unrelated screens. **Rewired on the 20 August
-    review.**
+    from the screen name and its operations on 17 August, not from a requirement. Wishlist. **Device and
+    consent operations removed 20 August** — Pranay asked why they were here, and the answer is that seven
+    operations were attached in bulk to three unrelated screens. **Rewired on the 20 August review.**
   density: comfortable
   entryState:
     params:
@@ -1265,11 +1513,16 @@ screens:
       from: deepLink
     - name: subjectId
       from: GST-001
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `itemId`.'
   requiresModule: marketing
+  statesDerived: true
 - id: GST-021
   name: Interactive Map
-  module: TODO
+  module: In-venue Services
   purpose: See where things are in relation to each other.
   wave: 2
   layout:
@@ -1278,17 +1531,42 @@ screens:
     - name: contentBody
       components:
       - kind: scanTarget
+      - kind: dataTable
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: detailPanel
+        derived: true
+        impliedBy: getVenueMap
+        notes: One record, read-only.
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      See where things are in relation to each other.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `seating` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: '**The cached map and graph.** Live wait times are absent and routing still works — which
       is the right way round, because a guest with no signal in the middle of a park needs directions
       more than they need a queue length.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
-    board: wireframes/P02 Guest App.dc.html#gst-021
+    status: designed
+    board: wireframes/Seat Board 4.dc.html#seat-4b
+    generatedFallback: wireframes/P02 Guest App.dc.html#gst-021
   capability: C39
   openQuestions:
   - Inventory cites `GET /venue-map` — no matching operation. Written before the contracts existed.
@@ -1305,14 +1583,17 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **Wired to
-    the venue map 18 August (CF-123).** The whole map arrives in one call and the client filters locally
-    — which is also what makes it work with no signal in the middle of a park. **Routing happens on
-    the device.** The platform guarantees the graph — connected, versioned, with step-free marked —
-    and the client walks it, because a phone with the graph cached routes with no signal and a server
-    round-trip per step does not. **The version is how a stale route is caught**: a guest holding a
-    route across a path that closed this morning gets told, rather than walking into a barrier.'
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Wired to the venue
+    map 18 August (CF-123).** The whole map arrives in one call and the client filters locally — which
+    is also what makes it work with no signal in the middle of a park. **Routing happens on the device.**
+    The platform guarantees the graph — connected, versioned, with step-free marked — and the client walks
+    it, because a phone with the graph cached routes with no signal and a server round-trip per step does
+    not. **The version is how a stale route is caught**: a guest holding a route across a path that closed
+    this morning gets told, rather than walking into a barrier. **Drawn 26 August** — `Seat Board 4.dc.html`
+    frame `seat-4b`. **The frame names this screen on its own face**, which is the first pack to do that:
+    the earlier F&B, POS and Retail boards had to be hand-assigned by purpose after three derivation attempts
+    produced nonsense. **A board that says what it draws removes the guess entirely.**'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -1335,11 +1616,18 @@ screens:
     params:
     - name: mapId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `mapId`.'
   requiresModule: seating
+  statesDerived: true
+  boardFrames:
+  - Seat Board 4.dc.html#seat-4b
 - id: GST-022
   name: Attraction Wait Times
-  module: TODO
+  module: In-venue Services
   purpose: See attraction wait times for this venue.
   wave: 2
   layout:
@@ -1351,7 +1639,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      See attraction wait times for this venue.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1385,9 +1678,10 @@ screens:
     with the queue platform F21 runs on.
   density: comfortable
   requiresModule: queue
+  statesDerived: true
 - id: GST-023
-  name: Virtual Queue / Join Queue
-  module: TODO
+  name: Virtual Queue
+  module: In-venue Services
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 3
   layout:
@@ -1399,7 +1693,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `joinQueue`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Find the right one quickly, and act
+      on it without opening it.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1411,7 +1710,7 @@ screens:
     contract: queue
     purpose: from page inventory
     trigger: onLoad
-  - operationId: getQueueEntry
+  - operationId: getWaitingGuest
     contract: queue
     purpose: Read a queue entry
     trigger: onLoad
@@ -1419,6 +1718,10 @@ screens:
     contract: queue
     purpose: Leave a queue
     trigger: onAction
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
   implementation:
     app: guest-app
     route: /general/virtual-queue-join-queue
@@ -1432,18 +1735,27 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Renamed 31 August**
+    from *Virtual Queue / Join Queue*. **A guest surface is one product with two renderings** — a screen
+    named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface
+    parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the
+    same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
     - name: entryId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `entryId`.'
   requiresModule: queue
+  statesDerived: true
 - id: GST-024
   name: F&B – Browse & Order
-  module: TODO
+  module: In-venue Services
   purpose: Order food to where the guest is sitting, or for collection.
   wave: 2
   layout:
@@ -1456,7 +1768,9 @@ screens:
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1488,9 +1802,19 @@ screens:
     contract: fnb
     purpose: Where an order can be delivered
     trigger: onLoad
-  notes: The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
-    or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen
-    pattern on 17 August, not individually considered.
+  - operationId: claimTableSession
+    contract: fnb
+    purpose: Identify which table a guest is sitting at
+    trigger: onAction
+  - operationId: listModifierGroups
+    contract: fnb
+    purpose: List modifier groups
+    trigger: onLoad
+  notes: 'The inventory cited `GET /menu`, which never existed. Now getGuestMenu. Ordering to a cabana
+    or a seat uses the same claimLocationSession as a table (4.6.26). States derived from the screen pattern
+    on 17 August, not individually considered. **Cross-surface parity, 31 August**: added claimTableSession,
+    listModifierGroups. **The same screen on web and app was calling different operations** — one side
+    could do something the other could not, and nothing recorded the difference as deliberate.'
   implementation:
     app: guest-app
     route: /general/fandb-browse-and-order
@@ -1515,13 +1839,13 @@ screens:
       from: deepLink
     - name: venueId
       from: session
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: fnb
+  statesDerived: true
 - id: GST-025
   name: F&B – Order Tracking
-  module: TODO
+  module: In-venue Services
   purpose: Track an order to the point it reaches the guest.
   wave: 2
   layout:
@@ -1558,8 +1882,8 @@ screens:
     the screen pattern on 17 August, not individually considered. **Navigation repointed to P15 on 20
     August** — the F&B screens it linked to moved out of the back office when the client board was adopted.
     **Cross-platform navigation removed 24 August**: BO-021. **A till does not navigate to a back office
-    and a guest app does not navigate to either** — those are device handovers, and a flow declares
-    them with `crossesDevice` rather than a screen pretending there is a link.'
+    and a guest app does not navigate to either** — those are device handovers, and a flow declares them
+    with `crossesDevice` rather than a screen pretending there is a link.'
   implementation:
     app: guest-app
     route: /general/fandb-order-tracking
@@ -1581,13 +1905,12 @@ screens:
       from: deepLink
     - name: sessionId
       from: session
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: fnb
 - id: GST-026
   name: Retail / Merchandise
-  module: TODO
+  module: Retail
   purpose: Find retail / merchandise for this venue.
   wave: 2
   layout:
@@ -1599,8 +1922,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find retail / merchandise for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `games` is not licensed.** The tenant has not bought this module, which is a
+      commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1633,21 +1967,26 @@ screens:
     contract: retail
     purpose: List merchandise
     trigger: onLoad
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform
-    navigation removed 24 August**: BO-048, BO-069. **A till does not navigate to a back office and
-    a guest app does not navigate to either** — those are device handovers, and a flow declares them
-    with `crossesDevice` rather than a screen pretending there is a link.'
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
+    removed 24 August**: BO-048, BO-069. **A till does not navigate to a back office and a guest app does
+    not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
+    rather than a screen pretending there is a link.'
   density: comfortable
   entryState:
     params:
     - name: cardCode
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `cardCode`.'
   requiresModule: games
+  statesDerived: true
 - id: GST-027
   name: Parking – Reserve & Pay
-  module: TODO
+  module: In-venue Services
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 3
   layout:
@@ -1683,8 +2022,14 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement`
+    is declared `service` audience and this is a guest screen.** Either the guest calls it — in which
+    case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act
+    it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already
+    `guest`, which makes the asymmetry look like an omission rather than a design. **Cross-surface parity,
+    31 August**: added listParkingFacilities. **The same screen on web and app was calling different operations**
+    — one side could do something the other could not, and nothing recorded the difference as deliberate.'
   apis:
   - operationId: createParkingEntitlement
     contract: access
@@ -1694,6 +2039,10 @@ screens:
     contract: access
     purpose: Change the plate, or revoke
     trigger: onAction
+  - operationId: listParkingFacilities
+    contract: access
+    purpose: Car parks at a venue, and how each integrates
+    trigger: onLoad
   density: comfortable
   entryState:
     params:
@@ -1704,7 +2053,7 @@ screens:
   requiresModule: access
 - id: GST-028
   name: Parking – Reservation Confirmed
-  module: TODO
+  module: In-venue Services
   purpose: Confirm it worked, and give them what they need to prove it.
   wave: 3
   layout:
@@ -1716,8 +2065,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `createParkingEntitlement`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Confirm it worked, and give them what
+      they need to prove it.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1740,8 +2100,12 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **`createParkingEntitlement`
+    is declared `service` audience and this is a guest screen.** Either the guest calls it — in which
+    case the audience is wrong — or a guest-scoped operation is missing and the screen is drawing an act
+    it cannot perform. **Recorded 24 August rather than guessed**: `updateParkingEntitlement` is already
+    `guest`, which makes the asymmetry look like an omission rather than a design.'
   apis:
   - operationId: createParkingEntitlement
     contract: access
@@ -1753,9 +2117,10 @@ screens:
     trigger: onLoad
   density: comfortable
   requiresModule: access
+  statesDerived: true
 - id: GST-029
   name: Venue Info & Services
-  module: TODO
+  module: In-venue Services
   purpose: See venue info & services for this venue.
   wave: 2
   layout:
@@ -1767,7 +2132,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      See venue info & services for this venue.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1807,9 +2177,10 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: fnb
+  statesDerived: true
 - id: GST-030
   name: In-Venue Notifications
-  module: TODO
+  module: Engagement & Support
   purpose: Work with in-venue notifications for this venue.
   wave: 2
   layout:
@@ -1821,7 +2192,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Work with in-venue notifications for this venue.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1854,9 +2230,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
   requiresModule: fnb
+  statesDerived: true
 - id: GST-031
   name: AI Concierge – Home
-  module: TODO
+  module: Engagement & Support
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 2
   layout:
@@ -1868,9 +2245,22 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      The screen this app sits on. Everything else is entered from here and returns to it.'
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `fnb` is not licensed.** The tenant has not bought this module, which is a commercial
+      answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1903,10 +2293,24 @@ screens:
     contract: ai
     purpose: Ask
     trigger: onAction
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
-    confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
-    Still degrades to the manual planner rather than to an error.
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Open a conversation
+    trigger: onAction
+  - operationId: handoverToAgent
+    contract: marketing-crm
+    purpose: Pass an assistant conversation to a person
+    trigger: onAction
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: requestSuggestion
+    trigger: onAction
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
+    in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
+    Still degrades to the manual planner rather than to an error. **Cross-surface parity, 31 August**:
+    added createAiConversation, handoverToAgent, requestSuggestion. **A guest does not know which surface
+    they are on** — the same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   entryState:
     params:
@@ -1917,9 +2321,10 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
   requiresModule: fnb
+  statesDerived: true
 - id: GST-032
   name: AI Concierge – Chat
-  module: TODO
+  module: Engagement & Support
   purpose: Add ai concierge – chat for this venue.
   wave: 2
   layout:
@@ -1931,8 +2336,18 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `addCartLine`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Add ai concierge – chat for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -1990,8 +2405,8 @@ screens:
     purpose: Pass an assistant conversation to a person
     trigger: onAction
   notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
-    confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
+    from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
+    in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error.
   density: comfortable
   entryState:
@@ -2004,12 +2419,13 @@ screens:
       from: deepLink
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom. **A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.
+      if it was refunded or the performance passed, says which and offers the order list rather than an
+      error.
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-033
   name: AI Concierge – Contextual Help
-  module: TODO
+  module: Engagement & Support
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -2021,8 +2437,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Answer a question without needing a person.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ai` is not licensed.** The tenant has not bought this module, which is a commercial
+      answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2045,15 +2472,15 @@ screens:
     - GST-002
     - GST-003
     fromFlows: true
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **Guest concierge
-    confirmed in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Guest concierge confirmed
+    in Phase 1 on 17 August (CF-14), charged per token and bounded by `AiPolicy.guestCapabilityScope`.**
     Still degrades to the manual planner rather than to an error. **createPayment removed 18 August**
     — attached by module resemblance, not by what this screen does. A screen that does not handle money
     should not be able to move it (CF-87''s class). **Navigation repointed to P15 on 20 August** — the
     F&B screens it linked to moved out of the back office when the client board was adopted. **Cross-platform
-    navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest
-    app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
+    navigation removed 24 August**: BO-020. **A till does not navigate to a back office and a guest app
+    does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
     rather than a screen pretending there is a link.'
   apis:
   - operationId: sendAiMessage
@@ -2068,9 +2495,10 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
   requiresModule: ai
+  statesDerived: true
 - id: GST-034
   name: Lost & Found
-  module: TODO
+  module: Support
   purpose: See lost & found for this venue.
   wave: 2
   layout:
@@ -2082,7 +2510,11 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `raiseMyCase`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** See lost & found for this venue.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2090,8 +2522,7 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-034
   capability: C18
   openQuestions:
-  - Inventory cites `POST /lost-found/reports` — no matching operation. Written before the contracts
-    existed.
+  - Inventory cites `POST /lost-found/reports` — no matching operation. Written before the contracts existed.
   implementation:
     app: guest-app
     route: /general/lost-and-found
@@ -2119,19 +2550,19 @@ screens:
     contract: marketing-crm
     purpose: Reply on a case the guest raised
     trigger: onAction
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **Navigation
-    repointed to P15 on 20 August** — the F&B screens it linked to moved out of the back office when
-    the client board was adopted. **Cross-platform navigation removed 24 August**: BO-021. **A till
-    does not navigate to a back office and a guest app does not navigate to either** — those are device
-    handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there is
-    a link. **Rebuilt 24 August.** This screen declared exactly one operation — `getGuestOrderStatus`
-    — **order tracking on a lost-property screen.** A guest reporting a lost bag could not raise anything.
-    **Lost and found is a case**, the same object as a complaint and a query, which is what lets one
-    queue serve all three. **Guest case operations wired 24 August.** **No case operation was guest-callable**
-    — a guest could raise nothing and read nothing, and `check-screens` refused the staff-permissioned
-    ones on a guest surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller
-    rather than filtered by a subject parameter.'
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Navigation repointed
+    to P15 on 20 August** — the F&B screens it linked to moved out of the back office when the client
+    board was adopted. **Cross-platform navigation removed 24 August**: BO-021. **A till does not navigate
+    to a back office and a guest app does not navigate to either** — those are device handovers, and a
+    flow declares them with `crossesDevice` rather than a screen pretending there is a link. **Rebuilt
+    24 August.** This screen declared exactly one operation — `getGuestOrderStatus` — **order tracking
+    on a lost-property screen.** A guest reporting a lost bag could not raise anything. **Lost and found
+    is a case**, the same object as a complaint and a query, which is what lets one queue serve all three.
+    **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could
+    raise nothing and read nothing, and `check-screens` refused the staff-permissioned ones on a guest
+    surface. `listMyCases`, `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered
+    by a subject parameter.'
   density: comfortable
   entryState:
     params:
@@ -2140,14 +2571,15 @@ screens:
     - name: caseId
       from: deepLink
       optional: true
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error. A case opened from a notification or the list. **Optional** — the ordinary way in is
-      to raise a new one, not to open an old one.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.
+      A case opened from a notification or the list. **Optional** — the ordinary way in is to raise a
+      new one, not to open an old one.'
   requiresModule: fnb
+  statesDerived: true
 - id: GST-035
   name: Feedback & Ratings
-  module: TODO
+  module: Engagement & Support
   purpose: Work with feedback & ratings for this venue.
   wave: 3
   layout:
@@ -2159,8 +2591,15 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `raiseMyCase`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Work with feedback & ratings for this
+      venue.'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2196,9 +2635,10 @@ screens:
     `raiseMyCase` and `replyToMyCase` are scoped to the caller rather than filtered by a subject parameter.
   density: comfortable
   requiresModule: marketing
+  statesDerived: true
 - id: GST-036
   name: Loyalty & Rewards
-  module: TODO
+  module: Membership, Loyalty & Value
   purpose: Your points, your tier, and what is within reach.
   wave: 2
   layout:
@@ -2211,7 +2651,13 @@ screens:
   states:
     loading: Balance and tier
     emptyFirstRun: Not enrolled — explains what joining gives you rather than showing zero
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. **Redeeming is blocked** rather than attempted against an unknown balance
     offline: Last known balance with its age. **Points earned since are not shown**, and that is said
   wireframe:
@@ -2233,9 +2679,12 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing
-    this screen existed** — same two operations, same capability, and the fuzzy match against the client
-    storyboard is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two.
+  notes: 'Merged with GST-064 on 18 August. **I created GST-064 in the parity sweep without noticing this
+    screen existed** — same two operations, same capability, and the fuzzy match against the client storyboard
+    is what surfaced it. Board 6 panel 6 shows one Loyalty & Rewards screen, not two. **Cross-surface
+    parity, 31 August**: added evaluatePromotions, listPromotions. **The same screen on web and app was
+    calling different operations** — one side could do something the other could not, and nothing recorded
+    the difference as deliberate.'
   apis:
   - operationId: getLoyaltyPosition
     contract: marketing-crm
@@ -2245,11 +2694,20 @@ screens:
     contract: marketing-crm
     purpose: List loyalty programmes
     trigger: onLoad
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  - operationId: listPromotions
+    contract: promotions
+    purpose: List promotions
+    trigger: onLoad
   density: comfortable
   requiresModule: marketing
+  statesDerived: true
 - id: GST-037
   name: Offers & Promotions
-  module: TODO
+  module: Promotions
   purpose: Find offers & promotions for this venue.
   wave: 2
   layout:
@@ -2261,8 +2719,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find offers & promotions for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2304,11 +2773,16 @@ screens:
     params:
     - name: promotionId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `promotionId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-038
   name: Digital Companion Mode
-  module: TODO
+  module: In-venue Services
   purpose: 'The in-venue home: your tickets, the map, and what is near you.'
   wave: 3
   layout:
@@ -2320,8 +2794,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      The in-venue home: your tickets, the map, and what is near you.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `queue` is not licensed.** The tenant has not bought this module, which is a
+      commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2360,9 +2845,10 @@ screens:
   provenance: none — see CF-92
   density: comfortable
   requiresModule: queue
+  statesDerived: true
 - id: GST-039
   name: Profile
-  module: TODO
+  module: Account & Self-Service
   purpose: What we hold about a guest, and what they can change.
   wave: 1
   layout:
@@ -2374,8 +2860,15 @@ screens:
       - kind: cardList
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `recordConsent`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** What we hold about a guest, and what
+      they can change.'
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2411,9 +2904,10 @@ screens:
       from: GST-001
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: marketing
+  statesDerived: true
 - id: GST-040
   name: Help & Support
-  module: TODO
+  module: Engagement & Support
   purpose: Answer a question without needing a person.
   wave: 2
   layout:
@@ -2425,8 +2919,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `raiseMyCase`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Answer a question without needing a
+      person.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2481,11 +2986,12 @@ screens:
     - name: caseId
       from: deepLink
       optional: true
-    coldEntry: A case opened from a notification or the list. **Optional** — the ordinary way in is
-      to raise a new one, not to open an old one.
+    coldEntry: A case opened from a notification or the list. **Optional** — the ordinary way in is to
+      raise a new one, not to open an old one.
+  statesDerived: true
 - id: GST-041
   name: Checkout Entry
-  module: TODO
+  module: Cart & Checkout
   purpose: Take the money, and be unambiguous about whether it worked.
   wave: 1
   layout:
@@ -2540,7 +3046,7 @@ screens:
   requiresModule: ticketing
 - id: GST-042
   name: Simple Registration & OTP
-  module: TODO
+  module: Account & Self-Service
   purpose: Work with simple registration & otp for this venue.
   wave: 1
   layout:
@@ -2552,7 +3058,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `enrolMfaMethod`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Work with simple registration & otp
+      for this venue.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2572,10 +3083,6 @@ screens:
     contract: identity
     purpose: Enrol an MFA method
     trigger: onAction
-  - operationId: getCurrentSession
-    contract: identity
-    purpose: Current session and effective permissions
-    trigger: onLoad
   - operationId: getGuestSession
     contract: identity
     purpose: Read the current guest session
@@ -2608,10 +3115,6 @@ screens:
     contract: identity
     purpose: Authenticate and open a session
     trigger: onAction
-  - operationId: logout
-    contract: identity
-    purpose: Close the current session
-    trigger: onAction
   - operationId: refreshToken
     contract: identity
     purpose: Rotate the access token
@@ -2623,10 +3126,6 @@ screens:
   - operationId: removeMfaMethod
     contract: identity
     purpose: Remove an MFA method
-    trigger: onAction
-  - operationId: selectRole
-    contract: identity
-    purpose: Choose a role for a multi-role session
     trigger: onAction
   - operationId: startSsoAuthorization
     contract: identity
@@ -2657,8 +3156,12 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Corrected 24 August**:
+    removed getCurrentSession, logout, selectRole. **A guest surface has no roles to select and its own
+    logout.** `selectRole` is ADR-0002 staff authorisation; `getCurrentSession` is the staff session.
+    `guestLogout` and `getGuestSession` already existed — the screen was reaching into the staff identity
+    surface because nothing checked that a guest platform only calls guest operations.'
   density: comfortable
   entryState:
     params:
@@ -2668,13 +3171,18 @@ screens:
       from: deepLink
     - name: providerId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `challengeId`, `methodId`, `providerId`.'
   requiresModule: core
+  statesDerived: true
 - id: GST-043
   name: Arabic / RTL Experience
-  module: TODO
-  purpose: Arabic / RTL Experience — the screen a person opens when they need to deal with arabic /
-    rtl experience.
+  module: System States
+  purpose: Arabic / RTL Experience — the screen a person opens when they need to deal with arabic / rtl
+    experience.
   wave: 1
   layout:
     template: detail
@@ -2685,7 +3193,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Arabic / RTL Experience — the screen a person opens when they need to deal with arabic / rtl experience.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2711,9 +3224,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
   density: comfortable
   requiresModule: core
+  statesDerived: true
 - id: GST-044
   name: Multi-Currency & Pricing
-  module: TODO
+  module: Ticketing
   purpose: See prices in your own currency, in the app, before and during the visit.
   wave: 2
   layout:
@@ -2725,13 +3239,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Rates and prices, with the base currency shown first
-    emptyFirstRun: One currency configured at this venue — the selector is hidden rather than shown
-      with a single option
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: One currency configured at this venue — the selector is hidden rather than shown with
+      a single option
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
       rate is worse than no rate, because a guest who budgets against it arrives short
-    offline: '**Last known rates, with their age shown.** A rate is a number a guest may act on, and
-      an undated one they cannot judge'
+    offline: '**Last known rates, with their age shown.** A rate is a number a guest may act on, and an
+      undated one they cannot judge'
   wireframe:
     status: generated
     board: wireframes/P02 Guest App.dc.html#gst-044
@@ -2753,13 +3273,13 @@ screens:
     - GST-003
   notes: 'Drawn in guest storyboard board 7 panel 4 — a selector across AED, USD, EUR, GBP and SAR with
     *"payment will be processed in AED"* — and board 8 carries an AED selector in its header. **Confirmed
-    for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the
-    storyboard draws the app; both are client documents and the answer is both, which is what CF-93
-    concluded for every other guest capability. **Display only — the sale settles in base currency**
-    (CF-37), and that is stated on the screen rather than in a footnote. **`getRegionSettings` deliberately
-    not called** — a guest does not need the venue''s scope configuration to pick a currency. `listFxRates`
-    is the currency list: a rate exists only for a currency the venue enabled, so the two questions
-    have one answer.'
+    for both surfaces on 18 August (CF-111).** The matrix names the website (2.6.33, 2.9.1) and the storyboard
+    draws the app; both are client documents and the answer is both, which is what CF-93 concluded for
+    every other guest capability. **Display only — the sale settles in base currency** (CF-37), and that
+    is stated on the screen rather than in a footnote. **`getRegionSettings` deliberately not called**
+    — a guest does not need the venue''s scope configuration to pick a currency. `listFxRates` is the
+    currency list: a rate exists only for a currency the venue enabled, so the two questions have one
+    answer.'
   apis:
   - operationId: listFxRates
     contract: finance
@@ -2771,9 +3291,10 @@ screens:
     trigger: onLoad
   density: comfortable
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-045
   name: Ticket Delivery & Sharing
-  module: TODO
+  module: Account & Self-Service
   purpose: Find ticket delivery & sharing for this venue.
   wave: 2
   layout:
@@ -2793,8 +3314,7 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-045
   capability: C02
   openQuestions:
-  - Inventory cites `POST /tickets/{id}/share` — no matching operation. Written before the contracts
-    existed.
+  - Inventory cites `POST /tickets/{id}/share` — no matching operation. Written before the contracts existed.
   implementation:
     app: guest-app
     route: /general/ticket-delivery-and-sharing
@@ -2820,13 +3340,12 @@ screens:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
 - id: GST-046
   name: Branded Queue / Waiting Room
-  module: TODO
+  module: High-Demand Access
   purpose: Find branded queue / waiting room for this venue.
   wave: 1
   layout:
@@ -2838,7 +3357,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find branded queue / waiting room for this venue.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2865,13 +3389,31 @@ screens:
     contract: queue
     purpose: Wait times across a venue
     trigger: onLoad
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  - operationId: getWaitingGuest
+    contract: queue
+    purpose: Read a queue entry
+    trigger: onLoad
+  - operationId: joinQueue
+    contract: queue
+    purpose: Join a virtual queue
+    trigger: onAction
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-surface parity,
+    31 August**: added getWaitingGuest, joinQueue. **A guest does not know which surface they are on**
+    — the same named screen on web and app now calls the same guest-callable operations.'
   density: comfortable
   requiresModule: queue
+  statesDerived: true
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    coldEntry: '**Named, expired or withdrawn — never a 404** (ADR-0030). A guest holding a link that
+      no longer resolves did nothing wrong; the screen says what happened and offers the list it came
+      from.'
 - id: GST-047
   name: Maintenance / Upgrade Page
-  module: TODO
+  module: System States
   purpose: Say what is wrong in a way that tells the person whether to wait or leave.
   wave: 1
   layout:
@@ -2883,7 +3425,12 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Say what is wrong in a way that tells the person whether to wait or leave.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2908,14 +3455,15 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel
-    7 and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not
-    two screens. Both had the same single operation and the same purpose.
+  notes: Merged with GST-060 on 18 August. The client storyboard shows this on two boards — G7 panel 7
+    and G8 panel 10 — which is a **board convention for a screen every journey can land on**, not two
+    screens. Both had the same single operation and the same purpose.
   density: comfortable
   requiresModule: core
+  statesDerived: true
 - id: GST-048
   name: Upsell / Cross-Sell
-  module: TODO
+  module: Booking & Selection
   purpose: See upsell / cross-sell for this venue.
   wave: 2
   layout:
@@ -2927,8 +3475,18 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `addCartLine`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** See upsell / cross-sell for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -2968,9 +3526,10 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-049
   name: Interactive Seat Selection
-  module: TODO
+  module: Booking & Selection
   purpose: See interactive seat selection for this venue.
   wave: 2
   layout:
@@ -2979,15 +3538,36 @@ screens:
     - name: contentBody
       components:
       - kind: scanTarget
+      - kind: detailPanel
+        derived: true
+        impliedBy: getSeatAvailability
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: createSeatHold
+        label: Create seat hold
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createSeatHold
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `seating` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
-    board: wireframes/P02 Guest App.dc.html#gst-049
+    status: designed
+    board: wireframes/Seat Board 4.dc.html#seat-4a
+    generatedFallback: wireframes/P02 Guest App.dc.html#gst-049
   capability: C53
   implementation:
     app: guest-app
@@ -3002,8 +3582,12 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
+    — `Seat Board 4.dc.html` frame `seat-4a`. **The frame names this screen on its own face**, which is
+    the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose
+    after three derivation attempts produced nonsense. **A board that says what it draws removes the guess
+    entirely.**'
   apis:
   - operationId: getSeatAvailability
     contract: seating
@@ -3025,9 +3609,12 @@ screens:
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   requiresModule: seating
+  statesDerived: true
+  boardFrames:
+  - Seat Board 4.dc.html#seat-4a
 - id: GST-050
   name: Resource Booking – Cabana
-  module: TODO
+  module: Booking & Selection
   purpose: Book a cabana or other capacity-based resource.
   wave: 3
   layout:
@@ -3039,8 +3626,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `addCartLine`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Book a cabana or other capacity-based
+      resource.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3048,8 +3646,7 @@ screens:
     board: wireframes/P02 Guest App.dc.html#gst-050
   capability: C78
   openQuestions:
-  - Inventory cites `POST /resource-bookings` — no matching operation. Written before the contracts
-    existed.
+  - Inventory cites `POST /resource-bookings` — no matching operation. Written before the contracts existed.
   implementation:
     app: guest-app
     route: /general/resource-booking-cabana
@@ -3063,10 +3660,9 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: 'Minuted 10 Aug §4.8: *"resource bookings (e.g., cabana rental) decrement a capacity-based
-    inventory on booking"*. **Distinct from GST-058**: this is one resource with a price and a booking
-    action; GST-058 is availability across areas. Confirmed against storyboard boards 7.10 and 8.8 on
-    18 August.'
+  notes: 'Minuted 10 Aug §4.8: *"resource bookings (e.g., cabana rental) decrement a capacity-based inventory
+    on booking"*. **Distinct from GST-058**: this is one resource with a price and a booking action; GST-058
+    is availability across areas. Confirmed against storyboard boards 7.10 and 8.8 on 18 August.'
   apis:
   - operationId: addCartLine
     contract: orders
@@ -3088,9 +3684,10 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-051
   name: Plan Your Adventure – Start
-  module: TODO
+  module: Engagement & Support
   purpose: Start a plan for the visit — which attractions, in what order — before arriving.
   wave: 3
   layout:
@@ -3102,8 +3699,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Start a plan for the visit — which attractions, in what order — before arriving.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `queue` is not licensed.** The tenant has not bought this module, which is a
+      commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3125,8 +3733,8 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a
-    personal visit profile.
+  notes: Minuted 10 Aug §4.9. Benchmarked against Skidata. Tied to a ticket purchase and saved as a personal
+    visit profile.
   apis:
   - operationId: getWaitTimes
     contract: queue
@@ -3139,9 +3747,10 @@ screens:
   provenance: MoM 10 August 2026 §4.9
   density: comfortable
   requiresModule: queue
+  statesDerived: true
 - id: GST-052
   name: Suggested Itineraries
-  module: TODO
+  module: Engagement & Support
   purpose: Curated plans a guest can take rather than build.
   wave: 3
   layout:
@@ -3153,8 +3762,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Curated plans a guest can take rather than build.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ai` is not licensed.** The tenant has not bought this module, which is a commercial
+      answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3180,10 +3800,10 @@ screens:
   notes: 'Minuted 10 Aug §4.9. ** wired 24 August.** The board drew four bespoke AI endpoints for itinerary
     planning; **one operation with a kind answers all of them** (ADR-0028), and recording the outcome
     is what lets a model replace the heuristic later. **`recordSuggestionOutcome` removed from the guest
-    surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the
-    platform observes what they did.** A guest app that self-reports whether it took the advice is a
-    training label the guest could forge, and the observation belongs server-side where the plan and
-    the visit can be compared.'
+    surface.** `check-screens` refused it and was right: **a guest does not record an outcome — the platform
+    observes what they did.** A guest app that self-reports whether it took the advice is a training label
+    the guest could forge, and the observation belongs server-side where the plan and the visit can be
+    compared.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -3206,9 +3826,10 @@ screens:
       from: deepLink
       optional: true
     coldEntry: A suggestion opened from a saved plan.
+  statesDerived: true
 - id: GST-053
   name: Build Your Own Itinerary
-  module: TODO
+  module: Engagement & Support
   purpose: Choose the attractions and the order yourself.
   wave: 3
   layout:
@@ -3220,8 +3841,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `addCartLine`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Choose the attractions and the order
+      yourself.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3270,9 +3902,10 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-054
   name: AI Optimized Itinerary
-  module: TODO
+  module: Engagement & Support
   purpose: Let the assistant order the day around waits and opening times.
   wave: 3
   layout:
@@ -3284,8 +3917,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Let the assistant order the day around waits and opening times.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ai` is not licensed.** The tenant has not bought this module, which is a commercial
+      answer and not a permission one — say which, because the person to ask is different.'
     error: '**Falls back to the manual planner** (GST-053) rather than to an error. A guest who wanted
       a plan should get one, optimised or not'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
@@ -3347,9 +3991,10 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom. A suggestion opened from a saved plan.
   requiresModule: ai
+  statesDerived: true
 - id: GST-055
   name: Dynamic QR Ticket
-  module: TODO
+  module: Account & Self-Service
   purpose: Find dynamic qr ticket for this venue.
   wave: 1
   layout:
@@ -3358,6 +4003,15 @@ screens:
     - name: contentBody
       components:
       - kind: scanTarget
+      - kind: primaryButton
+        derived: true
+        impliedBy: transferOrderTickets
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
   states:
     loading: Availability is live, never cached
     emptyFirstRun: '**Sold out is a real answer.** Offers the next available rather than a dead end'
@@ -3395,13 +4049,12 @@ screens:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
 - id: GST-056
   name: Bundle Package
-  module: TODO
+  module: Booking & Selection
   purpose: See bundle package for this venue.
   wave: 2
   layout:
@@ -3413,8 +4066,18 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `addCartLine`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** See bundle package for this venue.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3456,11 +4119,16 @@ screens:
       from: deepLink
     - name: cartId
       from: session
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `bundleId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-057
   name: Accessibility Information
-  module: TODO
+  module: Discovery & Browse
   purpose: Step-free routes, facilities and what to expect.
   wave: 2
   layout:
@@ -3472,8 +4140,15 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Step-free routes, facilities and what to expect.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3495,8 +4170,8 @@ screens:
     - GST-001
     - GST-002
     - GST-003
-  notes: 'Minuted 10 Aug §4.1: custom content pages *"with accessibility-guideline compliance to be
-    followed"*. **Tenant-authored content, not a built feature.**'
+  notes: 'Minuted 10 Aug §4.1: custom content pages *"with accessibility-guideline compliance to be followed"*.
+    **Tenant-authored content, not a built feature.**'
   apis:
   - operationId: listContentPages
     contract: white-label
@@ -3505,9 +4180,10 @@ screens:
   provenance: MoM 10 August 2026 §4.1
   density: comfortable
   requiresModule: core
+  statesDerived: true
 - id: GST-058
   name: Resource Availability (Cabana)
-  module: TODO
+  module: Booking & Selection
   purpose: See which cabanas are free, by area and date, before choosing one.
   wave: 3
   layout:
@@ -3519,8 +4195,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      See which cabanas are free, by area and date, before choosing one.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3544,9 +4231,8 @@ screens:
     - GST-002
     - GST-003
   notes: '**Deliberately separate from GST-050**, and checked on 18 August. Board 8 panel 8 is availability
-    across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now.
-    **A list and a detail, not a duplicate** — merging them would put a booking action on a browsing
-    screen.'
+    across areas with counts remaining; board 7 panel 10 is one cabana with a price and a Book Now. **A
+    list and a detail, not a duplicate** — merging them would put a booking action on a browsing screen.'
   apis:
   - operationId: getAvailability
     contract: catalogue
@@ -3558,9 +4244,10 @@ screens:
     trigger: onLoad
   density: comfortable
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-059
   name: Plan My Day – In Progress
-  module: TODO
+  module: Engagement & Support
   purpose: The plan while you are in the venue, against live waits.
   wave: 3
   layout:
@@ -3572,8 +4259,19 @@ screens:
       - kind: primaryButton
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      The plan while you are in the venue, against live waits.'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ai` is not licensed.** The tenant has not bought this module, which is a commercial
+      answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
@@ -3598,11 +4296,11 @@ screens:
     fromFlows: true
   notes: 'Minuted 10 Aug §4.9. **The in-visit half of GST-051** — one capability, two moments. ** wired
     24 August.** The board drew four bespoke AI endpoints for itinerary planning; **one operation with
-    a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace
-    the heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens`
-    refused it and was right: **a guest does not record an outcome — the platform observes what they
-    did.** A guest app that self-reports whether it took the advice is a training label the guest could
-    forge, and the observation belongs server-side where the plan and the visit can be compared.'
+    a kind answers all of them** (ADR-0028), and recording the outcome is what lets a model replace the
+    heuristic later. **`recordSuggestionOutcome` removed from the guest surface.** `check-screens` refused
+    it and was right: **a guest does not record an outcome — the platform observes what they did.** A
+    guest app that self-reports whether it took the advice is a training label the guest could forge,
+    and the observation belongs server-side where the plan and the visit can be compared.'
   apis:
   - operationId: getWaitTimes
     contract: queue
@@ -3625,6 +4323,7 @@ screens:
       from: deepLink
       optional: true
     coldEntry: A suggestion opened from a saved plan.
+  statesDerived: true
 - id: GST-061
   name: Menu Item Detail
   module: In-Venue Experience
@@ -3635,6 +4334,10 @@ screens:
   - operationId: getGuestMenu
     contract: fnb
     purpose: Item, modifiers and allergens
+    trigger: onLoad
+  - operationId: listModifierGroups
+    contract: fnb
+    purpose: List modifier groups
     trigger: onLoad
   layout:
     template: detail
@@ -3652,12 +4355,15 @@ screens:
     loading: Item skeleton
     emptyFirstRun: Not applicable
     error: Item unavailable, with a route back to the menu
-    offline: Cached menu shown with a staleness warning. Ordering is refused — availability changes
-      by the minute
+    offline: Cached menu shown with a staleness warning. Ordering is refused — availability changes by
+      the minute
   wireframe:
     status: generated
     board: wireframes/P02 Guest App.dc.html#gst-061
-  notes: P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August.
+  notes: 'P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface
+    parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different
+    operations** — one side could do something the other could not, and nothing recorded the difference
+    as deliberate.'
   implementation:
     app: guest-app
     route: /in-venue-experience/menu-item-detail
@@ -3675,7 +4381,11 @@ screens:
     params:
     - name: outletId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `outletId`.'
   requiresModule: fnb
 - id: GST-062
   name: Shop & Drop Collection
@@ -3695,8 +4405,16 @@ screens:
   states:
     loading: List skeleton
     emptyFirstRun: Nothing awaiting collection
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `retail` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Lookup unavailable — the collection point can still find it by receipt
     offline: Cannot look up. Shows the drop reference held locally so a guest can quote it
   wireframe:
@@ -3722,6 +4440,7 @@ screens:
     trigger: onLoad
   density: comfortable
   requiresModule: retail
+  statesDerived: true
 - id: GST-063
   name: Search
   module: Discovery
@@ -3734,6 +4453,11 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: searchField
+        derived: true
+        impliedBy: searchCatalogue
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
   apis:
   - operationId: searchCatalogue
     contract: catalogue
@@ -3742,13 +4466,19 @@ screens:
   states:
     loading: Results as you type
     emptyFirstRun: '**Nothing matched. Offers what is on** rather than a dead end'
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
     error: Search unavailable. Falls back to browsing categories
     offline: '**Searches the cached catalogue only**, with a note that newer items may exist'
   navigation:
     exitTo:
     - GST-001
-    inferred: true
+    inferred: false
+    entryFrom:
+    - GST-001
+    notes: '**Reached from GST-001** — search is reached from home. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   implementation:
     app: guest-app
     route: /search
@@ -3760,6 +4490,7 @@ screens:
   notes: Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.
   density: comfortable
   requiresModule: ticketing
+  statesDerived: true
 - id: GST-065
   name: Newsletter & Preferences
   module: Marketing
@@ -3772,6 +4503,15 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: recordConsent
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordConsent
   apis:
   - operationId: recordConsent
     contract: marketing-crm
@@ -3784,15 +4524,27 @@ screens:
   states:
     loading: Your current consents
     emptyFirstRun: —
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: '**Could not save. Consent is not recorded on a failed request** — a subscription the guest
       believes happened and did not is worse than a visible failure'
     offline: '**Not available.** A consent change must reach the server to mean anything'
   navigation:
     exitTo:
     - GST-001
-    inferred: true
+    inferred: false
+    entryFrom:
+    - GST-039
+    notes: '**Reached from GST-039** — a preference is a setting on the profile. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   implementation:
     app: guest-app
     route: /newsletter-preferences
@@ -3809,3 +4561,530 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: marketing
+  statesDerived: true
+- id: GST-066
+  name: Privacy & My Data
+  module: Account & Self-Service
+  wave: 2
+  purpose: '**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData`
+    and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a'
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/privacy-my-data
+    component: apps/guest-app/src/routes/account/PrivacyMyData.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: exportSubjectData
+    contract: identity
+    purpose: Everything the platform holds about one guest
+    trigger: onAction
+  - operationId: deleteGuestAccount
+    contract: identity
+    purpose: Self-service account deletion
+    trigger: onAction
+  - operationId: getGuestConsents
+    contract: marketing-crm
+    purpose: Read a guest's consent state
+    trigger: onLoad
+  - operationId: updateGuestPreferences
+    contract: marketing-crm
+    purpose: The things a regular should not have to say twice
+    trigger: onAction
+  - operationId: uploadGuestDocument
+    contract: marketing-crm
+    purpose: Store a guest photo, ID or signed document
+    trigger: onAction
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-039
+    inferred: false
+    notes: '**Reached from GST-039** — privacy is a setting on the profile. Stated on 4 September: this
+      screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**Nothing requested yet.** No export, no erasure, no document — and that is the ordinary
+      state. **The screen explains what each request means before offering it**, because an erasure a
+      guest did not understand is one they will phone about.'
+    offline: '**Nothing here works offline and it says so.** An erasure request queued on a phone and
+      never sent is worse than one that could not be made — the legal clock starts when the platform receives
+      it, not when the guest taps.'
+  notes: '**A guest can legally demand their data and its erasure, and had nowhere to ask.** `exportSubjectData`
+    and `deleteGuestAccount` existed as guest-callable operations reachable from no guest surface — a
+    promise the contracts made and the product did not keep.
+
+
+    **Erasure is not a button.** `platform.dsar_request` carries a legal clock and a lifecycle; this screen
+    starts it and shows where it has got to. **A request that silently fails is a regulatory failure with
+    a timestamp on it** (ADR-0033).'
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-066
+  offline: false
+- id: GST-067
+  name: Refunds & Resale
+  module: Account & Self-Service
+  wave: 2
+  purpose: '**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and
+    `createResaleListing` were back-office only, so every refund began as a phone call.'
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/refunds-resale
+    component: apps/guest-app/src/routes/account/RefundsResale.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: createRefundRequest
+    contract: orders
+    purpose: Guest-initiated refund request
+    trigger: onAction
+  - operationId: createResaleListing
+    contract: orders
+    purpose: List an entitlement for resale
+    trigger: onAction
+  - operationId: getWaiverStatus
+    contract: marketing-crm
+    purpose: Whether this guest may be issued a ticket that requires a wa
+    trigger: onLoad
+    offline: false
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-008
+    inferred: false
+    notes: '**Reached from GST-008** — a refund starts from the ticket being refunded. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**No refunds or listings yet.** The venue''s policy is shown regardless, so a guest
+      knows the answer before they need it.'
+    offline: Refunds and listings need the server. **A queued refund request is a promise nobody made.**
+  notes: '**A guest could buy a ticket and not ask for their money back.** `createRefundRequest` and `createResaleListing`
+    were back-office only, so every refund began as a phone call.
+
+
+    **The refund policy decides what is offered, not this screen.** `orders.refund_policy` is scoped,
+    so a venue may be stricter than its tenant — the screen shows the answer rather than arguing with
+    it.'
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-067
+  offline: false
+- id: GST-068
+  name: Help & My Cases
+  module: Engagement & Support
+  wave: 2
+  purpose: '**A guest could not raise a complaint.** Twelve case operations existed and every one of them
+    was staff-side — a guest with a problem had to find somebody.'
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/help-my-cases
+    component: apps/guest-app/src/routes/account/HelpMyCases.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: createCase
+    contract: marketing-crm
+    purpose: Raise a service case
+    trigger: onAction
+    offline: false
+  - operationId: listCases
+    contract: marketing-crm
+    purpose: List service cases
+    trigger: onLoad
+  - operationId: listAiConversations
+    contract: ai
+    purpose: A principal's conversation history
+    trigger: onLoad
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-001
+    inferred: false
+    notes: '**Reached from GST-001** — a top-level section of the app. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**No cases open.** The concierge sits here too — most questions never become a case,
+      and that is the intent.'
+    offline: Cases need the server. **Cached cases are shown read-only with their age**, so a guest can
+      see what they raised without believing a reply arrived.
+  notes: '**A guest could not raise a complaint.** Twelve case operations existed and every one of them
+    was staff-side — a guest with a problem had to find somebody.
+
+
+    **The AI concierge and a human case are one thread here.** A conversation that could not answer becomes
+    a case rather than a dead end, which is what `listAiConversations` beside `listCases` is for.'
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-068
+  offline: false
+- id: GST-069
+  name: Face Pass
+  module: Account & Self-Service
+  wave: 2
+  purpose: "\uD83D\uDD34 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was\
+    \ callable by a guest and reachable from nowhere, which means enrolment was happening at a desk with\
+    \ somebody else operat"
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/face-pass
+    component: apps/guest-app/src/routes/account/FacePass.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: enrolFacePass
+    contract: access
+    purpose: Register a facial profile against an entitlement
+    trigger: onAction
+  - operationId: getFacePassEnrolment
+    contract: access
+    purpose: Whether a pass has a face registered, and when
+    trigger: onLoad
+  - operationId: revokeFacePass
+    contract: access
+    purpose: Remove a facial profile
+    trigger: onAction
+  entryState:
+    params:
+    - name: enrolmentId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-039
+    inferred: false
+    notes: '**Reached from GST-039** — enrolment is a setting on the profile. Stated on 4 September: this
+      screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**Not enrolled.** What a face pass is for, where it works, and what withdrawing it
+      does — **before** the camera opens.'
+    offline: Biometric enrolment never works offline. **A face captured and queued is a face the guest
+      cannot withdraw until it uploads.**
+  notes: "\uD83D\uDD34 **Biometric enrolment had no guest-facing consent step.** `enrolFacePass` was callable\
+    \ by a guest and reachable from nowhere, which means enrolment was happening at a desk with somebody\
+    \ else operating the screen.\n\n**`pii.subject_biometric` is separate from contact and document precisely\
+    \ so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason —\
+    \ a face a guest cannot withdraw is a face they did not really consent to."
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-069
+  offline: false
+- id: GST-070
+  name: Reserve a Table or Cabana
+  module: In-venue Services
+  wave: 2
+  purpose: '**Staff could book a table and a guest could not.** Seven guest-callable operations with no
+    guest surface — reservations, cabanas, and both waitlists.'
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/reserve-table-cabana
+    component: apps/guest-app/src/routes/account/ReserveTableCabana.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: createTableReservation
+    contract: fnb
+    purpose: Book a table in advance
+    trigger: onAction
+  - operationId: updateTableReservation
+    contract: fnb
+    purpose: Change or cancel a booking
+    trigger: onAction
+  - operationId: bookResource
+    contract: resources
+    purpose: Reserve a specific resource for a window
+    trigger: onAction
+  - operationId: getResourceAvailability
+    contract: resources
+    purpose: When it is free, with conflicts already resolved
+    trigger: onLoad
+  - operationId: joinRestaurantWaitlist
+    contract: fnb
+    purpose: Add a party to an outlet's waitlist
+    trigger: onAction
+    offline: false
+  - operationId: joinWaitlist
+    contract: catalogue
+    purpose: Ask to be told if capacity frees up
+    trigger: onAction
+  - operationId: leaveWaitlist
+    contract: catalogue
+    purpose: Stop waiting
+    trigger: onAction
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    - name: reservationId
+      from: deepLink
+    - name: resourceId
+      from: deepLink
+    - name: subjectId
+      from: session
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-001
+    inferred: false
+    notes: '**Reached from GST-001** — a top-level section of the app. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**Nothing reserved.** Availability shows regardless; a guest looking at an empty list
+      should still see what is bookable.'
+    offline: Availability is cached with its age. **Booking is not** — a table held offline is a table
+      two people think they have.
+  notes: '**Staff could book a table and a guest could not.** Seven guest-callable operations with no
+    guest surface — reservations, cabanas, and both waitlists.
+
+
+    **Leaving a waitlist matters as much as joining one.** A guest who has given up and walked away still
+    holds a place, and a queue full of people who left is a queue nobody trusts.'
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-070
+  offline: false
+- id: GST-071
+  name: Payment Methods
+  module: Account & Self-Service
+  wave: 2
+  purpose: '**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens`
+    and `storePaymentToken` were guest-callable with no guest screen.'
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/payment-methods
+    component: apps/guest-app/src/routes/account/PaymentMethods.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: listPaymentTokens
+    contract: orders
+    purpose: A guest's saved payment methods
+    trigger: onLoad
+  - operationId: storePaymentToken
+    contract: orders
+    purpose: Save a payment method for future use
+    trigger: onAction
+  - operationId: transferWalletBalance
+    contract: retail
+    purpose: Send balance to another guest
+    trigger: onAction
+  - operationId: redeemLoyaltyPoints
+    contract: marketing-crm
+    purpose: Spend points
+    trigger: onAction
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    - name: walletId
+      from: deepLink
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-039
+    inferred: false
+    notes: '**Reached from GST-039** — a payment method is a setting on the profile. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**No stored cards.** A guest arrives here after a first purchase, so the empty state
+      is the common one.'
+    offline: Stored cards are shown from cache, masked. **Storing and transferring need the server.**
+  notes: '**A stored card a guest cannot see is a stored card they cannot remove.** `listPaymentTokens`
+    and `storePaymentToken` were guest-callable with no guest screen.
+
+
+    **Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever
+    the contracts call them.'
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-071
+  offline: false
+- id: GST-072
+  name: Share & Group Booking
+  module: Booking & Selection
+  wave: 2
+  purpose: '**A guest buying eight tickets could not give seven of them away.** `shareEntitlement`, `getGroupBooking`
+    and `respondToInvitation` had no surface, so a group booking was one person holding eight barc'
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/share-group-booking
+    component: apps/guest-app/src/routes/account/ShareGroupBooking.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: shareEntitlement
+    contract: orders
+    purpose: Let somebody else use this, without giving it away
+    trigger: onAction
+  - operationId: getGroupBooking
+    contract: orders
+    purpose: getGroupBooking
+    trigger: onLoad
+  - operationId: respondToInvitation
+    contract: marketing-crm
+    purpose: Accept or decline
+    trigger: onAction
+  - operationId: createReferral
+    contract: marketing-crm
+    purpose: Issue a referral code
+    trigger: onAction
+  - operationId: getMyChallenges
+    contract: marketing-crm
+    purpose: Active challenges and how far along I am
+    trigger: onLoad
+  entryState:
+    params:
+    - name: entitlementId
+      from: deepLink
+    - name: groupBookingId
+      from: deepLink
+    - name: subjectId
+      from: session
+    - name: token
+      from: deepLink
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-008
+    inferred: false
+    notes: '**Reached from GST-008** — sharing starts from the ticket being shared. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**Nothing shared.** A guest holding eight tickets sees the option here rather than
+      discovering it at the gate.'
+    offline: Shared tickets are cached so a gate can still read them. **Sharing needs the server** — a
+      transfer nobody received is a ticket nobody holds.
+  notes: '**A guest buying eight tickets could not give seven of them away.** `shareEntitlement`, `getGroupBooking`
+    and `respondToInvitation` had no surface, so a group booking was one person holding eight barcodes.
+
+
+    **`createReferral` writes `marketing.referral`, which nothing reads** — one of the sixteen orphan
+    writes. This screen is where the reward would be visible, and it stays an open question until the
+    wallet session settles what a referral credit is.'
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-072
+  offline: false
+- id: GST-073
+  name: Security & Sign-in
+  module: Account & Self-Service
+  wave: 2
+  purpose: '**A guest could enrol a second factor and not manage it.** Small screen, and it is the one
+    a guest reaches after losing a phone.'
+  capability: read-write
+  density: comfortable
+  implementation:
+    app: guest-app
+    route: /account/security-sign-in
+    component: apps/guest-app/src/routes/account/SecuritySignIn.tsx
+    status: notStarted
+  requiresModule: core
+  apis:
+  - operationId: createMfaChallenge
+    contract: identity
+    purpose: Step-up authentication for a sensitive action
+    trigger: onAction
+  entryState:
+    params:
+    - name: subjectId
+      from: session
+    coldEntry: '**Resolves from the session.** A guest arriving cold is asked to sign in and returned
+      here afterwards — never a 404, and never a screen that silently shows somebody else''s data (ADR-0030).'
+  navigation:
+    exitTo:
+    - GST-039
+    entryFrom:
+    - GST-039
+    inferred: false
+    notes: '**Reached from GST-039** — sign-in security is a setting on the profile. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+  states:
+    loading: Content loads.
+    emptyNoResults: '**Nothing here yet.** The scope is what narrowed it — naming the scope is what stops
+      somebody concluding the record does not exist.'
+    error: Could not load. **Says what failed and offers one way onward**, never a bare failure.
+    emptyFirstRun: '**No second factor enrolled.** Explains what one protects before asking for a phone
+      number.'
+    offline: Enrolment needs the server. **A second factor is not a second factor if it was set up offline.**
+  notes: '**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a
+    guest reaches after losing a phone.'
+  wireframe:
+    status: generated
+    board: wireframes/P02 Guest App.dc.html#gst-073
+  offline: false

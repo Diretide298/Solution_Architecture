@@ -32,7 +32,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -74,7 +74,7 @@ info:
     Three positions shape this contract:
 
     - A cell serves exactly one tenant in one REGION (ADR-0014). Every path here operates
-      within the current cell; there is no cross-cell read. Jurisdiction is a placement
+      within the current cell; there is no cross-region read. Jurisdiction is a placement
       constraint on regions, not the split rule.
     - Region owns currency, decimal scale, time zone, date format and fiscal year.
       These inherit to every venue beneath and are not overridable at venue level.
@@ -447,6 +447,7 @@ paths:
         - "P08 BO-037 Offline Package Status"
         - "P08 BO-128 Live Workstation Health Monitor"
         - "P08 BO-130 Offline Policy & Rules Configuration"
+        - "P08 BO-206 Offline Validation Policy Builder"
       summary: What a workstation may do with no network, and for how long
       description: >
         Board 5 of the client's POS set, and **one of only two things in 36 board screens the package
@@ -558,6 +559,7 @@ paths:
       operationId: setVenueSettings
       x-ticvai-consumed-by:
         - "P04 POS-019 Shift Templates & Policies"
+        - "P08 BO-065 Venue Configuration"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-136 F&B Global Settings & Controls"
         - "P08 BO-143 Retail Global Settings & Controls"

@@ -21,13 +21,15 @@ access.scan_event,access_point_id,access.access_point,reference,declared,,yes
 access.scan_event,device_id,platform.device,reference,declared,yes,yes
 access.scan_event,operator_principal_id,identity.principal,reference,declared,yes,yes
 access.scan_event,overridden_by_principal_id,identity.principal,reference,declared,yes,yes
-access.scan_event,ticket_id,catalogue.entitlement_template,reference,declared,yes,yes
+access.scan_event,ticket_id,access.entitlement,reference,declared,,yes
 access.scan_event,venue_id,platform.org_unit,reference,declared,yes,yes
 access.scan_event,via syncScans,sync.rejection,ambient,lineage,yes,
+access.scan_event,via validateAccess,platform.outbox,ambient,lineage,yes,
 ai.chunk_ref,document_id,ai.knowledge_document,reference,declared,,yes
 ai.conversation,principal_id,identity.principal,reference,declared,yes,yes
 ai.index_entry,source_id,ai.index_source,reference,declared,,yes
 ai.index_entry,via reindexSource,ai.index_job,ambient,lineage,,
+ai.index_failure,source_id,ai.index_source,reference,convention,,yes
 ai.index_job,source_id,ai.index_source,reference,declared,,yes
 ai.index_source,collection_id,ai.knowledge_collection,reference,declared,,yes
 ai.interaction,billable_to_tenant_id,control.tenant,reference,convention,yes,yes
@@ -52,6 +54,7 @@ ai.layout_draft,asset_id,assets.media_asset,reference,declared,yes,yes
 ai.layout_draft,import_job_id,venuemap.import_job,reference,declared,yes,yes
 ai.message,conversation_id,ai.conversation,reference,declared,,yes
 ai.message,proposed_action,ai.proposed_action,reference,declared,,yes
+ai.policy,fallback_provider_id,ai.provider,reference,convention,,yes
 ai.policy,tenant_id,platform.tenant,reference,declared,yes,yes
 ai.proposed_action,decided_by_principal_id,identity.principal,reference,declared,yes,yes
 ai.proposed_action,interaction_id,ai.interaction,reference,declared,,yes
@@ -60,9 +63,11 @@ ai.provider,region_id,platform.org_unit,reference,declared,yes,yes
 ai.provider,tenant_id,control.tenant,reference,declared,yes,yes
 ai.suggestion_outcome,decided_by_principal_id,identity.principal,reference,convention,yes,yes
 ai.suggestion_outcome,suggestion_id,ai.suggestion,child,convention,,yes
+approvals.accreditation_badge,approval_request_id,approvals.request,reference,convention,,yes
 approvals.decision,principal_id,identity.principal,reference,declared,yes,yes
 approvals.decision,request_id,approvals.request,reference,declared,,yes
 approvals.decision,via decideApprovalRequest,approvals.request,ambient,lineage,,
+approvals.decision,via decideApprovalRequest,platform.outbox,ambient,lineage,yes,
 approvals.delegation,delegate_principal_id,identity.principal,reference,declared,yes,yes
 approvals.delegation,delegator_principal_id,identity.principal,reference,declared,yes,yes
 approvals.escalation,request_id,approvals.request,reference,declared,,yes
@@ -112,6 +117,7 @@ catalogue.performance,admission_rules_id,access.admission_rules,reference,conven
 catalogue.performance,approval_request_id,approvals.request,reference,convention,yes,yes
 catalogue.performance,event_id,catalogue.event,reference,declared,,yes
 catalogue.performance,seat_map_id,seating.seat_map,reference,declared,yes,yes
+catalogue.performance,via cancelPerformance,platform.outbox,ambient,lineage,yes,
 catalogue.price,price_list_id,catalogue.price_list,reference,declared,,yes
 catalogue.price,tax_code_id,ledger.tax_code,reference,declared,yes,yes
 catalogue.price,variant_id,catalogue.variant,reference,declared,,yes
@@ -126,6 +132,7 @@ catalogue.product,entitlement_template_id,catalogue.entitlement_template,referen
 catalogue.product,venue_id,platform.org_unit,reference,declared,yes,yes
 catalogue.product,via cloneProduct,catalogue.variant,ambient,lineage,,
 catalogue.product,via restoreProductVersion,catalogue.product_version,ambient,lineage,,
+catalogue.product,via transitionProductLifecycle,platform.outbox,ambient,lineage,yes,
 catalogue.product_category,image_asset_id,maintenance.asset,reference,convention,yes,yes
 catalogue.product_version,product_id,catalogue.product,child,declared,,yes
 catalogue.product_version,published_by_principal_id,identity.principal,reference,convention,yes,yes
@@ -141,12 +148,17 @@ control.api_client,developer_id,control.developer_account,reference,convention,,
 control.api_licence,tenant_id,control.tenant,reference,declared,,yes
 control.api_quota,client_id,control.api_client,reference,convention,,yes
 control.api_version,via deprecateApiVersion,marketing.message_dispatch,ambient,lineage,yes,
+control.archival_job,cell_id,control.cell,reference,convention,,yes
+control.backup_run,cell_id,control.cell,reference,convention,,yes
+control.burst_environment,performance_id,catalogue.performance,reference,convention,yes,yes
+control.burst_environment,usage_record_id,control.usage_record,reference,convention,,yes
 control.cell,cluster_id,control.cell_cluster,reference,convention,,yes
 control.cell,region_id,platform.org_unit,reference,declared,yes,yes
-control.cell,tenant_id,platform.tenant,reference,declared,yes,yes
 control.cell_cluster,modelled_on_cell_id,control.cell,child,convention,,yes
 control.cell_cluster,region_id,platform.org_unit,reference,declared,yes,yes
 control.cell_job,cell_id,control.cell,child,declared,,yes
+control.cell_tenant,cell_id,control.cell,child,convention,,yes
+control.cell_tenant,tenant_id,platform.tenant,reference,convention,yes,yes
 control.channel_listing,price_list_id,catalogue.price_list,reference,declared,yes,yes
 control.channel_listing,product_id,catalogue.product,reference,declared,yes,yes
 control.content_block,approved_by_principal_id,identity.principal,reference,convention,yes,yes
@@ -163,12 +175,16 @@ control.migration,release_id,control.release,reference,declared,,yes
 control.migration_plan_cell,cell_id,control.cell,reference,declared,,yes
 control.migration_plan_cell,migration_plan_id,control.migration_plan,child,declared,,yes
 control.migration_run,canary_cell_id,control.cell,reference,declared,,yes
+control.migration_run,canary_tenant_id,platform.tenant,reference,convention,yes,yes
 control.migration_run,plan_id,control.subscription_plan,reference,declared,,yes
 control.migration_run,started_by_principal_id,identity.principal,reference,declared,yes,yes
 control.migration_run,via applyMigration,control.rollout_cell,ambient,lineage,,
 control.migration_run,via rollbackMigrationRun,control.rollout_cell,ambient,lineage,,
 control.migration_run_cell,cell_id,control.cell,reference,convention,,yes
 control.migration_run_cell,migration_run_id,control.migration_run,child,declared,,yes
+control.migration_run_tenant,cell_id,control.cell,reference,convention,,yes
+control.migration_run_tenant,migration_run_id,control.migration_run,child,declared,,yes
+control.migration_run_tenant,tenant_id,platform.tenant,reference,convention,yes,yes
 control.onboarding_application,provisioned_tenant_id,control.tenant,reference,convention,,yes
 control.onboarding_application,requested_plan_id,control.subscription_plan,reference,convention,,yes
 control.onboarding_application,venue_type_template_id,control.venue_type_template,reference,declared,,yes
@@ -186,7 +202,10 @@ control.rollout,started_by_principal_id,identity.principal,reference,declared,ye
 control.rollout,via pauseRollout,control.rollout_cell,ambient,lineage,,
 control.rollout,via rollbackRollout,control.rollout_cell,ambient,lineage,,
 control.rollout_cell,cell_id,control.cell,reference,declared,,yes
+control.rollout_tenant,cell_id,control.cell,reference,convention,,yes
+control.rollout_tenant,tenant_id,platform.tenant,reference,convention,yes,yes
 control.sandbox,developer_id,control.developer_account,reference,convention,,yes
+control.scaling_policy,cell_id,control.cell,reference,convention,,yes
 control.seo_metadata,entity_id,ledger.legal_entity,reference,convention,yes,yes
 control.subscription,plan_id,control.subscription_plan,reference,declared,,yes
 control.subscription,tenant_id,platform.tenant,reference,declared,yes,yes
@@ -195,6 +214,7 @@ control.support_notice,published_by_principal_id,identity.principal,reference,de
 control.tenant,account_manager_principal_id,identity.principal,reference,declared,yes,yes
 control.tenant,plan_id,control.subscription_plan,reference,declared,,yes
 control.tenant,subscription,control.subscription,reference,declared,,yes
+control.tenant,via suspendTenant,platform.outbox,ambient,lineage,yes,
 control.tenant_migration,from_cell_id,control.cell,reference,convention,,yes
 control.tenant_migration,plan_id,control.tenant_migration_plan,reference,declared,,yes
 control.tenant_migration,tenant_id,control.tenant,child,declared,,yes
@@ -204,6 +224,7 @@ control.tenant_migration_plan,tenant_id,control.tenant,child,declared,,yes
 control.tenant_migration_plan,to_cell_id,control.cell,reference,convention,,yes
 control.upgrade_schedule,tenant_id,platform.tenant,reference,declared,yes,yes
 control.usage_record,venue_id,platform.org_unit,reference,declared,yes,yes
+control.waf_rule,cell_id,control.cell,reference,convention,,yes
 control.webhook_delivery,event_id,catalogue.event,reference,declared,yes,yes
 control.webhook_delivery,subscription_id,control.subscription,reference,declared,,yes
 control.webhook_subscription,client_id,control.api_client,reference,convention,,yes
@@ -246,6 +267,7 @@ fnb.kitchen_ticket,order_id,orders.sales_order,reference,declared,yes,yes
 fnb.kitchen_ticket,outlet_id,platform.outlet,reference,declared,yes,yes
 fnb.kitchen_ticket,prioritised_by_principal_id,identity.principal,reference,declared,yes,yes
 fnb.kitchen_ticket,via moveTableVisit,fnb.table_visit,ambient,lineage,,
+fnb.kitchen_ticket,via setKitchenTicketStatus,platform.outbox,ambient,lineage,yes,
 fnb.kitchen_ticket_line,kitchen_ticket_id,fnb.kitchen_ticket,child,declared,,yes
 fnb.kitchen_ticket_line,station_id,fnb.kitchen_station,reference,declared,,yes
 fnb.kitchen_ticket_line,via refireItem,inventory.movement,ambient,lineage,yes,
@@ -362,6 +384,7 @@ inventory.count,journal_entry_id,ledger.journal_entry,reference,declared,yes,yes
 inventory.count,location_id,fnb.delivery_location,reference,declared,yes,yes
 inventory.count,posted_by_principal_id,identity.principal,reference,declared,yes,yes
 inventory.count,started_by_principal_id,identity.principal,reference,declared,yes,yes
+inventory.count,via postStockCount,platform.outbox,ambient,lineage,yes,
 inventory.count_line,count_id,inventory.count,child,convention,,yes
 inventory.count_line,counted_by_principal_id,identity.principal,reference,convention,yes,yes
 inventory.count_line,item_id,inventory.item,reference,convention,,yes
@@ -370,6 +393,7 @@ inventory.goods_receipt,journal_entry_id,ledger.journal_entry,reference,declared
 inventory.goods_receipt,location_id,fnb.delivery_location,reference,declared,yes,yes
 inventory.goods_receipt,purchase_order_id,inventory.purchase_order,reference,declared,,yes
 inventory.goods_receipt,received_by_principal_id,identity.principal,reference,declared,yes,yes
+inventory.goods_receipt,via createGoodsReceipt,platform.outbox,ambient,lineage,yes,
 inventory.goods_receipt_line,goods_receipt_id,inventory.goods_receipt,child,declared,,yes
 inventory.goods_receipt_line,item_id,inventory.item,reference,declared,,yes
 inventory.item,preferred_supplier_id,inventory.supplier,reference,declared,,yes
@@ -428,9 +452,10 @@ ledger.event_budget,cost_center_id,ledger.cost_center,reference,declared,,yes
 ledger.event_budget,event_id,catalogue.event,reference,declared,yes,yes
 ledger.fiscal_period,closed_by_principal_id,identity.principal,reference,declared,yes,yes
 ledger.fiscal_period,legal_entity_id,ledger.legal_entity,reference,declared,,yes
+ledger.fiscal_period,via closeFiscalPeriod,platform.outbox,ambient,lineage,yes,
 ledger.fx_rate,region_id,platform.org_unit,reference,declared,yes,yes
 ledger.fx_rate,set_by_principal_id,identity.principal,reference,convention,yes,yes
-ledger.inter_entity_obligation,entitlement_id,catalogue.entitlement_template,reference,declared,yes,yes
+ledger.inter_entity_obligation,entitlement_id,access.entitlement,reference,declared,yes,yes
 ledger.inter_entity_obligation,from_legal_entity_id,ledger.legal_entity,reference,convention,,yes
 ledger.inter_entity_obligation,to_legal_entity_id,ledger.legal_entity,reference,convention,,yes
 ledger.journal_entry,approved_by_principal_id,identity.principal,reference,declared,yes,yes
@@ -439,8 +464,15 @@ ledger.journal_entry,posted_by_principal_id,identity.principal,reference,declare
 ledger.journal_entry,reversal_of_entry_id,ledger.posting,reference,declared,,yes
 ledger.journal_entry,reversed_by_entry_id,ledger.posting,reference,declared,,yes
 ledger.journal_entry,source_id,ai.index_source,reference,convention,yes,yes
+ledger.journal_entry,via approveJournalEntry,platform.outbox,ambient,lineage,yes,
 ledger.journal_entry,via closeShift,orders.cash_count_line,ambient,lineage,yes,
 ledger.journal_entry,via closeShift,orders.shift,ambient,lineage,yes,
+ledger.journal_entry,via createPayment,ledger.posting,ambient,lineage,,
+ledger.journal_entry,via createPayment,orders.payment,ambient,lineage,yes,
+ledger.journal_entry,via createPayment,platform.outbox,ambient,lineage,yes,
+ledger.journal_entry,via createRefund,ledger.posting,ambient,lineage,,
+ledger.journal_entry,via createRefund,orders.refund,ambient,lineage,yes,
+ledger.journal_entry,via createRefund,platform.outbox,ambient,lineage,yes,
 ledger.journal_line,account_id,ledger.account,reference,convention,,yes
 ledger.journal_line,cost_center_id,ledger.cost_center,reference,convention,,yes
 ledger.journal_line,journal_entry_id,ledger.journal_entry,reference,declared,,yes
@@ -450,10 +482,6 @@ ledger.posting,journal_entry_id,ledger.journal_entry,reference,declared,,yes
 ledger.posting,source_id,ai.index_source,reference,convention,yes,yes
 ledger.posting,venue_id,platform.org_unit,reference,declared,yes,yes
 ledger.posting,via closeDepositBoxes,orders.deposit_box,ambient,lineage,yes,
-ledger.posting,via createPayment,ledger.journal_entry,ambient,lineage,,
-ledger.posting,via createPayment,orders.payment,ambient,lineage,yes,
-ledger.posting,via createRefund,ledger.journal_entry,ambient,lineage,,
-ledger.posting,via createRefund,orders.refund,ambient,lineage,yes,
 ledger.posting,via recordSettlement,ledger.inter_entity_obligation,ambient,lineage,,
 ledger.posting,via respondToChargeback,orders.chargeback,ambient,lineage,yes,
 ledger.posting,via runFxRevaluation,ledger.journal_entry,ambient,lineage,,
@@ -497,6 +525,8 @@ maintenance.work_order,source_inspection_id,maintenance.inspection,reference,dec
 maintenance.work_order,source_plan_id,control.subscription_plan,reference,declared,yes,yes
 maintenance.work_order,venue_id,platform.org_unit,reference,declared,yes,yes
 maintenance.work_order,verified_by_principal_id,identity.principal,reference,convention,yes,yes
+maintenance.work_order,via completeWorkOrder,platform.outbox,ambient,lineage,yes,
+maintenance.work_order,via verifyWorkOrder,platform.outbox,ambient,lineage,yes,
 maintenance.work_order_attachment,asset_ref,assets.media_asset,reference,declared,yes,yes
 maintenance.work_order_attachment,captured_by_principal_id,identity.principal,reference,convention,yes,yes
 maintenance.work_order_attachment,work_order_id,maintenance.work_order,child,declared,,yes
@@ -535,6 +565,7 @@ marketing.conversation,case_id,marketing.case,reference,declared,,yes
 marketing.conversation,queue_id,queue.queue,reference,declared,yes,yes
 marketing.conversation,subject_id,pii.subject,reference,declared,yes,yes
 marketing.conversation,venue_id,platform.org_unit,reference,declared,yes,yes
+marketing.conversation,via handoverToAgent,platform.outbox,ambient,lineage,yes,
 marketing.conversation,via sendConversationMessage,marketing.conversation_message,ambient,lineage,,
 marketing.conversation_message,ai_interaction_id,ai.interaction,reference,declared,yes,yes
 marketing.conversation_message,conversation_id,marketing.conversation,child,declared,,yes
@@ -560,6 +591,8 @@ marketing.invitation,performance_id,catalogue.performance,reference,declared,yes
 marketing.invitation,product_id,catalogue.product,reference,declared,yes,yes
 marketing.invitation_campaign,event_id,catalogue.event,reference,declared,yes,yes
 marketing.invitation_campaign,product_id,catalogue.product,reference,declared,yes,yes
+marketing.journey_entrant,journey_id,marketing.journey,child,convention,,yes
+marketing.journey_entrant,subject_id,pii.subject,reference,convention,yes,yes
 marketing.kiosk_assist_session,cart_id,orders.cart,reference,declared,yes,yes
 marketing.kiosk_assist_session,device_id,platform.device,reference,declared,yes,yes
 marketing.kiosk_assist_session,staff_principal_id,identity.principal,reference,declared,yes,yes
@@ -588,6 +621,7 @@ marketing.review,venue_id,platform.org_unit,reference,declared,yes,yes
 marketing.segment,venue_id,platform.org_unit,reference,declared,yes,yes
 marketing.segment,via createSegment,marketing.segment_criterion,ambient,lineage,,
 marketing.segment_criterion,segment_id,marketing.segment,child,declared,,yes
+marketing.subscription,guest_id,queue.waiting_guest,reference,convention,yes,yes
 marketing.suppression,suppressed_by_principal_id,identity.principal,reference,declared,yes,yes
 marketing.touch_point,campaign_id,marketing.campaign,reference,declared,,yes
 marketing.touch_point,journey_id,marketing.journey,reference,declared,,yes
@@ -663,6 +697,8 @@ orders.order_line,via voidOrder,orders.payment,ambient,lineage,,
 orders.order_line,via voidOrder,orders.sales_order,ambient,lineage,,
 orders.order_media_link,order_id,orders.sales_order,reference,declared,,yes
 orders.payment,order_id,orders.sales_order,reference,declared,,yes
+orders.payment,via capturePayment,platform.outbox,ambient,lineage,yes,
+orders.payment,via inquirePaymentStatus,platform.outbox,ambient,lineage,yes,
 orders.payment_link,issued_by_principal_id,identity.principal,reference,convention,yes,yes
 orders.payment_link,reservation_id,retail.reservation,reference,convention,yes,yes
 orders.payment_provider,via setPaymentProvider,orders.payment_routing,ambient,lineage,,
@@ -692,6 +728,7 @@ orders.sales_order,via linkGuestCheckout,pii.subject,ambient,lineage,yes,
 orders.sales_order,workstation_id,platform.workstation,reference,declared,yes,yes
 orders.shift,principal_id,identity.principal,reference,declared,yes,yes
 orders.shift,venue_id,platform.org_unit,reference,declared,yes,yes
+orders.shift,via acceptShiftVariance,platform.outbox,ambient,lineage,yes,
 orders.shift,workstation_id,platform.workstation,reference,declared,yes,yes
 orders.stored_value_authorisation,via captureStoredValue,retail.wallet_transaction,ambient,lineage,yes,
 orders.stored_value_authorisation,via checkInResource,resources.booking,ambient,lineage,yes,
@@ -712,31 +749,34 @@ pii.subject_contact,subject_id,pii.subject,child,declared,,yes
 pii.subject_document,subject_id,pii.subject,child,declared,,yes
 platform.audit_read,principal_id,identity.principal,reference,declared,yes,yes
 platform.audit_read,subject_id,pii.subject,reference,declared,yes,yes
+platform.audit_record,org_unit_id,platform.org_unit,reference,declared,,yes
 platform.audit_record,principal_id,identity.principal,reference,declared,yes,yes
-platform.audit_record,scope_node_id,platform.org_unit,reference,declared,,yes
 platform.cross_region_entitlement,admission_profile_id,access.admission_rules,reference,declared,yes,yes
 platform.cross_region_entitlement,admission_rules_id,access.admission_rules,reference,convention,yes,yes
 platform.cross_region_entitlement,guest_link_id,platform.guest_link,reference,declared,,yes
 platform.cross_region_entitlement,right_id,platform.cross_region_entitlement,reference,convention,,yes
-platform.cross_region_entitlement,ticket_id,catalogue.entitlement_template,reference,declared,yes,yes
+platform.cross_region_entitlement,ticket_id,access.entitlement,reference,declared,yes,yes
 platform.cross_region_entitlement,venue_id,platform.org_unit,reference,declared,,yes
+platform.dead_letter,outbox_id,platform.outbox,reference,convention,,yes
+platform.dead_letter,via replayDeadLetter,platform.outbox,ambient,lineage,,
 platform.device,via configureWorkstation,platform.workstation,ambient,lineage,,
 platform.device,workstation_id,platform.workstation,reference,declared,,yes
 platform.device_heartbeat,device_id,platform.device,child,declared,,yes
 platform.dsar_request,guest_link_id,platform.guest_link,reference,declared,,yes
 platform.dsar_request,request_id,approvals.request,reference,declared,yes,yes
 platform.guest_link,guest_link_id,platform.guest_link,reference,declared,,yes
+platform.outbox,via publishTenantConfig,whitelabel.config_version,ambient,lineage,yes,
 platform.outlet,cost_center_id,ledger.cost_center,reference,declared,yes,yes
 platform.outlet,stock_location_id,inventory.location,reference,declared,yes,yes
 platform.outlet,venue_id,platform.org_unit,reference,declared,,yes
 platform.profile_deployment,profile_id,platform.profile_deployment,reference,convention,,yes
 platform.profile_deployment,via deployConfigurationProfile,platform.workstation,ambient,lineage,,
-platform.region_settings,scope_node_id,platform.org_unit,reference,declared,,yes
+platform.region_settings,org_unit_id,platform.org_unit,reference,declared,,yes
 platform.sale_board,venue_id,platform.org_unit,reference,declared,,yes
 platform.sale_board_page,sale_board_id,platform.sale_board,child,declared,,yes
 platform.sale_board_tile,page_id,platform.sale_board_page,reference,declared,,yes
 platform.tenant,home_region_id,platform.org_unit,reference,declared,,yes
-platform.venue_settings,scope_node_id,platform.org_unit,reference,declared,,yes
+platform.venue_settings,org_unit_id,platform.org_unit,reference,declared,,yes
 platform.wallet_authorisation,authorisation_id,platform.wallet_authorisation,reference,convention,,yes
 platform.wallet_authorisation,fx_rate_id,ledger.fx_rate,reference,convention,yes,yes
 platform.wallet_authorisation,guest_link_id,platform.guest_link,reference,declared,,yes
@@ -745,8 +785,8 @@ platform.workstation,access_point_id,access.access_point,reference,declared,yes,
 platform.workstation,configuration_profile_id,platform.configuration_profile,reference,convention,,yes
 platform.workstation,department_id,platform.org_unit,reference,declared,,yes
 platform.workstation,edge_node_id,platform.org_unit,reference,convention,,yes
+platform.workstation,org_unit_id,platform.org_unit,reference,declared,,yes
 platform.workstation,region_id,platform.org_unit,reference,declared,,yes
-platform.workstation,scope_node_id,platform.org_unit,reference,declared,,yes
 platform.workstation,venue_id,platform.org_unit,reference,declared,,yes
 promotions.allocation_component,allocation_split_id,promotions.allocation_split,reference,declared,,yes
 promotions.allocation_component,legal_entity_id,ledger.legal_entity,reference,declared,yes,yes
@@ -778,7 +818,7 @@ queue.queue,attraction_product_id,catalogue.product,reference,declared,yes,yes
 queue.queue,parent_queue_id,queue.queue,reference,convention,,yes
 queue.queue,venue_id,platform.org_unit,reference,declared,yes,yes
 queue.reading,queue_id,queue.queue,reference,declared,,yes
-queue.waiting_guest,entitlement_id,catalogue.entitlement_template,reference,declared,yes,yes
+queue.waiting_guest,entitlement_id,access.entitlement,reference,declared,yes,yes
 queue.waiting_guest,queue_id,queue.queue,reference,declared,,yes
 queue.waiting_guest,subject_id,pii.subject,reference,declared,yes,yes
 reporting.alert,acknowledged_by_principal_id,identity.principal,reference,convention,yes,yes
@@ -849,13 +889,14 @@ retail.sale_line,sale_id,retail.sale,child,declared,,yes
 retail.shop_and_drop,collected_by,identity.principal,reference,declared,yes,yes
 retail.shop_and_drop,collected_by_principal_id,identity.principal,reference,declared,yes,yes
 retail.shop_and_drop,collection_point_id,fnb.delivery_location,reference,declared,yes,yes
-retail.shop_and_drop,entitlement_id,catalogue.entitlement_template,reference,declared,yes,yes
+retail.shop_and_drop,entitlement_id,access.entitlement,reference,declared,yes,yes
 retail.shop_and_drop,sale_id,retail.sale,reference,declared,,yes
 retail.shop_and_drop,subject_id,pii.subject,reference,declared,yes,yes
 retail.shop_and_drop,venue_id,platform.org_unit,reference,declared,yes,yes
 retail.shop_and_drop_line,drop_id,retail.shop_and_drop,child,declared,,yes
 retail.shop_and_drop_line,merchandise_id,retail.merchandise,reference,declared,,yes
 retail.shop_and_drop_line,shop_and_drop_id,retail.shop_and_drop,child,declared,,yes
+retail.store_rule,outlet_id,platform.outlet,reference,convention,yes,yes
 retail.wallet,subject_id,pii.subject,reference,declared,yes,yes
 retail.wallet,via transferWalletBalance,retail.wallet_transaction,ambient,lineage,,
 retail.wallet_transaction,order_id,orders.sales_order,reference,declared,yes,yes
@@ -883,6 +924,7 @@ seating.seating_rules,seat_map_id,seating.seat_map,reference,declared,,yes
 seating.section_row,section_id,seating.section,child,declared,,yes
 seating.zone,seat_category_id,seating.seat_category,reference,declared,,yes
 seating.zone,seat_map_id,seating.seat_map,reference,declared,,yes
+subscription.partner_quote,agreement_id,control.partner_agreement,reference,convention,yes,yes
 sync.rejection,resolved_by_principal_id,identity.principal,reference,declared,yes,yes
 sync.rejection,workstation_id,platform.workstation,reference,declared,yes,yes
 venuemap.import_job,map_id,venuemap.map,reference,declared,,yes
@@ -931,3 +973,4 @@ workforce.shift_swap,approval_request_id,approvals.request,reference,declared,ye
 workforce.shift_swap,assignment_id,workforce.rota_assignment,reference,declared,,yes
 workforce.shift_swap,from_principal_id,identity.principal,reference,convention,yes,yes
 workforce.shift_swap,to_principal_id,identity.principal,reference,convention,yes,yes
+workforce.training_record,principal_id,identity.principal,reference,convention,yes,yes

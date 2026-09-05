@@ -1,7 +1,3 @@
-# Entitlement — state model
-# Contract: orders.EntitlementStatus
-# Checked by tools/check-states.py.
-
 entity: Entitlement
 contract: orders
 enum: EntitlementStatus
@@ -22,16 +18,22 @@ transitions:
   trigger: operation
   guard: '**A multi-entry pass used once.** The distinction exists because a partly-used pass refunds
     differently from an untouched one'
+  emits:
+  - access.validated
 - from: partiallyConsumed
   to: fullyConsumed
   operation: validateAccess
   trigger: operation
   guard: Every entry taken
+  emits:
+  - access.validated
 - from: issued
   to: fullyConsumed
   operation: validateAccess
   trigger: operation
   guard: A single-entry ticket scanned
+  emits:
+  - access.validated
 - from: issued
   to: expired
   trigger: timer
@@ -70,23 +72,19 @@ transitions:
   trigger: operation
   guard: '**Suspended is a flag, not a state.** A suspended pass is still issued and can be reinstated
     without reissuing'
-notes: '**`expired` and `cancelled` are not interchangeable.** One is time passing and the other is
-  a decision, and only the second has money attached.
-
-
-  **`surrendered` exists so a transfer is not a void.** Voiding and reissuing produces two records where
-  the truth is one ticket that changed hands.
-
-
-  **Cancellation follows the refund, never precedes it** — the order the refund state model settles.
-
-
-  **Merged with `states/entitlement.yaml` on 18 August.** That file modelled `access.TicketStatus`,
-  which is **an object, not an enum** — a scan-response payload carrying `isValid`, `entriesUsed` and
-  `isInsideVenue`, computed at scan time from the entitlement and the scan history. Six states were
-  being checked against nothing, and `check-states` had warned about it since 17 August as its one standing
-  exception.
-
-
-  **The name is the trap.** `TicketStatus` reads like a lifecycle and is a validation result. The lifecycle
-  is `orders.EntitlementStatus`, which is this file.'
+notes: "**`expired` and `cancelled` are not interchangeable.** One is time passing and the other is\
+  \ a decision, and only the second has money attached.\n\n**`surrendered` exists so a transfer is not\
+  \ a void.** Voiding and reissuing produces two records where the truth is one ticket that changed\
+  \ hands.\n\n**Cancellation follows the refund, never precedes it** — the order the refund state model\
+  \ settles.\n\n**Merged with `states/entitlement.yaml` on 18 August.** That file modelled `access.TicketStatus`,\
+  \ which is **an object, not an enum** — a scan-response payload carrying `isValid`, `entriesUsed`\
+  \ and `isInsideVenue`, computed at scan time from the entitlement and the scan history. Six states\
+  \ were being checked against nothing, and `check-states` had warned about it since 17 August as its\
+  \ one standing exception.\n\n**The name is the trap.** `TicketStatus` reads like a lifecycle and is\
+  \ a validation result. The lifecycle is `orders.EntitlementStatus`, which is this file.\n\n  **`emits`\
+  \ declared 25 August.** `events/access-validated.yaml` said it fires on *issued to partiallyConsumed\
+  \ or fullyConsumed* and **the three transitions that do it never named the event** — so `check-states`\
+  \ reported an event no model emits, and the join existed in prose on one side only.\n\n  **The event\
+  \ is the highest-volume thing in the platform.** A gate admitting forty a minute per lane publishes\
+  \ this every time, and an event nothing is declared to emit is an event nobody can trace back to the\
+  \ act that caused it."

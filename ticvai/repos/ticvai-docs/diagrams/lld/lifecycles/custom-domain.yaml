@@ -1,0 +1,113 @@
+id: LLD-CustomDomain
+title: CustomDomain — 12 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/custom-domain.yaml
+entity: CustomDomain
+contract: white-label
+enum: CustomDomain.status
+enumKind: inline
+enumSchema: CustomDomain
+enumProperty: status
+owner: WhiteLabelService
+description: 'A tenant''s own domain on their white-label storefront, between claiming it and serving
+  traffic on it.
+
+
+  **Every state here is a step somebody else controls** — a DNS provider, a certificate authority. That
+  is why there are eight of them: each is a place a claim can sit for hours through no fault of the
+  platform.'
+initial:
+- pending
+terminal:
+- revoked
+states:
+- name: pending
+  description: Claimed, nothing verified. **The tenant has been given a DNS record to add and has not
+    added it.**
+- name: verifying
+  description: Checking DNS. **Separate from pending because the wait is not the tenant's any more**
+    — propagation takes as long as it takes.
+- name: verified
+  description: Ownership proven. **No certificate yet** — a verified domain that cannot serve HTTPS
+    is not a working domain, which is why this is not the end.
+- name: issuing
+  description: Obtaining a certificate.
+- name: active
+  description: Serving. **The only state where a guest can reach the storefront on this domain.**
+- name: failed
+  description: Something did not complete. **Not terminal** — a DNS record added late or a rate limit
+    hit is retried, and ending here would make a transient problem permanent.
+- name: expired
+  description: 'The certificate lapsed. **Distinct from failed**: it worked and stopped, which is a
+    renewal problem rather than a setup one.'
+- name: revoked
+  description: Withdrawn by the tenant or the platform. **Terminal** — reclaiming is a new claim, because
+    the domain may have moved on.
+transitions:
+- from: pending
+  to: verifying
+  trigger: verify
+  operation: verifyCustomDomain
+  guard: The tenant says the record is added.
+- from: verifying
+  to: verified
+  trigger: verified
+  operation: verifyCustomDomain
+  guard: DNS resolves as expected.
+- from: verifying
+  to: failed
+  trigger: verifyFailed
+  operation: verifyCustomDomain
+  guard: '**The record is absent or wrong, and it says which.** A tenant told only *failed* adds the
+    same record again.'
+- from: failed
+  to: verifying
+  trigger: retry
+  operation: verifyCustomDomain
+  guard: Tried again.
+- from: verified
+  to: issuing
+  trigger: issue
+  operation: claimCustomDomain
+  guard: Certificate requested.
+- from: issuing
+  to: active
+  trigger: issued
+  operation: claimCustomDomain
+  guard: Serving.
+- from: issuing
+  to: failed
+  trigger: issueFailed
+  operation: claimCustomDomain
+  guard: '**Rate limited or refused.** Retryable.'
+- from: active
+  to: expired
+  trigger: expire
+  operation: listCustomDomains
+  guard: '**Renewal did not happen.** The domain stops serving, and that is a page a guest sees.'
+- from: expired
+  to: issuing
+  trigger: renew
+  operation: claimCustomDomain
+  guard: Renewing.
+- from: active
+  to: revoked
+  trigger: revoke
+  operation: releaseCustomDomain
+  guard: Withdrawn.
+- from: failed
+  to: revoked
+  trigger: revoke
+  operation: releaseCustomDomain
+  guard: Given up on.
+- from: pending
+  to: revoked
+  trigger: revoke
+  operation: releaseCustomDomain
+  guard: Never completed.
+openQuestions: '**How long before an `expired` domain is revoked automatically?** A certificate that
+  lapsed on a tenant who has left is a claim held indefinitely against a domain somebody else may want.
+  No policy exists.'
+notes: '**`failed` is not terminal and `expired` is not `failed`.** One is setup, one is renewal, and
+  a tenant reading a status page needs to know whether to add a DNS record or pay an invoice.'

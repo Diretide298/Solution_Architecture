@@ -10,7 +10,8 @@ operations:
   path: /purchase-orders/{purchaseOrderId}/acknowledge
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -23,7 +24,8 @@ operations:
   path: /requisitions/{requisitionId}/approve
   scope: venue
   permission: APPROVAL_ACT
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -55,7 +57,8 @@ operations:
   path: /purchase-orders/{purchaseOrderId}/cancel
   scope: venue
   permission: ORDER_CANCEL
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -68,7 +71,8 @@ operations:
   path: /requisitions/{requisitionId}/cancel
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -81,7 +85,8 @@ operations:
   path: /stock-counts/{countId}/cancel
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -94,7 +99,8 @@ operations:
   path: /purchase-orders/{purchaseOrderId}/close-short
   scope: venue
   permission: LEDGER_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -107,7 +113,8 @@ operations:
   path: /stock-transfers/{transferId}/close-short
   scope: venue
   permission: LEDGER_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -120,7 +127,8 @@ operations:
   path: /requisitions/{requisitionId}/quotations
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.quotation
@@ -130,7 +138,8 @@ operations:
   path: /goods-receipts
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -138,12 +147,14 @@ operations:
   writes:
   - cache:idempotency
   - inventory.goods_receipt
+  - platform.outbox
 - operation: createInventoryItem
   verb: POST
   path: /inventory-items
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -156,7 +167,8 @@ operations:
   path: /purchase-orders
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -169,7 +181,8 @@ operations:
   path: /requisitions
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -182,7 +195,8 @@ operations:
   path: /stock-locations
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -195,7 +209,8 @@ operations:
   path: /stock-movements
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -208,7 +223,8 @@ operations:
   path: /stock-transfers
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -221,7 +237,8 @@ operations:
   path: /suppliers
   scope: region
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -234,8 +251,9 @@ operations:
   path: /stock-counts/{countId}/variance
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
-  offline: false
+  audience:
+  - staff
+  offline: true
   reads:
   - inventory.count
   writes: []
@@ -244,7 +262,8 @@ operations:
   path: /inventory-items/{itemId}
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - inventory.item
@@ -254,7 +273,8 @@ operations:
   path: /purchase-orders/{purchaseOrderId}
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.purchase_order
@@ -264,7 +284,8 @@ operations:
   path: /stock
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - inventory.item
@@ -288,7 +309,8 @@ operations:
   path: /stock/valuation
   scope: venue
   permission: LEDGER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.item
@@ -300,7 +322,8 @@ operations:
   path: /requisitions/suggested
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.requisition
@@ -322,7 +345,8 @@ operations:
   path: /goods-receipts
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.goods_receipt
@@ -332,7 +356,8 @@ operations:
   path: /inventory-items
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - inventory.item
@@ -342,7 +367,8 @@ operations:
   path: /purchase-orders
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.purchase_order
@@ -352,8 +378,9 @@ operations:
   path: /requisitions
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
-  offline: false
+  audience:
+  - staff
+  offline: true
   reads:
   - inventory.requisition
   writes: []
@@ -375,7 +402,8 @@ operations:
   path: /stock-counts
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.count
@@ -385,7 +413,8 @@ operations:
   path: /stock-locations
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - inventory.location
@@ -395,7 +424,8 @@ operations:
   path: /stock-movements
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.movement
@@ -405,7 +435,8 @@ operations:
   path: /stock-transfers
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.transfer
@@ -415,7 +446,8 @@ operations:
   path: /suppliers
   scope: region
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - inventory.supplier
@@ -425,7 +457,8 @@ operations:
   path: /inventory-items/lookup
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - inventory.item
@@ -435,7 +468,8 @@ operations:
   path: /stock-counts/{countId}/post
   scope: venue
   permission: LEDGER_POST
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -443,12 +477,14 @@ operations:
   writes:
   - cache:idempotency
   - inventory.count
+  - platform.outbox
 - operation: receiveStockTransfer
   verb: POST
   path: /stock-transfers/{transferId}/receive
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -461,7 +497,8 @@ operations:
   path: /suppliers/{supplierId}/quotations
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -474,7 +511,8 @@ operations:
   path: /stock-counts/{countId}/recount
   scope: venue
   permission: LEDGER_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -487,7 +525,8 @@ operations:
   path: /goods-receipts/{receiptId}/reject
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -500,7 +539,8 @@ operations:
   path: /requisitions/{requisitionId}/reject
   scope: venue
   permission: LEDGER_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -513,7 +553,8 @@ operations:
   path: /requisitions/{requisitionId}/return
   scope: venue
   permission: LEDGER_APPROVE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -526,7 +567,8 @@ operations:
   path: /purchase-orders/{purchaseOrderId}/send
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -553,7 +595,8 @@ operations:
   path: /stock-counts
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -566,7 +609,8 @@ operations:
   path: /stock-counts/{countId}/lines
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -579,7 +623,8 @@ operations:
   path: /inventory-items/{itemId}
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

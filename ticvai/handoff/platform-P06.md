@@ -5,29 +5,25 @@
 | | |
 |---|---|
 | Screens | 66 |
-| Operations | 180 |
+| Operations | 182 |
 | Contracts | 17 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 145 |
+| Operations with no screen | 126 |
 | Waves | wave1 25 · wave2 40 · wave3 1 |
 
 ## Gaps
 
-### 145 operations with no screen here
+### 126 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `enrolFacePass` | access | POST | Register a facial profile against an entitlement |
-| `getFacePassEnrolment` | access | GET | Whether a pass has a face registered, and when |
-| `revokeFacePass` | access | DELETE | Remove a facial profile |
 | `createKnowledgeCollection` | ai | POST | Create a collection |
 | `generateVenueLayout` | ai | POST | Draft a seat map from an uploaded plan |
 | `ingestKnowledgeDocument` | ai | POST | Add a document |
 | `listIndexSources` | ai | GET | What is indexed, and how current it is |
-| `listKnowledgeCollections` | ai | GET | Collections available to this tenant |
 | `proposeTranslations` | ai | POST |  |
 | `proposeWalkways` | ai | POST | Find walkable space in a drawing that has no vectors |
 | `reindexSource` | ai | POST | Rebuild a source |
@@ -41,7 +37,6 @@
 | `createDonationCampaign` | catalogue | POST | Create a campaign |
 | `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
 | `listDonationCampaigns` | catalogue | GET | Campaigns a guest can give to |
-| `listProductVersions` | catalogue | GET | What this product used to be |
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
@@ -60,7 +55,12 @@
 | `recordCorrectiveAction` | fnb | POST | Record what was done about a finding |
 | `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
-| … | | | 105 more |
+| `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
+| `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
+| `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
+| `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
+| `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
+| … | | | 86 more |
 
 ### 1 modules split across waves
 
@@ -97,8 +97,8 @@
 | `EMP-019` | AI assistant — home | Operations | 1 | 3 | yes |
 | `EMP-020` | AI assistant — answer | Operations | 1 | 3 | yes |
 | `EMP-021` | Roster | Operations | 1 | 2 | yes |
-| `EMP-022` | My rota | Operations | 1 | 2 | yes |
-| `EMP-023` | Swap request | Operations | 2 | 2 | yes |
+| `EMP-022` | My rota | Operations | 1 | 3 | yes |
+| `EMP-023` | Swap request | Operations | 2 | 3 | yes |
 | `EMP-024` | Clock in / out | Operations | 1 | 3 | yes |
 | `EMP-025` | Break management | Operations | 2 | 2 | yes |
 | `EMP-026` | Incident report | Operations | 1 | 5 | yes |
@@ -116,7 +116,7 @@
 | `EMP-038` | Broadcast to team | Operations | 2 | 4 | yes |
 | `EMP-039` | Announcements | Operations | 2 | 4 | yes |
 | `EMP-040` | Knowledge base | Operations | 2 | 1 | yes |
-| `EMP-041` | Training | Operations | 3 | 1 | yes |
+| `EMP-041` | Training | Operations | 3 | 2 | yes |
 | `EMP-042` | Profile | Operations | 1 | 4 | yes |
 | `EMP-043` | Device settings | Operations | 1 | 2 | yes |
 | `EMP-044` | Accessibility | Operations | 2 | 0 | yes |

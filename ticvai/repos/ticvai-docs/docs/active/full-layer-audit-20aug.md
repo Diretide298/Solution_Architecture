@@ -30,10 +30,10 @@ whether each crossing is deliberate.**
 
 | Table | Foreign writers | Why it is right |
 |---|---|---|
-| `ledger.entry`, `ledger.journal_entry` | orders, shift | **A sale and a till close both post to the ledger.** Routing them through `finance` would make every sale a two-hop write, and a ledger written only by finance is a ledger that lags the thing it records |
+| `ledger.posting`, `ledger.journal_entry` | orders, shift | **A sale and a till close both post to the ledger.** Routing them through `finance` would make every sale a two-hop write, and a ledger written only by finance is a ledger that lags the thing it records |
 | `access.entitlement` | catalogue, orders | An order issues an entitlement; a catalogue change revalidates one. **Both are the moment the row's truth changes** |
 | `pii.subject` | identity, marketing-crm | `identity` for registration and deletion, `marketing-crm` for `updateMyProfile` — **the one place a guest edits their own name.** ADR-0023 says one writer; this is one and a half, and it is worth confirming rather than assuming |
-| `catalogue.inventory_lease` | orders | Leasing is what an order does to inventory. **The lease is `catalogue`'s row and only `orders` has a reason to take one** |
+| `catalogue.inventory_hold` | orders | Leasing is what an order does to inventory. **The lease is `catalogue`'s row and only `orders` has a reason to take one** |
 | `inventory.stock_level` | fnb, retail | A production run consumes stock and a collection releases a reservation. **Stock moves where the work happens** |
 | `marketing.message_dispatch` | orders, public-api, workforce, identity | **Five writers, and every one is sending a message.** An order confirmation, a webhook, an evacuation notice and a verification email are all dispatches — a single writer would mean four contracts asking marketing to send things |
 

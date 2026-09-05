@@ -111,7 +111,7 @@ that upgrades a tenant from shared to dedicated infrastructure.
 
 **The cell is the shard boundary** (ADR-0014). A tenant-region that outgrows one primary is
 split by region, or a region is split, and the existing cell machinery handles it — because
-cross-cell was already built for jurisdiction rather than for load.
+cross-region was already built for jurisdiction rather than for load.
 
 **Venues are not shards.** Splitting a venue out of its cell breaks the single-transaction
 guarantee ADR-0005 exists to preserve: multi-venue passes, revenue splits, memberships and

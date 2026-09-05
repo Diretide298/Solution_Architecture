@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TICVAI — workshop boards</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* **The Claude Design system, applied to the generated boards on 24 August.**
+   Three client packs render at 1280x700 in this system and 385 screens rendered as
+   dashed-box wireframes — and **a client reviewing both reads the difference as *those screens
+   are not done*.** The information is identical either way; the fidelity is what was being
+   judged.
+
+   Tokens are the packs': #0B1324 rail, #0D6EFD primary, #00B8FF accent, Manrope for UI,
+   IBM Plex Mono for figures and codes. */
+:root{--ink:#0B1324;--mut:#5A6577;--dim:#9AA5B6;--line:#E8ECF3;--edge:#E3E8F0;
+--brand:#0D6EFD;--accent:#00B8FF;--rail:#0B1324;--paper:#FFF;--wash:#F7F9FC;
+--ok:#0E9F6E;--okbg:#E8F6F0;--okline:#BFE3D2;--warn:#8A6D00;--warnbg:#FFF7E6;
+--bad:#A81E1E;--badbg:#FDECEC}
+*{box-sizing:border-box}
+body{margin:0;background:#F2F5F9;color:var(--ink);
+font-family:Manrope,-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;line-height:1.55}
+a{color:inherit}
+.wrap{max-width:1420px;margin:0 auto;padding:22px 34px 90px}
+.home{font-size:11.5px;color:var(--mut);text-decoration:none;letter-spacing:.02em}
+.head{display:flex;align-items:baseline;justify-content:space-between;gap:20px;
+margin:14px 0 6px;padding-bottom:16px;border-bottom:2px solid var(--ink)}
+.mark{font-size:13px;font-weight:800;letter-spacing:.16em;
+background:linear-gradient(90deg,var(--brand),var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+h1{font-size:19px;font-weight:800;letter-spacing:-.015em;margin:0}
+.meta{font-size:11px;color:var(--mut);font-family:'IBM Plex Mono',ui-monospace,monospace;line-height:1.7}
+.lede{font-size:12.5px;color:var(--mut);max-width:82ch;margin:16px 0 0;line-height:1.65}
+.grp{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:11px;font-weight:600;
+letter-spacing:.14em;color:var(--dim);text-transform:uppercase;margin:52px 0 18px;
+padding-bottom:9px;border-bottom:1px solid var(--line)}
+.stack{display:flex;flex-direction:column;gap:52px}
+.scr{display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px}
+.hdr{display:flex;align-items:baseline;gap:9px;flex-wrap:wrap}
+.code{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8}
+.ttl{font-size:16.5px;font-weight:800;letter-spacing:-.015em}
+.pur{font-size:12px;color:#6B7280;margin-top:3px;max-width:96ch}
+.pill{font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;
+padding:2px 7px;border-radius:5px;background:#EEF3FA;color:#4A5A70}
+.pill.named{background:var(--warnbg);color:var(--warn)}
+.pill.off{background:var(--okbg);color:var(--ok)}
+
+/* the frame — 1280x700, the packs' dimension */
+.frame{width:1280px;height:700px;display:flex;background:var(--wash);border:1px solid var(--edge);
+border-radius:14px;overflow:hidden;box-shadow:0 16px 38px rgba(12,35,64,.09)}
+.rail{flex:none;width:180px;background:var(--rail);display:flex;flex-direction:column;position:relative}
+.rail::before{content:'';position:absolute;inset:0;
+background:radial-gradient(300px 200px at 0% 4%,rgba(0,184,255,.20),transparent 70%);pointer-events:none}
+.brand{position:relative;padding:15px 14px 13px;border-bottom:1px solid rgba(255,255,255,.08)}
+.brand b{display:block;font-size:14px;font-weight:800;letter-spacing:.1em;
+background:linear-gradient(90deg,#4DA3FF,var(--accent));-webkit-background-clip:text;
+background-clip:text;color:transparent}
+.brand span{display:block;font-size:9.5px;color:#7FA3C9;margin-top:5px}
+.nav{position:relative;display:flex;flex-direction:column;gap:2px;padding:11px 9px}
+.nav i{display:block;padding:8px 10px;border-radius:9px;font-size:11.5px;font-style:normal;color:#8FA8C4}
+.nav i.on{background:linear-gradient(90deg,rgba(13,110,253,.30),rgba(0,184,255,.10));
+color:#fff;font-weight:700}
+.body{flex:1;display:flex;flex-direction:column;min-width:0}
+.top{flex:none;height:54px;display:flex;align-items:center;gap:12px;padding:0 18px;
+background:var(--paper);border-bottom:1px solid var(--line)}
+.top h2{font-size:13.5px;font-weight:800;letter-spacing:-.01em;margin:0}
+.top small{display:block;font-size:10px;color:var(--dim);font-weight:500}
+.acts{margin-left:auto;display:flex;gap:6px}
+.chip{height:32px;display:flex;align-items:center;gap:6px;padding:0 11px;border:1px solid var(--edge);
+border-radius:8px;font-size:11px;font-weight:700;color:var(--mut);background:var(--paper)}
+.chip.live{background:var(--okbg);border-color:var(--okline);color:var(--ok)}
+.chip.live::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--ok)}
+.chip.cta{background:var(--brand);border-color:var(--brand);color:#fff}
+.canvas{flex:1;display:flex;flex-direction:column;gap:12px;padding:14px 16px;min-height:0;overflow:hidden}
+.kpis{flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.kpi{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:11px 13px;
+display:flex;flex-direction:column;gap:4px}
+.kpi b{font-size:9.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.kpi span{font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;letter-spacing:-.02em}
+.panel{background:var(--paper);border:1px solid var(--line);border-radius:12px;padding:12px 14px;
+display:flex;flex-direction:column;gap:8px;min-height:0}
+.panel > b{font-size:11px;font-weight:800;letter-spacing:-.005em}
+.panel .why{font-size:10px;color:#7C8899;font-style:italic;line-height:1.5}
+.kind{font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--dim);
+letter-spacing:.06em;text-transform:uppercase}
+.rows{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1.6fr 1fr 1fr .7fr;gap:10px;align-items:center;
+padding:7px 0;border-top:1px solid #F0F3F8}
+.row:first-child{border-top:0;font-size:9.5px;font-weight:700;letter-spacing:.06em;
+text-transform:uppercase;color:var(--dim)}
+.bar{height:7px;border-radius:4px;background:#EDF1F7}
+.bar i{display:block;height:100%;border-radius:4px;
+background:linear-gradient(90deg,var(--brand),var(--accent))}
+.side{flex:none;width:250px;display:flex;flex-direction:column;gap:10px}
+.two{flex:1;display:flex;gap:12px;min-height:0}
+.grow{flex:1;min-width:0}
+.strip{flex:none;height:26px;display:flex;align-items:center;gap:8px;padding:0 18px;
+background:var(--warnbg);color:var(--warn);font-size:10px;font-weight:700;
+letter-spacing:.05em;text-transform:uppercase;border-bottom:1px solid #F0E0B8}
+.dark .frame{background:#0A1524}
+.dark .top{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .top small{color:#7FA3C9}
+.dark .canvas{background:#0A1524}
+.dark .kpi,.dark .panel{background:#0E2A4C;border-color:#1E3A5F;color:#E6F0FA}
+.dark .row{border-color:#193353}
+.dark .chip{background:#0E2A4C;border-color:#1E3A5F;color:#9FC0E0}
+
+.foot{font-family:'IBM Plex Mono',ui-monospace,monospace;font-size:10px;line-height:1.85;color:#7C8899}
+.foot b{color:#4A5566;font-weight:600}
+.foot .warn{color:var(--warn)}
+.bottom{margin-top:64px;padding-top:16px;border-top:1px solid var(--line);
+display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
+
+.wsix{list-style:none;padding:0;margin:0 0 26px;display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}.wsix a{display:flex;justify-content:space-between;gap:10px;padding:11px 13px;border:1px solid #E5E7EB;border-radius:9px;text-decoration:none;color:#111827;font:600 13px/1.3 Manrope,sans-serif;background:#fff}.wsix a:hover{border-color:#9CA3AF}.wsix span{color:#6B7280;font:400 12px/1.3 'IBM Plex Mono',monospace}</style></head><body>
+<div class="wrap">
+  <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; Platform boards</a>
+  <div class="head">
+    <div><span class="mark">TICVAI</span>
+      <h1>Workshop boards <span style="font-weight:600;color:#6B7280">(59 boards · 590 screens)</span></h1></div>
+    <div class="meta">derived from sources/workshop/pack.json</div>
+  </div>
+  <p class="lede"><strong>The 59 boards the workshop specified, ten screens each.</strong> The
+  platform boards remain the place a team builds from — a team owns a platform, and these screens
+  are spread across five of them. <strong>This index is the client's view of the same work</strong>,
+  and it exists because the board is the unit the pack was written in.</p>
+  <div class="grp">Access Control · 12 boards</div><ul class="wsix"><li><a href="WS01%20Access%20Control%20Board%201.dc.html"><b>WS01</b> board 1 <span>10 screens</span></a></li><li><a href="WS02%20Access%20Control%20Board%202.dc.html"><b>WS02</b> board 2 <span>10 screens</span></a></li><li><a href="WS03%20Access%20Control%20Board%203.dc.html"><b>WS03</b> board 3 <span>10 screens</span></a></li><li><a href="WS04%20Access%20Control%20Board%204.dc.html"><b>WS04</b> board 4 <span>10 screens</span></a></li><li><a href="WS05%20Access%20Control%20Board%205.dc.html"><b>WS05</b> board 5 <span>10 screens</span></a></li><li><a href="WS06%20Access%20Control%20Board%206.dc.html"><b>WS06</b> board 6 <span>10 screens</span></a></li><li><a href="WS07%20Access%20Control%20Board%207.dc.html"><b>WS07</b> board 7 <span>10 screens</span></a></li><li><a href="WS08%20Access%20Control%20Board%208.dc.html"><b>WS08</b> board 8 <span>10 screens</span></a></li><li><a href="WS09%20Access%20Control%20Board%209.dc.html"><b>WS09</b> board 9 <span>10 screens</span></a></li><li><a href="WS10%20Access%20Control%20Board%2010.dc.html"><b>WS10</b> board 10 <span>10 screens</span></a></li><li><a href="WS11%20Access%20Control%20Board%2011.dc.html"><b>WS11</b> board 11 <span>10 screens</span></a></li><li><a href="WS12%20Access%20Control%20Board%2012.dc.html"><b>WS12</b> board 12 <span>10 screens</span></a></li></ul><div class="grp">B2B, Reseller &amp; OTA Partner Management · 3 boards</div><ul class="wsix"><li><a href="WS13%20B2B,%20Reseller%20&%20OTA%20Partner%20Management%20Board%201.dc.html"><b>WS13</b> board 1 <span>10 screens</span></a></li><li><a href="WS14%20B2B,%20Reseller%20&%20OTA%20Partner%20Management%20Board%202.dc.html"><b>WS14</b> board 2 <span>10 screens</span></a></li><li><a href="WS15%20B2B,%20Reseller%20&%20OTA%20Partner%20Management%20Board%203.dc.html"><b>WS15</b> board 3 <span>10 screens</span></a></li></ul><div class="grp">Communication &amp; Notification Platform Services · 1 boards</div><ul class="wsix"><li><a href="WS16%20Communication%20&%20Notification%20Platform%20Services%20Board%201.dc.html"><b>WS16</b> board 1 <span>10 screens</span></a></li></ul><div class="grp">Customer Service · 2 boards</div><ul class="wsix"><li><a href="WS17%20Customer%20Service%20Board%201.dc.html"><b>WS17</b> board 1 <span>10 screens</span></a></li><li><a href="WS18%20Customer%20Service%20Board%202.dc.html"><b>WS18</b> board 2 <span>10 screens</span></a></li></ul><div class="grp">Group Sales   Corporate Booking Management · 2 boards</div><ul class="wsix"><li><a href="WS19%20Group%20Sales%20%20%20Corporate%20Booking%20Management%20Board%201.dc.html"><b>WS19</b> board 1 <span>10 screens</span></a></li><li><a href="WS20%20Group%20Sales%20%20%20Corporate%20Booking%20Management%20Board%202.dc.html"><b>WS20</b> board 2 <span>10 screens</span></a></li></ul><div class="grp">Membership   Annual Pass Management · 2 boards</div><ul class="wsix"><li><a href="WS21%20Membership%20%20%20Annual%20Pass%20Management%20Board%201.dc.html"><b>WS21</b> board 1 <span>10 screens</span></a></li><li><a href="WS22%20Membership%20%20%20Annual%20Pass%20Management%20Board%202.dc.html"><b>WS22</b> board 2 <span>10 screens</span></a></li></ul><div class="grp">Order   Reservation Management · 3 boards</div><ul class="wsix"><li><a href="WS23%20Order%20%20%20Reservation%20Management%20Board%201.dc.html"><b>WS23</b> board 1 <span>10 screens</span></a></li><li><a href="WS24%20Order%20%20%20Reservation%20Management%20Board%202.dc.html"><b>WS24</b> board 2 <span>10 screens</span></a></li><li><a href="WS25%20Order%20%20%20Reservation%20Management%20Board%203.dc.html"><b>WS25</b> board 3 <span>10 screens</span></a></li></ul><div class="grp">Pricing   Revenue Management · 7 boards</div><ul class="wsix"><li><a href="WS26%20Pricing%20%20%20Revenue%20Management%20Board%201.dc.html"><b>WS26</b> board 1 <span>10 screens</span></a></li><li><a href="WS27%20Pricing%20%20%20Revenue%20Management%20Board%202.dc.html"><b>WS27</b> board 2 <span>10 screens</span></a></li><li><a href="WS28%20Pricing%20%20%20Revenue%20Management%20Board%203.dc.html"><b>WS28</b> board 3 <span>10 screens</span></a></li><li><a href="WS29%20Pricing%20%20%20Revenue%20Management%20Board%204.dc.html"><b>WS29</b> board 4 <span>10 screens</span></a></li><li><a href="WS30%20Pricing%20%20%20Revenue%20Management%20Board%205.dc.html"><b>WS30</b> board 5 <span>10 screens</span></a></li><li><a href="WS31%20Pricing%20%20%20Revenue%20Management%20Board%206.dc.html"><b>WS31</b> board 6 <span>10 screens</span></a></li><li><a href="WS32%20Pricing%20%20%20Revenue%20Management%20Board%207.dc.html"><b>WS32</b> board 7 <span>10 screens</span></a></li></ul><div class="grp">Privacy  Consent   Preference Management · 2 boards</div><ul class="wsix"><li><a href="WS33%20Privacy%20%20Consent%20%20%20Preference%20Management%20Board%201.dc.html"><b>WS33</b> board 1 <span>10 screens</span></a></li><li><a href="WS34%20Privacy%20%20Consent%20%20%20Preference%20Management%20Board%202.dc.html"><b>WS34</b> board 2 <span>10 screens</span></a></li></ul><div class="grp">Product Lifecycle   Catalogue Governance · 2 boards</div><ul class="wsix"><li><a href="WS35%20Product%20Lifecycle%20%20%20Catalogue%20Governance%20Board%201.dc.html"><b>WS35</b> board 1 <span>10 screens</span></a></li><li><a href="WS36%20Product%20Lifecycle%20%20%20Catalogue%20Governance%20Board%202.dc.html"><b>WS36</b> board 2 <span>10 screens</span></a></li></ul><div class="grp">Promotions   Bundles Management · 10 boards</div><ul class="wsix"><li><a href="WS37%20Promotions%20%20%20Bundles%20Management%20Board%201.dc.html"><b>WS37</b> board 1 <span>10 screens</span></a></li><li><a href="WS38%20Promotions%20%20%20Bundles%20Management%20Board%202.dc.html"><b>WS38</b> board 2 <span>10 screens</span></a></li><li><a href="WS39%20Promotions%20%20%20Bundles%20Management%20Board%203.dc.html"><b>WS39</b> board 3 <span>10 screens</span></a></li><li><a href="WS40%20Promotions%20%20%20Bundles%20Management%20Board%204.dc.html"><b>WS40</b> board 4 <span>10 screens</span></a></li><li><a href="WS41%20Promotions%20%20%20Bundles%20Management%20Board%205.dc.html"><b>WS41</b> board 5 <span>10 screens</span></a></li><li><a href="WS42%20Promotions%20%20%20Bundles%20Management%20Board%206.dc.html"><b>WS42</b> board 6 <span>10 screens</span></a></li><li><a href="WS43%20Promotions%20%20%20Bundles%20Management%20Board%207.dc.html"><b>WS43</b> board 7 <span>10 screens</span></a></li><li><a href="WS44%20Promotions%20%20%20Bundles%20Management%20Board%208.dc.html"><b>WS44</b> board 8 <span>10 screens</span></a></li><li><a href="WS45%20Promotions%20%20%20Bundles%20Management%20Board%209.dc.html"><b>WS45</b> board 9 <span>10 screens</span></a></li><li><a href="WS46%20Promotions%20%20%20Bundles%20Management%20Board%2010.dc.html"><b>WS46</b> board 10 <span>10 screens</span></a></li></ul><div class="grp">Rules  Workflow  Approval   Automation Engine · 2 boards</div><ul class="wsix"><li><a href="WS47%20Rules%20%20Workflow%20%20Approval%20%20%20Automation%20Engine%20Board%201.dc.html"><b>WS47</b> board 1 <span>10 screens</span></a></li><li><a href="WS48%20Rules%20%20Workflow%20%20Approval%20%20%20Automation%20Engine%20Board%202.dc.html"><b>WS48</b> board 2 <span>10 screens</span></a></li></ul><div class="grp">Sales Channel Management · 2 boards</div><ul class="wsix"><li><a href="WS49%20Sales%20Channel%20Management%20Board%201.dc.html"><b>WS49</b> board 1 <span>10 screens</span></a></li><li><a href="WS50%20Sales%20Channel%20Management%20Board%202.dc.html"><b>WS50</b> board 2 <span>10 screens</span></a></li></ul><div class="grp">Ticket Media   Credential Management · 3 boards</div><ul class="wsix"><li><a href="WS51%20Ticket%20Media%20%20%20Credential%20Management%20Board%201.dc.html"><b>WS51</b> board 1 <span>10 screens</span></a></li><li><a href="WS52%20Ticket%20Media%20%20%20Credential%20Management%20Board%202.dc.html"><b>WS52</b> board 2 <span>10 screens</span></a></li><li><a href="WS53%20Ticket%20Media%20%20%20Credential%20Management%20Board%203.dc.html"><b>WS53</b> board 3 <span>10 screens</span></a></li></ul><div class="grp">Ticket Resale Marketplace · 3 boards</div><ul class="wsix"><li><a href="WS54%20Ticket%20Resale%20Marketplace%20Board%201.dc.html"><b>WS54</b> board 1 <span>10 screens</span></a></li><li><a href="WS55%20Ticket%20Resale%20Marketplace%20Board%202.dc.html"><b>WS55</b> board 2 <span>10 screens</span></a></li><li><a href="WS56%20Ticket%20Resale%20Marketplace%20Board%203.dc.html"><b>WS56</b> board 3 <span>10 screens</span></a></li></ul><div class="grp">Ticket Upgrade, Exchange &amp; Conversion · 1 boards</div><ul class="wsix"><li><a href="WS57%20Ticket%20Upgrade,%20Exchange%20&%20Conversion%20Board%201.dc.html"><b>WS57</b> board 1 <span>10 screens</span></a></li></ul><div class="grp">Waiver, Consent &amp; Digital Form Management · 2 boards</div><ul class="wsix"><li><a href="WS58%20Waiver,%20Consent%20&%20Digital%20Form%20Management%20Board%201.dc.html"><b>WS58</b> board 1 <span>10 screens</span></a></li><li><a href="WS59%20Waiver,%20Consent%20&%20Digital%20Form%20Management%20Board%202.dc.html"><b>WS59</b> board 2 <span>10 screens</span></a></li></ul>
+  <div class="bottom">
+    <span>Generated by tools/derive-pack-boards.py — do not hand-edit</span>
+    <span>59 boards · 590 screens</span>
+  </div>
+</div></body></html>

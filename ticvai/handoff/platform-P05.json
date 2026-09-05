@@ -7,7 +7,7 @@
  "audience": "guest",
  "formFactor": "kiosk",
  "offlineCapable": false,
- "generated": "2026-09-01",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 17,
@@ -15,7 +15,7 @@
   "contracts": 8,
   "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 21
+  "operationsWithNoScreen": 0
  },
  "waves": {
   "wave2": 17
@@ -50,7 +50,7 @@
    "operations": 4
   },
   {
-   "contract": "marketing-crm",
+   "contract": "white-label",
    "operations": 2
   },
   {
@@ -58,7 +58,7 @@
    "operations": 2
   },
   {
-   "contract": "white-label",
+   "contract": "marketing-crm",
    "operations": 2
   },
   {
@@ -226,134 +226,7 @@
   }
  ],
  "gaps": {
-  "operationsWithNoScreen": [
-   {
-    "operation": "freezeEntitlement",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Pause a membership at the guest's request"
-   },
-   {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
-   },
-   {
-    "operation": "updateTableReservation",
-    "contract": "fnb",
-    "verb": "PATCH",
-    "summary": "Change or cancel a booking"
-   },
-   {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
-   },
-   {
-    "operation": "recordLostItem",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Report something lost, or hand something in"
-   },
-   {
-    "operation": "respondToInvitation",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Accept or decline"
-   },
-   {
-    "operation": "submitForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
-   },
-   {
-    "operation": "convertToTermProduct",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createCart",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Start a cart"
-   },
-   {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
-   },
-   {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
-   },
-   {
-    "operation": "transferWalletBalance",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Send balance to another guest"
-   }
-  ],
+  "operationsWithNoScreen": [],
   "modulesSplitAcrossWaves": [],
   "screensNotDrawn": [],
   "flowsNamingAMissingScreen": []

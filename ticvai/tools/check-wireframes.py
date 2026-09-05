@@ -156,7 +156,15 @@ def main() -> int:
         code = doc["platform"]["code"]
         for ref in (doc["platform"].get("designReferences") or []):
             if not (ROOT / ref["path"]).exists():
-                ERRORS.append(f"{code}: design reference '{ref['path']}' does not exist")
+                # **A design reference is a client file under `sources/`, and `sources/` is 117 MB of
+                # PDFs that a working package legitimately ships without.** Failing here made an
+                # extracted package look broken when it was only smaller.
+                #
+                # **An absent folder is a warning; an absent file inside a present folder is an error.**
+                # The first is a packaging choice, the second is a reference to something deleted or
+                # renamed — and only the second is a defect.
+                (WARNINGS if not (ROOT / "sources").exists() else ERRORS).append(
+                    f"{code}: design reference '{ref['path']}' does not exist")
         for s in doc["screens"]:
             dr = (s.get("wireframe") or {}).get("designReference")
             if dr and not (ROOT / dr).exists():

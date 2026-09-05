@@ -1,0 +1,25 @@
+digraph flow {
+  rankdir=TB; bgcolor="transparent"; ranksep=0.35; nodesep=0.4;
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=10 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=9 color="#5A6577"];
+  req [label="Request" fillcolor="#E2EFDA"];
+  { rank=same;
+    bp [label="Concurrency limit\n429 + jittered Retry-After\nshed guest before staff" fillcolor="#FDECEC"];
+    cr [label="cache:resolution\nstale-while-revalidate\njittered TTL ±10%" fillcolor="#DDEBF7"]; }
+  { rank=same;
+    sf [label="Single-flight\none recompute per key" fillcolor="#DDEBF7"];
+    bh [label="Bulkhead\none pool per downstream" fillcolor="#FFF6E0"]; }
+  { rank=same;
+    lk [label="acquireInventoryHold\nFOR UPDATE SKIP LOCKED" fillcolor="#FDECEC"];
+    pb [label="pgbouncer\n400 client → 40 server" fillcolor="#FFF6E0"]; }
+  pg [label="Postgres" fillcolor="#FFFFFF"];
+  { rank=same;
+    ob [label="platform.outbox\ncommits with the state change" fillcolor="#E2EFDA"];
+    dl [label="platform.dead_letter\n5 attempts, backed off" fillcolor="#FDECEC"]; }
+  { rank=same;
+    cb [label="Circuit breaker\n5 failures → open" fillcolor="#FFF6E0"];
+    ext [label="External provider" style="filled,rounded,dashed" fillcolor="#F4F7FB"]; }
+  req -> bp -> cr; cr -> sf [label="miss"]; cr -> req [label="hit" color="#1B7A3D"];
+  sf -> bh; bh -> lk [label="contended"]; bh -> pb; lk -> pb; pb -> pg;
+  pg -> ob; ob -> cb; cb -> ext; ob -> dl [label="retry budget spent" color="#B00020"];
+}

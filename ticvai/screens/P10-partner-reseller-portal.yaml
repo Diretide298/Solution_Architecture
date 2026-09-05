@@ -1,7 +1,3 @@
-# P10 — Partner & Reseller Portal
-# Generated from handoff/page-inventory.md. Layout, states and purpose are TODO.
-# Validated against _schema.yaml; component kinds from _components.yaml.
-
 platform:
   code: P10
   audience: partner
@@ -16,7 +12,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 21
+  screenCount: 51
   app: partner-web
   appStatus: not scaffolded
   packages:
@@ -58,21 +54,21 @@ screens:
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
-    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
-      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
-      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `CREDIT_MANAGE`, `CREDIT_OVERRIDE`, `ORDER_VIEW` and 2 more to manage credits; a person
-      without it sees the reason and who to ask, because an empty table reads as *there is no data*
-      and sends somebody to support with the wrong question.
+      needs `CREDIT_MANAGE`, `CREDIT_OVERRIDE`, `ORDER_VIEW` and 2 more to manage credits; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
   wireframe:
     status: generated
@@ -151,9 +147,9 @@ screens:
       from: deepLink
     - name: sessionId
       from: session
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `accountId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `accountId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-002
@@ -173,16 +169,16 @@ screens:
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `CREDIT_MANAGE`, `CREDIT_OVERRIDE`, `ORDER_CREATE` and 7 more to manage credits; a person
-      without it sees the reason and who to ask, because an empty table reads as *there is no data*
-      and sends somebody to support with the wrong question.
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
     status: designed
@@ -275,8 +271,8 @@ screens:
     18 August** — attached by module resemblance, not by what this screen does. A screen that does not
     handle money should not be able to move it (CF-87's class). **Drawn 26 August** — `Dashboards Board`
     frame `ptr-002`. **One board draws five dashboards across five platforms** — platform admin, partner,
-    support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the
-    pack recognised that before the package did.
+    support, guest web and cross-tenant health. A dashboard is a shape rather than a domain, and the pack
+    recognised that before the package did.
   density: compact
   entryState:
     params:
@@ -284,9 +280,8 @@ screens:
       from: PTR-001
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: partner
   statesDerived: true
   boardFrames:
@@ -312,6 +307,11 @@ screens:
         impliedBy: listPrincipals
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPrincipal
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -321,18 +321,18 @@ screens:
       an empty table reads as *there is no data* and sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
-      overwrites what someone else set'
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
+      what someone else set'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-003
@@ -394,20 +394,25 @@ screens:
         impliedBy: sendTransactionalMessage
         label: Send transactional message
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: sendTransactionalMessage
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `GUEST_VIEW` to read guests; a person without it sees the reason and who to ask, because
-      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+      needs `GUEST_VIEW` to read guests; a person without it sees the reason and who to ask, because an
+      empty table reads as *there is no data* and sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
   wireframe:
     status: generated
@@ -443,9 +448,9 @@ screens:
     params:
     - name: messageId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `messageId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `messageId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-005
@@ -475,41 +480,42 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createOrder
       - kind: confirmDialog
-        label: Void this order?
-        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
-          replacing one identical definition that had been pasted onto all 39 screens - the label read
-          *Confirm*, which is the *are you sure* the library entry rules out.
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
 
 
-          **Name the order, its line count and its value, and what happens to money already taken.**
-          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
-          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
-          is the only place a person learns it.
-
-
-          **State:** `Order pending -> voided`.'
-        bindsTo: voidOrder
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `CAPACITY_CONFIGURE`, `ORDER_CREATE`, `ORDER_DISCOUNT` and 7 more to configure capacitys;
-      a person without it sees the reason and who to ask, because an empty table reads as *there is
-      no data* and sends somebody to support with the wrong question.
+      a person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-005
@@ -618,9 +624,8 @@ screens:
       from: deepLink
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-006
@@ -638,21 +643,21 @@ screens:
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
-    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
-      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
-      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `PRICE_CONFIGURE`, `PRICE_VIEW`, `PRODUCT_CONFIGURE` and 1 more to configure prices; a person
-      without it sees the reason and who to ask, because an empty table reads as *there is no data*
-      and sends somebody to support with the wrong question.
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
     status: generated
@@ -750,8 +755,8 @@ screens:
       from: deepLink
     - name: productId
       from: deepLink
-    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a
-      successor exists, and the catalogue where none does.'
+    coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
+      exists, and the catalogue where none does.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-007
@@ -769,20 +774,20 @@ screens:
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
-    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
-      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
-      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `PRODUCT_VIEW` to read products; a person without it sees the reason and who to ask, because
       an empty table reads as *there is no data* and sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
     status: generated
@@ -831,17 +836,17 @@ screens:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE` and 6 more to create orders; a person
-      without it sees the reason and who to ask, because an empty table reads as *there is no data*
-      and sends somebody to support with the wrong question.
+      needs `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE` and 6 more to create orders; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load . Actions on the list are disabled
   wireframe:
     status: generated
@@ -925,16 +930,15 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
     removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not
-    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
-    rather than a screen pretending there is a link.'
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
+    than a screen pretending there is a link.'
   density: compact
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-009
@@ -963,19 +967,22 @@ screens:
         label: Release seat block
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: allocateBlockedSeats
       - kind: confirmDialog
-        label: Release this seat block?
-        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
-          replacing one identical definition that had been pasted onto all 39 screens - the label read
-          *Confirm*, which is the *are you sure* the library entry rules out.
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
 
 
-          **Name the block, the seat count and the performance.** Every seat returns to public availability
-          at once. No event is emitted, so nothing tells a partner holding an allocation.
-
-
-          **State:** `Seat blocked -> available`.'
-        bindsTo: releaseSeatBlock
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -985,17 +992,17 @@ screens:
       somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: designed
     board: wireframes/Seat Board 3.dc.html#seat-3d
@@ -1034,18 +1041,18 @@ screens:
   notes: 'States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
-    — `Seat Board 3.dc.html` frame `seat-3d`. **The frame names this screen on its own face**, which
-    is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by
-    purpose after three derivation attempts produced nonsense. **A board that says what it draws removes
-    the guess entirely.**'
+    — `Seat Board 3.dc.html` frame `seat-3d`. **The frame names this screen on its own face**, which is
+    the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned by purpose
+    after three derivation attempts produced nonsense. **A board that says what it draws removes the guess
+    entirely.**'
   density: compact
   entryState:
     params:
     - name: blockId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `blockId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `blockId`.'
   requiresModule: partner
   statesDerived: true
   boardFrames:
@@ -1076,39 +1083,42 @@ screens:
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
         label: Remove cart line
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: evaluatePromotions
       - kind: confirmDialog
-        label: Remove this line?
-        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
-          replacing one identical definition that had been pasted onto all 39 screens - the label read
-          *Confirm*, which is the *are you sure* the library entry rules out.
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
 
 
-          **Name the line and the new cart total.** Low consequence - this is the one case where a light
-          confirmation is enough, and on a touch surface an undo is better than a dialog.
-
-
-          **`Cart line` has no state model** - nothing declares what the record becomes.'
-        bindsTo: removeCartLine
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `PRICE_CONFIGURE`, `PRICE_VIEW` to configure prices; a person without it sees the reason
-      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
-      with the wrong question.
+      needs `PRICE_CONFIGURE`, `PRICE_VIEW` to configure prices; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-010
@@ -1203,9 +1213,9 @@ screens:
       from: deepLink
     - name: promotionId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `lineId`, `promotionId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `lineId`, `promotionId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-011
@@ -1225,19 +1235,19 @@ screens:
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
       (ADR-0018)
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `PARTNER_MANAGE`, `PARTNER_VIEW` to manage partners; a person without it sees the reason
-      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
-      with the wrong question.
+      needs `PARTNER_MANAGE`, `PARTNER_VIEW` to manage partners; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
-      overwrites what someone else set'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
+      what someone else set'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-011
@@ -1268,14 +1278,22 @@ screens:
     contract: subscription
     purpose: What the partner earned and what is owed
     trigger: onLoad
+  - operationId: listPartnerQuotes
+    contract: subscription
+    purpose: Quotes offered to this partner
+    trigger: onLoad
+  - operationId: createPartnerQuote
+    contract: subscription
+    purpose: Raise a quote
+    trigger: onAction
   density: compact
   entryState:
     params:
     - name: agreementId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `agreementId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `agreementId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-012
@@ -1294,17 +1312,17 @@ screens:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ORDER_CREATE`, `ORDER_MODIFY` to create orders; a person without it sees the reason and
-      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
-      the wrong question.
+      needs `ORDER_CREATE`, `ORDER_MODIFY` to create orders; a person without it sees the reason and who
+      to ask, because an empty table reads as *there is no data* and sends somebody to support with the
+      wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
   wireframe:
     status: generated
@@ -1353,9 +1371,9 @@ screens:
     params:
     - name: paymentId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `paymentId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `paymentId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-013
@@ -1373,21 +1391,26 @@ screens:
         derived: true
         impliedBy: overrideCreditLimit
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideCreditLimit
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `CREDIT_MANAGE`, `CREDIT_OVERRIDE`, `ORDER_VIEW` to manage credits; a person without it
-      sees the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      needs `CREDIT_MANAGE`, `CREDIT_OVERRIDE`, `ORDER_VIEW` to manage credits; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
       to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
     status: generated
@@ -1445,23 +1468,23 @@ screens:
   states:
     loading: Figures load; the expected total renders last
     emptyFirstRun: Nothing in the period — reported as a result, not an empty screen
-    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
-      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
-      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `SETTLEMENT_RECONCILE`, `SETTLEMENT_VIEW` to use settlements; a person without it sees the
       reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
       support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must
-      not be reconciled against'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Every action that moves money is blocked** — a figure nobody read must not
+      be reconciled against'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-014
@@ -1508,9 +1531,9 @@ screens:
     params:
     - name: settlementId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `settlementId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `settlementId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-015
@@ -1528,21 +1551,21 @@ screens:
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
-    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens
-      or clears it — distinct from first run, which has nothing to match, and **a screen that shows
-      the same panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE` and 6 more to create orders; a person
-      without it sees the reason and who to ask, because an empty table reads as *there is no data*
-      and sends somebody to support with the wrong question.
+      needs `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE` and 6 more to create orders; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
     status: generated
@@ -1623,16 +1646,15 @@ screens:
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
     removed 24 August**: BO-008. **A till does not navigate to a back office and a guest app does not
-    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
-    rather than a screen pretending there is a link.'
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
+    than a screen pretending there is a link.'
   density: compact
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-016
@@ -1661,41 +1683,42 @@ screens:
         label: Void order
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reprintOrder
       - kind: confirmDialog
-        label: Void this order?
-        notes: '**The consequence goes in the body, not the title.** Written per operation on 1 September,
-          replacing one identical definition that had been pasted onto all 39 screens - the label read
-          *Confirm*, which is the *are you sure* the library entry rules out.
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
 
 
-          **Name the order, its line count and its value, and what happens to money already taken.**
-          Writes `orders.sales_order`, `orders.order_line` and `orders.payment`. **No event is emitted,
-          so the ledger is not told** - until `order.voided` exists this is a silent write and the confirmation
-          is the only place a person learns it.
-
-
-          **State:** `Order pending -> voided`.'
-        bindsTo: voidOrder
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE` and 5 more to create orders; a person
-      without it sees the reason and who to ask, because an empty table reads as *there is no data*
-      and sends somebody to support with the wrong question.
+      needs `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE` and 5 more to create orders; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-016
@@ -1800,22 +1823,22 @@ screens:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `PARTNER_MANAGE`, `PARTNER_VIEW` to manage partners; a person without it sees the reason
-      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
-      with the wrong question.
+      needs `PARTNER_MANAGE`, `PARTNER_VIEW` to manage partners; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-017
@@ -1851,9 +1874,9 @@ screens:
     params:
     - name: agreementId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `agreementId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `agreementId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-018
@@ -1877,12 +1900,12 @@ screens:
       with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
   wireframe:
     status: generated
@@ -1955,8 +1978,8 @@ screens:
 - id: PTR-019
   name: API Credentials & Integration
   module: Access & Account
-  purpose: API Credentials & Integration — the screen a person opens when they need to deal with api
-    credentials & integration.
+  purpose: API Credentials & Integration — the screen a person opens when they need to deal with api credentials
+    & integration.
   wave: 3
   layout:
     template: detail
@@ -1988,9 +2011,36 @@ screens:
     - PTR-003
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **Licensed on `developerApi`,
+    not on `partner`.** The partner licence is what puts a partner on this portal at all; this screen's
+    whole function is the developer API, and without that licence there is nothing on it to show. Declared
+    `partner` it warned as a two-licence page, which is exactly the drift the rule exists to catch.
   density: compact
-  requiresModule: partner
+  requiresModule: developerApi
+  apis:
+  - operationId: listApiClients
+    contract: public-api
+    purpose: Clients issued to this partner
+    trigger: onLoad
+  - operationId: createApiClient
+    contract: public-api
+    purpose: Issue a client
+    trigger: onAction
+  - operationId: rotateApiCredential
+    contract: public-api
+    purpose: Rotate a key without downtime
+    trigger: onAction
+  - operationId: revokeApiCredential
+    contract: public-api
+    purpose: Revoke a key immediately
+    trigger: onAction
+  entryState:
+    params:
+    - name: clientId
+      from: navigation
+    coldEntry: '**Rotation and revocation act on one client**, which arrives from the row the partner
+      chose. Opened cold the screen lists clients rather than offering an action with no subject — revoking
+      the wrong key is not recoverable by the person who did it.'
 - id: PTR-020
   name: Sub-Agent Management
   module: Access & Account
@@ -2013,14 +2063,14 @@ screens:
       with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
-      overwrites what someone else set'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
+      what someone else set'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-020
@@ -2059,9 +2109,9 @@ screens:
     params:
     - name: delegatedAccessId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `delegatedAccessId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `delegatedAccessId`.'
   requiresModule: partner
   statesDerived: true
 - id: PTR-021
@@ -2085,26 +2135,31 @@ screens:
         impliedBy: listCases
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createCase
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who
-      to ask, because an empty table reads as *there is no data* and sends somebody to support with
-      the wrong question.
+      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who to
+      ask, because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
-      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+      **Also reached when `partner` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P10 Partner Web.dc.html#ptr-021
@@ -2159,8 +2214,1692 @@ screens:
     params:
     - name: caseId
       from: deepLink
-    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.**
-      A forwarded link between partners must not open another partner''s record. If the target is gone
-      the screen says so and offers the partner''s own list. Arrives with `caseId`.'
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `caseId`.'
   requiresModule: partner
   statesDerived: true
+- id: PTR-022
+  name: Partner Management Command Center
+  module: Partners
+  requiresModule: partner
+  purpose: Provide a centralized management dashboard for all B2B, reseller, OTA and distribution partners
+    across the TICVAI ecosystem.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Total Partners
+      - kind: metricTile
+        notes: Active Partners
+      - kind: metricTile
+        notes: Pending Onboarding
+      - kind: metricTile
+        notes: Pending Approval
+      - kind: metricTile
+        notes: Suspended Partners
+      - kind: metricTile
+        notes: Expiring Agreements
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartner
+    contract: subscription
+    purpose: Partner Management Command Center
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-management-command-center-ptr-022
+    component: apps/partner-web/src/routes/partners/PartnerManagementCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-022
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-022
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.1
+    page: 5
+  navigation:
+    entryFrom:
+    - PTR-001
+    exitTo:
+    - PTR-001
+    - PTR-023
+    - PTR-024
+    - PTR-025
+    - PTR-026
+    - PTR-027
+    - PTR-028
+    - PTR-029
+    - PTR-030
+    - PTR-031
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: PTR-023
+  name: Partner Profile & Organization Setup
+  module: Partners
+  requiresModule: partner
+  purpose: Create the master business record for each external distribution partner.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setPartnerProfileOrganization
+    contract: subscription
+    purpose: Partner Profile & Organization Setup
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /partners/partner-profile-organization-setup-ptr-023
+    component: apps/partner-web/src/routes/partners/PartnerProfileOrganizationSetup.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-023
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-023
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.2
+    page: 7
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-024
+  name: Partner Onboarding & Application Workflow
+  module: Partners
+  requiresModule: partner
+  purpose: Manage the complete journey from a new partner application through internal review and activation.
+    8 | Pag e
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerOnboardingApplication
+    contract: subscription
+    purpose: Partner Onboarding & Application Workflow
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-onboarding-application-workflow-ptr-024
+    component: apps/partner-web/src/routes/partners/PartnerOnboardingApplicationWorkflow.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-024
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-024
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.3
+    page: 8
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-025
+  name: Partner Contacts & User Administration
+  module: Partners
+  requiresModule: partner
+  purpose: Manage the individuals authorized to interact with TICVAI on behalf of each partner.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerContactUser
+    contract: subscription
+    purpose: Partner Contacts & User Administration
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-contacts-user-administration-ptr-025
+    component: apps/partner-web/src/routes/partners/PartnerContactsUserAdministration.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-025
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-025
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.4
+    page: 10
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-026
+  name: Territory, Market & Distribution Rights
+  module: Partners
+  requiresModule: partner
+  purpose: Define where and through what business scope a partner is authorized to distribute TICVAI products.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first territory, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listTerritoryMarketDistribution
+    contract: subscription
+    purpose: Territory, Market & Distribution Rights
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/territory-market-distribution-rights-ptr-026
+    component: apps/partner-web/src/routes/partners/TerritoryMarketDistributionRights.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-026
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-026
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.5
+    page: 12
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-027
+  name: Partner Brand, Venue & Business Scope Assignment
+  module: Partners
+  requiresModule: partner
+  purpose: Determine which TICVAI business entities the partner relationship covers. This is deliberately
+    separate from product assignment, which is governed through the Sales Channel and commercial configuration
+    layers.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setPartnerBrandVenue
+    contract: subscription
+    purpose: Partner Brand, Venue & Business Scope Assignment
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /partners/partner-brand-venue-business-scope-assignment-ptr-027
+    component: apps/partner-web/src/routes/partners/PartnerBrandVenueBusinessScopeAssignment.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-027
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-027
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.6
+    page: 14
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-028
+  name: Partner Documentation & Compliance Repository
+  module: Partners
+  requiresModule: partner
+  purpose: Maintain required partner documentation and ensure that commercial accounts remain compliant.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerDocumentationCompliance
+    contract: subscription
+    purpose: Partner Documentation & Compliance Repository
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-documentation-compliance-repository-ptr-028
+    component: apps/partner-web/src/routes/partners/PartnerDocumentationComplianceRepository.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-028
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-028
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.7
+    page: 15
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-029
+  name: Partner Access, Roles & Permission Profile
+  module: Partners
+  requiresModule: partner
+  purpose: Control what a partner organization is permitted to do, beyond individual-user permissions.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerAccessRole
+    contract: subscription
+    purpose: Partner Access, Roles & Permission Profile
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-access-roles-permission-profile-ptr-029
+    component: apps/partner-web/src/routes/partners/PartnerAccessRolesPermissionProfile.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-029
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-029
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.8
+    page: 16
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-030
+  name: Partner Approval, Status & Lifecycle Management
+  module: Partners
+  requiresModule: partner
+  purpose: Govern the complete business lifecycle of a partner after onboarding.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: approvePartnerStatuLifecycle
+    contract: subscription
+    purpose: Partner Approval, Status & Lifecycle Management
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /partners/partner-approval-status-lifecycle-management-ptr-030
+    component: apps/partner-web/src/routes/partners/PartnerApprovalStatusLifecycleManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-030
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-030
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.9
+    page: 18
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-031
+  name: Partner 360° Profile, Readiness & AI Review
+  module: Partners
+  requiresModule: partner
+  purpose: Provide one consolidated Partner 360 screen before activation and throughout the relationship.
+    19 | Pag e This should become one of the most useful screens for TICVAI commercial management.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerProfileReadiness
+    contract: subscription
+    purpose: Partner 360° Profile, Readiness & AI Review
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-360-profile-readiness-ai-review-ptr-031
+    component: apps/partner-web/src/routes/partners/Partner360ProfileReadinessAiReview.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-031
+    workshopBoard: wireframes/WS13 B2B, Reseller & OTA Partner Management Board 1.dc.html#ptr-031
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '1'
+    number: 8.1.10
+    page: 19
+  navigation:
+    entryFrom:
+    - PTR-022
+    exitTo:
+    - PTR-022
+    inferred: false
+    notes: '**Reached from PTR-022, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-032
+  name: Commercial Agreement Command Center
+  module: Partners
+  requiresModule: partner
+  purpose: Provide commercial and finance teams with a centralized view of all partner agreements and
+    their current commercial health. 23 | Pag e
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Active Agreements
+      - kind: metricTile
+        notes: Draft Agreements
+      - kind: metricTile
+        notes: Pending Approval
+      - kind: metricTile
+        notes: Agreements Expiring Soon
+      - kind: metricTile
+        notes: Expired Agreements
+      - kind: metricTile
+        notes: Partners on Credit Hold
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first commercial entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCommercialAgreement
+    contract: subscription
+    purpose: Commercial Agreement Command Center
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/commercial-agreement-command-center-ptr-032
+    component: apps/partner-web/src/routes/partners/CommercialAgreementCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-032
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-032
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.1
+    page: 23
+  navigation:
+    entryFrom:
+    - PTR-001
+    exitTo:
+    - PTR-001
+    - PTR-033
+    - PTR-034
+    - PTR-035
+    - PTR-036
+    - PTR-037
+    - PTR-038
+    - PTR-039
+    - PTR-040
+    - PTR-041
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: PTR-033
+  name: Agreement & Contract Terms Builder
+  module: Partners
+  requiresModule: partner
+  purpose: Create the structured commercial agreement governing the partner relationship.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first agreement entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setAgreementContractTerm
+    contract: subscription
+    purpose: Agreement & Contract Terms Builder
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /partners/agreement-contract-terms-builder-ptr-033
+    component: apps/partner-web/src/routes/partners/AgreementContractTermsBuilder.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-033
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-033
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.2
+    page: 25
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-034
+  name: Partner Rate & Net Pricing Configuration
+  module: Partners
+  requiresModule: partner
+  purpose: Define the commercial pricing basis available to a partner without recreating TICVAI's Pricing
+    Engine.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setPartnerRateNet
+    contract: subscription
+    purpose: Partner Rate & Net Pricing Configuration
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /partners/partner-rate-net-pricing-configuration-ptr-034
+    component: apps/partner-web/src/routes/partners/PartnerRateNetPricingConfiguration.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-034
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-034
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.3
+    page: 27
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-035
+  name: Commission, Margin & Incentive Management
+  module: Partners
+  requiresModule: partner
+  purpose: Configure how partner commissions and commercial incentives are calculated.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first commission, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCommissionMarginIncentive
+    contract: subscription
+    purpose: Commission, Margin & Incentive Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/commission-margin-incentive-management-ptr-035
+    component: apps/partner-web/src/routes/partners/CommissionMarginIncentiveManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-035
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-035
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.4
+    page: 29
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-036
+  name: Credit Limit & Exposure Management
+  module: Partners
+  requiresModule: partner
+  purpose: Control the financial exposure TICVAI permits for partners buying on account. This should be
+    one of the strongest finance-control screens in the B2B module. 30 | Pag e
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first credit entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCreditLimitExposure
+    contract: subscription
+    purpose: Credit Limit & Exposure Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/credit-limit-exposure-management-ptr-036
+    component: apps/partner-web/src/routes/partners/CreditLimitExposureManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-036
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-036
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.5
+    page: 30
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-037
+  name: Deposit, Guarantee & Financial Security Management
+  module: Partners
+  requiresModule: partner
+  purpose: Manage financial security required to support partner credit or commercial access.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first deposit, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listDepositGuaranteeFinancial
+    contract: subscription
+    purpose: Deposit, Guarantee & Financial Security Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/deposit-guarantee-financial-security-management-ptr-037
+    component: apps/partner-web/src/routes/partners/DepositGuaranteeFinancialSecurityManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-037
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-037
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.6
+    page: 32
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-038
+  name: Payment Terms, Billing & Account Configuration
+  module: Partners
+  requiresModule: partner
+  purpose: Define how the partner pays TICVAI and how transactions are financially grouped.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first payment entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setPaymentTermBilling
+    contract: subscription
+    purpose: Payment Terms, Billing & Account Configuration
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /partners/payment-terms-billing-account-configuration-ptr-038
+    component: apps/partner-web/src/routes/partners/PaymentTermsBillingAccountConfiguration.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-038
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-038
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.7
+    page: 33
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-039
+  name: Commercial Allocation, Quota & Commitment Management
+  module: Partners
+  requiresModule: partner
+  purpose: Define the commercial commitment of inventory to a partner. This differs from Area 4's operational
+    channel allocation.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first commercial entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCommercialAllocationQuota
+    contract: subscription
+    purpose: Commercial Allocation, Quota & Commitment Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/commercial-allocation-quota-commitment-management-ptr-039
+    component: apps/partner-web/src/routes/partners/CommercialAllocationQuotaCommitmentManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-039
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-039
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.8
+    page: 35
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-040
+  name: Booking Limits, Commercial Exceptions & Approval
+  module: Partners
+  requiresModule: partner
+  purpose: Control transaction limits and provide a governed mechanism for commercial exceptions.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first booking entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: approveBookingLimitCommercial
+    contract: subscription
+    purpose: Booking Limits, Commercial Exceptions & Approval
+    trigger: onAction
+  implementation:
+    app: partner-web
+    route: /partners/booking-limits-commercial-exceptions-approval-ptr-040
+    component: apps/partner-web/src/routes/partners/BookingLimitsCommercialExceptionsApproval.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-040
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-040
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.9
+    page: 37
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-041
+  name: Commercial Agreement 360°, Health & AI Review
+  module: Partners
+  requiresModule: partner
+  purpose: Give management a single consolidated view of the complete commercial relationship with a partner.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first commercial entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCommercialAgreementHealth
+    contract: subscription
+    purpose: Commercial Agreement 360°, Health & AI Review
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/commercial-agreement-360-health-ai-review-ptr-041
+    component: apps/partner-web/src/routes/partners/CommercialAgreement360HealthAiReview.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-041
+    workshopBoard: wireframes/WS14 B2B, Reseller & OTA Partner Management Board 2.dc.html#ptr-041
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '2'
+    number: 8.2.10
+    page: 38
+  navigation:
+    entryFrom:
+    - PTR-032
+    exitTo:
+    - PTR-032
+    inferred: false
+    notes: '**Reached from PTR-032, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-042
+  name: Partner Operations Command Center
+  module: Partners
+  requiresModule: partner
+  purpose: Provide commercial, operations and finance teams with one real-time view of active B2B, reseller
+    and OTA business.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Partner Sales Today
+      - kind: metricTile
+        notes: Partner Sales MTD
+      - kind: metricTile
+        notes: Active Partner Orders
+      - kind: metricTile
+        notes: Active Reservations/Holds
+      - kind: metricTile
+        notes: Tickets Sold
+      - kind: metricTile
+        notes: Cancellations
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartner2
+    contract: subscription
+    purpose: Partner Operations Command Center
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-operations-command-center-ptr-042
+    component: apps/partner-web/src/routes/partners/PartnerOperationsCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-042
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-042
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.1
+    page: 44
+  navigation:
+    entryFrom:
+    - PTR-001
+    exitTo:
+    - PTR-001
+    - PTR-043
+    - PTR-044
+    - PTR-045
+    - PTR-046
+    - PTR-047
+    - PTR-048
+    - PTR-049
+    - PTR-050
+    - PTR-051
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: PTR-043
+  name: Partner Orders & Booking Management
+  module: Partners
+  requiresModule: partner
+  purpose: Provide a consolidated operational view of orders created by each partner.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerOrderBooking
+    contract: subscription
+    purpose: Partner Orders & Booking Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-orders-booking-management-ptr-043
+    component: apps/partner-web/src/routes/partners/PartnerOrdersBookingManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-043
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-043
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.2
+    page: 46
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-044
+  name: Reservations, Holds & Release Management
+  module: Partners
+  requiresModule: partner
+  purpose: Manage inventory temporarily reserved by B2B partners before final confirmation. This is particularly
+    important for tour operators, corporate groups and travel-trade partners.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first reservations, entry,
+      and this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listReservationHoldRelease
+    contract: subscription
+    purpose: Reservations, Holds & Release Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/reservations-holds-release-management-ptr-044
+    component: apps/partner-web/src/routes/partners/ReservationsHoldsReleaseManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-044
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-044
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.3
+    page: 48
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-045
+  name: Partner Cancellations, Refunds & Amendments
+  module: Partners
+  requiresModule: partner
+  purpose: Manage post-booking changes according to the partner's commercial agreement and product policies.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerCancellationRefund
+    contract: subscription
+    purpose: Partner Cancellations, Refunds & Amendments
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-cancellations-refunds-amendments-ptr-045
+    component: apps/partner-web/src/routes/partners/PartnerCancellationsRefundsAmendments.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-045
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-045
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.4
+    page: 49
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-046
+  name: Partner Statement & Account Activity
+  module: Partners
+  requiresModule: partner
+  purpose: Give finance and commercial teams a complete financial statement for each partner account.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerStatementAccount
+    contract: subscription
+    purpose: Partner Statement & Account Activity
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-statement-account-activity-ptr-046
+    component: apps/partner-web/src/routes/partners/PartnerStatementAccountActivity.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-046
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-046
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.5
+    page: 51
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-047
+  name: Partner Reconciliation & Exception Management
+  module: Partners
+  requiresModule: partner
+  purpose: Reconcile operational bookings against financial and channel records and identify discrepancies.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerReconciliationException
+    contract: subscription
+    purpose: Partner Reconciliation & Exception Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-reconciliation-exception-management-ptr-047
+    component: apps/partner-web/src/routes/partners/PartnerReconciliationExceptionManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-047
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-047
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.6
+    page: 52
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-048
+  name: Commission Calculation & Settlement Management
+  module: Partners
+  requiresModule: partner
+  purpose: Calculate, approve and settle commission or incentive amounts owed under partner commercial
+    agreements.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first commission entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCommissionCalculationSettlement
+    contract: subscription
+    purpose: Commission Calculation & Settlement Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/commission-calculation-settlement-management-ptr-048
+    component: apps/partner-web/src/routes/partners/CommissionCalculationSettlementManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-048
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-048
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.7
+    page: 54
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-049
+  name: Partner Disputes, Cases & Service Management
+  module: Partners
+  requiresModule: partner
+  purpose: Provide a structured case-management environment for partner operational and commercial disputes.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerDisputeCase
+    contract: subscription
+    purpose: Partner Disputes, Cases & Service Management
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-disputes-cases-service-management-ptr-049
+    component: apps/partner-web/src/routes/partners/PartnerDisputesCasesServiceManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-049
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-049
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.8
+    page: 56
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-050
+  name: Partner Performance Scorecard & Risk Monitoring
+  module: Partners
+  requiresModule: partner
+  purpose: Create a consistent scorecard for evaluating the quality and commercial value of every partner
+    relationship.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerPerformanceScorecard
+    contract: subscription
+    purpose: Partner Performance Scorecard & Risk Monitoring
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-performance-scorecard-risk-monitoring-ptr-050
+    component: apps/partner-web/src/routes/partners/PartnerPerformanceScorecardRiskMonitoring.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-050
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-050
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.9
+    page: 57
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: PTR-051
+  name: Partner AI Intelligence & Relationship Optimization
+  module: Partners
+  requiresModule: partner
+  purpose: Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen
+    should combine information from Boards 1, 2 and 3.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first partner entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listPartnerRelationship
+    contract: subscription
+    purpose: Partner AI Intelligence & Relationship Optimization
+    trigger: onLoad
+  implementation:
+    app: partner-web
+    route: /partners/partner-ai-intelligence-relationship-optimization-ptr-051
+    component: apps/partner-web/src/routes/partners/PartnerAiIntelligenceRelationshipOptimization.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P10 Partner Web.dc.html#ptr-051
+    workshopBoard: wireframes/WS15 B2B, Reseller & OTA Partner Management Board 3.dc.html#ptr-051
+  source:
+    pack: B2B, Reseller & OTA Partner Management_Reference.pdf
+    board: '3'
+    number: 8.3.10
+    page: 59
+  navigation:
+    entryFrom:
+    - PTR-042
+    exitTo:
+    - PTR-042
+    inferred: false
+    notes: '**Reached from PTR-042, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'

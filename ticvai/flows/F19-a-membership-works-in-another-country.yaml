@@ -8,7 +8,7 @@ platforms:
 - P02 Guest App
 - P07 Venue Scanner
 - P09 TICVAI Web
-offlineBehaviour: '**The gate half is offline and the cross-cell half cannot be.** A redemption right
+offlineBehaviour: '**The gate half is offline and the cross-region half cannot be.** A redemption right
   propagated from another cell is in the local bundle if it arrived before the last sync, and is not
   if it did not — which is the whole risk.'
 trigger:
@@ -28,7 +28,7 @@ steps:
   - getMyMemberships
   outcome: '**Valid here is not the same as bought here**'
   note: '**Corrected 24 August.** This called `getGuestLink` from a guest screen — `service` audience,
-    the cross-cell pseudonymous lookup (ADR-0010). **A guest reading their own membership calls a guest
+    the cross-region pseudonymous lookup (ADR-0010). **A guest reading their own membership calls a guest
     operation**; the service resolves the link on their behalf at step 2, which is where it belongs.'
 - step: 2
   screen: ADM-003
@@ -103,8 +103,8 @@ exitStates:
 openQuestions:
 - Who refunds a pass used in two regions, and out of whose revenue. CF-31 named the mechanism and not
   the money.
-primaryContract: cross-cell
+primaryContract: cross-region
 contracts:
-- cross-cell
+- cross-region
 - access
 - catalogue

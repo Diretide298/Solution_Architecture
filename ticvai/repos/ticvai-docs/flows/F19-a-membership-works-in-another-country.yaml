@@ -1,10 +1,3 @@
-# F19 — A membership works in another country
-#
-# The `cross-cell` contract had sixteen operations and no flow. This is the journey the
-# whole cell architecture exists for, and it had never been walked through.
-#
-# Validated by tools/check-flows.py.
-
 id: F19
 name: A membership works in another country
 actor: guest
@@ -15,7 +8,7 @@ platforms:
 - P02 Guest App
 - P07 Venue Scanner
 - P09 TICVAI Web
-offlineBehaviour: '**The gate half is offline and the cross-cell half cannot be.** A redemption right
+offlineBehaviour: '**The gate half is offline and the cross-region half cannot be.** A redemption right
   propagated from another cell is in the local bundle if it arrived before the last sync, and is not
   if it did not — which is the whole risk.'
 trigger:
@@ -32,21 +25,24 @@ steps:
   action: Guest sees the pass and where it is valid
   operations:
   - listProducts
-  - getGuestLink
+  - getMyMemberships
   outcome: '**Valid here is not the same as bought here**'
+  note: '**Corrected 24 August.** This called `getGuestLink` from a guest screen — `service` audience,
+    the cross-region pseudonymous lookup (ADR-0010). **A guest reading their own membership calls a guest
+    operation**; the service resolves the link on their behalf at step 2, which is where it belongs.'
 - step: 2
   screen: ADM-003
   action: The right is propagated to the other cell
   operations:
-  - propagateRedemptionRight
-  - getRedemptionRight
+  - propagateCrossRegionEntitlement
+  - getCrossRegionEntitlement
   outcome: A copy of the entitlement to redeem against, not the entitlement itself
 - step: 3
   screen: SCN-003
   action: Guest scans at the other venue
   operations:
   - validateAccess
-  - consumeRedemptionRight
+  - consumeCrossRegionEntitlement
   outcome: Validated against the propagated right in the local bundle
 - step: 4
   screen: SCN-014
@@ -107,8 +103,8 @@ exitStates:
 openQuestions:
 - Who refunds a pass used in two regions, and out of whose revenue. CF-31 named the mechanism and not
   the money.
-primaryContract: cross-cell
+primaryContract: cross-region
 contracts:
-- cross-cell
+- cross-region
 - access
 - catalogue

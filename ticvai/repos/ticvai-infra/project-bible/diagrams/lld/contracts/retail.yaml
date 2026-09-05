@@ -1,5 +1,5 @@
 id: LLD-retail
-title: retail — 35 operations
+title: retail — 37 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -10,7 +10,8 @@ operations:
   path: /gift-cards/{giftCardId}/activate
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -23,7 +24,8 @@ operations:
   path: /wallets/{subjectId}/adjust
   scope: venue
   permission: LEDGER_POST
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -36,7 +38,8 @@ operations:
   path: /gift-cards/{cardCode}/block
   scope: venue
   permission: PRICE_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -49,11 +52,12 @@ operations:
   path: /merchandise-reservations/{reservationId}/cancel
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - inventory.movement
@@ -62,7 +66,8 @@ operations:
   path: /wallets/{walletId}/close
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -76,11 +81,12 @@ operations:
   path: /merchandise-reservations/{reservationId}/collect
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - inventory.movement
@@ -89,7 +95,8 @@ operations:
   path: /shop-and-drop/{dropId}/collect
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -102,7 +109,8 @@ operations:
   path: /merchandise
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -115,7 +123,8 @@ operations:
   path: /retail-exchanges
   scope: venue
   permission: ORDER_EXCHANGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -128,7 +137,8 @@ operations:
   path: /retail-returns
   scope: venue
   permission: ORDER_REFUND
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -141,7 +151,8 @@ operations:
   path: /retail-sales
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -154,7 +165,8 @@ operations:
   path: /shop-and-drop
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -167,7 +179,8 @@ operations:
   path: /shop-and-drop/{dropId}/dispose
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -180,7 +193,9 @@ operations:
   path: /gift-cards/{cardCode}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - retail.gift_card
@@ -190,7 +205,8 @@ operations:
   path: /outlets/{outletId}/stock-check
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - platform.outlet
@@ -200,7 +216,8 @@ operations:
   path: /retail-sales/{saleId}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - retail.sale
@@ -210,7 +227,8 @@ operations:
   path: /outlets/{outletId}/return-policy
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:resolution
@@ -222,7 +240,9 @@ operations:
   path: /wallets/{subjectId}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - retail.wallet
@@ -232,7 +252,8 @@ operations:
   path: /gift-cards
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -245,8 +266,10 @@ operations:
   path: /merchandise
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
-  offline: false
+  audience:
+  - staff
+  - guest
+  offline: true
   reads:
   - retail.merchandise
   writes: []
@@ -255,7 +278,8 @@ operations:
   path: /retail-returns
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - retail.return
@@ -265,17 +289,31 @@ operations:
   path: /retail-sales
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - retail.sale
+  writes: []
+- operation: listStoreRules
+  verb: GET
+  path: /store-rules
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.store_rule
   writes: []
 - operation: listWalletTransactions
   verb: GET
   path: /wallets/{subjectId}/transactions
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - retail.wallet_transaction
@@ -285,7 +323,9 @@ operations:
   path: /merchandise/lookup
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - retail.merchandise
@@ -295,7 +335,8 @@ operations:
   path: /retail-sales/lookup
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - retail.sale
@@ -305,7 +346,9 @@ operations:
   path: /shop-and-drop/lookup
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - retail.shop_and_drop
@@ -315,7 +358,8 @@ operations:
   path: /gift-cards/{giftCardId}/redeem
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -329,7 +373,8 @@ operations:
   path: /wallets/{walletId}/reinstate
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -342,7 +387,8 @@ operations:
   path: /retail-sales/{saleId}/reprint
   scope: venue
   permission: ORDER_REPRINT
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -355,7 +401,9 @@ operations:
   path: /outlets/{outletId}/reserve
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -368,7 +416,8 @@ operations:
   path: /outlets/{outletId}/return-policy
   scope: venue
   permission: REGION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -377,12 +426,25 @@ operations:
   - cache:idempotency
   - cache:resolution
   - retail.return_policy
+- operation: setStoreRules
+  verb: PUT
+  path: /store-rules
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - retail.store_rule
+  writes:
+  - retail.store_rule
 - operation: suspendWallet
   verb: POST
   path: /wallets/{walletId}/suspend
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -395,7 +457,8 @@ operations:
   path: /wallets/{subjectId}/top-ups
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -425,7 +488,8 @@ operations:
   path: /merchandise/{merchandiseId}
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

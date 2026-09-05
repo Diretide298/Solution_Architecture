@@ -33,6 +33,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.journal_entry
+  - platform.outbox
 - operation: beginPeriodClose
   verb: POST
   path: /fiscal-periods/{periodId}/begin-close
@@ -75,6 +76,7 @@ operations:
   writes:
   - cache:idempotency
   - ledger.fiscal_period
+  - platform.outbox
 - operation: createAccount
   verb: POST
   path: /accounts

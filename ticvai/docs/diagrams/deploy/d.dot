@@ -1,0 +1,21 @@
+digraph d {
+  rankdir=TB; bgcolor="transparent";
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=11 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=9 color="#5A6577"];
+  subgraph cluster_r { label="Region cell · uae-1 · shared burst tier"; style="rounded,filled"; fillcolor="#E2EFDA"; fontname="Helvetica"; fontsize=12;
+    r1 [label="Catalogue · Order\nIdentity · Access\nautoscale on RPS" fillcolor="#FFFFFF"];
+    r2 [label="Tenancy · Platform · Marketing\nAI · Reporting · WhiteLabel" fillcolor="#FFFFFF"];
+    r3 [label="Ledger · CrossRegion" fillcolor="#FFF6E0"];
+    rpg [label="Postgres 8 / 16 GB\n+ pgbouncer" fillcolor="#FFFFFF"]; rrd [label="Redis 8 GB" fillcolor="#FFFFFF"];
+    r1 -> rpg; r2 -> rpg; r3 -> rpg; r1 -> rrd [style=dotted]; }
+  subgraph cluster_v1 { label="Venue cell 1 · offline tier"; style="rounded,filled"; fillcolor="#DDEBF7"; fontsize=11;
+    v1 [label="F&B · Inventory\nRetail · VenueOps\n103 of 286 ops offline" fillcolor="#FFFFFF"];
+    vpg1 [label="Postgres 1 / 2 GB" fillcolor="#FFFFFF"]; vrd1 [label="Redis 512 MB" fillcolor="#FFFFFF"];
+    v1 -> vpg1; v1 -> vrd1; }
+  subgraph cluster_v2 { label="Venue cell 2"; style="rounded,filled"; fillcolor="#DDEBF7"; fontsize=11;
+    v2 [label="F&B · Inventory\nRetail · VenueOps" fillcolor="#FFFFFF"];
+    vpg2 [label="Postgres" fillcolor="#FFFFFF"]; v2 -> vpg2; }
+  r1 -> v1 [label="43 foreign reads\npublished as a bundle\nADR-0013" style=dashed color="#1B7A3D"];
+  v1 -> r1 [label="15 foreign writes\njournalled via syncOrders\n+ sync.rejection" color="#B00020" penwidth=2];
+  r1 -> v2 [style=dashed color="#1B7A3D"]; v2 -> r1 [color="#B00020"];
+}

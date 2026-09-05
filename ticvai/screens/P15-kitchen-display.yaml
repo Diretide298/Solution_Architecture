@@ -1,11 +1,3 @@
-# P15 — Kitchen Display
-#
-# Board 3 of the client F&B design set, received 20 August 2026. Ten screens.
-# Its own platform because a kitchen display is used standing, must survive the network
-# going down, and nobody logs into it.
-#
-# Validated against _schema.yaml; component kinds from _components.yaml.
-
 platform:
   code: P15
   formFactor: kiosk
@@ -34,9 +26,9 @@ platform:
   offlineCapable: true
   screenCount: 10
   notes: '**Its own platform, and the placement rule is what put it here.** Three questions decide where
-    a board screen rests, and a kitchen display answers all three differently from a back office: it
-    is used standing, it **must survive the network going down because the kitchen still has to send
-    food out**, and no existing platform does it — P08 had a `Kitchen Display` screen among 143 back-office
+    a board screen rests, and a kitchen display answers all three differently from a back office: it is
+    used standing, it **must survive the network going down because the kitchen still has to send food
+    out**, and no existing platform does it — P08 had a `Kitchen Display` screen among 143 back-office
     screens, which is a rail buried in a configuration tool.
 
 
@@ -95,8 +87,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -107,8 +99,8 @@ screens:
       from: session
     - name: stationId
       from: session
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person.'
   layout:
     template: board
     regions:
@@ -154,16 +146,16 @@ screens:
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3a` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer. **`wireframe.status` corrected 25 August.** When
-    these screens were repointed from the client pack to their own board on 24 August, the status stayed
-    `designed` — **which claimed a client had drawn a board this package generated.** `derivedFrom`
-    keeps the pack frame, which is where the design came from; `status` describes the file being pointed
-    at, and those are different facts. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3a`. **Matched
-    on frame title against screen name, constrained to this board’s platforms.** These packs label by
-    board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen
-    Operations Command Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet
-    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
+    is worth more than the wrong pointer. **`wireframe.status` corrected 25 August.** When these screens
+    were repointed from the client pack to their own board on 24 August, the status stayed `designed`
+    — **which claimed a client had drawn a board this package generated.** `derivedFrom` keeps the pack
+    frame, which is where the design came from; `status` describes the file being pointed at, and those
+    are different facts. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3a`. **Matched on frame
+    title against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Kitchen Operations Command
+    Center* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85
+    against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3a
@@ -212,8 +204,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -229,9 +221,9 @@ screens:
     - name: visitId
       from: deepLink
       optional: true
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.
-      The table the ticket belongs to.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person. The table
+      the ticket belongs to.'
   layout:
     template: board
     regions:
@@ -249,7 +241,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/kitchen-display-system-kds
@@ -267,21 +264,20 @@ screens:
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **The screen the platform exists
     for.** Bumped, not tapped — a bump bar and a touch target sized for somebody wearing gloves. Nothing
-    on it is more than one action deep. **Operations from the 24 August F&B build wired here** — the
-    contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.
-    **Cross-platform navigation removed 24 August**: EMP-058. **A till does not navigate to a back office
-    and a guest app does not navigate to either** — those are device handovers, and a flow declares
-    them with `crossesDevice` rather than a screen pretending there is a link. **Board repointed 24
-    August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3b` — a frame in the client
-    pack, which is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
-    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame
-    `fnb-3b`. **Matched on frame title against screen name, constrained to this board’s platforms.**
-    These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the
-    only join — *Kitchen Display System (KDS)* matched at 1.0. **A cross-platform title match was refused**:
-    `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong
-    quietly.'
+    on it is more than one action deep. **Operations from the 24 August F&B build wired here** — the contract
+    grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Cross-platform
+    navigation removed 24 August**: EMP-058. **A till does not navigate to a back office and a guest app
+    does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
+    rather than a screen pretending there is a link. **Board repointed 24 August.** This screen pointed
+    at `wireframes/FnB Board 3.dc.html#fnb-3b` — a frame in the client pack, which is where the design
+    came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html`
+    carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and
+    unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong
+    pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3b`. **Matched on frame title against
+    screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
+    rather than naming the screen, so the title is the only join — *Kitchen Display System (KDS)* matched
+    at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3b
@@ -322,8 +318,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -338,9 +334,9 @@ screens:
       from: KIT-002
     - name: outletId
       from: session
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.
-      Resolves from the station assignment. A kitchen display belongs to one outlet.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person. Resolves
+      from the station assignment. A kitchen display belongs to one outlet.'
   layout:
     template: board
     regions:
@@ -358,7 +354,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/order-firing-course-management
@@ -374,20 +375,20 @@ screens:
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3c
     generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-003
   provenance: client board, specified
-  notes: '**Built 20 August from board 3 of the client F&B design set.** **Starters before mains is
-    the entire job of a kitchen pass.** `KitchenTicket.coursing` carries `holdAndFire`, `phased` and
-    `timed`; without it a table gets dessert while eating its starter. **Operations from the 24 August
-    F&B build wired here** — the contract grew and the screens had not caught up, which is how 92 operations
-    reached 49% of screens. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board
-    3.dc.html#fnb-3c` — a frame in the client pack, which is where the design came from and not where
-    this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one
-    anchor per screen and nothing referenced either**, so both shipped correctly anchored and unreachable.
-    The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong pointer.
-    **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3c`. **Matched on frame title against screen
-    name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`) rather
-    than naming the screen, so the title is the only join — *Order Firing &amp; Course Management* matched
-    at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a
-    partner-portal screen, which is how a mapping goes wrong quietly.'
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **Starters before mains is the
+    entire job of a kitchen pass.** `KitchenTicket.coursing` carries `holdAndFire`, `phased` and `timed`;
+    without it a table gets dessert while eating its starter. **Operations from the 24 August F&B build
+    wired here** — the contract grew and the screens had not caught up, which is how 92 operations reached
+    49% of screens. **Board repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3c`
+    — a frame in the client pack, which is where the design came from and not where this screen is drawn.
+    **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and
+    nothing referenced either**, so both shipped correctly anchored and unreachable. The pack frame is
+    kept in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August**
+    — `FnB Board 3.dc.html` frame `fnb-3c`. **Matched on frame title against screen name, constrained
+    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
+    screen, so the title is the only join — *Order Firing &amp; Course Management* matched at 1.0. **A
+    cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3c
@@ -416,8 +417,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -430,8 +431,8 @@ screens:
       from: session
     - name: orderId
       from: KIT-002
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person.'
   layout:
     template: board
     regions:
@@ -449,7 +450,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/active-order-management-fulfilment-journey
@@ -468,8 +474,8 @@ screens:
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3d` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer.'
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
+    is worth more than the wrong pointer.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3d
@@ -498,8 +504,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -510,8 +516,8 @@ screens:
       from: session
     - name: stationId
       from: session
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person.'
   layout:
     template: board
     regions:
@@ -529,7 +535,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/kitchen-station-workload-dynamic-routing
@@ -549,13 +560,12 @@ screens:
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3e` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame
-    `fnb-3e`. **Matched on frame title against screen name, constrained to this board’s platforms.**
-    These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the
-    only join — *Station Workload &amp; Dynamic Routing* matched at 0.89. **A cross-platform title match
-    was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
-    goes wrong quietly.'
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
+    is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3e`.
+    **Matched on frame title against screen name, constrained to this board’s platforms.** These packs
+    label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Station
+    Workload &amp; Dynamic Routing* matched at 0.89. **A cross-platform title match was refused**: `Outlet
+    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3e
@@ -596,8 +606,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -612,9 +622,9 @@ screens:
       from: KIT-002
     - name: orderId
       from: session
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.
-      An order tapped on the rail.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person. An order
+      tapped on the rail.'
   layout:
     template: board
     regions:
@@ -632,7 +642,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/expeditor-order-assembly
@@ -649,19 +664,19 @@ screens:
     generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-006
   provenance: client board, specified
   notes: '**Built 20 August from board 3 of the client F&B design set.** **No expeditor role is modelled**
-    — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is
-    a kitchen question rather than a contract one. **Operations from the 24 August F&B build wired here**
-    — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of
-    screens. **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen
-    pointed at `wireframes/FnB Board 3.dc.html#fnb-3f` — a frame in the client pack, which is where
-    the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16
-    Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so both shipped
-    correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance is
-    worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3f`. **Matched
-    on frame title against screen name, constrained to this board’s platforms.** These packs label by
-    board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Expeditor
-    &amp; Order Assembly* matched at 1.0. **A cross-platform title match was refused**: `Outlet Management`
-    scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
+    — this reads and sets ticket status like the KDS. Whether an expeditor needs their own state is a
+    kitchen question rather than a contract one. **Operations from the 24 August F&B build wired here**
+    — the contract grew and the screens had not caught up, which is how 92 operations reached 49% of screens.
+    **Retail board operations wired 24 August.** **Board repointed 24 August.** This screen pointed at
+    `wireframes/FnB Board 3.dc.html#fnb-3f` — a frame in the client pack, which is where the design came
+    from and not where this screen is drawn. **`P15 Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html`
+    carry one anchor per screen and nothing referenced either**, so both shipped correctly anchored and
+    unreachable. The pack frame is kept in `derivedFrom` because provenance is worth more than the wrong
+    pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3f`. **Matched on frame title against
+    screen name, constrained to this board’s platforms.** These packs label by board position (`GM-6C`)
+    rather than naming the screen, so the title is the only join — *Expeditor &amp; Order Assembly* matched
+    at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
+    screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3f
@@ -690,8 +705,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -704,8 +719,8 @@ screens:
       from: session
     - name: orderId
       from: KIT-002
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person.'
   layout:
     template: board
     regions:
@@ -723,7 +738,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/guest-collection-buzzer-digital-notification
@@ -785,8 +805,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -803,9 +823,9 @@ screens:
       from: KIT-002
     - name: outletId
       from: session
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.
-      Resolves from the station assignment. A kitchen display belongs to one outlet.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person. Resolves
+      from the station assignment. A kitchen display belongs to one outlet.'
   layout:
     template: board
     regions:
@@ -823,7 +843,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/exceptions-re-fire-unavailable-items
@@ -839,22 +864,21 @@ screens:
     derivedFrom: wireframes/FnB Board 3.dc.html#fnb-3h
     generatedFallback: wireframes/P15 Kitchen Display.dc.html#kit-008
   provenance: client board, specified
-  notes: '**Built 20 August from board 3 of the client F&B design set.** **86 is a kitchen word and
-    a real state.** An item marked unavailable here stops selling at every till in the venue within
-    seconds, which is the only reason to put it on a kitchen screen. **Food-safety operations wired
-    20 August** — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing
-    in the package touched.** **Operations from the 24 August F&B build wired here** — the contract
-    grew and the screens had not caught up, which is how 92 operations reached 49% of screens. **Board
-    repointed 24 August.** This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3h` — a frame
-    in the client pack, which is where the design came from and not where this screen is drawn. **`P15
-    Kitchen Display.dc.html` and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing
-    referenced either**, so both shipped correctly anchored and unreachable. The pack frame is kept
-    in `derivedFrom` because provenance is worth more than the wrong pointer. **Drawn 31 August** —
-    `FnB Board 3.dc.html` frame `fnb-3h`. **Matched on frame title against screen name, constrained
-    to this board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the
-    screen, so the title is the only join — *Exceptions, Re-Fire &amp; Unavailable Items* matched at
-    1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against a partner-portal
-    screen, which is how a mapping goes wrong quietly.'
+  notes: '**Built 20 August from board 3 of the client F&B design set.** **86 is a kitchen word and a
+    real state.** An item marked unavailable here stops selling at every till in the venue within seconds,
+    which is the only reason to put it on a kitchen screen. **Food-safety operations wired 20 August**
+    — boards 5G and 5J of the client F&B pack, and **HACCP is a regulatory obligation nothing in the package
+    touched.** **Operations from the 24 August F&B build wired here** — the contract grew and the screens
+    had not caught up, which is how 92 operations reached 49% of screens. **Board repointed 24 August.**
+    This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3h` — a frame in the client pack, which
+    is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
+    and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
+    is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3h`.
+    **Matched on frame title against screen name, constrained to this board’s platforms.** These packs
+    label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *Exceptions,
+    Re-Fire &amp; Unavailable Items* matched at 1.0. **A cross-platform title match was refused**: `Outlet
+    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3h
@@ -883,8 +907,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Amber, and it keeps working.** The kitchen still has to send food out — a display that
       blanks mid-service is worse than one that says it is behind, and every bump journals locally and
@@ -897,8 +921,8 @@ screens:
       from: session
     - name: ticketId
       from: KIT-002
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person.'
   layout:
     template: board
     regions:
@@ -916,7 +940,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/sla-priority-service-rules
@@ -936,13 +965,12 @@ screens:
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3j` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame
-    `fnb-3j`. **Matched on frame title against screen name, constrained to this board’s platforms.**
-    These packs label by board position (`GM-6C`) rather than naming the screen, so the title is the
-    only join — *SLA, Priority &amp; Service Rules* matched at 1.0. **A cross-platform title match was
-    refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
-    goes wrong quietly.'
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
+    is worth more than the wrong pointer. **Drawn 31 August** — `FnB Board 3.dc.html` frame `fnb-3j`.
+    **Matched on frame title against screen name, constrained to this board’s platforms.** These packs
+    label by board position (`GM-6C`) rather than naming the screen, so the title is the only join — *SLA,
+    Priority &amp; Service Rules* matched at 1.0. **A cross-platform title match was refused**: `Outlet
+    Management` scored 0.85 against a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3j
@@ -971,8 +999,8 @@ screens:
       same picture otherwise.'
     emptyNoResults: Nothing matches this station or course filter. **The rail is not empty** — the filter
       is narrow, and on a kitchen screen that distinction is the difference between calm and panic.
-    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** —
-      a kitchen screen does not choose what it shows.
+    emptyNoAccess: This display is not assigned to a station. **Assignment is a back-office act** — a
+      kitchen screen does not choose what it shows.
     error: Could not reach the platform. **The rail is still live from cache** and every bump is queued.
     offline: '**Not available offline.** `getDashboard` is an analytical read (ADR-0016) and there is
       nothing local to serve. The rail on KIT-001 is what survives a network loss. **Corrected 24 August**:
@@ -986,8 +1014,8 @@ screens:
       from: session
     - name: dashboardId
       from: KIT-002
-    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the
-      kitchen is open, and it resolves its station from the device assignment rather than from a person.'
+    coldEntry: '**Cold is the only way in.** Nobody logs into a kitchen display — it is on when the kitchen
+      is open, and it resolves its station from the device assignment rather than from a person.'
   layout:
     template: board
     regions:
@@ -1005,7 +1033,12 @@ screens:
   navigation:
     entryFrom:
     - KIT-001
-    exitTo: []
+    exitTo:
+    - KIT-001
+    inferred: false
+    notes: '**Returns to KIT-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: kitchen-display
     route: /kitchen/kitchen-performance-ai-operational-optimization
@@ -1024,8 +1057,8 @@ screens:
     This screen pointed at `wireframes/FnB Board 3.dc.html#fnb-3k` — a frame in the client pack, which
     is where the design came from and not where this screen is drawn. **`P15 Kitchen Display.dc.html`
     and `P16 Venue Analytics.dc.html` carry one anchor per screen and nothing referenced either**, so
-    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because
-    provenance is worth more than the wrong pointer.'
+    both shipped correctly anchored and unreachable. The pack frame is kept in `derivedFrom` because provenance
+    is worth more than the wrong pointer.'
   requiresModule: fnb
   boardFrames:
   - FnB Board 3.dc.html#fnb-3k

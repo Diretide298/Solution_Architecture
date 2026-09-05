@@ -1,5 +1,5 @@
 id: LLD-P13
-title: P13 Venue CMS — White Label — 20 screens
+title: P13 Venue CMS — White Label — 60 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,7 +20,7 @@ deployment:
 why: null
 modulesUsed:
 - module: core
-  screens: 15
+  screens: 55
 - module: membership
   screens: 1
 - module: maintenance
@@ -32,14 +32,14 @@ modulesUsed:
 - module: marketing
   screens: 1
 servicesCalled:
+- service: MarketingService
+  operationCalls: 52
 - service: WhiteLabelService
-  operationCalls: 28
-- service: ControlService
+  operationCalls: 32
+- service: PlatformService
   operationCalls: 19
 - service: VenueOpsService
   operationCalls: 19
-- service: MarketingService
-  operationCalls: 11
 - service: FnbService
   operationCalls: 5
 - service: IdentityService
@@ -47,9 +47,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 2
 coverage:
-  screens: 20
+  screens: 60
   inAFlow: 9
-  drawn: 20
+  drawn: 60
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -84,6 +84,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -93,8 +94,9 @@ screens:
   - CMS-002
   - CMS-003
   - CMS-004
-  boardFrames: null
-  wireframe: wireframes/P13 Venue CMS.dc.html#cms-001
+  boardFrames:
+  - Marketing Board 7.dc.html#crm-7f
+  wireframe: wireframes/Marketing Board 7.dc.html#crm-7f
   inFlows:
   - F102 A brand is set, previewed, published and rolled back
 - screen: CMS-002
@@ -172,6 +174,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -224,6 +227,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -277,6 +281,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -303,6 +308,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -337,6 +343,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -357,7 +364,8 @@ screens:
   requiresModule: core
   wave: 2
   density: compact
-  operations: []
+  operations:
+  - setSeoMetadata
   states:
   - emptyFirstRun
   - error
@@ -457,6 +465,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -498,13 +507,18 @@ screens:
   requiresModule: core
   wave: 2
   density: compact
-  operations: []
+  operations:
+  - claimCustomDomain
+  - listCustomDomains
+  - releaseCustomDomain
+  - verifyCustomDomain
   states:
   - emptyFirstRun
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - domainId<-navigation
   goesTo:
   - CMS-001
   - CMS-002
@@ -533,6 +547,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -557,6 +572,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -579,6 +595,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -589,4 +606,880 @@ screens:
   - CMS-003
   boardFrames: null
   wireframe: wireframes/P13 Venue CMS.dc.html#cms-020
+  inFlows: null
+- screen: CMS-021
+  name: Privacy & Consent Configuration Command Center
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listPrivacyConsent
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-022
+  - CMS-023
+  - CMS-024
+  - CMS-025
+  - CMS-026
+  - CMS-027
+  - CMS-028
+  - CMS-029
+  - CMS-030
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-021
+  inFlows: null
+- screen: CMS-022
+  name: Data Processing Purpose & Lawful Basis Registry
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listDataProcessingPurpose
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-022
+  inFlows: null
+- screen: CMS-023
+  name: Consent Purpose & Consent Type Builder
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setConsentPurposes
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-023
+  inFlows: null
+- screen: CMS-024
+  name: Communication Preference & Marketing Permission Configuration
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setCommunicationPreferenceMarketing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-024
+  inFlows: null
+- screen: CMS-025
+  name: Cookie, Tracking & Digital Technology Registry
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listCookieTrackingDigital
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-025
+  inFlows: null
+- screen: CMS-026
+  name: Cookie Banner & Preference Center Designer
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listCookieBannerPreference
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-026
+  inFlows: null
+- screen: CMS-027
+  name: Consent Capture Point & Customer Journey Configuration
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setConsentCapturePoint
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-027
+  inFlows: null
+- screen: CMS-028
+  name: Privacy Notice, Policy & Terms Version Management
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listPrivacyNoticePolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-028
+  inFlows: null
+- screen: CMS-029
+  name: Minor, Guardian & Age-Based Privacy Configuration
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setMinorGuardianAge
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-029
+  inFlows: null
+- screen: CMS-030
+  name: Privacy Configuration Testing, Approval & Publication
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - approvePrivacyTesting
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-021
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-030
+  inFlows: null
+- screen: CMS-031
+  name: Privacy Operations Command Center
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listPrivacy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-032
+  - CMS-033
+  - CMS-034
+  - CMS-035
+  - CMS-036
+  - CMS-037
+  - CMS-038
+  - CMS-039
+  - CMS-040
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-031
+  inFlows: null
+- screen: CMS-032
+  name: Customer Privacy, Consent & Preference 360°
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerPrivacyConsent
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-032
+  inFlows: null
+- screen: CMS-033
+  name: Consent Evidence, History & Withdrawal Management
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listConsentEvidenceWithdrawal
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-033
+  inFlows: null
+- screen: CMS-034
+  name: Data Subject / Customer Privacy Request Management
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listDataSubjectCustomer
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-034
+  inFlows: null
+- screen: CMS-035
+  name: Data Discovery, Access, Export & Correction Workspace
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setDataDiscoveryAccess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-035
+  inFlows: null
+- screen: CMS-036
+  name: Deletion, Anonymization & Restriction Operations
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listDeletionAnonymizationRestriction
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-036
+  inFlows: null
+- screen: CMS-037
+  name: Data Retention, Expiry & Legal Hold Operations
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listDataRetentionExpiry
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-037
+  inFlows: null
+- screen: CMS-038
+  name: Privacy Compliance, Exception & Investigation Workspace
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setPrivacyComplianceException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-038
+  inFlows: null
+- screen: CMS-039
+  name: Privacy Audit, Evidence & Compliance Reporting
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listPrivacyEvidenceCompliance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-039
+  inFlows: null
+- screen: CMS-040
+  name: Privacy Analytics & AI Compliance Intelligence
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listPrivacyCompliance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-031
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-040
+  inFlows: null
+- screen: CMS-041
+  name: Waiver & Consent Command Center
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWaiverConsent
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-042
+  - CMS-043
+  - CMS-044
+  - CMS-045
+  - CMS-046
+  - CMS-047
+  - CMS-048
+  - CMS-049
+  - CMS-050
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-041
+  inFlows: null
+- screen: CMS-042
+  name: Waiver Template Library & Master Setup
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWaiverTemplateMaster
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-042
+  inFlows: null
+- screen: CMS-043
+  name: Digital Waiver & Form Builder
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setDigitalWaiverForm
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-043
+  inFlows: null
+- screen: CMS-044
+  name: Dynamic Fields, Questions & Conditional Logic
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicFieldQuestion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-044
+  inFlows: null
+- screen: CMS-045
+  name: Signatory, Signature & Guardian Rule Configuration
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setSignatorySignatureGuardian
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-045
+  inFlows: null
+- screen: CMS-046
+  name: Product, Event & Experience Association
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listProductEventExperience
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-046
+  inFlows: null
+- screen: CMS-047
+  name: Waiver Trigger, Eligibility & Completion Rules
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWaiverTriggerEligibility
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-047
+  inFlows: null
+- screen: CMS-048
+  name: Versioning, Effective Dates & Legal Change Control
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listVersioningEffectiveDate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-048
+  inFlows: null
+- screen: CMS-049
+  name: Localization, Branding & Customer Experience Configuration
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setLocalizationBrandingCustomer
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-049
+  inFlows: null
+- screen: CMS-050
+  name: Waiver Approval, Testing & Publication Workspace
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - approveWaiverTesting
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-041
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-050
+  inFlows: null
+- screen: CMS-051
+  name: Waiver Operations Command Center
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWaiver
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-001
+  - CMS-052
+  - CMS-053
+  - CMS-054
+  - CMS-055
+  - CMS-056
+  - CMS-057
+  - CMS-058
+  - CMS-059
+  - CMS-060
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-051
+  inFlows: null
+- screen: CMS-052
+  name: Participant Waiver Status & Tracking
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listParticipantWaiverStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-052
+  inFlows: null
+- screen: CMS-053
+  name: Digital Signing & Collection Operations
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listDigitalSigningCollection
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-053
+  inFlows: null
+- screen: CMS-054
+  name: Minor, Guardian & Group Consent Management
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listMinorGuardianGroup
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-054
+  inFlows: null
+- screen: CMS-055
+  name: Waiver Verification & Validation Workspace
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setWaiverVerificationValidation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-055
+  inFlows: null
+- screen: CMS-056
+  name: Missing, Expired & Invalid Waiver Management
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listMissingExpiredInvalid
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-056
+  inFlows: null
+- screen: CMS-057
+  name: On-Site Waiver & Exception Handling
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listSiteWaiverException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-057
+  inFlows: null
+- screen: CMS-058
+  name: Compliance Evidence, Audit & Waiver Repository
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listComplianceEvidenceWaiver
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-058
+  inFlows: null
+- screen: CMS-059
+  name: Waiver Analytics, Compliance & Operational Insights
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWaiverComplianceOperational
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-059
+  inFlows: null
+- screen: CMS-060
+  name: AI Waiver Compliance & Risk Intelligence Center
+  module: Policy
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWaiverComplianceRisk
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - CMS-051
+  boardFrames: null
+  wireframe: wireframes/P13 Venue CMS.dc.html#cms-060
   inFlows: null

@@ -30,7 +30,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -263,6 +263,8 @@ paths:
         - name: openOnly
           in: query
           schema: { type: boolean }
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       responses:
         '200':
           description: Boxes
@@ -444,6 +446,7 @@ paths:
         - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
+        - "P06 EMP-022 My rota"
         - "P07 SCN-001 Sign in"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"
@@ -910,6 +913,9 @@ paths:
       x-ticvai-read-routing: primary
       summary: Lifts, adds and the opening float
       tags: [cash]
+      parameters:
+        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
+        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
       x-ticvai-permission: REPORT_VIEW_WORKSTATION
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: true

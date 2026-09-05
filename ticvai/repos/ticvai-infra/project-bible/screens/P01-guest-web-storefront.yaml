@@ -1,10 +1,3 @@
-# P01 — Guest Web Storefront (B2C)
-#
-# WEB-001 to WEB-013 are the purchase path and are fully specified.
-# The remainder carry structure and open questions; layout is still to be drawn.
-#
-# Validated against _schema.yaml; component kinds from _components.yaml.
-
 platform:
   code: P01
   audience: guest
@@ -19,7 +12,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 35
+  screenCount: 46
   app: guest-web
   appStatus: scaffolded
   packages:
@@ -76,10 +69,18 @@ screens:
           a disabled module must not render at all
   states:
     loading: Section skeletons in configured order. Header renders immediately from cache.
-    emptyFirstRun: No sections configured. Shows the tenant contact block rather than a blank page —
-      a storefront with nothing on it should still tell a guest how to reach the venue.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: No sections configured. Shows the tenant contact block rather than a blank page — a
+      storefront with nothing on it should still tell a guest how to reach the venue.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Config fetch failed. Falls back to the last cached configuration with a dismissible warning.
       A storefront that will not load because branding is unavailable is worse than an unbranded one.
   wireframe:
@@ -106,6 +107,17 @@ screens:
     - WEB-003
     - WEB-004
     - WEB-016
+    - WEB-036
+    - WEB-037
+    - WEB-038
+    - WEB-039
+    - WEB-040
+    - WEB-041
+    - WEB-042
+    - WEB-043
+    - WEB-044
+    - WEB-045
+    - WEB-046
   accessibility:
     focusOrder: Skip link, then first section heading. Not the carousel.
   implementation:
@@ -115,6 +127,7 @@ screens:
     status: notStarted
   density: compact
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-002
   name: Event & Attraction Listing
   module: Discovery & Browse
@@ -137,10 +150,18 @@ screens:
         notes: Cursor pagination. Infinite scroll with an explicit load-more fallback
   states:
     loading: Card skeletons at the current page size.
-    emptyFirstRun: No products match. Names the most restrictive filter and offers to clear it — an
-      empty state with no action is a dead end.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: No products match. Names the most restrictive filter and offers to clear it — an empty
+      state with no action is a dead end.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Retry with filters preserved. Filters are never silently reset.
   wireframe:
     status: generated
@@ -172,13 +193,24 @@ screens:
     contract: catalogue
     purpose: Find something by name
     trigger: onLoad
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
   density: compact
   entryState:
     params:
     - name: eventId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `eventId`.'
   requiresModule: ticketing
+  statesDerived: true
+  notes: '**Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface
+    they are on** — the same named screen on web and app now calls the same guest-callable operations.'
 - id: WEB-003
   name: Search Results
   module: Discovery & Browse
@@ -195,8 +227,16 @@ screens:
     loading: Results stream in; facets render first
     emptyFirstRun: '**No results is a real answer.** Offers what is on rather than an empty page, because
       a guest who searched for a closed attraction still came to buy something'
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Search unavailable. Falls back to browsing the catalogue
   wireframe:
     status: generated
@@ -227,8 +267,9 @@ screens:
     trigger: onLoad
   density: compact
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-004
-  name: Event / Attraction Detail
+  name: Attraction Details
   module: Discovery & Browse
   purpose: Decide whether to book this.
   wave: 1
@@ -251,7 +292,13 @@ screens:
   states:
     loading: Detail skeleton with the image slot reserved to avoid layout shift.
     emptyFirstRun: Not applicable — a product either exists or the screen is notFound.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Product unavailable, with a route back to the listing.
   wireframe:
     status: generated
@@ -281,6 +328,14 @@ screens:
     contract: catalogue
     purpose: List performances of an event
     trigger: onLoad
+  - operationId: getAvailability
+    contract: catalogue
+    purpose: Live remaining capacity
+    trigger: onLoad
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
   density: compact
   entryState:
     params:
@@ -290,6 +345,12 @@ screens:
       from: WEB-001
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
+  notes: '**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with
+    two renderings** — a screen named differently on web and app is two screens to a developer and one
+    journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A
+    guest does not know which surface they are on** — the same named screen on web and app now calls the
+    same guest-callable operations.'
 - id: WEB-005
   name: Ticket Type Selection
   module: Booking & Selection
@@ -305,8 +366,8 @@ screens:
         notes: Each row is a variant with a stepper. Price updates live
       - kind: banner
         bindsTo: PromotionEvaluation.rejected
-        notes: Shows near-miss offers — "add one more for the family rate". Uses the rejected list,
-          which exists precisely so this can be said
+        notes: Shows near-miss offers — "add one more for the family rate". Uses the rejected list, which
+          exists precisely so this can be said
     - name: actionBar
       components:
       - kind: primaryButton
@@ -314,8 +375,16 @@ screens:
   states:
     loading: Variant rows skeleton.
     emptyFirstRun: No ticket types on sale, with the next on-sale date if known.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Pricing unavailable. Continue is blocked rather than showing a stale price.
   wireframe:
     status: generated
@@ -351,6 +420,7 @@ screens:
       from: WEB-004
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-006
   name: Date & Session Selection
   module: Booking & Selection
@@ -365,8 +435,8 @@ screens:
         notes: Sold-out dates disabled with a reason on hover, not hidden
       - kind: cardList
         bindsTo: Availability.performances
-        notes: Session times with remaining counts. Availability is per channel — a session showing
-          sold out here may still have counter allocation, which is correct behaviour and not a defect
+        notes: Session times with remaining counts. Availability is per channel — a session showing sold
+          out here may still have counter allocation, which is correct behaviour and not a defect
     - name: actionBar
       components:
       - kind: primaryButton
@@ -374,8 +444,16 @@ screens:
   states:
     loading: Calendar skeleton with the current month reserved.
     emptyFirstRun: No sessions in range, with the next available date offered.
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Availability unavailable. Selection blocked — overselling is worse than waiting.
   wireframe:
     status: generated
@@ -391,8 +469,8 @@ screens:
     - WEB-008
     - WEB-010
   notes: 'Availability is read live and never cached beyond a few seconds. A guest selecting a session
-    that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24
-    August from review**: acquireLease. **The operations existed and this screen could not call them**
+    that filled while they were reading is a worse outcome than a slightly slower screen. **Wired 24 August
+    from review**: acquireInventoryHold. **The operations existed and this screen could not call them**
     — reviewers reported them as missing APIs, which is what an unreachable operation looks like from
     a wireframe.'
   implementation:
@@ -405,14 +483,15 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
-  - operationId: acquireLease
+  - operationId: acquireInventoryHold
     contract: catalogue
     purpose: Acquire an inventory lease
     trigger: onAction
   density: compact
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-007
-  name: Seat Map Selection
+  name: Interactive Seat Selection
   module: Booking & Selection
   purpose: Choose specific seats.
   wave: 2
@@ -437,11 +516,18 @@ screens:
   states:
     loading: Map skeleton at the venue's aspect ratio.
     emptyFirstRun: No seats available in the selected category.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `seating` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Map unavailable, with the option to continue on best-available instead.
   wireframe:
-    status: generated
-    board: wireframes/P01 Guest Web.dc.html#web-007
+    status: designed
+    board: wireframes/Seat Board 3.dc.html#seat-3b
+    generatedFallback: wireframes/P01 Guest Web.dc.html#web-007
   capability: C51
   navigation:
     entryFrom:
@@ -453,7 +539,15 @@ screens:
     - WEB-008
     - WEB-010
   notes: 'A map with no geometry falls back to category and best-available selection. Availability returns
-    renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.'
+    renderMode: list, and the screen renders groups rather than a plan. Never refuses the seated flow.
+    **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3b`. **The frame names this screen on its
+    own face**, which is the first pack to do that: the earlier F&B, POS and Retail boards had to be hand-assigned
+    by purpose after three derivation attempts produced nonsense. **A board that says what it draws removes
+    the guess entirely.** **Renamed 31 August** from *Seat Map Selection*. **A guest surface is one product
+    with two renderings** — a screen named differently on web and app is two screens to a developer and
+    one journey to a guest. **Cross-surface parity, 31 August**: added recommendSeats. **A guest does
+    not know which surface they are on** — the same named screen on web and app now calls the same guest-callable
+    operations.'
   implementation:
     app: guest-web
     route: /booking-and-selection/seat-map-selection
@@ -468,6 +562,10 @@ screens:
     contract: seating
     purpose: Seat status for a performance
     trigger: onLoad
+  - operationId: recommendSeats
+    contract: seating
+    purpose: Recommend seats for a party
+    trigger: onAction
   density: compact
   entryState:
     params:
@@ -476,6 +574,9 @@ screens:
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   requiresModule: seating
+  statesDerived: true
+  boardFrames:
+  - Seat Board 3.dc.html#seat-3b
 - id: WEB-008
   name: Add-ons & Upsell
   module: Booking & Selection
@@ -487,10 +588,26 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addCartLine
+        label: Add cart line
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addCartLine
   states:
     loading: Upsells resolve after the cart is priced
     emptyFirstRun: No add-ons for this product — the step is skipped entirely rather than shown empty
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Upsells unavailable. **The purchase continues** — a failed upsell must never block a sale
   wireframe:
     status: generated
@@ -529,6 +646,7 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-009
   name: Wishlist
   module: Booking & Selection
@@ -540,6 +658,33 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addToWishlist
+        label: Add to wishlist
+        notes: The act the screen exists for.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeFromWishlist
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+        label: Remove from wishlist
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addToWishlist
+      - kind: confirmDialog
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
+
+
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: Saved items load
     emptyFirstRun: Nothing saved — explains what the list is for
@@ -586,7 +731,11 @@ screens:
       from: deepLink
     - name: subjectId
       from: session
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `itemId`.'
   requiresModule: marketing
 - id: WEB-010
   name: Shopping Cart
@@ -604,8 +753,8 @@ screens:
         label: Promo code
       - kind: banner
         bindsTo: PromotionEvaluation.rejected
-        notes: When a code does not apply, say which condition failed. "Expired" and "already used"
-          are very different conversations
+        notes: When a code does not apply, say which condition failed. "Expired" and "already used" are
+          very different conversations
     - name: actionBar
       components:
       - kind: primaryButton
@@ -613,7 +762,13 @@ screens:
   states:
     loading: Totals skeleton. Line items render immediately from local state.
     emptyFirstRun: Empty cart with a route back to browsing.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Pricing failed. Checkout blocked rather than proceeding on a stale total.
   wireframe:
     status: generated
@@ -681,8 +836,13 @@ screens:
       from: deepLink
     - name: lineId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `code`, `lineId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-011
   name: Guest Details & Attendee Forms
   module: Cart & Checkout
@@ -714,7 +874,13 @@ screens:
   states:
     loading: Form renders immediately; prefill populates when it arrives.
     emptyFirstRun: Not applicable.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Prefill failed. The form still works, entered manually.
   wireframe:
     status: generated
@@ -786,11 +952,16 @@ screens:
       from: deepLink
     - name: subjectId
       from: session
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
-  notes: '**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen
-    could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
+  notes: '**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could
+    not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
     looks like from a wireframe.'
+  statesDerived: true
 - id: WEB-012
   name: Checkout — Payment
   module: Cart & Checkout
@@ -812,7 +983,13 @@ screens:
   states:
     loading: Button enters loading and is disabled. Double submission is impossible.
     emptyFirstRun: Not applicable.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Declined, with the reason where it is safe to show, and a retry that reuses the same idempotency
       key.
   wireframe:
@@ -847,11 +1024,11 @@ screens:
   notes: 'The unknown outcome is the one to build for. A payment taken but never confirmed must offer
     inquiry, not a retry — a retry double-charges and the guest finds out. **Card only, so tender currency
     equals base currency.** A guest paying with a foreign card is converted by their own issuer at their
-    own rate — that is not our conversion and is not recorded as one. The displayed comparison price
-    (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest
-    commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could
-    not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
-    looks like from a wireframe.'
+    own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`)
+    and the charged amount are different numbers and the screen says so before the guest commits. **Wired
+    24 August from review**: getOrder. **The operations existed and this screen could not call them**
+    — reviewers reported them as missing APIs, which is what an unreachable operation looks like from
+    a wireframe.'
   openQuestions:
   - Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot
     be tested without them.
@@ -865,12 +1042,12 @@ screens:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-013
-  name: Order Confirmation
+  name: Booking Confirmation
   module: Cart & Checkout
   purpose: Confirm the purchase and deliver the tickets.
   wave: 1
@@ -890,7 +1067,13 @@ screens:
   states:
     loading: Skeleton. Order number shows immediately from the create response.
     emptyFirstRun: Not applicable.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Payment succeeded but confirmation did not load. Shows the order number and a support route
       — never implies the purchase failed.
   wireframe:
@@ -931,6 +1114,9 @@ screens:
       from: WEB-012
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
+  notes: '**Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two renderings**
+    — a screen named differently on web and app is two screens to a developer and one journey to a guest.'
 - id: WEB-014
   name: Pay for a Booking
   module: Cart & Checkout
@@ -950,8 +1136,8 @@ screens:
           is actionable; **expires at 14:32** needs arithmetic.
       - kind: textField
         label: Email for your tickets (optional)
-        notes: '**Optional, and only to send the ticket.** Requiring an account before taking money
-          is how a paid booking becomes an abandoned one.'
+        notes: '**Optional, and only to send the ticket.** Requiring an account before taking money is
+          how a paid booking becomes an abandoned one.'
       - kind: primaryButton
         label: Pay now
   states:
@@ -962,10 +1148,10 @@ screens:
       or it has gone.'
     error: Could not load the booking. **The hold is unaffected** — a failed page load must not release
       inventory.
-    expired: '**The hold was released and the booking is gone.** Says so plainly, with what was held
-      and a link to book it again. The commonest non-happy path on this screen by a wide margin.'
-    alreadyPaid: '**Paid, with the order number and the tickets.** A guest clicking twice is normal
-      — the second click should show their tickets, not a payment form.'
+    expired: '**The hold was released and the booking is gone.** Says so plainly, with what was held and
+      a link to book it again. The commonest non-happy path on this screen by a wide margin.'
+    alreadyPaid: '**Paid, with the order number and the tickets.** A guest clicking twice is normal —
+      the second click should show their tickets, not a payment form.'
     superseded: '**A newer link was sent.** Names the channel it went to, because *this link no longer
       works* with no explanation sends them to the phone.'
   wireframe:
@@ -989,6 +1175,12 @@ screens:
   navigation:
     exitTo:
     - WEB-013
+    entryFrom:
+    - WEB-013
+    inferred: false
+    notes: '**Reached from WEB-013** — an unpaid booking is paid from the confirmation that says it is
+      unpaid. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was
+      outside the navigation graph entirely.'
   notes: BL-072, rebuilt 20 August. **Declared `getCart` and `checkoutCart` until then, and `createPaymentLink`
     takes an `orderId`** — the screen was looking for a cart that was never created, and its entryState
     said `cartId` came from the session when **a guest arriving from an email has no session.** Wired
@@ -999,13 +1191,13 @@ screens:
     - name: token
       from: deepLink
     coldEntry: '**Cold is the only way in.** The guest arrives from an email, an SMS or a WhatsApp message
-      with no session and quite possibly no account. **A link opened three days late is the ordinary
-      case, not an edge** — the screen says the hold was released and offers to book again. Expired,
-      already paid and superseded are three different messages, and **404 is never one of them**: telling
-      somebody their booking does not exist when it expired is how a support call starts.'
+      with no session and quite possibly no account. **A link opened three days late is the ordinary case,
+      not an edge** — the screen says the hold was released and offers to book again. Expired, already
+      paid and superseded are three different messages, and **404 is never one of them**: telling somebody
+      their booking does not exist when it expired is how a support call starts.'
   requiresModule: ticketing
 - id: WEB-015
-  name: Virtual Waiting Room
+  name: Branded Queue / Waiting Room
   module: High-Demand Access
   purpose: Virtual Waiting Room — the screen a person opens when they need to deal with virtual waiting
     room.
@@ -1016,12 +1208,21 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: joinQueue
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: joinQueue
   states:
     loading: Position in the queue, updating
     emptyFirstRun: —
-    error: '**Lost the queue position.** The worst failure on this screen: it re-queues rather than
-      silently admitting, and says so, because a guest who thinks they lost their place will open a
-      second tab and make it worse'
+    error: '**Lost the queue position.** The worst failure on this screen: it re-queues rather than silently
+      admitting, and says so, because a guest who thinks they lost their place will open a second tab
+      and make it worse'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-015
@@ -1040,12 +1241,14 @@ screens:
     exitTo:
     - WEB-001
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Renamed 31 August** from *Virtual Waiting Room*. **A guest surface is one product with two renderings**
+    — a screen named differently on web and app is two screens to a developer and one journey to a guest.
   apis:
   - operationId: joinQueue
     contract: queue
     purpose: Join a virtual queue
     trigger: onAction
-  - operationId: getQueueEntry
+  - operationId: getWaitingGuest
     contract: queue
     purpose: Read a queue entry
     trigger: onLoad
@@ -1058,7 +1261,11 @@ screens:
     params:
     - name: entryId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `entryId`.'
   requiresModule: queue
 - id: WEB-016
   name: Login / Register
@@ -1075,7 +1282,9 @@ screens:
   states:
     loading: Checking the session
     emptyFirstRun: —
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     error: Sign-in failed. Wrong password reads differently from an unavailable identity provider
   wireframe:
     status: generated
@@ -1094,10 +1303,6 @@ screens:
     contract: identity
     purpose: Enrol an MFA method
     trigger: onAction
-  - operationId: getCurrentSession
-    contract: identity
-    purpose: Current session and effective permissions
-    trigger: onLoad
   - operationId: getGuestSession
     contract: identity
     purpose: Read the current guest session
@@ -1130,10 +1335,6 @@ screens:
     contract: identity
     purpose: Authenticate and open a session
     trigger: onAction
-  - operationId: logout
-    contract: identity
-    purpose: Close the current session
-    trigger: onAction
   - operationId: refreshToken
     contract: identity
     purpose: Rotate the access token
@@ -1145,10 +1346,6 @@ screens:
   - operationId: requestGuestOtp
     contract: identity
     purpose: Request a one-time code
-    trigger: onAction
-  - operationId: selectRole
-    contract: identity
-    purpose: Choose a role for a multi-role session
     trigger: onAction
   - operationId: startSsoAuthorization
     contract: identity
@@ -1184,7 +1381,12 @@ screens:
     - WEB-017
     - WEB-018
     - WEB-019
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Corrected 24 August**: removed getCurrentSession, logout, selectRole. **A guest surface has no roles
+    to select and its own logout** — `selectRole` is ADR-0002 staff authorisation and `getCurrentSession`
+    is the staff session. `guestLogout` and `getGuestSession` are the equivalents and both already existed.
+    **The screen was calling the staff identity surface because nothing checked that a guest platform
+    only calls guest operations.**'
   density: compact
   entryState:
     params:
@@ -1196,8 +1398,13 @@ screens:
       from: deepLink
     - name: providerId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `challengeId`, `methodId`, `providerId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-017
   name: My Account Dashboard
   module: Account & Self-Service
@@ -1215,8 +1422,9 @@ screens:
     emptyFirstRun: A new account with no orders — offers what to do next
     error: Partial. Each tile fails independently
   wireframe:
-    status: generated
-    board: wireframes/P01 Guest Web.dc.html#web-017
+    status: designed
+    board: wireframes/Dashboards Board.dc.html#web-017
+    generatedFallback: wireframes/P01 Guest Web.dc.html#web-017
   capability: C36
   apis:
   - operationId: addToWishlist
@@ -1262,6 +1470,9 @@ screens:
     - WEB-018
     - WEB-019
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Drawn 26 August** — `Dashboards Board` frame `web-017`. **One board draws five dashboards across
+    five platforms** — platform admin, partner, support, guest web and cross-tenant health. A dashboard
+    is a shape rather than a domain, and the pack recognised that before the package did.
   density: compact
   entryState:
     params:
@@ -1271,8 +1482,14 @@ screens:
       from: deepLink
     - name: subjectId
       from: session
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
+  boardFrames:
+  - Dashboards Board.dc.html#web-017
 - id: WEB-018
   name: My Tickets
   module: Account & Self-Service
@@ -1284,20 +1501,31 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listMyEntitlements
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Tickets load
     emptyFirstRun: No tickets — distinguishes never bought from all past
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-018
   capability: C09
-  notes: Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
+  notes: 'Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
     from the screen name and its operations on 17 August, not from a requirement. The read surface Deep
     asked for. **All four were missing and the table itself did not exist until 18 August.** **Rewired
     on the 20 August review.** **`listEntitlements` wired 24 August, raised in review.** The staff-scoped
-    list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered
-    by a subject parameter**, or a guest is one parameter away from somebody else’s.
+    list was on this guest screen — **a guest-facing list must be scoped to the caller, not filtered by
+    a subject parameter**, or a guest is one parameter away from somebody else’s. **Cross-surface parity,
+    31 August**: added transferOrderTickets. **The same screen on web and app was calling different operations**
+    — one side could do something the other could not, and nothing recorded the difference as deliberate.'
   apis:
   - operationId: listMyEntitlements
     contract: access
@@ -1319,6 +1547,10 @@ screens:
     contract: access
     purpose: Every entitlement this guest holds, including expired
     trigger: onLoad
+  - operationId: transferOrderTickets
+    contract: orders
+    purpose: Transfer tickets to another guest
+    trigger: onAction
   implementation:
     app: guest-web
     route: /account-and-self-service/my-tickets
@@ -1338,6 +1570,8 @@ screens:
     params:
     - name: entitlementId
       from: deepLink
+    - name: orderId
+      from: deepLink
     coldEntry: '**A ticket link opened after the event.** Shows the entitlement with its status — expired,
       used, transferred — because *not found* to somebody holding a ticket is the wrong answer.'
   requiresModule: access
@@ -1356,7 +1590,9 @@ screens:
   states:
     loading: Orders, newest first
     emptyFirstRun: No orders yet
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
     error: Could not load
   wireframe:
     status: generated
@@ -1370,6 +1606,14 @@ screens:
   - operationId: listMyOrders
     contract: orders
     purpose: The orders this guest placed
+    trigger: onLoad
+  - operationId: getOrder
+    contract: orders
+    purpose: Read an order
+    trigger: onLoad
+  - operationId: listOrders
+    contract: orders
+    purpose: List orders
     trigger: onLoad
   implementation:
     app: guest-web
@@ -1385,19 +1629,21 @@ screens:
     - WEB-016
     - WEB-017
     - WEB-018
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
     **`listMyOrders` wired 24 August, raised in review.** The staff-scoped list was on this guest screen
-    — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or
-    a guest is one parameter away from somebody else’s.
+    — **a guest-facing list must be scoped to the caller, not filtered by a subject parameter**, or a
+    guest is one parameter away from somebody else’s. **Cross-surface parity, 31 August**: added getOrder,
+    listOrders. **A guest does not know which surface they are on** — the same named screen on web and
+    app now calls the same guest-callable operations.'
   density: compact
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-020
   name: Profile & Preferences
   module: Account & Self-Service
@@ -1409,11 +1655,30 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: updateMyProfile
+        label: Save my profile
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listConsentPurposes
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: updateMyProfile
   states:
     loading: Profile and consents
     emptyFirstRun: —
     error: '**Save failed and the form keeps what was typed.** A consent change that silently did not
       save is a compliance failure, so the screen states it rather than showing success'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-020
@@ -1475,11 +1740,26 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listWalletTransactions
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Balance and gift cards
     emptyFirstRun: No wallet — offers to top up
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `retail` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Balance unavailable. **Spending is blocked** rather than attempted against an unknown balance
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-021
@@ -1519,8 +1799,13 @@ screens:
       from: deepLink
     - name: subjectId
       from: session
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `cardCode`.'
   requiresModule: retail
+  statesDerived: true
 - id: WEB-022
   name: Membership Plans
   module: Membership, Loyalty & Value
@@ -1532,11 +1817,26 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Plans load
     emptyFirstRun: No memberships on sale at this venue
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-022
@@ -1555,7 +1855,10 @@ screens:
     - WEB-023
     - WEB-024
     inferred: true
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
+    could not fetch what it shows** — the app had these and the browser did not, and there is no reason
+    a membership or a bundle should need an app.'
   apis:
   - operationId: listProducts
     contract: catalogue
@@ -1565,6 +1868,14 @@ screens:
     contract: catalogue
     purpose: Read a product
     trigger: onLoad
+  - operationId: getMyMemberships
+    contract: catalogue
+    purpose: A guest's own memberships, benefits and history
+    trigger: onLoad
+  - operationId: listGuestMemberships
+    contract: catalogue
+    purpose: A guest's memberships, benefits and history
+    trigger: onLoad
   density: compact
   entryState:
     params:
@@ -1572,6 +1883,7 @@ screens:
       from: WEB-001
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-023
   name: Membership Management
   module: Membership, Loyalty & Value
@@ -1597,6 +1909,14 @@ screens:
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
+  - operationId: getMyMemberships
+    contract: catalogue
+    purpose: A guest's own memberships, benefits and history
+    trigger: onLoad
+  - operationId: listGuestMemberships
+    contract: catalogue
+    purpose: A guest's memberships, benefits and history
+    trigger: onLoad
   implementation:
     app: guest-web
     route: /membership-loyalty-and-value/membership-management
@@ -1611,18 +1931,20 @@ screens:
     - WEB-021
     - WEB-022
     - WEB-024
-  notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+  notes: 'Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Wired 24 August**: getMyMemberships, listGuestMemberships. **The web surface drew the screen and
+    could not fetch what it shows** — the app had these and the browser did not, and there is no reason
+    a membership or a bundle should need an app.'
   density: compact
   entryState:
     params:
     - name: orderId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
 - id: WEB-024
-  name: Loyalty & Rewards
+  name: Devices, Wishlist & Consent
   module: Membership, Loyalty & Value
   purpose: See loyalty & rewards for this venue.
   wave: 3
@@ -1632,10 +1954,46 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addToWishlist
+        label: Add to wishlist
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listGuestDevices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeFromWishlist
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+        label: Remove from wishlist
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addToWishlist
+      - kind: confirmDialog
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
+
+
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: Points and rewards
     emptyFirstRun: No points yet — explains how they accrue
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-024
@@ -1684,6 +2042,8 @@ screens:
     - WEB-023
     inferred: true
   notes: Purpose derived from the screen name and its operations on 17 August, not from a requirement.
+    **Renamed 31 August** from *Loyalty & Rewards*. **A guest surface is one product with two renderings**
+    — a screen named differently on web and app is two screens to a developer and one journey to a guest.
   density: compact
   entryState:
     params:
@@ -1693,7 +2053,11 @@ screens:
       from: deepLink
     - name: subjectId
       from: session
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
 - id: WEB-025
   name: Help Centre / FAQ
@@ -1748,6 +2112,16 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: submitReview
+        label: Submit review
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: submitReview
   states:
     loading: Survey loads
     emptyFirstRun: —
@@ -1789,11 +2163,46 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: recordConsent
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listGuestDevices
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: destructiveButton
+        derived: true
+        impliedBy: removeFromWishlist
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+        label: Remove from wishlist
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: recordConsent
+      - kind: confirmDialog
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
+
+
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   states:
     loading: —
     emptyFirstRun: —
     error: Could not subscribe. **Consent is not recorded on a failed request**, because a subscription
       the guest believes happened and did not is worse than a visible failure
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-027
@@ -1827,6 +2236,14 @@ screens:
     contract: marketing-crm
     purpose: Revoke a device registration
     trigger: onAction
+  - operationId: getMarketingSubscription
+    contract: marketing-crm
+    purpose: What this guest has opted into
+    trigger: onLoad
+  - operationId: setMarketingSubscription
+    contract: marketing-crm
+    purpose: Subscribe or unsubscribe
+    trigger: onAction
   implementation:
     app: guest-web
     route: /engagement-and-support/newsletter-subscription
@@ -1851,7 +2268,11 @@ screens:
       from: deepLink
     - name: subjectId
       from: session
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `deviceId`, `itemId`.'
   requiresModule: marketing
 - id: WEB-028
   name: Contact & Venue Information
@@ -1915,9 +2336,8 @@ screens:
     status: generated
     board: wireframes/P01 Guest Web.dc.html#web-029
   capability: C57
-  notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's
-    failure, not ours. Purpose derived from the screen name and its operations on 17 August, not from
-    a requirement.
+  notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure,
+    not ours. Purpose derived from the screen name and its operations on 17 August, not from a requirement.
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -1948,6 +2368,15 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: transferOrderTickets
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -1964,8 +2393,16 @@ screens:
   states:
     loading: Your transferable tickets
     emptyFirstRun: Nothing transferable — already used, or not transferable by product rule
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. **Transferring is blocked** — sending a ticket you could not read is sending
       the wrong one
   navigation:
@@ -1990,10 +2427,10 @@ screens:
       from: deepLink
     - name: transferId
       from: deepLink
-    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves;
-      if it was refunded or the performance passed, says which and offers the order list rather than
-      an error.'
+    coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
+      it was refunded or the performance passed, says which and offers the order list rather than an error.'
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-031
   name: My Reservations
   module: Ticketing
@@ -2006,6 +2443,32 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: detailPanel
+        derived: true
+        impliedBy: getReservation
+        notes: One record, read-only.
+      - kind: destructiveButton
+        derived: true
+        impliedBy: cancelReservation
+        label: Cancel reservation
+        notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
+          3 orders worth AED 480* is a confirmation, *are you sure* is not.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: cancelReservation
+      - kind: confirmDialog
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
+
+
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
   apis:
   - operationId: listReservations
     contract: orders
@@ -2022,8 +2485,16 @@ screens:
   states:
     loading: Reservations, soonest first
     emptyFirstRun: Nothing reserved
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Cancelling is blocked
   navigation:
     exitTo:
@@ -2045,8 +2516,13 @@ screens:
     params:
     - name: reservationId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `reservationId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-032
   name: Offers & Promotions
   module: Promotions
@@ -2059,6 +2535,19 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: detailPanel
+        derived: true
+        impliedBy: getPromotion
+        notes: One record, read-only.
+      - kind: primaryButton
+        derived: true
+        impliedBy: evaluatePromotions
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: evaluatePromotions
   apis:
   - operationId: listPromotions
     contract: promotions
@@ -2075,13 +2564,25 @@ screens:
   states:
     loading: Offers load
     emptyFirstRun: Nothing running — said plainly rather than shown as an empty page
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   navigation:
     exitTo:
     - WEB-001
-    inferred: true
+    inferred: false
+    entryFrom:
+    - WEB-001
+    notes: '**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   implementation:
     app: guest-web
     route: /offers-promotions
@@ -2096,8 +2597,13 @@ screens:
     params:
     - name: promotionId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `promotionId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: WEB-033
   name: Shop
   module: Retail
@@ -2110,6 +2616,20 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: searchField
+        derived: true
+        impliedBy: lookupMerchandise
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: primaryButton
+        derived: true
+        impliedBy: reserveMerchandise
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: reserveMerchandise
   apis:
   - operationId: listMerchandise
     contract: retail
@@ -2130,14 +2650,26 @@ screens:
   states:
     loading: Products load
     emptyFirstRun: Nothing available online at this venue
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `retail` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. **Reserving is blocked** — a reservation against unknown stock is a promise
       we cannot keep
   navigation:
     exitTo:
     - WEB-001
-    inferred: true
+    inferred: false
+    entryFrom:
+    - WEB-001
+    notes: '**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   implementation:
     app: guest-web
     route: /shop
@@ -2154,8 +2686,13 @@ screens:
       from: session
     - name: outletId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `outletId`.'
   requiresModule: retail
+  statesDerived: true
 - id: WEB-034
   name: Lost & Found
   module: Support
@@ -2168,6 +2705,15 @@ screens:
     - name: contentBody
       components:
       - kind: dataTable
+      - kind: primaryButton
+        derived: true
+        impliedBy: raiseMyCase
+        notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: raiseMyCase
   apis:
   - operationId: listMyCases
     contract: marketing-crm
@@ -2184,13 +2730,25 @@ screens:
   states:
     loading: Your reports
     emptyFirstRun: Nothing reported
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not submit. **The report is kept** and retried
   navigation:
     exitTo:
     - WEB-001
-    inferred: true
+    inferred: false
+    entryFrom:
+    - WEB-001
+    notes: '**Reached from WEB-001** — a top-level section of the site. Stated on 4 September: this screen
+      exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   implementation:
     app: guest-web
     route: /lost-found
@@ -2211,8 +2769,9 @@ screens:
     - name: caseId
       from: deepLink
       optional: true
-    coldEntry: A case opened from a notification or the list. **Optional** — the ordinary way in is
-      to raise a new one, not to open an old one.
+    coldEntry: A case opened from a notification or the list. **Optional** — the ordinary way in is to
+      raise a new one, not to open an old one.
+  statesDerived: true
 - id: WEB-035
   name: Multi-Currency & Pricing
   module: Ticketing
@@ -2236,10 +2795,18 @@ screens:
     trigger: onLoad
   states:
     loading: Rates and prices, with the base currency shown first
-    emptyFirstRun: One currency configured at this venue — the selector is hidden rather than shown
-      with a single option
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: One currency configured at this venue — the selector is hidden rather than shown with
+      a single option
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
+      to lack — this state is reached by a session that expired, and the action is to sign in again rather
+      than to ask for access.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Rates unavailable. **Prices show in base currency rather than a stale conversion** — a wrong
       rate is worse than no rate, because a guest who budgets against it arrives short
   navigation:
@@ -2259,9 +2826,751 @@ screens:
   notes: 'Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display
     multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. Wave 1 against the app''s
     Wave 2, because **the website is where an overseas guest compares before booking** and the app is
-    where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the
-    wireframe board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not
-    need the venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a
-    rate exists only for a currency the venue enabled, so the two questions have one answer.'
+    where they check after. **Display only — the sale settles in base currency** (CF-37). Not on the wireframe
+    board; needs drawing. **`getRegionSettings` deliberately not called** — a guest does not need the
+    venue''s scope configuration to pick a currency. `listFxRates` is the currency list: a rate exists
+    only for a currency the venue enabled, so the two questions have one answer.'
   density: compact
   requiresModule: ticketing
+  statesDerived: true
+- id: WEB-036
+  name: F&B – Browse & Order
+  module: In-venue Services
+  wave: 2
+  requiresModule: fnb
+  purpose: Order food from a table, a lounger or a seat.
+  density: compact
+  apis:
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: The menu a guest sees
+    trigger: onLoad
+  - operationId: listDiningOutlets
+    contract: fnb
+    purpose: Where a guest can eat, right now
+    trigger: onLoad
+  - operationId: listModifierGroups
+    contract: fnb
+    purpose: List modifier groups
+    trigger: onLoad
+  - operationId: claimLocationSession
+    contract: fnb
+    purpose: Tell the platform where the guest is
+    trigger: onAction
+  - operationId: claimTableSession
+    contract: fnb
+    purpose: Identify which table a guest is sitting at
+    trigger: onAction
+  - operationId: createGuestFnbOrder
+    contract: fnb
+    purpose: A guest orders food
+    trigger: onAction
+  - operationId: listDeliveryLocations
+    contract: fnb
+    purpose: Where an order can be delivered
+    trigger: onLoad
+  - operationId: getGuestOrderStatus
+    contract: fnb
+    purpose: Track an order
+    trigger: onLoad
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: outletId
+      from: deepLink
+    - name: venueId
+      from: session
+    - name: orderId
+      from: deepLink
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `outletId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: F&B — Browse & Order
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /fandb--browse-and-order
+    component: apps/guest-web/src/routes/FBBrowseOrder.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-036
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**A guest scans a QR on a table and lands in a browser.** That is the single most common F&B
+    ordering pattern anywhere, and until 24 August it was the one thing this surface could not do — `claimTableSession`
+    and `claimLocationSession` were app-only. **Nobody installs an app to order a coffee.** **Renamed
+    31 August** from *F&B — Browse & Order*. **A guest surface is one product with two renderings** —
+    a screen named differently on web and app is two screens to a developer and one journey to a guest.
+    **Cross-surface parity, 31 August**: added getGuestOrderStatus. **The same screen on web and app was
+    calling different operations** — one side could do something the other could not, and nothing recorded
+    the difference as deliberate.'
+- id: WEB-037
+  name: Menu Item Detail
+  module: In-venue Services
+  wave: 2
+  requiresModule: fnb
+  purpose: What is in it, and what may be changed.
+  density: compact
+  apis:
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: The menu a guest sees
+    trigger: onLoad
+  - operationId: listModifierGroups
+    contract: fnb
+    purpose: List modifier groups
+    trigger: onLoad
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: outletId
+      from: deepLink
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `outletId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Menu Item Detail
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /menu-item-detail
+    component: apps/guest-web/src/routes/MenuItemDetail.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-037
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**Allergens are read here more often than anywhere else in the platform**, and a guest checking
+    one on a phone browser is the ordinary case rather than the exception.'
+- id: WEB-038
+  name: F&B – Order Tracking
+  module: In-venue Services
+  wave: 2
+  requiresModule: fnb
+  purpose: Watch it being made, and settle the bill.
+  density: compact
+  apis:
+  - operationId: getGuestOrderStatus
+    contract: fnb
+    purpose: Track an order
+    trigger: onLoad
+  - operationId: getGuestBill
+    contract: fnb
+    purpose: The bill for the guest's table
+    trigger: onLoad
+  - operationId: claimTableSession
+    contract: fnb
+    purpose: Identify which table a guest is sitting at
+    trigger: onAction
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: orderId
+      from: deepLink
+    - name: sessionId
+      from: deepLink
+    - name: venueId
+      from: session
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `orderId`, `sessionId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: F&B — Order Tracking
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /fandb--order-tracking
+    component: apps/guest-web/src/routes/FBOrderTracking.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-038
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**Order to ready is the kitchen''s number; ready to collected is the counter''s.** A guest watching
+    a status that never changes walks to the counter. **Renamed 31 August** from *F&B — Order Tracking*.
+    **A guest surface is one product with two renderings** — a screen named differently on web and app
+    is two screens to a developer and one journey to a guest.'
+- id: WEB-039
+  name: Venue Map & Wait Times
+  module: In-venue Services
+  wave: 2
+  requiresModule: queue
+  purpose: Where things are, and how long they take.
+  density: compact
+  apis:
+  - operationId: getVenueMap
+    contract: venue-map
+    purpose: A map with its points and paths
+    trigger: onLoad
+  - operationId: getVenueMapGraph
+    contract: venue-map
+    purpose: The navigation graph, ready to route over
+    trigger: onLoad
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
+  - operationId: listQueues
+    contract: queue
+    purpose: List queues
+    trigger: onLoad
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: mapId
+      from: deepLink
+    - name: venueId
+      from: session
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `mapId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Venue Map & Wait Times
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /venue-map-and-wait-times
+    component: apps/guest-web/src/routes/VenueMapWaitTimes.tsx
+    status: notStarted
+  wireframe:
+    status: designed
+    board: wireframes/Seat Board 3.dc.html#seat-3c
+    generatedFallback: wireframes/P01 Guest Web.dc.html#web-039
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**`getVenueMap` was already `guest` audience and offline-capable and no web screen drew it.**
+    A map in a browser is a map. **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3c`. **The frame
+    names this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and
+    Retail boards had to be hand-assigned by purpose after three derivation attempts produced nonsense.
+    **A board that says what it draws removes the guess entirely.**'
+  boardFrames:
+  - Seat Board 3.dc.html#seat-3c
+- id: WEB-040
+  name: Virtual Queue
+  module: In-venue Services
+  wave: 2
+  requiresModule: queue
+  purpose: Hold a place without standing in one.
+  density: compact
+  apis:
+  - operationId: joinQueue
+    contract: queue
+    purpose: Join a virtual queue
+    trigger: onAction
+  - operationId: getWaitingGuest
+    contract: queue
+    purpose: Read a queue entry
+    trigger: onLoad
+  - operationId: leaveQueue
+    contract: queue
+    purpose: Leave a queue
+    trigger: onAction
+  - operationId: getWaitTimes
+    contract: queue
+    purpose: Wait times across a venue
+    trigger: onLoad
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: entryId
+      from: deepLink
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `entryId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Virtual Queue
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /virtual-queue
+    component: apps/guest-web/src/routes/VirtualQueue.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-040
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**The point of a virtual queue is that the guest walks away** — which works the same in a browser
+    tab as in an app.'
+- id: WEB-041
+  name: Parking – Reserve & Pay
+  module: In-venue Services
+  wave: 2
+  requiresModule: access
+  purpose: Reserve a facility before arriving.
+  density: compact
+  apis:
+  - operationId: listParkingFacilities
+    contract: access
+    purpose: Car parks at a venue, and how each integrates
+    trigger: onLoad
+  - operationId: createParkingEntitlement
+    contract: access
+    purpose: A guest bought parking
+    trigger: onAction
+  - operationId: updateParkingEntitlement
+    contract: access
+    purpose: Change the plate, or revoke
+    trigger: onAction
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: entitlementId
+      from: deepLink
+    - name: venueId
+      from: session
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `entitlementId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Parking — Reserve & Pay
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /parking--reserve-and-pay
+    component: apps/guest-web/src/routes/ParkingReservePay.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-041
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**A guest reserves parking on the drive, from whatever is open on their phone.** Requiring an
+    install for a car park is requiring an install to arrive. **Renamed 31 August** from *Parking — Reserve
+    & Pay*. **A guest surface is one product with two renderings** — a screen named differently on web
+    and app is two screens to a developer and one journey to a guest.'
+- id: WEB-042
+  name: Retail & Shop and Drop
+  module: Retail
+  wave: 2
+  requiresModule: retail
+  purpose: Buy merchandise and collect it on the way out.
+  density: compact
+  apis:
+  - operationId: listMerchandise
+    contract: retail
+    purpose: List merchandise
+    trigger: onLoad
+  - operationId: lookupMerchandise
+    contract: retail
+    purpose: Price and stock check by barcode
+    trigger: onLoad
+  - operationId: reserveMerchandise
+    contract: retail
+    purpose: Reserve an item for collection
+    trigger: onAction
+  - operationId: lookupShopAndDrop
+    contract: retail
+    purpose: Find a guest's dropped goods
+    trigger: onLoad
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: outletId
+      from: deepLink
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `outletId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Retail & Shop and Drop
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /retail-and-shop-and-drop
+    component: apps/guest-web/src/routes/RetailShopAndDrop.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-042
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was
+    app-only, which made the service half-available on the surface most guests use.'
+- id: WEB-043
+  name: Loyalty & Rewards
+  module: Membership, Loyalty & Value
+  wave: 2
+  requiresModule: marketing
+  purpose: Points, tier, and what the next one needs.
+  density: compact
+  apis:
+  - operationId: getLoyaltyPosition
+    contract: marketing-crm
+    purpose: A guest's points, tier and what is within reach
+    trigger: onLoad
+  - operationId: listLoyaltyProgrammes
+    contract: marketing-crm
+    purpose: List loyalty programmes
+    trigger: onLoad
+  - operationId: listPromotions
+    contract: promotions
+    purpose: List promotions
+    trigger: onLoad
+  - operationId: evaluatePromotions
+    contract: promotions
+    purpose: Evaluate promotions against a cart
+    trigger: onAction
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params: []
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from
+      the site.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Loyalty & Rewards
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /loyalty-and-rewards
+    component: apps/guest-web/src/routes/LoyaltyRewards.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-043
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**P01 Board 3 drew *Membership* with nothing behind it.** `getLoyaltyPosition` and `listLoyaltyProgrammes`
+    were app-only — **the surface a guest checks their points on between visits is the web one.**'
+- id: WEB-044
+  name: AI Concierge – Home
+  module: Engagement & Support
+  wave: 2
+  requiresModule: ai
+  purpose: Ask, and be answered or handed to a person.
+  density: compact
+  apis:
+  - operationId: createAiConversation
+    contract: ai
+    purpose: Open a conversation
+    trigger: onAction
+  - operationId: sendAiMessage
+    contract: ai
+    purpose: Ask
+    trigger: onAction
+  - operationId: handoverToAgent
+    contract: marketing-crm
+    purpose: Pass an assistant conversation to a person
+    trigger: onAction
+  - operationId: requestSuggestion
+    contract: ai
+    purpose: requestSuggestion
+    trigger: onAction
+  - operationId: getGuestMenu
+    contract: fnb
+    purpose: The menu a guest sees
+    trigger: onLoad
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params:
+    - name: conversationId
+      from: deepLink
+    - name: outletId
+      from: session
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with `conversationId`.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: AI Concierge
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /ai-concierge
+    component: apps/guest-web/src/routes/AiConcierge.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-044
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**A concierge in a browser is a concierge.** ADR-0020 keeps it read-only against the transactional
+    core regardless of surface. **Renamed 31 August** from *AI Concierge*. **A guest surface is one product
+    with two renderings** — a screen named differently on web and app is two screens to a developer and
+    one journey to a guest. **Cross-surface parity, 31 August**: added getGuestMenu. **A guest does not
+    know which surface they are on** — the same named screen on web and app now calls the same guest-callable
+    operations.'
+- id: WEB-045
+  name: Help Centre & Accessibility
+  module: Support
+  wave: 2
+  requiresModule: core
+  purpose: Answers, policies and the accessibility statement.
+  density: compact
+  apis:
+  - operationId: listFaqs
+    contract: white-label
+    purpose: List FAQs
+    trigger: onLoad
+  - operationId: listContentPages
+    contract: white-label
+    purpose: List custom content pages
+    trigger: onLoad
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params: []
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from
+      the site.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: Help Centre & Accessibility
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /help-centre-and-accessibility
+    component: apps/guest-web/src/routes/HelpCentreAccessibility.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-045
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**P01 Board 4 drew *Help Centre* and *Accessibility Statement* and neither could load content.**
+    `listFaqs` and `listContentPages` were app-only.'
+- id: WEB-046
+  name: In-Venue Notifications
+  module: Engagement & Support
+  wave: 2
+  requiresModule: marketing
+  purpose: Queue calls, order updates, venue notices.
+  density: compact
+  apis:
+  - operationId: claimLocationSession
+    contract: fnb
+    purpose: Tell the platform where the guest is
+    trigger: onAction
+  states:
+    loading: Content resolves in place.
+    emptyFirstRun: '**Nothing here yet for this venue.** Names what turns it on rather than showing an
+      empty panel.'
+    emptyNoResults: Nothing matches.
+    emptyNoAccess: '**Sign in to see this.** A guest who is not signed in is offered the door, not refused.'
+    error: Could not load. **The rest of the site is unaffected.**
+  entryState:
+    params: []
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared link, a scanned code and a forwarded confirmation all land
+      here, and the person holding it did nothing wrong. Arrives with no parameter — the venue comes from
+      the site.'
+  layout:
+    template: list
+    regions:
+    - name: contentBody
+      components:
+      - kind: cardList
+        label: In-Venue Notifications
+      - kind: detailPanel
+        label: Detail
+  navigation:
+    entryFrom:
+    - WEB-001
+    exitTo:
+    - WEB-001
+  accessibility:
+    notes: '**RTL and screen-reader parity with the app.** A guest using the web because they cannot install
+      an app is exactly the guest who most needs this.'
+  implementation:
+    app: guest-web
+    route: /in-venue-notifications
+    component: apps/guest-web/src/routes/InVenueNotifications.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P01 Guest Web.dc.html#web-046
+  provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
+  notes: '**Web push is weaker than native and it is not absent.** A guest with a tab open gets their
+    queue call; the app does it better and the web does it.'

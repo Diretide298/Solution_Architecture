@@ -1,0 +1,174 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; background: #EEF1F6; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+a { color: #0D6EFD; text-decoration: none; }
+a:hover { color: #0A55C7; }
+</style>
+</helmet>
+
+<div style="font-family: Manrope, system-ui, sans-serif; color: #1F2937; background: #EEF1F6; padding: 44px 40px 56px">
+  <div style="max-width: 1160px; margin: 0 auto">
+
+    <div style="border-bottom: 1px solid #DCE3ED; padding-bottom: 22px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: .14em; color: #C02626; text-transform: uppercase">Tier 1 &middot; Decide before the next screen is drawn</div>
+      <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -.02em; margin: 8px 0 10px; line-height: 1.08">Hard duplicates</h1>
+      <p style="font-size: 14px; line-height: 1.65; color: #4B5563; max-width: 80ch; margin: 0; text-wrap: pretty">Screens that are not merely similar. Each group below shares a name, a purpose or an exact operation set with another screen, and no difference in the definitions explains why both exist. These need a decision &mdash; keep one, or write down what makes the second one different.</p>
+    </div>
+
+    <div style="margin-top: 22px; background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #C02626; border-radius: 14px; padding: 20px 24px 22px">
+      <div style="display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #C02626; text-transform: uppercase">Same name, same platform</div>
+        <div style="font-size: 11.5px; color: #6B7280">Two collisions inside the back office alone</div>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px">
+        <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 13px 15px; background: #FCFDFE">
+          <div style="font-size: 14px; font-weight: 800; margin-bottom: 8px">F&amp;B Order Management</div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; gap: 9px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #C02626; font-weight: 600; flex: none; min-width: 52px">BO-020</span><span style="font-size: 12px; color: #4B5563">module <strong>Food &amp; Beverage</strong> &mdash; 11 kitchen and F&amp;B order operations</span></div>
+            <div style="display: flex; gap: 9px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #C02626; font-weight: 600; flex: none; min-width: 52px">BO-047</span><span style="font-size: 12px; color: #4B5563">module <strong>Orders &amp; Money</strong> &mdash; the 14 generic order operations</span></div>
+          </div>
+          <p style="font-size: 11.5px; line-height: 1.6; color: #6B7280; margin: 10px 0 0; text-wrap: pretty">BO-047 is not an F&amp;B screen at all &mdash; it carries the same signature as Order Detail, Held Orders and Group Bookings. The F&amp;B one is BO-020.</p>
+        </div>
+        <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 13px 15px; background: #FCFDFE">
+          <div style="font-size: 14px; font-weight: 800; margin-bottom: 8px">Asset Register</div>
+          <div style="display: flex; flex-direction: column; gap: 6px">
+            <div style="display: flex; gap: 9px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #C02626; font-weight: 600; flex: none; min-width: 52px">BO-031</span><span style="font-size: 12px; color: #4B5563">module <strong>Access &amp; Venue</strong></span></div>
+            <div style="display: flex; gap: 9px; align-items: baseline"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #C02626; font-weight: 600; flex: none; min-width: 52px">BO-069</span><span style="font-size: 12px; color: #4B5563">module <strong>Access &amp; Venue</strong> &mdash; same module, same name</span></div>
+          </div>
+          <p style="font-size: 11.5px; line-height: 1.6; color: #6B7280; margin: 10px 0 0; text-wrap: pretty">Same title, same section. One of these is an id that was never retired when the maintenance screens were folded in.</p>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 20px 24px 22px">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #0D6EFD; text-transform: uppercase">Identical operation sets, different names</div>
+      <p style="font-size: 12.5px; line-height: 1.6; color: #6B7280; margin: 7px 0 16px; max-width: 82ch; text-wrap: pretty">Five of the largest clusters. Every screen in a group declares exactly the same contract operations &mdash; same data in, same actions out. A sixth, not shown, is six P09 infrastructure screens on one seven-operation cell signature: ADM-013, 014, 030, 032, 033, 034.</p>
+
+      <div style="display: flex; flex-direction: column; gap: 14px">
+
+        <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 16px; background: #FCFDFE">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px">
+            <div style="font-size: 13.5px; font-weight: 800">The order workspace &mdash; 14 operations, 7 screens</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">P04 &middot; P06 &middot; P08 &middot; P10</div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 7px">
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">POS-006</span><span style="font-size: 11.5px; font-weight: 700">Held Orders</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-014</span><span style="font-size: 11.5px; font-weight: 700">Ticket lookup</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-022</span><span style="font-size: 11.5px; font-weight: 700">Order Detail</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-026</span><span style="font-size: 11.5px; font-weight: 700">Group Bookings</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-047</span><span style="font-size: 11.5px; font-weight: 700">F&amp;B Order Management</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">PTR-008</span><span style="font-size: 11.5px; font-weight: 700">Booking Creation</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">PTR-015</span><span style="font-size: 11.5px; font-weight: 700">Order History</span></span>
+          </div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; line-height: 1.75; color: #6E7681; margin-top: 11px; word-break: break-word">listOrders &middot; getOrder &middot; createOrder &middot; modifyOrder &middot; voidOrder &middot; holdOrder &middot; resumeOrder &middot; rescheduleOrder &middot; exchangeOrderLines &middot; createRefund &middot; listOrderRefunds &middot; applyManualDiscount &middot; reprintOrder &middot; getOrderStatement</div>
+          <p style="font-size: 11.5px; line-height: 1.6; color: #4B5563; margin: 11px 0 0; text-wrap: pretty"><strong>Three more sit one operation away:</strong> BO-051 Purchase Orders, BO-070 Work Orders and PTR-016 Voucher / Ticket Download carry thirteen of the same fourteen. A purchase order and a ticket order are not the same object, so those three are a modelling question, not a merge.</p>
+        </div>
+
+        <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 16px; background: #FCFDFE">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px">
+            <div style="font-size: 13.5px; font-weight: 800">Access validation &mdash; 7 operations, 8 screens</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">P06 &middot; P07 &middot; P08</div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 7px">
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-010</span><span style="font-size: 11.5px; font-weight: 700">Scan &mdash; ready</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-015</span><span style="font-size: 11.5px; font-weight: 700">Group scan</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">SCN-007</span><span style="font-size: 11.5px; font-weight: 700">Group admission</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">SCN-008</span><span style="font-size: 11.5px; font-weight: 700">Manual entry</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">SCN-009</span><span style="font-size: 11.5px; font-weight: 700">Ticket lookup</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">SCN-013</span><span style="font-size: 11.5px; font-weight: 700">Offline journal</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">SCN-015</span><span style="font-size: 11.5px; font-weight: 700">Offline package</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-034</span><span style="font-size: 11.5px; font-weight: 700">Scan Activity</span></span>
+          </div>
+          <p style="font-size: 11.5px; line-height: 1.6; color: #4B5563; margin: 11px 0 0; text-wrap: pretty"><strong>Read this one carefully.</strong> The signature is identical because the operation list was applied wholesale to a whole platform, not because all eight screens do the same job &mdash; a gate admission and an offline package status are different screens. The real redundancy is the <em>pairing across</em> P06 and P07: <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">EMP-010&nbsp;&equiv;&nbsp;SCN-007</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">EMP-015&nbsp;&equiv;&nbsp;SCN-008</span> and <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">EMP-017&nbsp;&equiv;&nbsp;SCN-014</span> (a separate nine-operation sync signature). The fix is to say which app owns scanning, not to merge the seven operations.</p>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+          <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 16px; background: #FCFDFE">
+            <div style="font-size: 13.5px; font-weight: 800; margin-bottom: 4px">Shift and cash &mdash; 13 operations, 5 screens</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681; margin-bottom: 10px">P06 &middot; P08</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 7px">
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-009</span><span style="font-size: 11.5px; font-weight: 700">End shift</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-039</span><span style="font-size: 11.5px; font-weight: 700">Shift Directory</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-040</span><span style="font-size: 11.5px; font-weight: 700">Variance Approval</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-041</span><span style="font-size: 11.5px; font-weight: 700">Cash Movements</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-042</span><span style="font-size: 11.5px; font-weight: 700">Banking &amp; Safe</span></span>
+            </div>
+            <p style="font-size: 11.5px; line-height: 1.6; color: #4B5563; margin: 11px 0 0; text-wrap: pretty">POS-001 Begin Shift and POS-007 Close Shift carry all thirteen inside a set of seventeen &mdash; supersets, not copies. Seven screens over one shift ledger.</p>
+          </div>
+
+          <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 16px; background: #FCFDFE">
+            <div style="font-size: 13.5px; font-weight: 800; margin-bottom: 4px">Announcements &mdash; 4 operations, 6 screens</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681; margin-bottom: 10px">P06 &middot; P08</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 7px">
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-007</span><span style="font-size: 11.5px; font-weight: 700">Handover notes</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-037</span><span style="font-size: 11.5px; font-weight: 700">Notifications</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-038</span><span style="font-size: 11.5px; font-weight: 700">Broadcast to team</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-039</span><span style="font-size: 11.5px; font-weight: 700">Announcements</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">EMP-047</span><span style="font-size: 11.5px; font-weight: 700">Emergency mode</span></span>
+              <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-066</span><span style="font-size: 11.5px; font-weight: 700">Notification Settings</span></span>
+            </div>
+            <p style="font-size: 11.5px; line-height: 1.6; color: #4B5563; margin: 11px 0 0; text-wrap: pretty">Emergency mode is the one that should <em>not</em> be a broadcast list. If it is genuinely the same screen, the emergency path has not been designed.</p>
+          </div>
+        </div>
+
+        <div style="border: 1px solid #E5E7EB; border-radius: 12px; padding: 14px 16px; background: #FCFDFE">
+          <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px">
+            <div style="font-size: 13.5px; font-weight: 800">Section landings &mdash; 1 operation, 8 screens</div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">P08</div>
+          </div>
+          <div style="display: flex; flex-wrap: wrap; gap: 7px">
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-101</span><span style="font-size: 11.5px; font-weight: 700">Orders &amp; Money</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-102</span><span style="font-size: 11.5px; font-weight: 700">Sell</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-103</span><span style="font-size: 11.5px; font-weight: 700">Access &amp; Venue</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-104</span><span style="font-size: 11.5px; font-weight: 700">Food &amp; Beverage</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-105</span><span style="font-size: 11.5px; font-weight: 700">Stock &amp; Supply</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-106</span><span style="font-size: 11.5px; font-weight: 700">People &amp; Access Rights</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-107</span><span style="font-size: 11.5px; font-weight: 700">Guests &amp; Marketing</span></span>
+            <span style="display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681">BO-108</span><span style="font-size: 11.5px; font-weight: 700">Venue Operations</span></span>
+          </div>
+          <p style="font-size: 11.5px; line-height: 1.6; color: #4B5563; margin: 11px 0 0; text-wrap: pretty">Each screen's name is its module's name and its only operation is <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">getVenueSettings</span>. These are the eight items of the back-office nav. Counting them as screens inflates P08 and commits the team to writing eight sets of loading, empty, error and offline states for a menu.</p>
+        </div>
+
+      </div>
+    </div>
+
+    <div style="margin-top: 16px; background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #96650A; border-radius: 14px; padding: 20px 24px 22px">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #96650A; text-transform: uppercase">Copy-pasted purposes</div>
+      <p style="font-size: 12.5px; line-height: 1.6; color: #6B7280; margin: 7px 0 14px; max-width: 84ch; text-wrap: pretty">The <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">purpose</span> field is meant to be one sentence saying what the user came to do. Four sentences are doing duty for 28 screens, which means those 28 have not been asked the question.</p>
+      <div style="display: flex; flex-direction: column; gap: 9px">
+        <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; border-top: 1px solid #E5E7EB; padding-top: 9px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: #96650A; font-variant-numeric: tabular-nums">10&times;</div>
+          <div><div style="font-size: 12.5px; color: #1F2937; font-style: italic">&ldquo;The screen this app sits on. Everything else is entered from here and returns to it.&rdquo;</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681; margin-top: 4px">WEB-017 &middot; GST-001 &middot; GST-011 &middot; GST-031 &middot; ADM-002 &middot; ADM-003 &middot; ADM-031 &middot; PTR-002 &middot; ACC-001 &middot; SUP-002</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; border-top: 1px solid #E5E7EB; padding-top: 9px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: #96650A; font-variant-numeric: tabular-nums">8&times;</div>
+          <div><div style="font-size: 12.5px; color: #1F2937; font-style: italic">&ldquo;Find the right one quickly, and act on it without opening it.&rdquo;</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681; margin-top: 4px">WEB-009 &middot; GST-003 &middot; GST-020 &middot; GST-023 &middot; ADM-005 &middot; ADM-020 &middot; ACC-006 &middot; SUP-004</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; border-top: 1px solid #E5E7EB; padding-top: 9px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: #96650A; font-variant-numeric: tabular-nums">6&times;</div>
+          <div><div style="font-size: 12.5px; color: #1F2937; font-style: italic">&ldquo;Answer a question without needing a person.&rdquo;</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681; margin-top: 4px">WEB-025 &middot; GST-033 &middot; GST-040 &middot; ADM-026 &middot; ADM-035 &middot; PTR-021</div></div>
+        </div>
+        <div style="display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 12px; align-items: start; border-top: 1px solid #E5E7EB; padding-top: 9px">
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 15px; font-weight: 600; color: #96650A; font-variant-numeric: tabular-nums">4&times;</div>
+          <div><div style="font-size: 12.5px; color: #1F2937; font-style: italic">&ldquo;Take the money, and be unambiguous about whether it worked.&rdquo;</div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681; margin-top: 4px">GST-027 &middot; GST-041 &middot; PTR-012 &middot; PTR-014</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

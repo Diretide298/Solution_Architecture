@@ -25,6 +25,7 @@ Checks:
 
 Run: python3 tools/check-states.py
 """
+import json
 import sys
 from pathlib import Path
 
@@ -207,6 +208,32 @@ def main() -> int:
         print(f"  {n:26}{len(e['consumers'])} consumers, {crit} critical")
 
     print()
+    # **ADR-0033: a state change that must reach anything outside its own transaction writes an
+    # outbox row in that transaction.** The ADR was written on 31 August and the lineage still had
+    # one operation writing `platform.outbox` against thirty declared events — **the decision was
+    # recorded and nothing enforced it**, which is how an ADR becomes a document nobody follows.
+    #
+    # **Not a queue write inside a transaction.** A broker acknowledging a publish that then rolls
+    # back is the exactly-once problem restated; the row and the state change commit together or
+    # neither does.
+    _lin_path = ROOT / "handoff" / "api-data-lineage.json"
+    if _lin_path.exists():
+        _lin = json.loads(_lin_path.read_text(encoding="utf-8"))
+        for f in sorted(STATES.glob("*.yaml")):
+            if f.stem.startswith("_"):
+                continue
+            doc = yaml.safe_load(f.read_text(encoding="utf-8")) or {}
+            for tr in (doc.get("transitions") or []):
+                ev = tr.get("emits") or tr.get("emit")
+                op = tr.get("operation")
+                if not ev or not op or op not in _lin:
+                    continue
+                if "platform.outbox" not in (_lin[op].get("writes") or []):
+                    WARNINGS.append(
+                        f"{f.stem}: {tr.get('from')}->{tr.get('to')} emits {ev} but {op} does not "
+                        "write platform.outbox — the event and the state change must commit "
+                        "together (ADR-0033)")
+
     for w in WARNINGS:
         print(f"  WARN  {w}")
     for x in ERRORS:

@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI — Workforce
   version: 1.0.0
-  x-ticvai-screen-count: 11
+  x-ticvai-screen-count: 13
   x-ticvai-module: "18 — Employee Mobile App & AI Assistant (workforce)"
   x-ticvai-platforms:
     - P06 Venue Staff App
@@ -431,6 +431,7 @@ paths:
         - "P06 EMP-039 Announcements"
         - "P06 EMP-047 Emergency mode"
         - "P08 BO-066 Notification Settings"
+        - "P09 ADM-036 Platform Notification Broadcast"
       x-ticvai-audience: [staff]
       summary: What staff have been told
       description: 18.9.3 and 18.9.5. `EMP-039`.
@@ -462,6 +463,7 @@ paths:
         - "P06 EMP-039 Announcements"
         - "P06 EMP-047 Emergency mode"
         - "P08 BO-066 Notification Settings"
+        - "P09 ADM-036 Platform Notification Broadcast"
       x-ticvai-audience: [staff]
       summary: Tell staff something
       description: >
@@ -557,6 +559,60 @@ paths:
             application/json:
               schema: { $ref: '#/components/schemas/AnnouncementReach' }
 
+  /training-records:
+    get:
+      operationId: listTrainingRecords
+      x-ticvai-consumed-by:
+        - "P06 EMP-041 Training"
+      x-ticvai-audience:
+      - staff
+      summary: Training completed and what is expiring
+      description: '**Drafted 4 September as a stub.** EMP-041 *Training* sat on `semanticSearch` alone, which made it identical to the knowledge base. **The F&B `fireCourse` / `holdCourse` / `setCourseRules` operations are meal courses, not training** - the name collision is why this gap survived a search. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Training completed and what is expiring
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TrainingRecord'
+  /shift-swaps:
+    get:
+      operationId: listShiftSwapRequests
+      x-ticvai-consumed-by:
+        - "P06 EMP-023 Swap request"
+      x-ticvai-audience:
+      - staff
+      summary: Swap requests and their state
+      description: '**Drafted 4 September as a stub.** `requestShiftSwap` existed and nothing could read the requests back, so EMP-023 shared the roster''s operations. **A request nobody can list is a request nobody can approve.** Returns the existing `ShiftSwap` schema: a first draft of this added a `ShiftSwapRequest` of its own and derived a second table for the same rows, which is the modelling mistake this package exists to make visible. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - workforce
+      x-ticvai-permission: WORKFORCE_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Swap requests and their state
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ShiftSwap'
 components:
   securitySchemes:
     bearerAuth:
@@ -564,6 +620,41 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    TrainingRecord:
+      type: object
+      x-ticvai-persistence: workforce.training_record
+      description: '**Drafted 4 September.** One person, one course, one outcome. **The field that
+        matters is the expiry** - a lapsed food-safety or first-aid certificate is a person who
+        may not work a station, and a list without it is a list nobody can roster from.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        principalId:
+          type: string
+          format: uuid
+        courseName:
+          type: string
+        required:
+          type: boolean
+        completedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        state:
+          type: string
+          enum:
+          - notStarted
+          - inProgress
+          - passed
+          - failed
+          - expired
+        evidenceRef:
+          type: string
     RotaStatus:
       type: string
       enum: [planned, published, confirmed, swapPending, cancelled, completed, noShow]

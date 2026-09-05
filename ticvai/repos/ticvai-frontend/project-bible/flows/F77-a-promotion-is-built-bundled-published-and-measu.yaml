@@ -24,12 +24,12 @@ steps:
   screen: BO-013
   action: Channel & Distribution.
   operations:
-  - createEnvelope
+  - createChannelCapacity
   - listChannelListings
   - publishBundle
   - releaseChannelAllocation
   - setChannelListing
-  - updateEnvelope
+  - updateChannelCapacity
   outcome: '**Drawn by the client as RET-5G.** 6 operations on this step.'
 - step: 2
   screen: BO-011

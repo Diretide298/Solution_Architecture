@@ -1,0 +1,21 @@
+digraph ai {
+  rankdir=LR; bgcolor="transparent";
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=11 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=9 color="#5A6577"];
+  subgraph cluster_ai { label="AI tier · shared across every configuration · sized by tenant count";
+    style="rounded,filled"; fillcolor="#F4F7FB"; fontname="Helvetica"; fontsize=12;
+    svc [label="AiService\n30 operations" fillcolor="#E2EFDA"];
+    wk  [label="Index + embedding workers\n2 × 2 vCPU / 4 GB\nbatch, not request-driven" fillcolor="#FFFFFF"];
+    qd  [label="Qdrant · 3 nodes HA\none collection per\nembedding model (ADR-0021)\n4M vectors ≈ 49 GB\n12 GB quantised" fillcolor="#FFF6E0"];
+    ca  [label="cache:answer\nquestion + scope + locale\nthe largest cost lever" fillcolor="#DDEBF7"];
+    ce  [label="cache:embedding\ncontent hash + model\nedit 50 of 20,000,\nre-embed 50" fillcolor="#DDEBF7"];
+    pg  [label="ai.* — 15 tables\nconversation, interaction,\npolicy, provider, index_job" fillcolor="#FFFFFF"];
+    svc -> ca [label="hit costs nothing"];
+    svc -> qd [label="semanticSearch"];
+    svc -> pg;
+    wk  -> ce; wk -> qd [label="reindexSource"]; }
+  llm [label="Provider — BYOK\ncredentialRef in secret store\nmonthlyTokenCeiling per tenant" shape=box style="filled,rounded,dashed" fillcolor="#FDECEC"];
+  svc -> llm [label="miss costs a call\nbilled to the tenant" color="#B00020" style=dashed];
+  note [label="Not platform cost.\nquotaExceeded and residencyRefused\nare first-class outcomes." shape=note fillcolor="#FFFFFF" fontsize=9];
+  llm -> note [style=invis];
+}

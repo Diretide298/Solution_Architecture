@@ -9,7 +9,7 @@ criticality: operational
 primaryContract: platform-ops
 contracts:
 - platform-ops
-- cross-cell
+- cross-region
 platforms:
 - P09
 trigger:

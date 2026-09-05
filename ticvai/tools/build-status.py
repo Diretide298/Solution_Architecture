@@ -22,10 +22,18 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from datetime import date
 from pathlib import Path
 
 import yaml
+
+# The closing line prints an arrow against a cp1252 console and raised after the file had already
+# been written — a traceback on a run that succeeded. Every other deriver carries this guard.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 ROOT = Path(__file__).resolve().parents[1]
 HANDOFF = ROOT / "handoff"
@@ -140,13 +148,40 @@ def _metric(name, done, total, note):
             "percent": round(100 * done / total) if total else 0, "note": note}
 
 
+def _ddl_counts() -> dict:
+    """Foreign keys and indexes, counted from the DDL rather than remembered.
+
+    **Both were quoted from memory and both were wrong** — `MANIFEST.md` said 580 foreign keys and
+    250 indexes, `services/README.md` said 580 and 194, against 594 and 240 actually emitted. A
+    figure a person retypes is a figure that stops being true on the next generation.
+    """
+    out = {"foreignKeys": 0, "indexes": 0}
+    fk = ROOT / "backend" / "900-foreign-keys.sql"
+    ix = ROOT / "backend" / "910-indexes.sql"
+    if fk.exists():
+        out["foreignKeys"] = fk.read_text(encoding="utf-8").count("ADD CONSTRAINT")
+    if ix.exists():
+        out["indexes"] = ix.read_text(encoding="utf-8").count("CREATE INDEX")
+    return out
+
+
 def platform_status() -> dict:
     contracts = _contracts()
     ops = _operations(contracts)
     lineage = json.loads((HANDOFF / "api-data-lineage.json").read_text(encoding="utf-8"))
     schema = _package_json("schema-reference.json", "schema_v4.json") or {"cols": {}, "storage": {}, "store": {}}
     links = _package_json("relationship-graph.json", "links.json") or {"rels": []}
-    tables = set(schema["cols"]) | set(schema["storage"])
+    # **`tables` is the count of Postgres tables, and it used to be four other things.** The union
+    # below reads 383: it takes in the five `cache:` and `qdrant:` pseudo-stores and four entries
+    # that exist in `storage` and carry no columns. `derive-ddl` emits 374, `backend/README.md`
+    # said 373 and `services/README.md` 369 — **five numbers for one fact**, and every document in
+    # the package quoted whichever it was written next to.
+    #
+    # A pseudo-store is a real thing and it is not a table. Both are counted, separately.
+    tables = {t for t in schema["cols"] if "." in t and ":" not in t}
+    stores = (set(schema["cols"]) | set(schema["storage"])) - tables
+    # Everything addressable, for the reach metrics below — a relationship may point at a cache.
+    addressable = set(schema["cols"]) | set(schema["storage"])
     rels = [r for r in links["rels"] if r.get("to")]
     linked = {r["frm"] for r in rels} | {r["to"] for r in rels}
 
@@ -212,7 +247,7 @@ def platform_status() -> dict:
         _metric("State models", len(states), _lifecycles(contracts),
                 "The denominator is status enums in contracts. Some models describe behaviour "
                 "with no enum, so this can exceed 100%."),
-        _metric("Tables with a relationship", len(linked & tables), len(tables),
+        _metric("Tables with a relationship", len(linked & addressable), len(addressable),
                 "The remainder are partitions, platform-written tables and caches, each stating why."),
         _metric("Screens with operations", with_ops, len(screens),
                 "The remainder are static, workshop-blocked, or navigation shells."),
@@ -279,6 +314,7 @@ def platform_status() -> dict:
                  "worse than none, because somebody plans against it."),
         "counts": {
             "operations": len(ops), "contracts": len(contracts), "tables": len(tables),
+            "stores": len(stores), **_ddl_counts(),
             "relationships": len(rels), "states": len(states), "events": len(events),
             "flows": len(flows), "adrs": len(adrs), "screens": len(screens),
             "platforms": len(platforms), "apps": len({p["app"] for p in platforms}),
@@ -292,7 +328,7 @@ def platform_status() -> dict:
         "waves": {f"wave{k}": v for k, v in sorted(waves.items())},
         "platformBreakdown": platforms,
         "conflicts": _conflicts(),
-        "stores": sorted({schema["store"].get(t, "postgres") for t in tables}),
+        "stores": sorted({schema["store"].get(t, "postgres") for t in addressable}),
         "openQuestions": [
             {"id": "CF-64", "what": "Retention. Determines the database topology and is the "
                                     "most expensive open item to answer late."},

@@ -32,7 +32,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -107,6 +107,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-031 Asset Register"
         - "P08 BO-069 Asset Register"
+        - "P08 BO-108 Venue Operations"
         - "P13 CMS-004 Logo & Assets"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
@@ -380,6 +381,7 @@ paths:
         - "P06 EMP-005 Task detail"
         - "P06 EMP-006 Raise a task"
         - "P08 BO-030 Work Order Verification"
+        - "P08 BO-108 Venue Operations"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List work orders
@@ -1392,6 +1394,7 @@ paths:
         - "P06 EMP-029 Guest assistance"
         - "P06 EMP-050 Post-incident restore"
         - "P08 BO-072 Incident Log"
+        - "P08 BO-108 Venue Operations"
       x-ticvai-audience: [staff]
       x-ticvai-read-routing: replica
       summary: List incidents

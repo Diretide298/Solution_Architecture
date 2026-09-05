@@ -1,5 +1,5 @@
 id: LLD-P10
-title: P10 Partner Web — Reseller Portal — 21 screens
+title: P10 Partner Web — Reseller Portal — 51 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: partner
@@ -20,10 +20,14 @@ deployment:
 why: null
 modulesUsed:
 - module: partner
-  screens: 21
+  screens: 50
+- module: developerApi
+  screens: 1
 servicesCalled:
 - service: OrderService
   operationCalls: 85
+- service: PlatformService
+  operationCalls: 41
 - service: CatalogueService
   operationCalls: 39
 - service: IdentityService
@@ -34,18 +38,16 @@ servicesCalled:
   operationCalls: 8
 - service: LedgerService
   operationCalls: 6
-- service: ControlService
-  operationCalls: 5
 coverage:
-  screens: 21
+  screens: 51
   inAFlow: 9
-  drawn: 21
+  drawn: 51
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
 - screen: PTR-001
   name: Partner Login / MFA
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 2
   density: compact
@@ -84,7 +86,7 @@ screens:
   - F104 A platform operator signs in under MFA
 - screen: PTR-002
   name: Partner Dashboard
-  module: TODO
+  module: Overview
   requiresModule: partner
   wave: 2
   density: compact
@@ -119,13 +121,14 @@ screens:
   - PTR-003
   - PTR-004
   - PTR-007
-  boardFrames: null
-  wireframe: wireframes/P10 Partner Web.dc.html#ptr-002
+  boardFrames:
+  - Dashboards Board.dc.html#ptr-002
+  wireframe: wireframes/Dashboards Board.dc.html#ptr-002
   inFlows:
   - F03 Partner books on credit
 - screen: PTR-003
   name: Profile & Company Details
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 2
   density: compact
@@ -137,6 +140,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -151,7 +155,7 @@ screens:
   inFlows: null
 - screen: PTR-004
   name: Notifications
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 3
   density: compact
@@ -175,20 +179,20 @@ screens:
   inFlows: null
 - screen: PTR-005
   name: Inventory & Allocation View
-  module: TODO
+  module: Inventory & Pricing
   requiresModule: partner
   wave: 2
   density: compact
   operations:
   - applyManualDiscount
-  - createEnvelope
+  - createChannelCapacity
   - createOrder
   - exchangeOrderLines
   - getChannelAllocations
   - getOrder
   - getOrderStatement
   - holdOrder
-  - listEnvelopes
+  - listChannelCapacities
   - listOrderRefunds
   - listOrders
   - modifyOrder
@@ -197,16 +201,17 @@ screens:
   - rescheduleOrder
   - resumeOrder
   - setChannelAllocations
-  - updateEnvelope
+  - updateChannelCapacity
   - voidOrder
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
   entryParams:
-  - envelopeId<-deepLink
+  - channelCapacityId<-deepLink
   - orderId<-deepLink
   goesTo:
   - PTR-001
@@ -219,7 +224,7 @@ screens:
   - F10 Partner books, uses and settles
 - screen: PTR-006
   name: Product Catalog (B2B Pricing)
-  module: TODO
+  module: Inventory & Pricing
   requiresModule: partner
   wave: 2
   density: compact
@@ -260,7 +265,7 @@ screens:
   inFlows: null
 - screen: PTR-007
   name: Availability Search
-  module: TODO
+  module: Inventory & Pricing
   requiresModule: partner
   wave: 2
   density: compact
@@ -285,7 +290,7 @@ screens:
   - F03 Partner books on credit
 - screen: PTR-008
   name: Booking Creation
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 2
   density: compact
@@ -324,7 +329,7 @@ screens:
   - F10 Partner books, uses and settles
 - screen: PTR-009
   name: Group / Bulk Booking
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 3
   density: compact
@@ -336,6 +341,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -345,12 +351,13 @@ screens:
   - PTR-001
   - PTR-002
   - PTR-003
-  boardFrames: null
-  wireframe: wireframes/P10 Partner Web.dc.html#ptr-009
+  boardFrames:
+  - Seat Board 3.dc.html#seat-3d
+  wireframe: wireframes/Seat Board 3.dc.html#seat-3d
   inFlows: null
 - screen: PTR-010
   name: Cart & Quote
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 3
   density: compact
@@ -374,6 +381,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -390,13 +398,15 @@ screens:
   inFlows: null
 - screen: PTR-011
   name: Quote Management
-  module: TODO
+  module: Booking & Quotes
   requiresModule: partner
   wave: 3
   density: compact
   operations:
+  - createPartnerQuote
   - getCommissionStatement
   - listPartnerAgreements
+  - listPartnerQuotes
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -414,7 +424,7 @@ screens:
   inFlows: null
 - screen: PTR-012
   name: Checkout / Credit Purchase
-  module: TODO
+  module: Credit & Settlement
   requiresModule: partner
   wave: 2
   density: compact
@@ -440,7 +450,7 @@ screens:
   inFlows: null
 - screen: PTR-013
   name: Credit Limit & Balance
-  module: TODO
+  module: Credit & Settlement
   requiresModule: partner
   wave: 2
   density: compact
@@ -465,7 +475,7 @@ screens:
   inFlows: null
 - screen: PTR-014
   name: Settlement & Payment History
-  module: TODO
+  module: Reports & Settlement
   requiresModule: partner
   wave: 3
   density: compact
@@ -494,7 +504,7 @@ screens:
   - F99 A chargeback arrives and is defended
 - screen: PTR-015
   name: Order History
-  module: TODO
+  module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
   density: compact
@@ -532,7 +542,7 @@ screens:
   - F10 Partner books, uses and settles
 - screen: PTR-016
   name: Voucher / Ticket Download
-  module: TODO
+  module: Orders & Fulfilment
   requiresModule: partner
   wave: 2
   density: compact
@@ -553,6 +563,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -568,7 +579,7 @@ screens:
   - F03 Partner books on credit
 - screen: PTR-017
   name: Commission Statement
-  module: TODO
+  module: Reports & Settlement
   requiresModule: partner
   wave: 3
   density: compact
@@ -578,6 +589,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -592,7 +604,7 @@ screens:
   inFlows: null
 - screen: PTR-018
   name: Reports & Sales Performance
-  module: TODO
+  module: Reports & Settlement
   requiresModule: partner
   wave: 3
   density: compact
@@ -624,17 +636,22 @@ screens:
   inFlows: null
 - screen: PTR-019
   name: API Credentials & Integration
-  module: TODO
-  requiresModule: partner
+  module: Access & Account
+  requiresModule: developerApi
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - createApiClient
+  - listApiClients
+  - revokeApiCredential
+  - rotateApiCredential
   states:
   - emptyFirstRun
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - clientId<-navigation
   goesTo:
   - PTR-001
   - PTR-002
@@ -644,14 +661,14 @@ screens:
   inFlows: null
 - screen: PTR-020
   name: Sub-Agent Management
-  module: TODO
+  module: Access & Account
   requiresModule: partner
   wave: 3
   density: compact
   operations:
-  - createGrant
-  - deleteGrant
-  - listGrants
+  - createDelegatedAccess
+  - deleteDelegatedAccess
+  - listDelegatedAccess
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -659,7 +676,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - grantId<-deepLink
+  - delegatedAccessId<-deepLink
   goesTo:
   - PTR-001
   - PTR-002
@@ -670,7 +687,7 @@ screens:
   - F105 A rate limit is set and a developer hits it
 - screen: PTR-021
   name: Support & Contact
-  module: TODO
+  module: Support
   requiresModule: partner
   wave: 3
   density: compact
@@ -685,6 +702,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -696,4 +714,661 @@ screens:
   - PTR-003
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-021
+  inFlows: null
+- screen: PTR-022
+  name: Partner Management Command Center
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartner
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-001
+  - PTR-023
+  - PTR-024
+  - PTR-025
+  - PTR-026
+  - PTR-027
+  - PTR-028
+  - PTR-029
+  - PTR-030
+  - PTR-031
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-022
+  inFlows: null
+- screen: PTR-023
+  name: Partner Profile & Organization Setup
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - setPartnerProfileOrganization
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-023
+  inFlows: null
+- screen: PTR-024
+  name: Partner Onboarding & Application Workflow
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerOnboardingApplication
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-024
+  inFlows: null
+- screen: PTR-025
+  name: Partner Contacts & User Administration
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerContactUser
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-025
+  inFlows: null
+- screen: PTR-026
+  name: Territory, Market & Distribution Rights
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listTerritoryMarketDistribution
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-026
+  inFlows: null
+- screen: PTR-027
+  name: Partner Brand, Venue & Business Scope Assignment
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - setPartnerBrandVenue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-027
+  inFlows: null
+- screen: PTR-028
+  name: Partner Documentation & Compliance Repository
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerDocumentationCompliance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-028
+  inFlows: null
+- screen: PTR-029
+  name: Partner Access, Roles & Permission Profile
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerAccessRole
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-029
+  inFlows: null
+- screen: PTR-030
+  name: Partner Approval, Status & Lifecycle Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - approvePartnerStatuLifecycle
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-030
+  inFlows: null
+- screen: PTR-031
+  name: Partner 360° Profile, Readiness & AI Review
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerProfileReadiness
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-022
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-031
+  inFlows: null
+- screen: PTR-032
+  name: Commercial Agreement Command Center
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listCommercialAgreement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-001
+  - PTR-033
+  - PTR-034
+  - PTR-035
+  - PTR-036
+  - PTR-037
+  - PTR-038
+  - PTR-039
+  - PTR-040
+  - PTR-041
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-032
+  inFlows: null
+- screen: PTR-033
+  name: Agreement & Contract Terms Builder
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - setAgreementContractTerm
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-033
+  inFlows: null
+- screen: PTR-034
+  name: Partner Rate & Net Pricing Configuration
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - setPartnerRateNet
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-034
+  inFlows: null
+- screen: PTR-035
+  name: Commission, Margin & Incentive Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listCommissionMarginIncentive
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-035
+  inFlows: null
+- screen: PTR-036
+  name: Credit Limit & Exposure Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listCreditLimitExposure
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-036
+  inFlows: null
+- screen: PTR-037
+  name: Deposit, Guarantee & Financial Security Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listDepositGuaranteeFinancial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-037
+  inFlows: null
+- screen: PTR-038
+  name: Payment Terms, Billing & Account Configuration
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - setPaymentTermBilling
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-038
+  inFlows: null
+- screen: PTR-039
+  name: Commercial Allocation, Quota & Commitment Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listCommercialAllocationQuota
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-039
+  inFlows: null
+- screen: PTR-040
+  name: Booking Limits, Commercial Exceptions & Approval
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - approveBookingLimitCommercial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-040
+  inFlows: null
+- screen: PTR-041
+  name: Commercial Agreement 360°, Health & AI Review
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listCommercialAgreementHealth
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-032
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-041
+  inFlows: null
+- screen: PTR-042
+  name: Partner Operations Command Center
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartner2
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-001
+  - PTR-043
+  - PTR-044
+  - PTR-045
+  - PTR-046
+  - PTR-047
+  - PTR-048
+  - PTR-049
+  - PTR-050
+  - PTR-051
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-042
+  inFlows: null
+- screen: PTR-043
+  name: Partner Orders & Booking Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerOrderBooking
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-043
+  inFlows: null
+- screen: PTR-044
+  name: Reservations, Holds & Release Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listReservationHoldRelease
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-044
+  inFlows: null
+- screen: PTR-045
+  name: Partner Cancellations, Refunds & Amendments
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerCancellationRefund
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-045
+  inFlows: null
+- screen: PTR-046
+  name: Partner Statement & Account Activity
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerStatementAccount
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-046
+  inFlows: null
+- screen: PTR-047
+  name: Partner Reconciliation & Exception Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerReconciliationException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-047
+  inFlows: null
+- screen: PTR-048
+  name: Commission Calculation & Settlement Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listCommissionCalculationSettlement
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-048
+  inFlows: null
+- screen: PTR-049
+  name: Partner Disputes, Cases & Service Management
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerDisputeCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-049
+  inFlows: null
+- screen: PTR-050
+  name: Partner Performance Scorecard & Risk Monitoring
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerPerformanceScorecard
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-050
+  inFlows: null
+- screen: PTR-051
+  name: Partner AI Intelligence & Relationship Optimization
+  module: Partners
+  requiresModule: partner
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerRelationship
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - PTR-042
+  boardFrames: null
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-051
   inFlows: null

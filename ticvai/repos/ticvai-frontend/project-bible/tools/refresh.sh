@@ -9,12 +9,22 @@ cd "$(dirname "$0")/.."
 
 python3 tools/derive-schema.py
 python3 tools/derive-relationships.py
+python3 tools/derive-ddl.py --apply
+python3 tools/derive-burst-scope.py --apply
+python3 tools/derive-sizing.py --apply
+python3 tools/derive-table-notes.py --apply
 python3 tools/derive-schema-roots.py
 python3 tools/derive-frontend.py
 python3 tools/derive-board-panel-map.py
 python3 tools/derive-diagrams.py
+python3 tools/build-schema-workbook.py
 python3 tools/build-services-workbook.py 2>/dev/null || true
 python3 tools/derive-wireframes.py
+python3 tools/derive-pack-boards.py --apply
+# **The id register has to be current before check-screens runs**, because that check now
+# fails on a screen issued above the recorded high-water mark - which is the whole point of
+# it, and also means a stale register fails the package for a screen that is perfectly fine.
+python3 tools/derive-id-register.py --apply
 python3 tools/link-screens-contracts.py
 
 python3 - <<'PY'
@@ -52,6 +62,7 @@ python3 tools/build-backlog-index.py
 python3 tools/build-cluster-index.py
 python3 tools/sync-project-bible.py
 python3 tools/derive-platform.py
+python3 tools/derive-platform-deployment.py
 python3 tools/build-audience.py
 python3 tools/build-status.py
 
@@ -63,6 +74,6 @@ python3 tools/build-status.py --domain ai
 python3 tools/sync-counts.py
 
 echo
-for t in check-screens check-frontend check-flows check-states check-config-scope check-wireframes check-backlog check-traceability check-package; do
+for t in check-screens check-frontend check-flows check-states check-config-scope check-wireframes check-backlog check-traceability check-package check-screen-redundancy audit-links; do
   printf "  %-22s" "$t"; python3 "tools/$t.py" 2>&1 | tail -1
 done

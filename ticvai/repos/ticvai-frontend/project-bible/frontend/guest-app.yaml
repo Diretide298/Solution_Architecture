@@ -24,7 +24,6 @@ contracts:
 - access
 - ai
 - catalogue
-- cross-cell
 - finance
 - fnb
 - games
@@ -33,6 +32,7 @@ contracts:
 - orders
 - promotions
 - queue
+- resources
 - retail
 - seating
 - venue-map

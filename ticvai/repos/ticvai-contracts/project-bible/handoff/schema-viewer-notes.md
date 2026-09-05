@@ -4,7 +4,7 @@
 
 ## The cause is the data, not the viewer
 
-`platform.scope_node` is referenced by **64 tables**. `identity.principal` by **69**.
+`platform.org_unit` is referenced by **64 tables**. `identity.principal` by **69**.
 `pii.subject` by 25.
 
 Every table that belongs to a venue carries `venue_id`. Every table that records who did

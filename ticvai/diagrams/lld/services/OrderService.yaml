@@ -1,5 +1,5 @@
 id: LLD-OrderService
-title: OrderService — 97 operations, 34 tables
+title: OrderService — 186 operations, 34 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**The transactional core.** 96 operations, 34 tables, and the highest writ
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 97
+  operations: 186
   inAFlow: 53
   percent: 55%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -33,7 +33,7 @@ schemas:
   largestTable: orders.shift
 operationsByContract:
 - contract: orders
-  count: 78
+  count: 167
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -75,6 +75,30 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 4
+  - operation: approveExceptionServiceRecovery
+    verb: PUT
+    path: /exception-service-recovery
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveGroupDiscountException
+    verb: PUT
+    path: /group-discount-exception
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveListingModeration
+    verb: PUT
+    path: /listing-moderation
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: approveRefund
     verb: POST
     path: /refunds/{refundId}/approve
@@ -106,7 +130,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 3
-    writes: 2
+    writes: 3
   - operation: captureStoredValue
     verb: POST
     path: /stored-value/authorisations/{authorisationId}/capture
@@ -171,6 +195,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
+  - operation: createListingSeller
+    verb: POST
+    path: /listing-seller
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: createOrder
     verb: POST
     path: /orders
@@ -179,6 +211,14 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 4
+  - operation: createOrderSourceChannel
+    verb: POST
+    path: /order-source-channel
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: createPayment
     verb: POST
     path: /payments
@@ -186,7 +226,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: true
     reads: 4
-    writes: 4
+    writes: 5
   - operation: createPaymentLink
     verb: POST
     path: /payment-links
@@ -202,7 +242,7 @@ operationsByContract:
     permission: ORDER_REFUND
     offline: false
     reads: 4
-    writes: 4
+    writes: 5
   - operation: createRefundRequest
     verb: POST
     path: /refund-requests
@@ -227,6 +267,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: createUpgradeCredentialRegeneration
+    verb: POST
+    path: /upgrade-credential-regeneration
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: exchangeOrderLines
     verb: POST
     path: /orders/{orderId}/exchanges
@@ -338,7 +386,7 @@ operationsByContract:
     permission: ORDER_CREATE
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: issueInvitation
     verb: POST
     path: /invitations
@@ -363,6 +411,62 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: listAmendmentAfterSale
+    verb: GET
+    path: /amendment-after-sale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAmendmentAfterSale2
+    verb: GET
+    path: /amendment-after-sale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBulkGroupAssisted
+    verb: GET
+    path: /bulk-group-assisted
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBuyerCheckoutInventory
+    verb: GET
+    path: /buyer-checkout-inventory
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBuyerPurchaseResale
+    verb: GET
+    path: /buyer-purchase-resale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCapacityInventoryReconciliation
+    verb: GET
+    path: /capacity-inventory-reconciliation
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCapacityReservationInventory
+    verb: GET
+    path: /capacity-reservation-inventory
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listChargebacks
     verb: GET
     path: /chargebacks
@@ -370,6 +474,54 @@ operationsByContract:
     permission: ORDER_REFUND_APPROVE
     offline: false
     reads: 2
+    writes: 0
+  - operation: listCreateListingResale
+    verb: GET
+    path: /create-listing-resale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialRevocationRegeneration
+    verb: GET
+    path: /credential-revocation-regeneration
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDepositPartialPayment
+    verb: GET
+    path: /deposit-partial-payment
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listExternalPaymentPartner
+    verb: GET
+    path: /external-payment-partner
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFeeSellerProceed
+    verb: GET
+    path: /fee-seller-proceed
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFinancialTraceability
+    verb: GET
+    path: /financial-traceability
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listFraudRules
     verb: GET
@@ -379,6 +531,102 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listGroupAmendmentCancellation
+    verb: GET
+    path: /group-amendment-cancellation
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupArrivalCheck
+    verb: GET
+    path: /group-arrival-check
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupBooking
+    verb: GET
+    path: /group-booking
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupBookingReconciliation
+    verb: GET
+    path: /group-booking-reconciliation
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupCustomerOrganization
+    verb: GET
+    path: /group-customer-organization
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupEnquiryOpportunity
+    verb: GET
+    path: /group-enquiry-opportunity
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupPaymentDeposit
+    verb: GET
+    path: /group-payment-deposit
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupRequirementAvailability
+    verb: GET
+    path: /group-requirement-availability
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupSale
+    verb: GET
+    path: /group-sale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupSale2
+    verb: GET
+    path: /group-sale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupTicketFulfillment
+    verb: GET
+    path: /group-ticket-fulfillment
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupTicketSeat
+    verb: GET
+    path: /group-ticket-seat
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listInvitationAllowances
     verb: GET
     path: /invitations/allowances
@@ -386,6 +634,14 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: listListingLifecycleExpiry
+    verb: GET
+    path: /listing-lifecycle-expiry
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listMyOrders
     verb: GET
@@ -395,6 +651,46 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 0
+  - operation: listOfficialResaleMarketplace
+    verb: GET
+    path: /official-resale-marketplace
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOrderFinancialReconciliation
+    verb: GET
+    path: /order-financial-reconciliation
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOrderLifecycleTimeline
+    verb: GET
+    path: /order-lifecycle-timeline
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOrderLineProduct
+    verb: GET
+    path: /order-line-product
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOrderPaymentDetail
+    verb: GET
+    path: /order-payment-detail
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listOrderRefunds
     verb: GET
     path: /orders/{orderId}/refunds
@@ -402,6 +698,22 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: true
     reads: 1
+    writes: 0
+  - operation: listOrderReservation
+    verb: GET
+    path: /order-reservation
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOrderSplitMerge
+    verb: GET
+    path: /order-split-merge
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listOrders
     verb: GET
@@ -411,6 +723,22 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 0
+  - operation: listParticipantGuestList
+    verb: GET
+    path: /participant-guest-list
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPaymentOrderFinancial
+    verb: GET
+    path: /payment-order-financial
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listPaymentProviders
     verb: GET
     path: /payment-providers
@@ -418,6 +746,14 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: false
     reads: 2
+    writes: 0
+  - operation: listPaymentReconciliationException
+    verb: GET
+    path: /payment-reconciliation-exception
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listPaymentTokens
     verb: GET
@@ -427,6 +763,158 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listPersonTypeProduct
+    verb: GET
+    path: /person-type-product
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listQuoteBookingConversion
+    verb: GET
+    path: /quote-booking-conversion
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listQuoteRevisionNegotiation
+    verb: GET
+    path: /quote-revision-negotiation
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRefundDisputeResale
+    verb: GET
+    path: /refund-dispute-resale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRelatedOrderTransaction
+    verb: GET
+    path: /related-order-transaction
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResale
+    verb: GET
+    path: /resale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResale2
+    verb: GET
+    path: /resale
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleConfirmationOwnership
+    verb: GET
+    path: /resale-confirmation-ownership
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleEligibilityTicket
+    verb: GET
+    path: /resale-eligibility-ticket
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleFeeCommission
+    verb: GET
+    path: /resale-fee-commission
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleFraudDuplicate
+    verb: GET
+    path: /resale-fraud-duplicate
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleInventoryAvailability
+    verb: GET
+    path: /resale-inventory-availability
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleListingSeller
+    verb: GET
+    path: /resale-listing-seller
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleMarketplace
+    verb: GET
+    path: /resale-marketplace
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleOwnership
+    verb: GET
+    path: /resale-ownership
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResalePolicyMarketplace
+    verb: GET
+    path: /resale-policy-marketplace
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResalePricingPrice
+    verb: GET
+    path: /resale-pricing-price
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listResaleTicketDetail
+    verb: GET
+    path: /resale-ticket-detail
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listReservationConfirmationExpiry
+    verb: GET
+    path: /reservation-confirmation-expiry
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listReservations
     verb: GET
     path: /reservations
@@ -435,6 +923,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 0
+  - operation: listSellerSettlementPayout
+    verb: GET
+    path: /seller-settlement-payout
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listSyncRejections
     verb: GET
     path: /sync/rejections
@@ -442,6 +938,86 @@ operationsByContract:
     permission: ORDER_VIEW
     offline: false
     reads: 1
+    writes: 0
+  - operation: listTicketOwnershipTransfer
+    verb: GET
+    path: /ticket-ownership-transfer
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTicketReissueFulfillment
+    verb: GET
+    path: /ticket-reissue-fulfillment
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTicketResaleMarketplace
+    verb: GET
+    path: /ticket-resale-marketplace
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUpgradeConversion
+    verb: GET
+    path: /upgrade-conversion
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUpgradeEligibilityQualification
+    verb: GET
+    path: /upgrade-eligibility-qualification
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUpgradeException
+    verb: GET
+    path: /upgrade-exception
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUpgradeFinancialTreatment
+    verb: GET
+    path: /upgrade-financial-treatment
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUpgradeTimingUsage
+    verb: GET
+    path: /upgrade-timing-usage
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVoidReversalSame
+    verb: GET
+    path: /void-reversal-same
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listWhiteLabelMarketplace
+    verb: GET
+    path: /white-label-marketplace
+    scope: venue
+    permission: ORDER_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: modifyOrder
     verb: POST
@@ -563,6 +1139,22 @@ operationsByContract:
     offline: false
     reads: 4
     writes: 4
+  - operation: setAfterSaleFinancial
+    verb: PUT
+    path: /after-sale-financial
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setAmendmentEligibilityPolicy
+    verb: PUT
+    path: /amendment-eligibility-policy
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setB2bCreditLimit
     verb: PUT
     path: /b2b-accounts/{accountId}/credit
@@ -571,6 +1163,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setCancellationPartialPolicy
+    verb: PUT
+    path: /cancellation-partial-policy
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setCustomerGuestAccount
+    verb: PUT
+    path: /customer-guest-account
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setFraudRules
     verb: PUT
     path: /fraud-rules
@@ -579,6 +1187,70 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setGroupBookingHandover
+    verb: PUT
+    path: /group-booking-handover
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGroupOperationalPlanning
+    verb: PUT
+    path: /group-operational-planning
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGroupPackageExperience
+    verb: PUT
+    path: /group-package-experience
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGroupQuotationProposal
+    verb: PUT
+    path: /group-quotation-proposal
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setMultiPaymentSplit
+    verb: PUT
+    path: /multi-payment-split
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setOrderAmendment
+    verb: PUT
+    path: /order-amendment
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setOrderDetailTransaction
+    verb: PUT
+    path: /order-detail-transaction
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setOrderReservationStatus
+    verb: PUT
+    path: /order-reservation-statu
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setPaymentProvider
     verb: PUT
     path: /payment-providers
@@ -587,6 +1259,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setProRataResidual
+    verb: PUT
+    path: /pro-rata-residual
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setRefundPolicy
     verb: PUT
     path: /venues/{venueId}/refund-policy
@@ -595,6 +1275,38 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setResaleEligibilityRule
+    verb: PUT
+    path: /resale-eligibility-rule
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setResaleMarketplaceRecommendation
+    verb: PUT
+    path: /resale-marketplace-recommendation
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setReservationHoldPolicy
+    verb: PUT
+    path: /reservation-hold-policy
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setUpgradeConversionPath
+    verb: PUT
+    path: /upgrade-conversion-path
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: shareEntitlement
     verb: POST
     path: /entitlements/{entitlementId}/share
@@ -669,7 +1381,7 @@ operationsByContract:
     permission: OVERSHORT_ACCEPT
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
   - operation: adjustDepositBoxFloat
     verb: POST
     path: /deposit-boxes/{boxId}/adjust-float
@@ -830,7 +1542,7 @@ tables:
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: orders.b2b_credit
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -872,7 +1584,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.credit_override
-  columns: 6
+  columns: 7
   store: postgres
   parent: orders.b2b_credit
   writtenBy:
@@ -886,13 +1598,13 @@ tables:
   - shift
   foreignWriters: null
 - table: orders.donation_line
-  columns: 2
+  columns: 3
   store: postgres
   parent: null
   writtenBy: []
   foreignWriters: null
 - table: orders.fraud_rule
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -926,7 +1638,7 @@ tables:
   - shift
   foreignWriters: null
 - table: orders.order_discount
-  columns: 1
+  columns: 2
   store: postgres
   parent: null
   writtenBy:
@@ -940,10 +1652,12 @@ tables:
   writtenBy:
   - fnb
   - orders
+  - subscription
   foreignWriters:
   - fnb
+  - subscription
 - table: orders.order_media_link
-  columns: 1
+  columns: 2
   store: postgres
   parent: null
   writtenBy: []
@@ -954,9 +1668,11 @@ tables:
   parent: null
   writtenBy:
   - orders
-  foreignWriters: null
+  - subscription
+  foreignWriters:
+  - subscription
 - table: orders.payment_link
-  columns: 13
+  columns: 14
   store: postgres
   parent: null
   writtenBy:
@@ -970,14 +1686,14 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.payment_routing
-  columns: 5
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
   - orders
   foreignWriters: null
 - table: orders.payment_tip
-  columns: 1
+  columns: 2
   store: postgres
   parent: orders.payment
   writtenBy: []
@@ -1004,7 +1720,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.resale_listing
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -1024,8 +1740,10 @@ tables:
   writtenBy:
   - identity
   - orders
+  - subscription
   foreignWriters:
   - identity
+  - subscription
 - table: orders.sales_order_unassigned
   columns: 0
   store: postgres
@@ -1040,7 +1758,7 @@ tables:
   - shift
   foreignWriters: null
 - table: orders.stored_value_authorisation
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1064,7 +1782,7 @@ tables:
   - orders
   foreignWriters: null
 - table: orders.wallet_pass
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
@@ -1127,6 +1845,9 @@ screens:
 - P02:GST-053 Build Your Own Itinerary
 - P02:GST-055 Dynamic QR Ticket
 - P02:GST-056 Bundle Package
+- P02:GST-067 Refunds & Resale
+- P02:GST-071 Payment Methods
+- P02:GST-072 Share & Group Booking
 - P04:POS-001 Begin Shift
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-004 Sell — Seat Map
@@ -1160,6 +1881,7 @@ screens:
 - P06:EMP-009 End shift
 - P06:EMP-014 Ticket lookup
 - P06:EMP-017 Sync & reconciliation
+- P06:EMP-022 My rota
 - P06:EMP-034 Walk-up sale
 - P06:EMP-035 Payment on device
 - P06:EMP-036 Issue media
@@ -1187,9 +1909,100 @@ screens:
 - P08:BO-082 Stock Movements
 - P08:BO-097 Check Out & Check In
 - P08:BO-100 Venue Home
+- P08:BO-101 Orders & Money
 - P08:BO-130 Offline Policy & Rules Configuration
 - P08:BO-132 Offline Transaction Monitor & Sync Queue
 - P08:BO-133 Offline Alerts, Limits & Audit
+- P08:BO-264 Group Sales Command Center
+- P08:BO-265 Group Enquiry & Opportunity Capture
+- P08:BO-266 Group Customer & Organization Profile
+- P08:BO-267 Group Requirements, Availability & Capacity Planner
+- P08:BO-268 Group Package & Experience Builder
+- P08:BO-269 Group Quotation Builder & Proposal Generation
+- P08:BO-270 Quote Revision, Negotiation & Version Management
+- P08:BO-271 Group Discount, Exception & Approval Workflow
+- P08:BO-272 Quote-to-Booking Conversion & Confirmation
+- P08:BO-273 Group Booking 360° & Handover Workspace
+- P08:BO-274 Group Booking Operations Command Center
+- P08:BO-275 Group Operational Planning & Task Workspace
+- P08:BO-276 Participants, Guest Lists & Group Structure
+- P08:BO-277 Group Payment, Deposit & Balance Management
+- P08:BO-278 Group Ticket, Seat & Entitlement Allocation
+- P08:BO-279 Group Ticket Fulfillment & Distribution
+- P08:BO-280 Group Arrival, Check-In & Admission Operations
+- P08:BO-281 Group Amendments, Cancellation & Refund Operations
+- P08:BO-282 Group Booking Reconciliation, Closure & Performance
+- P08:BO-283 Group Sales Analytics & AI Intelligence Center
+- P08:BO-304 Order & Reservation Command Center
+- P08:BO-305 Order Detail & Transaction Workspace
+- P08:BO-306 Reservation & Hold Policy Configuration
+- P08:BO-307 Order & Reservation Status Lifecycle Configuration
+- P08:BO-308 Order Creation & Source/Channel Configuration
+- P08:BO-309 Customer, Guest & Account Assignment
+- P08:BO-310 Order Line, Product & Entitlement Composition
+- P08:BO-311 Capacity Reservation & Inventory Commitment
+- P08:BO-312 Reservation Confirmation, Expiry & Fulfillment Readiness
+- P08:BO-313 Order Lifecycle Timeline, SLA, Exceptions & AI Operations
+- P08:BO-314 Amendment & After-Sales Command Center
+- P08:BO-315 Order Amendment Workspace
+- P08:BO-316 Amendment Eligibility & Policy Rule Builder
+- P08:BO-317 Cancellation & Partial Cancellation Policy Configuration
+- P08:BO-318 Refund Policy & Refund Calculation Configuration
+- P08:BO-319 Void, Reversal & Same-Day Correction Management
+- P08:BO-320 Ticket Reissue & Fulfillment Regeneration
+- P08:BO-321 After-Sales Financial Settlement & Adjustment Workspace
+- P08:BO-322 Approval, Exception & Service Recovery Management
+- P08:BO-323 Amendment History, Audit & After-Sales Analytics
+- P08:BO-324 Payment & Order Financial Command Center
+- P08:BO-325 Order Payment Detail & Transaction Ledger
+- P08:BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration
+- P08:BO-327 Deposit, Partial Payment & Outstanding Balance Management
+- P08:BO-328 Order Split, Merge & Transaction Relationship Management
+- P08:BO-329 Related Order & Transaction Relationship Explorer
+- P08:BO-330 External Payment, Partner & Settlement Reference Mapping
+- P08:BO-331 Payment Reconciliation & Exception Management
+- P08:BO-332 Financial Traceability, Control & Audit Explorer
+- P08:BO-333 Order Financial Analytics & AI Reconciliation Intelligence
+- P09:ADM-278 Resale Marketplace Command Center
+- P09:ADM-279 Resale Eligibility Rule Configuration
+- P09:ADM-280 Resale Policy & Marketplace Settings
+- P09:ADM-281 Listing Creation & Seller Configuration
+- P09:ADM-282 Resale Pricing & Price Guardrails
+- P09:ADM-283 Resale Fees, Commission & Seller Proceeds
+- P09:ADM-284 Listing Approval & Moderation
+- P09:ADM-285 Resale Inventory & Availability Management
+- P09:ADM-286 Listing Lifecycle, Expiry & Cancellation
+- P09:ADM-287 AI Resale Configuration & Marketplace Recommendations
+- P09:ADM-288 Resale Operations Command Center
+- P09:ADM-289 Buyer Purchase & Resale Order Management
+- P09:ADM-290 Ticket Ownership Transfer Management
+- P09:ADM-291 Credential Revocation & Regeneration
+- P09:ADM-292 Resale Fraud & Duplicate Sale Protection
+- P09:ADM-293 Capacity & Inventory Reconciliation
+- P09:ADM-294 Seller Settlement & Payout Management
+- P09:ADM-295 Refunds, Disputes & Resale Exceptions
+- P09:ADM-296 Resale Audit & Ownership History
+- P09:ADM-297 Resale Analytics & AI Intelligence
+- P09:ADM-298 My Tickets & Resale Marketplace Entry
+- P09:ADM-299 Resale Eligibility & Ticket Selection
+- P09:ADM-300 Create Listing & Resale Price Selection
+- P09:ADM-301 Fees, Seller Proceeds & Listing Confirmation
+- P09:ADM-302 My Resale Listings & Seller Dashboard
+- P09:ADM-303 Official Resale Marketplace & Buyer Discovery
+- P09:ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
+- P09:ADM-305 Buyer Checkout, Inventory Hold & Secure Payment
+- P09:ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery
+- P09:ADM-307 White-Label Marketplace Deployment & Experience Architecture
+- P09:ADM-308 Upgrade & Conversion Command Center
+- P09:ADM-309 Upgrade & Conversion Path Builder
+- P09:ADM-310 Upgrade Eligibility & Qualification Rules
+- P09:ADM-311 Upgrade Timing, Usage & Ticket Status Rules
+- P09:ADM-312 Upgrade Financial Treatment & Price Difference Rules
+- P09:ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration
+- P09:ADM-314 Person-Type, Product & Entitlement Conversion Rules
+- P09:ADM-315 Bulk, Group & Assisted Upgrade Operations
+- P09:ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls
+- P09:ADM-317 Upgrade History, Exception Management & Audit Explorer
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-002 Partner Dashboard
 - P10:PTR-005 Inventory & Allocation View

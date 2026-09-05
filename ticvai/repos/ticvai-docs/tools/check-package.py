@@ -90,6 +90,21 @@ def snake_table(name: str) -> str:
     return re.sub(r"(?<!^)(?=[A-Z])", "_", name).lower()
 
 
+
+def _scope_levels() -> list:
+    """The scope vocabulary, read from `common.ScopeLevel` rather than typed twice."""
+    p = ROOT / "contracts" / "shared" / "common.yaml"
+    try:
+        d = yaml.safe_load(p.read_text(encoding="utf-8"))
+        return list(((d.get("components") or {}).get("schemas") or {})
+                    .get("ScopeLevel", {}).get("enum") or [])
+    except Exception:
+        return []
+
+
+import collections as _collections
+
+
 def main() -> int:
     C = ROOT / "contracts"
     if not C.exists():
@@ -125,7 +140,7 @@ def main() -> int:
         ERRORS.append(f"contract operation '{x}' is missing from the lineage")
 
     # 10. every contract names the requirement domain it serves, or a documented reason not to
-    CROSS_CUTTING = {"identity", "tenancy", "cross-cell", "platform-ops"}
+    CROSS_CUTTING = {"identity", "tenancy", "cross-region", "platform-ops"}
     for tier in ("spine", "satellite"):
         for f in (C / tier).glob("*.yaml"):
             if f.name in shared:
@@ -588,14 +603,310 @@ def main() -> int:
                     "the scope walk (ADR-0018). Mark the property `x-ticvai-persisted: false`, or "
                     "add the table to CURRENCY_OK with the reason it genuinely differs")
 
+    # 34. **Every `$ref` resolves.** Deleting a shared schema breaks every contract that points at
+    # it and nothing in the suite noticed: the `Money` rewrite on 24 August removed `SalesChannel`,
+    # `ScopeLevel` and `ScopeRef` from `shared/common.yaml`, leaving ten references across five
+    # files pointing at nothing. **YAML still parsed, so eight validators still passed** — a broken
+    # reference is only visible to something that follows it.
+    #
+    # It also caught `#/components/schemas/SalesOrder` in an operation I built the same day: the
+    # schema is `Order`. **A local ref is as easy to get wrong as a shared one and looks more
+    # trustworthy.**
+    _docs = {}
+    for _f in sorted(ROOT.glob("contracts/*/*.yaml")):
+        try:
+            _docs[str(_f.resolve())] = yaml.safe_load(_f.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+
+    def _at(doc, frag):
+        for part in frag.lstrip("#/").split("/"):
+            doc = doc.get(part) if isinstance(doc, dict) else None
+        return doc
+
+    for _f in sorted(ROOT.glob("contracts/*/*.yaml")):
+        _own = _docs.get(str(_f.resolve()))
+        for _m in re.finditer(r"\$ref: '([^']+)'", _f.read_text(encoding="utf-8")):
+            _r = _m.group(1)
+            if _r.startswith("#"):
+                if _at(_own, _r) is None:
+                    ERRORS.append(f"{_f.name}: $ref '{_r}' resolves to nothing in its own file")
+            else:
+                _path, _, _frag = _r.partition("#")
+                _t = (_f.parent / _path).resolve()
+                if str(_t) not in _docs:
+                    ERRORS.append(f"{_f.name}: $ref '{_r}' — no such file")
+                elif _frag and _at(_docs[str(_t)], _frag) is None:
+                    ERRORS.append(f"{_f.name}: $ref '{_r}' — the file exists, the schema does not")
+
+    # 34. **Every `$ref` resolves.** A reference to a schema that does not exist parses fine,
+    # generates fine and fails at the first client — which is how eleven of them survived a rewrite
+    # of `shared/common.yaml` on 24 August. `SalesChannel`, `ScopeLevel` and `ScopeRef` were
+    # removed while nine references across four contracts kept pointing at them, and nothing here
+    # noticed.
+    #
+    # **The one that found it was a person reading a diagram**, and that is the wrong last line of
+    # defence for a link the whole package is built on resolving.
+    _docs = {}
+    for _f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+        try:
+            _docs[str(_f.resolve())] = yaml.safe_load(_f.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+
+    def _at(doc, frag):
+        for part in frag.lstrip("#/").split("/"):
+            doc = (doc or {}).get(part) if isinstance(doc, dict) else None
+        return doc
+
+    for _f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+        _key = str(_f.resolve())
+        _self = _docs.get(_key)
+        for _m in re.finditer(r"\$ref: '([^']+)'", _f.read_text(encoding="utf-8")):
+            _r = _m.group(1)
+            if _r.startswith("#"):
+                if _at(_self, _r) is None:
+                    ERRORS.append(f"{_f.name}: $ref '{_r}' resolves to nothing in its own file")
+            else:
+                _path, _, _frag = _r.partition("#")
+                _t = (_f.parent / _path).resolve()
+                if str(_t) not in _docs:
+                    ERRORS.append(f"{_f.name}: $ref '{_r}' names a file that is not there")
+                elif _frag and _at(_docs[str(_t)], _frag) is None:
+                    ERRORS.append(f"{_f.name}: $ref '{_r}' resolves to nothing — the file exists "
+                                  "and the schema in it does not")
+
+    # 35. **An unbounded list over a table that grows without limit is the query that takes a
+    # venue down.** 94 of 183 `list*` operations declared no page size; 38 of those read `orders`,
+    # `marketing`, `access`, `ledger`, `fnb`, `retail` or `inventory` — the tables a campaign send
+    # or a season-ticket base fills. **The first venue to notice is the one whose guest base crossed
+    # a hundred thousand**, and by then it is a production incident rather than a review comment.
+    _BIG = ("orders.", "marketing.", "access.", "ledger.", "fnb.", "retail.", "inventory.")
+    _lin_p = ROOT / "handoff" / "api-data-lineage.json"
+    if _lin_p.exists():
+        _L = json.loads(_lin_p.read_text(encoding="utf-8"))
+        for _f in sorted((ROOT / "contracts").glob("*/*.yaml")):
+            _d = yaml.safe_load(_f.read_text(encoding="utf-8")) or {}
+            for _path, _item in (_d.get("paths") or {}).items():
+                for _v, _o in _item.items():
+                    if _v.upper() != "GET" or not isinstance(_o, dict):
+                        continue
+                    _oid = _o.get("operationId") or ""
+                    if not _oid.startswith("list") or _oid not in _L:
+                        continue
+                    if "PageSize" in str(_o.get("parameters") or ""):
+                        continue
+                    if any(t.startswith(_BIG) for t in _L[_oid].get("reads", [])):
+                        ERRORS.append(
+                            f"{_f.stem}.{_oid}: no page size, and it reads a high-volume table "
+                            f"({[t for t in _L[_oid]['reads'] if t.startswith(_BIG)][:2]}) — an "
+                            "unbounded list over a table that grows without limit")
+
+    # 36. **A table written by something and read by nothing is a feature that half-exists.**
+    # A guest joins a restaurant waitlist and no operation lists the waitlist; a steward attaches a
+    # photograph to a work order and nothing retrieves it. **`platform.audit_record` was exactly
+    # this on 20 August** — written by nothing, read by nothing, found by walking a journey rather
+    # than by any check here.
+    #
+    # **A child table read through its parent is not orphaned**, which is why the parent is
+    # consulted before reporting.
+    _sch_p = ROOT / "handoff" / "schema-reference.json"
+    if _lin_p.exists() and _sch_p.exists():
+        _S = json.loads(_sch_p.read_text(encoding="utf-8"))
+        _real = {t for t in (set(_S.get("cols") or {}) | set(_S.get("storage") or {}))
+                 if "." in t and ":" not in t}
+        _lineage = _S.get("lineage") or {}
+        _w, _r = {}, set()
+        for _o, _v in _L.items():
+            for _t in _v.get("writes", []):
+                if _t in _real:
+                    _w.setdefault(_t, []).append(_o)
+            for _t in _v.get("reads", []):
+                if _t in _real:
+                    _r.add(_t)
+        for _t in sorted(set(_w) - _r):
+            if (_lineage.get(_t) or {}).get("parent"):
+                continue
+            WARNINGS.append(
+                f"{_t}: written by {sorted(_w[_t])[:2]} and read by nothing, and it has no parent "
+                "to be read through — either an operation is missing or the table should not exist")
+
+    # 37. **A relationship naming a column the table does not have is an edge nobody can follow.**
+    # 185 lineage edges carried an operation name in `col` — `orders.order_line.via createOrder` —
+    # so a viewer comparing `col` against the columns reported them as undefined and a reader had
+    # no way to tell a real gap from a field used for two purposes.
+    #
+    # **Three kinds and only two are column joins**: `declared` and `convention` name a column,
+    # `lineage` names an act and puts it in `viaOperation`.
+    _g = ROOT / "handoff" / "relationship-graph.json"
+    _s = ROOT / "handoff" / "schema-reference.json"
+    if _g.exists() and _s.exists():
+        _cols = {t: {c["column"] for c in cs}
+                 for t, cs in (json.loads(_s.read_text(encoding="utf-8")).get("cols") or {}).items()}
+        for _r in (json.loads(_g.read_text(encoding="utf-8")).get("rels") or []):
+            # **A lineage edge has no column and says so with .** Skipping on a
+            # falsy `col` alone would also skip a declared edge whose column went missing, which
+            # is the defect this check exists to catch.
+            if (_r.get("how") or _r.get("kind")) == "lineage" or _r.get("viaOperation"):
+                continue
+            _c = _r.get("col")
+            if not _c:
+                ERRORS.append(f"relationship-graph: {_r.get('frm')} -> {_r.get('to')} has no "
+                              "column and is not a lineage edge")
+                continue
+            if _c not in _cols.get(_r.get("frm", ""), set()):
+                ERRORS.append(
+                    f"relationship-graph: {_r.get('frm')}.{_c} names a column that table does not "
+                    f"have (kind {_r.get('how') or _r.get('kind')}) — a lineage edge names an "
+                    "operation and belongs in viaOperation")
+
+    # 38. **A table with no description is a table only its author can read.** 200 of 369 carried
+    # a note saying no description had been written — honest, generated, and useless: a reader
+    # opening `platform.outlet` learned that it held nine columns.
+    #
+    # **The name is not enough.** `catalogue.envelope` was capacity across sales channels;
+    # `identity.grant` was delegated access; `platform.scope_node` was the org tree. Three of those
+    # were renamed on 26 August because the name was actively misleading, and the other 366 still
+    # needed a sentence.
+    #
+    # **Written where it is derived**, in `tools/derive-table-notes.py`, so a hand-edit cannot
+    # drift from the table it describes.
+    if _schema.exists():
+        _st = (json.loads(_schema.read_text(encoding="utf-8")).get("storage") or {})
+        _missing = [t for t, n in sorted(_st.items())
+                    if "." in t and ":" not in t
+                    and ("No description has been written" in str(n) or not str(n).strip())]
+        for _t in _missing:
+            WARNINGS.append(
+                f"{_t}: no description — the name is the only thing saying what it is. Add it to "
+                "WHAT in tools/derive-table-notes.py")
+
+    # 39. **A table whose operations declare a scope must carry a column for it.** 49 tables were
+    # written at `venue` or `tenant` scope and held no scope column at all — `marketing.suppression`
+    # among them, which is *who must not be contacted, whatever a campaign says*. **A suppression
+    # list with no tenant scope is one tenant's opt-out silencing another's.**
+    #
+    # **A child inherits through its parent** and is exempt: `orders.order_line` reaches scope
+    # through `sales_order`, and duplicating it would create two answers.
+    #
+    # **Three tables are genuinely global** and named rather than inferred, because "no scope" and
+    # "not scoped yet" look identical from here.
+    GLOBAL_TABLES = {
+        "control.subscription_plan",   # the plan catalogue the platform sells
+        "control.api_version",         # the API the platform publishes
+        "platform.org_unit",           # the root of the tree — it *is* the scope
+        # **`pii.subject` is deliberately unscoped and it is the most important exemption here.**
+        # A guest is not a venue's guest — they buy at one venue and are admitted at another, and
+        # ADR-0023 keeps the subject isolated so a data-subject request has one place to answer
+        # from. **Scoping it to a venue would create one subject row per venue**, which is exactly
+        # the duplication a DSAR cannot survive.
+        "pii.subject",
+        # `orders.invitation` reaches scope through the order it invites to. It carries no
+        # same-schema reference the child rule can see, so it is named here instead.
+        "orders.invitation",
+    }
+    SCOPE_COLS = {"scope_path", "venue_id", "tenant_id", "outlet_id", "location_id", "region_id",
+                  "cell_name", "org_unit_id", "department_id", "workstation_id", "subject_id",
+                  "principal_id", "partner_id"}
+    if _schema.exists():
+        _s = json.loads(_schema.read_text(encoding="utf-8"))
+        _written = {t for v in lin.values() for t in v["writes"]}
+        for _t in sorted(_s.get("cols") or {}):
+            if "." not in _t or ":" in _t or _t in GLOBAL_TABLES or _t not in _written:
+                continue
+            _cols = {c["column"] for c in _s["cols"][_t]}
+            if _cols & SCOPE_COLS:
+                continue
+            if any(c.get("references", "").split(".")[0] == _t.split(".")[0]
+                   for c in _s["cols"][_t] if c.get("references")):
+                continue
+            _sc = sorted({lin[o].get("scope") for o, v in lin.items()
+                          if _t in v["writes"] and lin[o].get("scope")})
+            WARNINGS.append(
+                f"{_t}: written at {'/'.join(_sc) or 'unstated'} scope and carries no scope column "
+                "— a row written at one scope is readable by anything that reaches the table")
+
+    # 40. **One generation of DDL, or a consumer silently gets the older one.** A parser reading
+    # `backend/*.sql` in sorted order applies a later `CREATE TABLE` over an earlier one for the
+    # same name, and **digits sort before letters** — so `V0002__identity.sql` beside
+    # `010-identity.sql` wins.
+    #
+    # **Found 31 August in a consumer's tree**, which held this generation and an August
+    # `V0001`–`V0003b` series. Thirty-three tables existed in both, the August definition won every
+    # time, and **65 foreign keys were discarded** because `900-foreign-keys.sql` attaches them
+    # before the V-series re-creates their tables.
+    #
+    # **Nothing reported a dangling reference** — both generations' tables existed, so a key on
+    # `identity.principal` pointing at `platform.scope_node` resolved to a table this generation
+    # renamed six days earlier. **The graph wired itself to the dead half and said nothing.**
+    _backend = ROOT / "backend"
+    if _backend.exists():
+        _sql = sorted(f.name for f in _backend.glob("*.sql"))
+        _ours = {n for n in _sql if re.match(r"^\d{3}-", n)}
+        _other = [n for n in _sql if n not in _ours]
+        if _other:
+            ERRORS.append(
+                f"backend/ holds {len(_other)} SQL file(s) this package did not generate "
+                f"({', '.join(_other[:3])}{'...' if len(_other) > 3 else ''}) — a parser sorting "
+                "them after the numeric series will apply them last and discard the foreign keys "
+                "attached to the tables they redefine")
+        # **A table defined twice inside our own generation would be the same defect from a
+        # different direction**, so it is checked rather than assumed impossible.
+        _seen: dict = {}
+        for _n in sorted(_ours):
+            for _m in re.finditer(r"CREATE TABLE IF NOT EXISTS ([\w\".]+)\.([\w\"]+)",
+                                  (_backend / _n).read_text(encoding="utf-8")):
+                _t = f"{_m.group(1)}.{_m.group(2)}".replace('"', "")
+                if _t in _seen:
+                    ERRORS.append(f"{_t} is created in both {_seen[_t]} and {_n}")
+                _seen[_t] = _n
+
+    # 41. **ADR-0037: a lock holds one statement, not a transaction.** An operation declaring
+    # `x-ticvai-lock` must say what it resolves *before* the transaction opens, because the default
+    # is that everything in `reads` happens inside it — and that default is what made
+    # `acquireInventoryHold` a six-millisecond lease when a row lock costs microseconds.
+    #
+    # **Two things are always outside**: a cache read, because it is a network hop to another
+    # process, and any table the locked decision does not use. **`platform.workstation` is who is
+    # holding, not whether capacity exists** — it was inside the lock and it never needed to be.
+    for _f in sorted(C.glob("*/*.yaml")):
+        _d = yaml.safe_load(_f.read_text(encoding="utf-8")) or {}
+        for _p, _item in (_d.get("paths") or {}).items():
+            for _v, _op in _item.items():
+                if not isinstance(_op, dict) or not _op.get("x-ticvai-lock"):
+                    continue
+                _oid = _op.get("operationId")
+                _ex = _op.get("x-ticvai-lock-excludes")
+                if _ex is None:
+                    ERRORS.append(
+                        f"{_oid}: declares a lock and not what sits outside it — ADR-0037 requires "
+                        "x-ticvai-lock-excludes, because the default is that every read happens "
+                        "inside the lock")
+                    continue
+                _reads = set((lin.get(_oid) or {}).get("reads") or [])
+                _cache = {r for r in _reads if r.startswith("cache:")}
+                _missed = sorted(_cache - set(_ex))
+                if _missed:
+                    ERRORS.append(
+                        f"{_oid}: reads {', '.join(_missed)} and does not exclude it from the lock "
+                        "— a cache read is a network hop, and a lock held across one is held for "
+                        "the latency of the slowest thing on the path")
+
     # 13. The x-ticvai-* vocabularies are closed sets. `lastWriteWins` and `lastWriterWins` were
     # both in use on 17 August — one policy, two spellings, ten operations split between them, and
     # every checker passed because each value was individually plausible.
     VOCAB = {
         "x-ticvai-conflict-policy": {"serverWins", "lastWriterWins", "append", "manualMerge"},
-        # Sourced from tenancy.ScopeLevel plus `platform`, which is above the tenant tree.
-        "x-ticvai-scope-level": {"platform", "tenant", "brand", "region", "venue", "department",
-                                 "subDepartment", "workstation"},
+        # **Derived from `common.ScopeLevel`, not typed here.** This list was hand-maintained and
+        # **had already lost `outlet`**, a real scope since 18 August (CF-138) — so a correctly
+        # tagged operation would have been reported as using a value outside the closed set, and
+        # the check would have been wrong rather than the contract.
+        #
+        # Same failure as `platform-deployment.md` at twelve rows against fifteen platforms and the
+        # viewer at 654 operations against 1,023: **a vocabulary typed once is correct once.**
+        # `platform` is added because it sits above the tenant tree and is not a scope node;
+        # `subject` because a guest's own setting is not a level of the venue hierarchy at all.
+        "x-ticvai-scope-level": set(_scope_levels()) | {"platform"},
         "x-ticvai-read-routing": {"primary", "replica", "analytical"},
         # A partner and an external reviewer hold real permissions and are neither staff nor guests.
         # Omitting them is what let P11 be treated as a guest surface on 17 August.
@@ -713,6 +1024,30 @@ def main() -> int:
                 if ln.startswith("**Status:**") and ("uperseded" in ln or "mended" in ln):
                     superseded[f.name[:4]] = f.name
                     break
+        # **Prose wraps, and the acknowledgement lands on the next line.** This read the single
+        # line naming the ADR, so a citation that said what it needed to say one line later
+        # failed anyway. On 3 September five deploy files carried
+        #
+        #     ... which is exactly ADR-0032's
+        #     amendment: 20 connections across 25 concurrent tenants ...
+        #
+        # and were reported as not saying so. The label was there; the reading was one line
+        # short. **This is the same failure the rule exists to catch, committed by the rule** —
+        # ADR-0021's original defect was a supersession that was labelled and not read.
+        #
+        # A window of one line either way is what a wrap needs, and no more. Widening further
+        # would start matching an unrelated sentence in the next paragraph, which is how a
+        # control stops meaning anything.
+        def acknowledged(text: str, num: str) -> bool:
+            lines = text.split("\n")
+            for i, ln in enumerate(lines):
+                if f"ADR-{num}" not in ln:
+                    continue
+                window = " ".join(lines[max(0, i - 1):i + 2])
+                if "upersed" in window or "amend" in window or "no longer" in window:
+                    return True
+            return False
+
         for f in adr_dir.glob("0*.md"):
             text = f.read_text(encoding="utf-8")
             for num in sorted(superseded):
@@ -720,10 +1055,30 @@ def main() -> int:
                     continue
                 if f"ADR-{num}" not in text:
                     continue
-                near = [ln for ln in text.split("\n") if f"ADR-{num}" in ln]
-                if not any("upersed" in ln or "amend" in ln or "no longer" in ln for ln in near):
+                if not acknowledged(text, num):
                     ERRORS.append(f"{f.name} cites ADR-{num}, which is superseded or amended, "
-                                  "without saying so on any line that mentions it")
+                                  "without saying so on or beside any line that mentions it")
+
+        # 15b. **The same rule, applied to the files that get deployed.** Rule 15
+        # covers ADRs citing ADRs and stopped there, and a compose file citing a
+        # superseded ADR passed every check in the package. On 3 September
+        # ADR-0036 was superseded and four configurations still carried its
+        # reasoning in their headers — one instance, a database per service —
+        # with the arrangement it argued for in the YAML underneath.
+        #
+        # A deployment configuration is the one artefact a person hands to a
+        # machine, so a stale decision in its header is worse there than in an
+        # ADR, not better.
+        for d in ("deploy", "deploy/variants"):
+            for f in sorted((ROOT / d).glob("*.y*ml")):
+                text = f.read_text(encoding="utf-8")
+                for num in sorted(superseded):
+                    if f"ADR-{num}" not in text:
+                        continue
+                    if not acknowledged(text, num):
+                        ERRORS.append(f"{d}/{f.name} reasons from ADR-{num}, which is superseded "
+                                      "or amended, without saying so on or beside any line that "
+                                      "mentions it")
 
     # 11. no document names a platform code that no longer exists
     import re as _re
@@ -839,6 +1194,101 @@ def main() -> int:
                if f.name != "_schema.yaml"}
     for e in sorted(emitted - defined):
         ERRORS.append(f"a state model emits '{e}' with no event definition")
+
+
+    # 42. **One contract per operationId.** On 3 September `contracts/spine/cross-cell.yaml` had
+    # been renamed to `cross-region.yaml` and the original was never deleted, so sixteen operations
+    # were declared twice. Every loader here keys by `operationId` and a dict keeps the last, so
+    # **every count in the package still read 1,032** and nothing looked wrong.
+    #
+    # **Two tools in this pipeline then resolved the same operation to different files.**
+    # `api-data-lineage.json` took `authoriseWalletSpend` from `cross-region`; rule 41 above walks
+    # files in order and took it from `cross-cell`, which is the copy the ADR-0037 fix never
+    # reached. A duplicate is not a tidiness problem — it is two answers to one question.
+    _where = _collections.defaultdict(list)
+    for _f in sorted(C.glob("*/*.yaml")):
+        if _f.name in shared:
+            continue
+        for _item in (yaml.safe_load(_f.read_text(encoding="utf-8")) or {}).get("paths", {}).values():
+            if not isinstance(_item, dict):
+                continue
+            for _v, _op in _item.items():
+                if _v in ("get", "post", "put", "patch", "delete") and isinstance(_op, dict):
+                    if _oid := _op.get("operationId"):
+                        _where[_oid].append(_f.name)
+    for _oid, _files in sorted(_where.items()):
+        if len(_files) > 1:
+            ERRORS.append(f"{_oid} is declared in {' and '.join(_files)} — one operation, two "
+                          "contracts, and which one a tool sees depends on the order it globs")
+
+    # 43 + 44. **The emitted DDL, checked against Postgres's own rules rather than against the
+    # schema reference it came from.** Rule 30 asks whether a table has a column that *could* be a
+    # key; it never opens the SQL to see whether one was written. On 3 September that gap held
+    # **84 tables with no `PRIMARY KEY`, 37 foreign keys between `uuid` and `text`, and 16 pointing
+    # at a column carrying no unique constraint** — 52 statements Postgres rejects outright.
+    #
+    # **None of it would have surfaced before the first `psql -f`**, which this package has never
+    # run. A generated artefact nothing parses back is a generated artefact nobody has read.
+    _backend = ROOT / "backend"
+    if _backend.exists():
+        _sql = "".join(f.read_text(encoding="utf-8") + "\n"
+                       for f in sorted(_backend.glob("010-*.sql")))
+        _cols: dict = {}
+        for _m in _re.finditer(
+                r'CREATE TABLE IF NOT EXISTS ([\w.]+|\w+\."\w+") \(\n(.*?)\n\);', _sql, _re.S):
+            _t = _m.group(1).replace('"', "")
+            _cols[_t] = {}
+            for _line in _m.group(2).split("\n"):
+                _mm = _re.match(r"^(\w+)\s+(.+)$", _line.strip().rstrip(","))
+                if _mm:
+                    _cols[_t][_mm.group(1)] = _mm.group(2)
+        _nokey = sorted(t for t, v in _cols.items()
+                        if not any("PRIMARY KEY" in d for d in v.values()))
+        for _t in _nokey:
+            ERRORS.append(f"{_t}: no PRIMARY KEY in the DDL — a row nothing can address, and a "
+                          "table nothing may reference")
+        _uniq = {t: {c for c, d in v.items() if "PRIMARY KEY" in d or "UNIQUE" in d}
+                 for t, v in _cols.items()}
+        _fkf = _backend / "900-foreign-keys.sql"
+        if _fkf.exists():
+            _pat = _re.compile(
+                r'ALTER TABLE ([\w.]+|\w+\."\w+") ADD CONSTRAINT (\w+) FOREIGN KEY '
+                r'\((\w+)\) REFERENCES ([\w.]+|\w+\."\w+")\((\w+)\);')
+            for _m in _pat.finditer(_fkf.read_text(encoding="utf-8")):
+                _src, _cn, _sc, _tgt, _tc = [g.replace('"', "") for g in _m.groups()]
+                if _src not in _cols or _tgt not in _cols:
+                    continue
+                if _tc not in _uniq[_tgt]:
+                    ERRORS.append(f"{_cn}: references {_tgt}.{_tc}, which is neither a primary key "
+                                  "nor unique — Postgres refuses the constraint")
+                elif (_cols[_src][_sc].split()[0].lower()
+                      != _cols[_tgt][_tc].split()[0].lower()):
+                    ERRORS.append(
+                        f"{_cn}: {_src}.{_sc} is {_cols[_src][_sc].split()[0]} and "
+                        f"{_tgt}.{_tc} is {_cols[_tgt][_tc].split()[0]} — a foreign key cannot "
+                        "span two types")
+        # **Synthesised keys are counted, not passed off.** 81 tables carry a surrogate `id` no
+        # contract asserts, because they were derived from response shapes. They are a worklist.
+        _ref = H / "schema-reference.json"
+        if _ref.exists():
+            _sr = json.loads(_ref.read_text(encoding="utf-8"))
+            _syn = sum(1 for v in (_sr.get("cols") or {}).values()
+                       for c in v if c.get("synthesised"))
+            if _syn:
+                WARNINGS.append(f"{_syn} table(s) are keyed by a synthesised surrogate — no "
+                                "contract asserts an identity for them")
+
+    # 45. **A link in prose resolves, or it is not a link.** `audit-links.py` covers nine
+    # directions of cross-layer integrity and prose is not among them, so ADR-0034 shipped on
+    # 31 August pointing at `0020-ai-proposes-a-person-accepts.md` and
+    # `0021-qdrant-collections-and-shards.md` — **two ADRs that had been renamed**, in the Related
+    # line a reader follows first.
+    for _f in sorted((ROOT / "docs").rglob("*.md")):
+        if "repos" in str(_f):
+            continue
+        for _m in _re.finditer(r"\]\(([^)#:]+\.md)(?:#[^)]*)?\)", _f.read_text(encoding="utf-8")):
+            if not (_f.parent / _m.group(1)).exists():
+                ERRORS.append(f"{_f.name}: links to {_m.group(1)}, which does not exist")
 
     print(f"{len(ops)} operations · {len(tables)} tables · {len(sids)} screens · "
           f"{len(apps)} apps · {len(plats)} platforms\n")

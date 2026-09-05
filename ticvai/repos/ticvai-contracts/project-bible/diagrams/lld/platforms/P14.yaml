@@ -31,7 +31,7 @@ modulesUsed:
 - module: developerApi
   screens: 8
 servicesCalled:
-- service: ControlService
+- service: PlatformService
   operationCalls: 21
 coverage:
   screens: 8
@@ -205,7 +205,8 @@ screens:
   - loading
   offlineState: false
   entryParams: []
-  goesTo: []
+  goesTo:
+  - DEV-006
   boardFrames: null
   wireframe: wireframes/P14 Developer.dc.html#dev-007
   inFlows:
@@ -231,7 +232,8 @@ screens:
   entryParams:
   - listingId<-deepLink
   - version<-deepLink
-  goesTo: []
+  goesTo:
+  - DEV-001
   boardFrames: null
   wireframe: wireframes/P14 Developer.dc.html#dev-008
   inFlows: null

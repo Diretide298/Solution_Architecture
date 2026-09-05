@@ -205,7 +205,7 @@ operationsByContract:
     path: /tenant-config/pages
     scope: tenant
     permission: TENANT_CONFIGURE
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: listCustomDomains
@@ -221,7 +221,7 @@ operationsByContract:
     path: /tenant-config/faqs
     scope: tenant
     permission: TENANT_CONFIGURE
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: listPolicies
@@ -255,7 +255,7 @@ operationsByContract:
     permission: TENANT_PUBLISH
     offline: false
     reads: 2
-    writes: 3
+    writes: 4
   - operation: releaseCustomDomain
     verb: DELETE
     path: /tenant-domains/{domainId}
@@ -425,6 +425,20 @@ operationsByContract:
     reads: 2
     writes: 2
 tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: whitelabel.banner
   columns: 12
   store: postgres
@@ -433,14 +447,14 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.config_version
-  columns: 8
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
   - white-label
   foreignWriters: null
 - table: whitelabel.content_page
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -454,7 +468,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.faq_category
-  columns: 3
+  columns: 5
   store: postgres
   parent: null
   writtenBy:
@@ -467,7 +481,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: whitelabel.feature_toggle
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -481,7 +495,7 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.module_enablement
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -495,35 +509,35 @@ tables:
   - white-label
   foreignWriters: null
 - table: whitelabel.policy
-  columns: 7
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
   - white-label
   foreignWriters: null
 - table: whitelabel.promo_block
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
   - white-label
   foreignWriters: null
 - table: whitelabel.tenant_config
-  columns: 16
+  columns: 17
   store: postgres
   parent: platform.tenant
   writtenBy:
   - white-label
   foreignWriters: null
 readsFrom:
-- service: ControlService
+- service: PlatformService
   operations: 3
 - service: MarketingService
   operations: 1
 - service: IdentityService
   operations: 1
 writesOutside:
-- service: ControlService
+- service: PlatformService
   operations: 3
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
@@ -531,15 +545,18 @@ screens:
 - P01:WEB-025 Help Centre / FAQ
 - P01:WEB-028 Contact & Venue Information
 - P01:WEB-029 Error / Sold Out / Maintenance
+- P01:WEB-045 Help Centre & Accessibility
 - P02:GST-001 Home – Default
 - P02:GST-038 Digital Companion Mode
 - P02:GST-040 Help & Support
 - P02:GST-047 Maintenance / Upgrade Page
 - P02:GST-057 Accessibility Information
 - P05:KSK-002 Language Select
+- P08:BO-243 Policy Approval, Audit, Analytics & AI Optimization
 - P09:ADM-016 White-Label Branding Management
 - P09:ADM-017 Domain & Certificate Management
 - P09:ADM-018 Localisation & Language Pack
+- P12:SUP-006 Knowledge Base Search
 - P13:CMS-002 Brand Kit
 - P13:CMS-003 Typography
 - P13:CMS-005 Theme Editor
@@ -551,6 +568,7 @@ screens:
 - P13:CMS-014 Publishing Workflow
 - P13:CMS-015 Version History
 - P13:CMS-016 Site Settings
+- P13:CMS-017 Domain & Certificate
 - P13:CMS-020 Change Log
 flows:
 - F01 Guest buys a ticket online

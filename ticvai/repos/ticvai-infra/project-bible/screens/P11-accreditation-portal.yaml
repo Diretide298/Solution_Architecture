@@ -1,8 +1,3 @@
-# P11 — Accreditation Portal
-# BLOCKED on the Accreditation workshop.
-# Note the split: this portal is Wave 3, but accreditation VALIDATION appears on the
-# employee scanner in Wave 1. That is why this is the urgent one of the four workshops.
-
 platform:
   code: P11
   audience: public
@@ -61,14 +56,19 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      The screen this app sits on. Everything else is entered from here and returns to it.'
     error: Could not load
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-001
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /applicant-journey/landing-programme-overview
@@ -86,6 +86,7 @@ screens:
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   density: compact
   requiresModule: accreditation
+  statesDerived: true
 - id: ACC-002
   name: Registration Form
   module: Applicant Journey
@@ -96,17 +97,41 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listApprovalRequests
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find registration form for this venue.'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `APPROVAL_VIEW` to read approvals; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `accreditation` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-002
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
@@ -132,6 +157,7 @@ screens:
     trigger: onLoad
   density: compact
   requiresModule: accreditation
+  statesDerived: true
 - id: ACC-003
   name: Application Review & Submit
   module: Applicant Journey
@@ -144,14 +170,20 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Application Review & Submit — the screen a person opens when they need to deal with application
+      review & submit.'
     error: Could not load
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-003
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-review-and-submit
@@ -171,6 +203,7 @@ screens:
     review & submit.
   density: compact
   requiresModule: accreditation
+  statesDerived: true
 - id: ACC-004
   name: Application Status Tracking
   module: Applicant Journey
@@ -183,14 +216,19 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find application status tracking for this venue.'
     error: Could not load
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-004
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-status-tracking
@@ -209,6 +247,7 @@ screens:
   purpose: Find application status tracking for this venue.
   density: compact
   requiresModule: accreditation
+  statesDerived: true
 - id: ACC-005
   name: Accreditation Badge
   module: Applicant Journey
@@ -219,17 +258,41 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: dataTable
+        derived: true
+        impliedBy: listApprovalRequests
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find accreditation badge for this venue.'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `APPROVAL_VIEW` to read approvals; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `accreditation` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-005
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /applicant-journey/accreditation-badge
@@ -244,19 +307,24 @@ screens:
     - ACC-003
     inferred: true
     fromFlows: true
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose
-    derived from the screen name and its operations on 17 August, not from a requirement. **Cross-platform
-    navigation removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest
-    app does not navigate to either** — those are device handovers, and a flow declares them with `crossesDevice`
-    rather than a screen pretending there is a link.'
+  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
+    from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
+    removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not
+    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
+    than a screen pretending there is a link.'
   purpose: Find accreditation badge for this venue.
   apis:
   - operationId: listApprovalRequests
     contract: approvals
     purpose: Requests awaiting a decision, or already decided
     trigger: onLoad
+  - operationId: listAccreditationBadges
+    contract: approvals
+    purpose: Badges issued and their state
+    trigger: onLoad
   density: compact
   requiresModule: accreditation
+  statesDerived: true
 - id: ACC-006
   name: Reviewer Queue
   module: Reviewer (Internal)
@@ -269,14 +337,19 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Find the right one quickly, and act on it without opening it.'
     error: Could not load
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-006
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-queue
@@ -300,6 +373,7 @@ screens:
   purpose: Find the right one quickly, and act on it without opening it.
   density: compact
   requiresModule: accreditation
+  statesDerived: true
 - id: ACC-007
   name: Reviewer Application Detail
   module: Reviewer (Internal)
@@ -310,17 +384,51 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: decideApprovalRequest
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listApprovalRequests
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: decideApprovalRequest
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Everything known about one reviewer application, and what can be done to it.'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `APPROVAL_DECIDE`, `APPROVAL_VIEW` to use approvals; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `accreditation` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-007
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail
@@ -353,8 +461,13 @@ screens:
     params:
     - name: requestId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
+      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
+      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
+      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
+      Arrives with `requestId`.'
   requiresModule: accreditation
+  statesDerived: true
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)
@@ -367,14 +480,19 @@ screens:
       - kind: detailPanel
   states:
     loading: Content loads
-    emptyFirstRun: TODO — what exists here, and what this person does to create the first one.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Get a guest into the app, fast, on a device that may be shared.'
     error: Could not load
   wireframe:
     status: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-008
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API
-    mapping until the domain is discussed.
+  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
+    until the domain is discussed.
   implementation:
     app: accreditation-web
     route: /reviewer-internal/credential-register
@@ -393,3 +511,4 @@ screens:
   purpose: Get a guest into the app, fast, on a device that may be shared.
   density: compact
   requiresModule: accreditation
+  statesDerived: true

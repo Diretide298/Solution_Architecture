@@ -10,7 +10,8 @@ operations:
   path: /workstations/{workstationId}
   scope: venue
   permission: WORKSTATION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -20,12 +21,28 @@ operations:
   - cache:idempotency
   - platform.device
   - platform.workstation
+- operation: createOrgUnit
+  verb: POST
+  path: /org-units
+  scope: brand
+  permission: SCOPE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.org_unit
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.org_unit
 - operation: createOutlet
   verb: POST
   path: /outlets
   scope: venue
   permission: REGION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -38,7 +55,8 @@ operations:
   path: /sale-boards
   scope: venue
   permission: WORKSTATION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -46,20 +64,6 @@ operations:
   writes:
   - cache:idempotency
   - platform.sale_board
-- operation: createScopeNode
-  verb: POST
-  path: /scope-nodes
-  scope: brand
-  permission: SCOPE_MANAGE
-  audience: null
-  offline: false
-  reads:
-  - cache:idempotency
-  - platform.scope_node
-  writes:
-  - cache:idempotency
-  - cache:resolution
-  - platform.scope_node
 - operation: deployConfigurationProfile
   verb: POST
   path: /configuration-profiles/{profileId}/deploy
@@ -76,28 +80,30 @@ operations:
   - cache:idempotency
   - platform.profile_deployment
   - platform.workstation
+- operation: getOrgUnit
+  verb: GET
+  path: /org-units/{orgUnitId}
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - platform.org_unit
+  writes:
+  - cache:resolution
 - operation: getRegionSettings
   verb: GET
   path: /regions/{regionId}/settings
   scope: region
   permission: SCOPE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:resolution
   - platform.region_settings
-  writes:
-  - cache:resolution
-- operation: getScopeNode
-  verb: GET
-  path: /scope-nodes/{scopeNodeId}
-  scope: venue
-  permission: SCOPE_VIEW
-  audience: null
-  offline: false
-  reads:
-  - cache:resolution
-  - platform.scope_node
   writes:
   - cache:resolution
 - operation: getVenueSettings
@@ -117,7 +123,8 @@ operations:
   path: /workstations/{workstationId}
   scope: workstation
   permission: SCOPE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - platform.device
@@ -148,7 +155,7 @@ operations:
   - cache:idempotency
   - identity.principal
   - platform.audit_record
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - platform.audit_read
 - operation: listDevices
@@ -156,17 +163,32 @@ operations:
   path: /devices
   scope: venue
   permission: DEVICE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - platform.device
   writes: []
+- operation: listOrgUnits
+  verb: GET
+  path: /org-units
+  scope: tenant
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:resolution
+  - platform.org_unit
+  writes:
+  - cache:resolution
 - operation: listOutlets
   verb: GET
   path: /outlets
   scope: venue
   permission: SCOPE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - platform.outlet
@@ -176,29 +198,19 @@ operations:
   path: /sale-boards
   scope: venue
   permission: SCOPE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - platform.sale_board
   writes: []
-- operation: listScopeNodes
-  verb: GET
-  path: /scope-nodes
-  scope: tenant
-  permission: SCOPE_VIEW
-  audience: null
-  offline: false
-  reads:
-  - cache:resolution
-  - platform.scope_node
-  writes:
-  - cache:resolution
 - operation: listWorkstations
   verb: GET
   path: /workstations
   scope: venue
   permission: SCOPE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - platform.device
@@ -209,7 +221,8 @@ operations:
   path: /devices/{deviceId}/heartbeat
   scope: workstation
   permission: null
-  audience: null
+  audience:
+  - device
   offline: false
   reads:
   - platform.device
@@ -220,7 +233,8 @@ operations:
   path: /devices
   scope: venue
   permission: DEVICE_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -307,12 +321,28 @@ operations:
   - cache:idempotency
   - cache:resolution
   - platform.venue_settings
+- operation: updateOrgUnit
+  verb: PATCH
+  path: /org-units/{orgUnitId}
+  scope: brand
+  permission: SCOPE_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - cache:idempotency
+  - platform.org_unit
+  writes:
+  - cache:idempotency
+  - cache:resolution
+  - platform.org_unit
 - operation: updateOutlet
   verb: PATCH
   path: /outlets/{outletId}
   scope: venue
   permission: REGION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -325,7 +355,8 @@ operations:
   path: /regions/{regionId}/settings
   scope: region
   permission: REGION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -339,7 +370,8 @@ operations:
   path: /sale-boards/{saleBoardId}
   scope: venue
   permission: WORKSTATION_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -347,17 +379,3 @@ operations:
   writes:
   - cache:idempotency
   - platform.sale_board
-- operation: updateScopeNode
-  verb: PATCH
-  path: /scope-nodes/{scopeNodeId}
-  scope: brand
-  permission: SCOPE_MANAGE
-  audience: null
-  offline: false
-  reads:
-  - cache:idempotency
-  - platform.scope_node
-  writes:
-  - cache:idempotency
-  - cache:resolution
-  - platform.scope_node

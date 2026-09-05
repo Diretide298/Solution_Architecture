@@ -2,121 +2,127 @@ openapi: 3.1.0
 info:
   title: TICVAI — Approvals
   version: 1.0.0
-  x-ticvai-screen-count: 13
-  x-ticvai-module: "11 — Approval Workflows and Governance"
+  x-ticvai-screen-count: 34
+  x-ticvai-module: 11 — Approval Workflows and Governance
   x-ticvai-platforms:
-    - P04 POS
-    - P08 Venue Management
-    - P11 Accreditation Web
-  # Derived from screens/*.yaml on 18 August — every platform with a screen that calls an
-  # operation in this contract. **Six contracts declared none**, which the viewer reports as
-  # missing taxonomy and no package checker tested for.
+  - P04 POS
+  - P08 Venue Management
+  - P11 Accreditation Web
   x-ticvai-tier: spine
-  description: >
-    **One approval mechanism, not five.**
+  description: '**One approval mechanism, not five.**
 
-    Approval was implemented four times before this contract existed — refund thresholds, shift
-    variance, release promotion, manual discount — and a fifth was about to be written for AI
-    proposed actions. Each was correct in isolation and none shared a rule, an audit trail or a
-    delegation model, so "who approved this and why" had four different answers and "I am on
-    leave, route my approvals to Sara" had none.
+    Approval was implemented four times before this contract existed — refund thresholds, shift variance,
+    release promotion, manual discount — and a fifth was about to be written for AI proposed actions.
+    Each was correct in isolation and none shared a rule, an audit trail or a delegation model, so "who
+    approved this and why" had four different answers and "I am on leave, route my approvals to Sara"
+    had none.
 
-    This is the shared object those four collapse into. **The requesting contract does not
-    implement approval; it asks whether one is required, and blocks until it is granted.**
+    This is the shared object those four collapse into. **The requesting contract does not implement approval;
+    it asks whether one is required, and blocks until it is granted.**
 
     ## The four rules that are not configurable
 
-    **Segregation of duties.** A requester may never approve their own request (11.1.24). This
-    is enforced here, in the platform, not left to a workflow definition somebody might write
-    wrongly.
+    **Segregation of duties.** A requester may never approve their own request (11.1.24). This is enforced
+    here, in the platform, not left to a workflow definition somebody might write wrongly.
 
-    **A rejection carries a reason** (11.1.21). Without it a rejected request tells the
-    requester nothing and the analytics tell the business nothing.
+    **A rejection carries a reason** (11.1.21). Without it a rejected request tells the requester nothing
+    and the analytics tell the business nothing.
 
-    **A completed record is immutable** (11.1.56). Approvals are evidence. Amending one is not
-    a correction, it is a different fact, and reopening (11.1.54) creates a new decision linked
-    to the old rather than overwriting it.
+    **A completed record is immutable** (11.1.56). Approvals are evidence. Amending one is not a correction,
+    it is a different fact, and reopening (11.1.54) creates a new decision linked to the old rather than
+    overwriting it.
 
-    **Approval records an authorisation; it does not perform the action.** The requesting
-    contract executes, under the approver's permission, after the grant. An approval endpoint
-    that also executed would let a person authorise something they could not do themselves, and
-    the whole control depends on them being the same person.
+    **Approval records an authorisation; it does not perform the action.** The requesting contract executes,
+    under the approver''s permission, after the grant. An approval endpoint that also executed would let
+    a person authorise something they could not do themselves, and the whole control depends on them being
+    the same person.
 
     ## What routes a request
 
-    A matrix, resolved up the scope tree the way everything else resolves (ADR-0018): tenant
-    default, region override, venue override. Rules match on **value** (11.1.11),
-    **organisational level** (11.1.38–11.1.42) and **condition** (11.1.13), and the first
-    matching rule wins so that adding a rule cannot silently change an unrelated one.
+    A matrix, resolved up the scope tree the way everything else resolves (ADR-0018): tenant default,
+    region override, venue override. Rules match on **value** (11.1.11), **organisational level** (11.1.38–11.1.42)
+    and **condition** (11.1.13), and the first matching rule wins so that adding a rule cannot silently
+    change an unrelated one.
 
     ## Deliberately absent
 
-    **Risk scoring and AI recommendations** (11.1.12, 11.1.72–11.1.75) need history to score
-    against and are parked with the rest of the model-dependent AI. The routing rule accepts a
-    `riskScore` today and nothing supplies one — the field exists so that adding the engine
-    later is configuration rather than a schema change.
+    **Risk scoring and AI recommendations** (11.1.12, 11.1.72–11.1.75) need history to score against and
+    are parked with the rest of the model-dependent AI. The routing rule accepts a `riskScore` today and
+    nothing supplies one — the field exists so that adding the engine later is configuration rather than
+    a schema change.
+
+    '
   contact:
     name: TICVAI Platform
 servers:
-  - url: https://api.{region}.ticvai.com/approvals/v1
-    variables:
-      region:
-        default: ae
+- url: https://api.{region}.ticvai.com/approvals/v1
+  variables:
+    region:
+      default: ae
 security:
-  - bearerAuth: []
+- bearerAuth: []
 tags:
-  - name: request
-    description: Raising, deciding and tracking an approval
-  - name: matrix
-    description: What requires approval, and who grants it
-  - name: delegation
-    description: Standing in for an approver who is away
-  - name: analytics
-    description: Volumes, times and bottlenecks
+- name: request
+  description: Raising, deciding and tracking an approval
+- name: matrix
+  description: What requires approval, and who grants it
+- name: delegation
+  description: Standing in for an approver who is away
+- name: analytics
+  description: Volumes, times and bottlenecks
 paths:
-
   /approval-requests:
     get:
       operationId: listApprovalRequests
       x-ticvai-consumed-by:
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-085 Approval Request"
+        - "P09 ADM-145 Promotion Approval Inbox"
         - "P11 ACC-002 Registration Form"
         - "P11 ACC-005 Accreditation Badge"
         - "P11 ACC-007 Reviewer Application Detail"
-      x-ticvai-audience: [staff, public]
+      x-ticvai-audience:
+      - staff
+      - public
       summary: Requests awaiting a decision, or already decided
-      description: >
-        11.1.16. The approver's queue and the requester's history are the same list filtered
+      description: '11.1.16. The approver''s queue and the requester''s history are the same list filtered
         differently, so they are one operation.
 
-        Sorted by SLA proximity rather than age. **A request breaching in ten minutes matters
-        more than one raised yesterday with a week to run**, and sorting by age buries it.
-      tags: [request]
+        Sorted by SLA proximity rather than age. **A request breaching in ten minutes matters more than
+        one raised yesterday with a week to run**, and sorting by age buries it.
+
+        '
+      tags:
+      - request
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
-        - name: assignedToMe
-          in: query
-          schema: { type: boolean }
-        - name: raisedByMe
-          in: query
-          schema: { type: boolean }
-        - name: status
-          in: query
-          schema: { $ref: '#/components/schemas/ApprovalStatus' }
-        - name: kind
-          in: query
-          schema: { $ref: '#/components/schemas/ApprovalKind' }
-        - name: breachingWithinMinutes
-          in: query
-          description: 11.1.15. What is about to miss its SLA.
-          schema: { type: integer }
-        - $ref: '../shared/common.yaml#/components/parameters/PageSize'
-        - $ref: '../shared/common.yaml#/components/parameters/PageCursor'
+      - name: assignedToMe
+        in: query
+        schema:
+          type: boolean
+      - name: raisedByMe
+        in: query
+        schema:
+          type: boolean
+      - name: status
+        in: query
+        schema:
+          $ref: '#/components/schemas/ApprovalStatus'
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/ApprovalKind'
+      - name: breachingWithinMinutes
+        in: query
+        description: 11.1.15. What is about to miss its SLA.
+        schema:
+          type: integer
+      - $ref: ../shared/common.yaml#/components/parameters/PageSize
+      - $ref: ../shared/common.yaml#/components/parameters/PageCursor
       responses:
         '200':
           description: Requests
@@ -124,58 +130,63 @@ paths:
             application/json:
               schema:
                 allOf:
-                  - $ref: '../shared/common.yaml#/components/schemas/Page'
-                  - type: object
-                    properties:
+                - $ref: ../shared/common.yaml#/components/schemas/Page
+                - type: object
+                  properties:
+                    items:
+                      type: array
                       items:
-                        type: array
-                        items: { $ref: '#/components/schemas/ApprovalRequest' }
-
+                        $ref: '#/components/schemas/ApprovalRequest'
     post:
       operationId: createApprovalRequest
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-020 Shift Exceptions & Alerts"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Raise a request
-      description: >
-        Called by the contract that needs the authorisation, not by a person. `createRefund`
-        asks `evaluateApprovalRequirement` first, and where one is required it raises this and
-        holds the refund at `pendingApproval`.
+      description: 'Called by the contract that needs the authorisation, not by a person. `createRefund`
+        asks `evaluateApprovalRequirement` first, and where one is required it raises this and holds the
+        refund at `pendingApproval`.
 
-        **The subject is a reference, never a copy.** The request points at the order, the
-        shift or the proposed action; it does not embed it. A copy goes stale between raising
-        and deciding, and an approver reading a stale copy approves something that no longer
-        exists.
+        **The subject is a reference, never a copy.** The request points at the order, the shift or the
+        proposed action; it does not embed it. A copy goes stale between raising and deciding, and an
+        approver reading a stale copy approves something that no longer exists.
 
-        Draft is supported (11.1.51) for the case where a person raises it themselves and wants
-        to gather detail first.
-      tags: [request]
+        Draft is supported (11.1.51) for the case where a person raises it themselves and wants to gather
+        detail first.
+
+        '
+      tags:
+      - request
       x-ticvai-permission: APPROVAL_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/CreateApprovalRequest' }
+            schema:
+              $ref: '#/components/schemas/CreateApprovalRequest'
       responses:
         '201':
           description: Raised, and routed
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
         '409':
-          description: >
-            An open request already exists for this subject. Two approvals for one refund is
-            how a refund gets paid twice.
+          description: 'An open request already exists for this subject. Two approvals for one refund
+            is how a refund gets paid twice.
+
+            '
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /approval-requests/evaluate:
     post:
       operationId: evaluateApprovalRequirement
@@ -183,36 +194,44 @@ paths:
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-085 Approval Request"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Does this need approval, and from whom
-      description: >
-        **The operation every other contract calls.** It answers before the action, not after,
+      description: '**The operation every other contract calls.** It answers before the action, not after,
         so a cashier learns a discount needs a manager while the guest is still at the counter.
 
-        Returns the matching rule and the resolved approver chain, so the caller can say *"this
-        needs Sara, and she has four hours"* rather than *"this needs approval"*.
+        Returns the matching rule and the resolved approver chain, so the caller can say *"this needs
+        Sara, and she has four hours"* rather than *"this needs approval"*.
 
-        Read-only and deliberately cheap. It runs on the hot path — every refund, every
-        discount, every price override — and a slow answer here is a slow till.
-      tags: [request]
+        Read-only and deliberately cheap. It runs on the hot path — every refund, every discount, every
+        price override — and a slow answer here is a slow till.
+
+        '
+      tags:
+      - request
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: primary
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [kind, scopePath]
+              required:
+              - kind
+              - scopePath
               properties:
-                kind: { $ref: '#/components/schemas/ApprovalKind' }
-                scopePath: { type: string }
-                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                kind:
+                  $ref: '#/components/schemas/ApprovalKind'
+                scopePath:
+                  type: string
+                amount:
+                  $ref: ../shared/common.yaml#/components/schemas/Money
                 attributes:
                   type: object
                   additionalProperties: true
@@ -222,14 +241,16 @@ paths:
           description: Whether approval is required, and who would grant it
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalRequirement' }
-
+              schema:
+                $ref: '#/components/schemas/ApprovalRequirement'
   /approval-requests/{requestId}/decide:
     parameters:
-      - name: requestId
-        in: path
-        required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: decideApprovalRequest
       x-ticvai-consumed-by:
@@ -237,37 +258,47 @@ paths:
         - "P08 BO-084 Approval Inbox"
         - "P08 BO-085 Approval Request"
         - "P08 BO-133 Offline Alerts, Limits & Audit"
+        - "P09 ADM-145 Promotion Approval Inbox"
         - "P11 ACC-007 Reviewer Application Detail"
-      x-ticvai-audience: [staff, public]
+      x-ticvai-audience:
+      - staff
+      - public
       summary: Approve or reject
-      description: >
-        **Records an authorisation. Does not perform the action.** The requesting contract
-        executes afterwards under the approver's permission.
+      description: '**Records an authorisation. Does not perform the action.** The requesting contract
+        executes afterwards under the approver''s permission.
 
-        Refused where the approver is the requester (11.1.24), where they do not hold the
-        permission the rule demands, or where the rule requires MFA and the step-up token is
-        absent (11.1.60).
+        Refused where the approver is the requester (11.1.24), where they do not hold the permission the
+        rule demands, or where the rule requires MFA and the step-up token is absent (11.1.60).
 
-        A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.20) and
-        usually should — six months later the comment is the only record of why the exception
-        was allowed.
-      tags: [request]
+        A rejection requires a reason (11.1.21). An approval may carry a comment (11.1.20) and usually
+        should — six months later the comment is the only record of why the exception was allowed.
+
+        '
+      tags:
+      - request
       x-ticvai-permission: APPROVAL_DECIDE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [decision]
+              required:
+              - decision
               properties:
-                decision: { type: string, enum: [approve, reject] }
-                comment: { type: string, maxLength: 1000 }
+                decision:
+                  type: string
+                  enum:
+                  - approve
+                  - reject
+                comment:
+                  type: string
+                  maxLength: 1000
                 reason:
                   type: string
                   maxLength: 500
@@ -280,48 +311,57 @@ paths:
                   description: 11.1.57. Where the rule demands a digital signature.
       responses:
         '200':
-          description: >
-            Decided. On a multi-level chain the request advances to the next level rather than
-            completing.
+          description: 'Decided. On a multi-level chain the request advances to the next level rather
+            than completing.
+
+            '
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
         '403':
-          description: >
-            The approver is the requester, lacks the permission, or is not in the resolved
+          description: 'The approver is the requester, lacks the permission, or is not in the resolved
             chain.
+
+            '
           content:
             application/problem+json:
-              schema: { $ref: '#/components/schemas/ApprovalRefusedProblem' }
+              schema:
+                $ref: '#/components/schemas/ApprovalRefusedProblem'
         '409':
           description: Already decided, withdrawn or expired
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /approval-requests/{requestId}/withdraw:
     parameters:
-      - name: requestId
-        in: path
-        required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: withdrawApprovalRequest
       x-ticvai-consumed-by:
         - "P08 BO-085 Approval Request"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: The requester takes it back
-      description: >
-        11.1.22. Distinct from a rejection: nobody refused it, and the analytics must not read
-        it as one. A cashier who realises the discount is wrong should be able to pull the
-        request without it counting against the approver's rejection rate.
-      tags: [request]
+      description: '11.1.22. Distinct from a rejection: nobody refused it, and the analytics must not
+        read it as one. A cashier who realises the discount is wrong should be able to pull the request
+        without it counting against the approver''s rejection rate.
+
+        '
+      tags:
+      - request
       x-ticvai-permission: APPROVAL_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: false
         content:
@@ -329,113 +369,137 @@ paths:
             schema:
               type: object
               properties:
-                reason: { type: string, maxLength: 300 }
+                reason:
+                  type: string
+                  maxLength: 300
       responses:
         '200':
           description: Withdrawn
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalRequest' }
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
         '409':
           description: Already decided
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /approval-requests/{requestId}/escalate:
     parameters:
-      - name: requestId
-        in: path
-        required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: escalateApprovalRequest
       x-ticvai-consumed-by:
         - "P08 BO-084 Approval Inbox"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Move it up a level
-      description: >
-        11.1.5, 11.1.47. Usually automatic on an SLA breach; manual where a requester needs it
-        sooner.
+      description: '11.1.5, 11.1.47. Usually automatic on an SLA breach; manual where a requester needs
+        it sooner.
 
-        **Escalation adds an approver, it does not replace one.** The original remains in the
-        chain and the history keeps both, because "who was asked and did not answer" is the
-        question the escalation report exists to answer.
-      tags: [request]
+        **Escalation adds an approver, it does not replace one.** The original remains in the chain and
+        the history keeps both, because "who was asked and did not answer" is the question the escalation
+        report exists to answer.
+
+        '
+      tags:
+      - request
       x-ticvai-permission: APPROVAL_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [reason]
+              required:
+              - reason
               properties:
-                reason: { type: string, maxLength: 300 }
+                reason:
+                  type: string
+                  maxLength: 300
       responses:
         '200':
           description: Escalated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalRequest' }
-
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
   /approval-requests/{requestId}/resubmit:
     parameters:
-      - name: requestId
-        in: path
-        required: true
-        schema: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
+    - name: requestId
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
     post:
       operationId: resubmitApprovalRequest
       x-ticvai-consumed-by:
         - "P08 BO-085 Approval Request"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Amend a rejected request and try again
-      description: >
-        11.1.23. **Creates a new request linked to the rejected one** rather than reopening it,
-        so the rejection stays in the record. A request that was refused twice and granted on
-        the third attempt is a pattern worth being able to see.
-      tags: [request]
+      description: '11.1.23. **Creates a new request linked to the rejected one** rather than reopening
+        it, so the rejection stays in the record. A request that was refused twice and granted on the
+        third attempt is a pattern worth being able to see.
+
+        '
+      tags:
+      - request
       x-ticvai-permission: APPROVAL_REQUEST
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
             schema:
               type: object
-              required: [changes]
+              required:
+              - changes
               properties:
-                changes: { type: string, maxLength: 1000, description: What was changed in response to the rejection }
-                amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+                changes:
+                  type: string
+                  maxLength: 1000
+                  description: What was changed in response to the rejection
+                amount:
+                  $ref: ../shared/common.yaml#/components/schemas/Money
       responses:
         '201':
           description: A new request, linked to the rejected one
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalRequest' }
-
+              schema:
+                $ref: '#/components/schemas/ApprovalRequest'
   /approval-matrices:
     get:
       operationId: listApprovalMatrices
       x-ticvai-consumed-by:
         - "P08 BO-086 Approval Matrix"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: What requires approval here
-      description: >
-        11.1.38–11.1.42. Resolves up the scope tree: tenant default, region override, venue
-        override (ADR-0018). A venue may tighten a threshold and never loosen one — **a venue
-        that can raise its own refund limit is not a control.**
-      tags: [matrix]
+      description: '11.1.38–11.1.42. Resolves up the scope tree: tenant default, region override, venue
+        override (ADR-0018). A venue may tighten a threshold and never loosen one — **a venue that can
+        raise its own refund limit is not a control.**
+
+        '
+      tags:
+      - matrix
       x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
@@ -443,13 +507,16 @@ paths:
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: kind
-          in: query
-          schema: { $ref: '#/components/schemas/ApprovalKind' }
-        - name: effective
-          in: query
-          description: Show the resolved matrix as it applies here, rather than the rules set at this level.
-          schema: { type: boolean, default: false }
+      - name: kind
+        in: query
+        schema:
+          $ref: '#/components/schemas/ApprovalKind'
+      - name: effective
+        in: query
+        description: Show the resolved matrix as it applies here, rather than the rules set at this level.
+        schema:
+          type: boolean
+          default: false
       responses:
         '200':
           description: Matrices
@@ -457,58 +524,66 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/ApprovalMatrix' }
-
+                items:
+                  $ref: '#/components/schemas/ApprovalMatrix'
     put:
       operationId: setApprovalMatrix
       x-ticvai-consumed-by:
         - "P08 BO-086 Approval Matrix"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Configure what requires approval
-      description: >
-        11.1.2. Rules are ordered and **the first match wins**, so adding a rule cannot silently
-        change an unrelated one. A matrix with overlapping unordered rules is a matrix nobody
-        can reason about, and the ordering is the thing that makes it reviewable.
+      description: '11.1.2. Rules are ordered and **the first match wins**, so adding a rule cannot silently
+        change an unrelated one. A matrix with overlapping unordered rules is a matrix nobody can reason
+        about, and the ordering is the thing that makes it reviewable.
 
-        Changing a matrix creates a version (11.1.80). Requests in flight keep the version they
-        were raised under — **a request must be decided by the rules it was raised under**, or
-        an approver is answering a question that changed while they read it.
-      tags: [matrix]
+        Changing a matrix creates a version (11.1.80). Requests in flight keep the version they were raised
+        under — **a request must be decided by the rules it was raised under**, or an approver is answering
+        a question that changed while they read it.
+
+        '
+      tags:
+      - matrix
       x-ticvai-permission: APPROVAL_CONFIGURE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ApprovalMatrix' }
+            schema:
+              $ref: '#/components/schemas/ApprovalMatrix'
       responses:
         '200':
           description: Set, as a new version
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalMatrix' }
+              schema:
+                $ref: '#/components/schemas/ApprovalMatrix'
         '409':
-          description: >
-            The matrix would loosen a rule set at a higher scope, or a rule is unreachable
+          description: 'The matrix would loosen a rule set at a higher scope, or a rule is unreachable
             behind an earlier one.
+
+            '
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /delegations:
     get:
       operationId: listApprovalDelegations
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Who is standing in for whom
       description: 11.1.8–11.1.10.
-      tags: [delegation]
+      tags:
+      - delegation
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -521,107 +596,1037 @@ paths:
             application/json:
               schema:
                 type: array
-                items: { $ref: '#/components/schemas/ApprovalDelegation' }
-
+                items:
+                  $ref: '#/components/schemas/ApprovalDelegation'
     post:
       operationId: createApprovalDelegation
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Delegate approval authority
-      description: >
-        11.1.9. **Always time-bounded.** An open-ended delegation is an approver who quietly
+      description: '11.1.9. **Always time-bounded.** An open-ended delegation is an approver who quietly
         stopped approving months ago and a delegate who does not know they still hold it.
 
-        The delegate cannot exceed the delegator's own authority, and **cannot approve a request
-        the delegator raised** — segregation of duties survives delegation, or delegation
-        becomes the way around it.
-      tags: [delegation]
+        The delegate cannot exceed the delegator''s own authority, and **cannot approve a request the
+        delegator raised** — segregation of duties survives delegation, or delegation becomes the way
+        around it.
+
+        '
+      tags:
+      - delegation
       x-ticvai-permission: APPROVAL_DECIDE
-      x-ticvai-permission-escalated: APPROVAL_DELEGATE   # delegating is distinct from deciding — CF-59a
+      x-ticvai-permission-escalated: APPROVAL_DELEGATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       requestBody:
         required: true
         content:
           application/json:
-            schema: { $ref: '#/components/schemas/ApprovalDelegation' }
+            schema:
+              $ref: '#/components/schemas/ApprovalDelegation'
       responses:
         '201':
           description: Delegated
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalDelegation' }
+              schema:
+                $ref: '#/components/schemas/ApprovalDelegation'
         '403':
           description: The delegate does not hold the permission being delegated
           content:
             application/problem+json:
-              schema: { $ref: '../shared/common.yaml#/components/schemas/Problem' }
-
+              schema:
+                $ref: ../shared/common.yaml#/components/schemas/Problem
   /delegations/{delegationId}:
     parameters:
-      - name: delegationId
-        in: path
-        required: true
-        schema: { type: string, format: uuid }
+    - name: delegationId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
     delete:
       operationId: revokeApprovalDelegation
       x-ticvai-consumed-by:
         - "P08 BO-087 Approval Delegations"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: End a delegation early
-      description: >
-        Requests already routed to the delegate stay with them. **Re-routing in flight would
+      description: 'Requests already routed to the delegate stay with them. **Re-routing in flight would
         leave a request assigned to nobody** while the original approver is still away.
-      tags: [delegation]
+
+        '
+      tags:
+      - delegation
       x-ticvai-permission: APPROVAL_DECIDE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
-        - $ref: '../shared/common.yaml#/components/parameters/IdempotencyKey'
+      - $ref: ../shared/common.yaml#/components/parameters/IdempotencyKey
       responses:
         '204':
           description: Revoked
-        '404': { $ref: '../shared/common.yaml#/components/responses/NotFound' }
-
+        '404':
+          $ref: ../shared/common.yaml#/components/responses/NotFound
   /approval-analytics:
     get:
       operationId: getApprovalAnalytics
       x-ticvai-consumed-by:
         - "P08 BO-088 Approval Analytics"
-      x-ticvai-audience: [staff]
+      x-ticvai-audience:
+      - staff
       summary: Volumes, times, rejections and bottlenecks
-      description: >
-        11.1.27, 11.1.67–11.1.71. Volume, median and p95 decision time, rejection rate,
-        escalation rate and SLA breach rate, by kind, approver, venue and period.
+      description: '11.1.27, 11.1.67–11.1.71. Volume, median and p95 decision time, rejection rate, escalation
+        rate and SLA breach rate, by kind, approver, venue and period.
 
-        **Bottleneck analysis is the useful part** (11.1.69): the approver whose queue is
-        always breaching is usually a person with a day job, not a person who is slow, and the
-        fix is the matrix rather than the person.
-      tags: [analytics]
+        **Bottleneck analysis is the useful part** (11.1.69): the approver whose queue is always breaching
+        is usually a person with a day job, not a person who is slow, and the fix is the matrix rather
+        than the person.
+
+        '
+      tags:
+      - analytics
       x-ticvai-permission: APPROVAL_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: analytical
       parameters:
-        - name: from
-          in: query
-          schema: { type: string, format: date }
-        - name: groupBy
-          in: query
-          schema: { type: string, enum: [kind, approver, venue, day, week] }
+      - name: from
+        in: query
+        schema:
+          type: string
+          format: date
+      - name: groupBy
+        in: query
+        schema:
+          type: string
+          enum:
+          - kind
+          - approver
+          - venue
+          - day
+          - week
       responses:
         '200':
           description: Analytics
           content:
             application/json:
-              schema: { $ref: '#/components/schemas/ApprovalAnalytics' }
+              schema:
+                $ref: '#/components/schemas/ApprovalAnalytics'
+  /accreditation-badges:
+    get:
+      operationId: listAccreditationBadges
+      x-ticvai-consumed-by:
+        - "P11 ACC-005 Accreditation Badge"
+      x-ticvai-audience:
+      - staff
+      summary: Badges issued and their state
+      description: '**Drafted 4 September as a stub.** ACC-005 *Accreditation Badge* sat on `listApprovalRequests` alone, identical to the registration form. **An approval is the decision; a badge is the credential that decision produces**, and they have different lifetimes - a badge is revoked without the approval being reversed. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
 
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Badges issued and their state
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AccreditationBadge'
+    post:
+      operationId: issueAccreditationBadge
+      x-ticvai-audience:
+      - staff
+      summary: Issue a badge
+      description: '**Drafted 4 September as a stub.** **Issuing is separate from approving on purpose.** An approved application whose badge was never collected is a normal state, and collapsing the two loses it. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+
+        '
+      tags:
+      - approvals
+      x-ticvai-permission: APPROVAL_ACT
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccreditationBadge'
+      responses:
+        '200':
+          description: Issue a badge
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccreditationBadge'
+  /rule-workflow:
+    get:
+      operationId: listRuleWorkflow
+      x-ticvai-consumed-by:
+        - P09 ADM-238 Rules & Workflow Command Center
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Rules & Workflow Command Center
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 5. The screen says: Provide administrators
+        with a centralized portfolio of all business rules, workflows, approvals and automations configured
+        across TICVAI.
+
+
+        **Every property carries the sentence it came from.** 30 were read from the screen''s own bulleted
+        directory and 9 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Rules & Workflow Command Center
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RulesWorkflowCommandCenterView'
+  /visual-business-rule:
+    put:
+      operationId: setVisualBusinessRule
+      x-ticvai-consumed-by:
+        - P09 ADM-239 Visual Business Rule Builder
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Visual Business Rule Builder
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 6. The screen says: Allow administrators to
+        create business rules without software development.
+
+
+        **Every property carries the sentence it came from.** 9 were read from the screen''s own bulleted
+        directory and 15 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-config-scope: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisualBusinessRuleBuilderInput'
+      responses:
+        '200':
+          description: Visual Business Rule Builder
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisualBusinessRuleBuilderView'
+  /condition-decision-logic:
+    get:
+      operationId: listConditionDecisionLogic
+      x-ticvai-consumed-by:
+        - P09 ADM-240 Conditions, Decision Logic & Decision Tables
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Conditions, Decision Logic & Decision Tables
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 8. The screen says: Configure advanced decision
+        logic where simple IF/THEN rules are insufficient.
+
+
+        **Every property carries the sentence it came from.** 13 were read from the screen''s own bulleted
+        directory and 18 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Conditions, Decision Logic & Decision Tables
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ConditionsDecisionLogicDecisionTablesView'
+  /visual-workflow:
+    put:
+      operationId: setVisualWorkflow
+      x-ticvai-consumed-by:
+        - P09 ADM-241 Visual Workflow Designer
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Visual Workflow Designer
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 10. The screen says: Allow administrators
+        to visually design complete business processes.
+
+
+        **Every property carries the sentence it came from.** 25 were read from the screen''s own bulleted
+        directory and 9 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VisualWorkflowDesignerInput'
+      responses:
+        '200':
+          description: Visual Workflow Designer
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VisualWorkflowDesignerView'
+  /matrix-multi-level:
+    put:
+      operationId: approveMatrixMultiLevel
+      x-ticvai-consumed-by:
+        - P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Approval Matrix & Multi-Level Approval Configuration
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 11. The screen says: Configure when approvals
+        are required and who must approve.
+
+
+        **Every property carries the sentence it came from.** 32 were read from the screen''s own bulleted
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationInput'
+      responses:
+        '200':
+          description: Approval Matrix & Multi-Level Approval Configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApprovalMatrixMultiLevelApprovalConfigurationView'
+  /role-authority-delegation:
+    put:
+      operationId: approveRoleAuthorityDelegation
+      x-ticvai-consumed-by:
+        - P09 ADM-243 Roles, Authority, Delegation & Approval Limits
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Roles, Authority, Delegation & Approval Limits
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 13. The screen says: Define who has authority
+        to perform or approve specific actions. This should work with TICVAI RBAC/PBAC rather than replace
+        it.
+
+
+        **Every property carries the sentence it came from.** 24 were read from the screen''s own bulleted
+        directory and 14 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsInput'
+      responses:
+        '200':
+          description: Roles, Authority, Delegation & Approval Limits
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RolesAuthorityDelegationApprovalLimitsView'
+  /sla-escalation-reminder:
+    get:
+      operationId: listSlaEscalationReminder
+      x-ticvai-consumed-by:
+        - P09 ADM-244 SLA, Escalation, Reminder & Timeout Rules
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: SLA, Escalation, Reminder & Timeout Rules
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 14. The screen says: Define how workflows
+        behave when people or systems do not act within the expected time.
+
+
+        **Every property carries the sentence it came from.** 17 were read from the screen''s own bulleted
+        directory and 12 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: SLA, Escalation, Reminder & Timeout Rules
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SlaEscalationReminderTimeoutRulesView'
+  /trigger-action-cross:
+    put:
+      operationId: setTriggerActionCross
+      x-ticvai-consumed-by:
+        - P09 ADM-245 Trigger, Action & Cross-Module Orchestration Configuration
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Trigger, Action & Cross-Module Orchestration Configuration
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 16. The screen says: Define what starts a
+        workflow and what TICVAI services may be called during execution.
+
+
+        **Every property carries the sentence it came from.** 18 were read from the screen''s own bulleted
+        directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TriggerActionCrossModuleOrchestrationConfigurationInput'
+      responses:
+        '200':
+          description: Trigger, Action & Cross-Module Orchestration Configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TriggerActionCrossModuleOrchestrationConfigurationView'
+  /workflow-testing-impact:
+    put:
+      operationId: simulateWorkflowTestingImpact
+      x-ticvai-consumed-by:
+        - P09 ADM-246 Workflow Testing, Simulation & Impact Analysis
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Workflow Testing, Simulation & Impact Analysis
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 18. The screen says: Allow administrators
+        to test rules and workflows before they affect live operations. This is a critical screen.
+
+
+        **Every property carries the sentence it came from.** 17 were read from the screen''s own bulleted
+        directory and 19 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WorkflowTestingSimulationImpactAnalysisInput'
+      responses:
+        '200':
+          description: Workflow Testing, Simulation & Impact Analysis
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkflowTestingSimulationImpactAnalysisView'
+  /versioning-governance:
+    put:
+      operationId: approveVersioningGovernance
+      x-ticvai-consumed-by:
+        - P09 ADM-247 Versioning, Governance, Approval & Publication
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Versioning, Governance, Approval & Publication
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 19. The screen says: Control how rules and
+        workflows move safely from configuration into production.
+
+
+        **Every property carries the sentence it came from.** 32 were read from the screen''s own bulleted
+        directory and 71 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VersioningGovernanceApprovalPublicationInput'
+      responses:
+        '200':
+          description: Versioning, Governance, Approval & Publication
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VersioningGovernanceApprovalPublicationView'
+  /workflow:
+    get:
+      operationId: listWorkflow
+      x-ticvai-consumed-by:
+        - P09 ADM-248 Workflow Operations Command Center
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Workflow Operations Command Center
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 23. The screen says: Provide administrators
+        and operational managers with a real-time view of all workflow activity across TICVAI.
+
+
+        **Every property carries the sentence it came from.** 37 were read from the screen''s own bulleted
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Workflow Operations Command Center
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkflowOperationsCommandCenterView'
+  /unified-decision:
+    put:
+      operationId: approveUnifiedDecision
+      x-ticvai-consumed-by:
+        - P09 ADM-249 Unified Approval Inbox & Decision Workspace
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Unified Approval Inbox & Decision Workspace
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 25. The screen says: Provide users with one
+        approval inbox across all TICVAI modules. This is extremely important. A manager should not need
+        to open Finance for one approval, Pricing for another, Procurement for another, and Customer Service
+        for another.
+
+
+        **Every property carries the sentence it came from.** 16 were read from the screen''s own bulleted
+        directory and 13 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UnifiedApprovalInboxDecisionWorkspaceInput'
+      responses:
+        '200':
+          description: Unified Approval Inbox & Decision Workspace
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnifiedApprovalInboxDecisionWorkspaceView'
+  /workflow-instance-process:
+    get:
+      operationId: listWorkflowInstanceProcess
+      x-ticvai-consumed-by:
+        - P09 ADM-250 Workflow Instance Monitor & Process Timeline
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Workflow Instance Monitor & Process Timeline
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 27. The screen says: Allow administrators
+        to inspect exactly what is happening inside an individual running workflow.
+
+
+        **Every property carries the sentence it came from.** 31 were read from the screen''s own bulleted
+        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Workflow Instance Monitor & Process Timeline
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkflowInstanceMonitorProcessTimelineView'
+  /workflow-exception-failure:
+    get:
+      operationId: listWorkflowExceptionFailure
+      x-ticvai-consumed-by:
+        - P09 ADM-251 Workflow Exception, Failure & Recovery Center
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Workflow Exception, Failure & Recovery Center
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 28. The screen says: Provide one controlled
+        workspace for failed workflow executions.
+
+
+        **Every property carries the sentence it came from.** 24 were read from the screen''s own bulleted
+        directory and 8 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Workflow Exception, Failure & Recovery Center
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkflowExceptionFailureRecoveryCenterView'
+  /sla-escalation-bottleneck:
+    get:
+      operationId: listSlaEscalationBottleneck
+      x-ticvai-consumed-by:
+        - P09 ADM-252 SLA, Escalation & Bottleneck Monitor
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: SLA, Escalation & Bottleneck Monitor
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 30. The screen says: Monitor workflows approaching
+        or exceeding configured time limits.
+
+
+        **Every property carries the sentence it came from.** 29 were read from the screen''s own bulleted
+        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: SLA, Escalation & Bottleneck Monitor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SlaEscalationBottleneckMonitorView'
+  /automation-autonomou-action:
+    post:
+      operationId: createAutomationAutonomouAction
+      x-ticvai-consumed-by:
+        - P09 ADM-253 Automation Execution & Autonomous Action Monitor
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Automation Execution & Autonomous Action Monitor
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 31. The screen says: Provide visibility and
+        governance over actions executed automatically by TICVAI. This becomes especially important as
+        TICVAI becomes more AI-driven.
+
+
+        **Every property carries the sentence it came from.** 24 were read from the screen''s own bulleted
+        directory and 6 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a request, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_REQUEST
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: primary
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AutomationExecutionAutonomousActionMonitorInput'
+      responses:
+        '200':
+          description: Automation Execution & Autonomous Action Monitor
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AutomationExecutionAutonomousActionMonitorView'
+  /cross-module-orchestration:
+    get:
+      operationId: listCrossModuleOrchestration
+      x-ticvai-consumed-by:
+        - P09 ADM-254 Cross-Module Orchestration Monitor
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Cross-Module Orchestration Monitor
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 33. The screen says: Monitor complex workflows
+        involving multiple TICVAI services. Example — Group Booking Confirmation
+
+
+        **Every property carries the sentence it came from.** 17 were read from the screen''s own bulleted
+        directory and 10 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Cross-Module Orchestration Monitor
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CrossModuleOrchestrationMonitorView'
+  /workflow-process-performance:
+    get:
+      operationId: listWorkflowProcessPerformance
+      x-ticvai-consumed-by:
+        - P09 ADM-255 Workflow Analytics & Process Performance
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Workflow Analytics & Process Performance
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 34. The screen says: Measure how effectively
+        TICVAI''s business workflows are performing.
+
+
+        **Every property carries the sentence it came from.** 21 were read from the screen''s own bulleted
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      parameters:
+        - name: workflow
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Workflow
+        - name: module
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Module
+        - name: venue
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Venue
+        - name: brand
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Brand
+        - name: businessProcess
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Business Process
+        - name: department
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Department
+        - name: approver
+          in: query
+          required: false
+          schema:
+            type: string
+          description: Approver
+        - name: user
+          in: query
+          required: false
+          schema:
+            type: string
+          description: User
+      responses:
+        '200':
+          description: Workflow Analytics & Process Performance
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkflowAnalyticsProcessPerformanceView'
+  /process-automation-opportunity:
+    get:
+      operationId: listProcessAutomationOpportunity
+      x-ticvai-consumed-by:
+        - P09 ADM-256 Process Optimization & Automation Opportunity Center
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: Process Optimization & Automation Opportunity Center
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 36. The screen says: Identify business processes
+        that should be simplified, redesigned or automated. This is where TICVAI moves beyond simply running
+        workflows.
+
+
+        **Every property carries the sentence it came from.** 20 were read from the screen''s own bulleted
+        directory and 11 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: Process Optimization & Automation Opportunity Center
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ProcessOptimizationAutomationOpportunityCenterView'
+  /workflow-autonomou-governance:
+    get:
+      operationId: listWorkflowAutonomouGovernance
+      x-ticvai-consumed-by:
+        - P09 ADM-257 AI Workflow Intelligence & Autonomous Governance Center
+      x-ticvai-audience:
+        - staff
+      x-ticvai-provisional: true
+      summary: AI Workflow Intelligence & Autonomous Governance Center
+      description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
+        Rules  Workflow  Approval   Automation Engine, page 37. The screen says: Create the AI intelligence
+        layer across TICVAI''s entire rules, workflow and automation ecosystem. This is the management-level
+        AI brain for Area 13.
+
+
+        **Every property carries the sentence it came from.** 29 were read from the screen''s own bulleted
+        directory and 75 bullets were dropped as prose, examples or hierarchy illustrations rather than
+        bent into fields. Names and types are this package''s reading of those sentences and are the part
+        to check; the sentences themselves are the client''s.
+
+
+        **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
+        it, and the schema says so in its own persistence tag: it is a projection, not a table.'
+      tags:
+        - drafted
+      x-ticvai-permission: APPROVAL_VIEW
+      x-ticvai-scope-level: venue
+      x-ticvai-offline-capable: false
+      x-ticvai-conflict-policy: serverWins
+      x-ticvai-read-routing: replica
+      responses:
+        '200':
+          description: AI Workflow Intelligence & Autonomous Governance Center
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/AiWorkflowIntelligenceAutonomousGovernanceCenterView'
 components:
   securitySchemes:
     bearerAuth:
@@ -629,68 +1634,146 @@ components:
       scheme: bearer
       bearerFormat: JWT
   schemas:
+    DraftedRecord:
+      type: object
+      x-ticvai-provisional: true
+      description: '**A provisional envelope, drafted 2026-09-04 from the workshop pack.** It carries what
+        every one of these screens needs to address a row and nothing it has not earned. **There is
+        deliberately no `x-ticvai-persistence`** - naming a table here would put a storage decision
+        nobody made into the ER model and the DDL.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        state:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+    AccreditationBadge:
+      type: object
+      x-ticvai-persistence: approvals.accreditation_badge
+      description: '**Drafted 4 September.** The credential an approved application produces. **Its
+        lifetime is not the approval''s** - a badge is revoked, lost or expires while the decision
+        that authorised it still stands.'
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          format: uuid
+        approvalRequestId:
+          type: string
+          format: uuid
+        holderName:
+          type: string
+        zones:
+          type: array
+          items:
+            type: string
+          description: Where this badge admits, which is the whole point of it.
+        state:
+          type: string
+          enum:
+          - issued
+          - collected
+          - suspended
+          - revoked
+          - expired
+        issuedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        revokedReason:
+          type: string
     ApprovalKind:
       type: string
-      description: >
-        11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations**
+      description: '11.1.7 and 11.1.30–11.1.37. **The first four already exist as bespoke implementations**
         and this contract is what they collapse into.
-      enum:
-        - refund
-        - priceOverride
-        - discountOverride
-        - complimentaryTicket
-        - membershipCancellation
-        - accessPermissionChange
-        - configurationChange
-        - aiRecommendation
-        - shiftVariance
-        - releasePromotion
-        - requisition
-        - stockWriteOff
-        - journalEntry
-        - periodReopen
-        - tenantMigration
 
+        '
+      enum:
+      - refund
+      - priceOverride
+      - discountOverride
+      - complimentaryTicket
+      - membershipCancellation
+      - accessPermissionChange
+      - configurationChange
+      - aiRecommendation
+      - shiftVariance
+      - releasePromotion
+      - requisition
+      - stockWriteOff
+      - journalEntry
+      - periodReopen
+      - tenantMigration
     ApprovalStatus:
       type: string
-      enum: [draft, pending, escalated, approved, rejected, withdrawn, expired, cancelled]
-
+      enum:
+      - draft
+      - pending
+      - escalated
+      - approved
+      - rejected
+      - withdrawn
+      - expired
+      - cancelled
     ApprovalMode:
       type: string
-      description: >
-        11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at once,
-        **consensus** needs all of them, **majority** needs more than half.
+      description: '11.1.43–11.1.46. **Sequential** asks one at a time, **parallel** asks everyone at
+        once, **consensus** needs all of them, **majority** needs more than half.
 
-        Parallel and consensus differ in when it completes: parallel completes on the first
-        approval, consensus waits for all. Conflating them is how a four-eyes rule turns into a
-        one-eye rule.
-      enum: [sequential, parallel, consensus, majority]
+        Parallel and consensus differ in when it completes: parallel completes on the first approval,
+        consensus waits for all. Conflating them is how a four-eyes rule turns into a one-eye rule.
 
+        '
+      enum:
+      - sequential
+      - parallel
+      - consensus
+      - majority
     ApprovalRule:
       type: object
-      x-ticvai-persistence: "approvals.rule"
-      required: [order, approverRoleIds, mode]
+      x-ticvai-persistence: approvals.rule
+      required:
+      - order
+      - approverRoleIds
+      - mode
       properties:
         id:
           type: string
           format: uuid
           readOnly: true
-          description: >
-            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
+          description: '**Added 20 August.** The schema reference derives table columns from API response
+            schemas, and a response is not a table — this one returned everything a caller needs and not
+            the row''s own identity, so the table had no key and no row could be addressed, updated or
+            deleted. Found by an audit of all 365 tables, not by a reader.
+
+            '
         order:
           type: integer
-          description: >
-            **First match wins.** Explicit ordering is what makes a matrix reviewable — an
+          description: '**First match wins.** Explicit ordering is what makes a matrix reviewable — an
             unordered set of overlapping rules is one nobody can reason about.
-        minAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        maxAmount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
+
+            '
+        minAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        maxAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
         riskScoreAbove:
           type: number
           nullable: true
-          description: >
-            11.1.12. **Nothing supplies this yet** — risk scoring is parked with the
-            model-dependent AI. The field exists so adding the engine later is configuration
-            rather than a schema change.
+          description: '11.1.12. **Nothing supplies this yet** — risk scoring is parked with the model-dependent
+            AI. The field exists so adding the engine later is configuration rather than a schema change.
+
+            '
         condition:
           type: string
           nullable: true
@@ -698,150 +1781,248 @@ components:
         approverRoleIds:
           type: array
           minItems: 1
-          items: { type: string, format: uuid }
+          items:
+            type: string
+            format: uuid
         approverScopeLevel:
           type: string
-          enum: [venue, department, region, tenant]
+          enum:
+          - venue
+          - department
+          - region
+          - tenant
           description: 11.1.39. Which organisational level the approver must sit at.
-        mode: { $ref: '#/components/schemas/ApprovalMode' }
+        mode:
+          $ref: '#/components/schemas/ApprovalMode'
         levels:
           type: integer
           default: 1
           description: 11.1.3. Multi-level chains ask each level in turn.
-        requiresMfa: { type: boolean, default: false }
-        requiresSignature: { type: boolean, default: false }
+        requiresMfa:
+          type: boolean
+          default: false
+        requiresSignature:
+          type: boolean
+          default: false
         slaMinutes:
           type: integer
           nullable: true
           description: 11.1.14. Null means no SLA, which is different from a long one.
-        escalateAfterMinutes: { type: integer, nullable: true }
+        escalateAfterMinutes:
+          type: integer
+          nullable: true
         escalateToRoleIds:
           type: array
-          items: { type: string, format: uuid }
+          items:
+            type: string
+            format: uuid
         expiresAfterMinutes:
           type: integer
           nullable: true
           description: 11.1.53. An unanswered request eventually stops waiting.
-
     ApprovalMatrix:
       type: object
-      x-ticvai-persistence: "approvals.matrix"
-      required: [kind, scopeLevel, rules]
-      properties:
-        id: { type: string, format: uuid, readOnly: true }
-        kind: { $ref: '#/components/schemas/ApprovalKind' }
-        scopeLevel: { type: string, enum: [tenant, region, venue] }
-        scopePath: { type: string, readOnly: true }
-        version:
-          type: integer
-          readOnly: true
-          description: >
-            11.1.80. **A request is decided by the rules it was raised under.** Changing the
-            matrix mid-flight would mean an approver answering a question that changed while
-            they read it.
-        rules:
-          type: array
-          items: { $ref: '#/components/schemas/ApprovalRule' }
-        isActive: { type: boolean }
-
-    ApprovalRequirement:
-      type: object
-      x-ticvai-persistence: "none — computed"
-      description: The answer to "does this need approval", returned before the action.
-      required: [isRequired]
-      properties:
-        isRequired: { type: boolean }
-        matchedRule:
-          allOf:
-            - $ref: '#/components/schemas/ApprovalRule'
-          nullable: true
-        matrixVersion: { type: integer, nullable: true }
-        approvers:
-          type: array
-          description: >
-            Resolved, with delegations applied. **Named so the caller can say "this needs Sara"**
-            rather than "this needs approval".
-          items:
-            type: object
-            properties:
-              principalId: { type: string, format: uuid }
-              displayName: { type: string }
-              level: { type: integer }
-              isDelegate: { type: boolean }
-              delegatedFrom: { type: string, format: uuid, nullable: true }
-        slaMinutes: { type: integer, nullable: true }
-        noApproverAvailable:
-          type: boolean
-          description: >
-            **The case that must not fail silently.** A rule requiring a role nobody at this
-            venue holds means the action is blocked forever, and the caller needs to know that
-            now rather than after raising a request nobody can decide.
-
-    CreateApprovalRequest:
-      type: object
-      x-ticvai-persistence: "none — request only"
-      required: [id, kind, subjectContract, subjectType, subjectId, scopePath, summary]
-      properties:
-        id: { type: string, pattern: '^[0-9A-HJKMNP-TV-Z]{26}$' }
-        kind: { $ref: '#/components/schemas/ApprovalKind' }
-        subjectContract:
-          type: string
-          description: Which contract owns the thing being approved.
-        subjectType: { type: string }
-        subjectId:
-          type: string
-          description: >
-            **A reference, never a copy.** A copy goes stale between raising and deciding, and
-            an approver reading a stale copy approves something that no longer exists.
-        scopePath: { type: string }
-        summary:
-          type: string
-          maxLength: 300
-          description: What the approver sees in their queue before opening it.
-        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        attributes:
-          type: object
-          additionalProperties: true
-        justification: { type: string, maxLength: 1000 }
-        isDraft: { type: boolean, default: false }
-
-    ApprovalDecision:
-      type: object
-      x-ticvai-persistence: "approvals.decision"
-      required: [level, principalId, decision, decidedAt]
+      x-ticvai-persistence: approvals.matrix
+      required:
+      - kind
+      - scopeLevel
+      - rules
       properties:
         id:
           type: string
           format: uuid
           readOnly: true
-          description: >
-            **Added 20 August.** The schema reference derives table columns from API response schemas, and a response is not a table — this one returned everything a caller needs and not the row's own identity, so the table had no key and no row could be addressed, updated or deleted. Found by an audit of all 365 tables, not by a reader.
-        level: { type: integer }
-        principalId: { type: string, format: uuid }
-        displayName: { type: string }
-        isDelegate: { type: boolean }
-        delegatedFrom: { type: string, format: uuid, nullable: true }
-        decision: { type: string, enum: [approve, reject] }
-        comment: { type: string, nullable: true }
-        reason: { type: string, nullable: true }
-        usedMfa: { type: boolean }
-        signatureRef: { type: string, nullable: true }
-        decidedAt: { type: string, format: date-time }
+        kind:
+          $ref: '#/components/schemas/ApprovalKind'
+        scopeLevel:
+          type: string
+          enum:
+          - tenant
+          - region
+          - venue
+        scopePath:
+          type: string
+          readOnly: true
+        version:
+          type: integer
+          readOnly: true
+          description: '11.1.80. **A request is decided by the rules it was raised under.** Changing the
+            matrix mid-flight would mean an approver answering a question that changed while they read
+            it.
 
+            '
+        rules:
+          type: array
+          items:
+            $ref: '#/components/schemas/ApprovalRule'
+        isActive:
+          type: boolean
+    ApprovalRequirement:
+      type: object
+      x-ticvai-persistence: none — computed
+      description: The answer to "does this need approval", returned before the action.
+      required:
+      - isRequired
+      properties:
+        isRequired:
+          type: boolean
+        matchedRule:
+          allOf:
+          - $ref: '#/components/schemas/ApprovalRule'
+          nullable: true
+        matrixVersion:
+          type: integer
+          nullable: true
+        approvers:
+          type: array
+          description: 'Resolved, with delegations applied. **Named so the caller can say "this needs
+            Sara"** rather than "this needs approval".
+
+            '
+          items:
+            type: object
+            properties:
+              principalId:
+                type: string
+                format: uuid
+              displayName:
+                type: string
+              level:
+                type: integer
+              isDelegate:
+                type: boolean
+              delegatedFrom:
+                type: string
+                format: uuid
+                nullable: true
+        slaMinutes:
+          type: integer
+          nullable: true
+        noApproverAvailable:
+          type: boolean
+          description: '**The case that must not fail silently.** A rule requiring a role nobody at this
+            venue holds means the action is blocked forever, and the caller needs to know that now rather
+            than after raising a request nobody can decide.
+
+            '
+    CreateApprovalRequest:
+      type: object
+      x-ticvai-persistence: none — request only
+      required:
+      - id
+      - kind
+      - subjectContract
+      - subjectType
+      - subjectId
+      - scopePath
+      - summary
+      properties:
+        id:
+          type: string
+          pattern: ^[0-9A-HJKMNP-TV-Z]{26}$
+        kind:
+          $ref: '#/components/schemas/ApprovalKind'
+        subjectContract:
+          type: string
+          description: Which contract owns the thing being approved.
+        subjectType:
+          type: string
+        subjectId:
+          type: string
+          description: '**A reference, never a copy.** A copy goes stale between raising and deciding,
+            and an approver reading a stale copy approves something that no longer exists.
+
+            '
+        scopePath:
+          type: string
+        summary:
+          type: string
+          maxLength: 300
+          description: What the approver sees in their queue before opening it.
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        attributes:
+          type: object
+          additionalProperties: true
+        justification:
+          type: string
+          maxLength: 1000
+        isDraft:
+          type: boolean
+          default: false
+    ApprovalDecision:
+      type: object
+      x-ticvai-persistence: approvals.decision
+      required:
+      - level
+      - principalId
+      - decision
+      - decidedAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          description: '**Added 20 August.** The schema reference derives table columns from API response
+            schemas, and a response is not a table — this one returned everything a caller needs and not
+            the row''s own identity, so the table had no key and no row could be addressed, updated or
+            deleted. Found by an audit of all 365 tables, not by a reader.
+
+            '
+        level:
+          type: integer
+        principalId:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+        isDelegate:
+          type: boolean
+        delegatedFrom:
+          type: string
+          format: uuid
+          nullable: true
+        decision:
+          type: string
+          enum:
+          - approve
+          - reject
+        comment:
+          type: string
+          nullable: true
+        reason:
+          type: string
+          nullable: true
+        usedMfa:
+          type: boolean
+        signatureRef:
+          type: string
+          nullable: true
+        decidedAt:
+          type: string
+          format: date-time
     ApprovalRequest:
       type: object
-      x-ticvai-persistence: "approvals.request"
-      required: [id, kind, status, requestedByPrincipalId, requestedAt]
+      x-ticvai-persistence: approvals.request
+      required:
+      - id
+      - kind
+      - status
+      - requestedByPrincipalId
+      - requestedAt
       properties:
-        id: { type: string }
-        kind: { $ref: '#/components/schemas/ApprovalKind' }
+        id:
+          type: string
+        kind:
+          $ref: '#/components/schemas/ApprovalKind'
         rerouteOnNoApprover:
           type: boolean
           default: true
-          description: >
-            BL-154. **An approver on leave is an approval that waits for them to come back.**
-            Reroutes to the next in the chain rather than stalling — `workforce` already knows who
-            is on leave, and an approval queue nobody is watching is the thing that stops a venue.
+          description: 'BL-154. **An approver on leave is an approval that waits for them to come back.**
+            Reroutes to the next in the chain rather than stalling — `workforce` already knows who is
+            on leave, and an approval queue nobody is watching is the thing that stops a venue.
+
+            '
         outOfOfficeDelegateId:
           type: string
           format: uuid
@@ -849,131 +2030,2387 @@ components:
         allowEmailApproval:
           type: boolean
           default: false
-          description: >
-            **Approving from an email link with no second factor is the weakest path in the
+          description: '**Approving from an email link with no second factor is the weakest path in the
             system**, so it is off by default and available only below a configured value.
+
+            '
         reopenedFrom:
           type: string
           format: uuid
           nullable: true
-          description: >
-            **Reopening a decided approval creates a new one that points back.** Editing a decision
-            in place destroys the record of what was originally approved, which is the only thing an
-            audit wants.
-        status: { $ref: '#/components/schemas/ApprovalStatus' }
-        subjectContract: { type: string }
-        subjectType: { type: string }
-        subjectId: { type: string }
-        scopePath: { type: string }
-        summary: { type: string }
-        amount: { $ref: '../shared/common.yaml#/components/schemas/Money' }
-        justification: { type: string, nullable: true }
-        requestedByPrincipalId: { type: string, format: uuid }
-        matrixVersion: { type: integer }
-        mode: { $ref: '#/components/schemas/ApprovalMode' }
-        currentLevel: { type: integer }
-        totalLevels: { type: integer }
+          description: '**Reopening a decided approval creates a new one that points back.** Editing a
+            decision in place destroys the record of what was originally approved, which is the only thing
+            an audit wants.
+
+            '
+        status:
+          $ref: '#/components/schemas/ApprovalStatus'
+        subjectContract:
+          type: string
+        subjectType:
+          type: string
+        subjectId:
+          type: string
+        scopePath:
+          type: string
+        summary:
+          type: string
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+        justification:
+          type: string
+          nullable: true
+        requestedByPrincipalId:
+          type: string
+          format: uuid
+        matrixVersion:
+          type: integer
+        mode:
+          $ref: '#/components/schemas/ApprovalMode'
+        currentLevel:
+          type: integer
+        totalLevels:
+          type: integer
         pendingApprovers:
           type: array
           items:
             type: object
             properties:
-              principalId: { type: string, format: uuid }
-              displayName: { type: string }
-              isDelegate: { type: boolean }
+              principalId:
+                type: string
+                format: uuid
+              displayName:
+                type: string
+              isDelegate:
+                type: boolean
         decisions:
           type: array
-          description: >
-            Every decision at every level, in order. **Immutable once the request completes**
+          description: 'Every decision at every level, in order. **Immutable once the request completes**
             (11.1.56) — an approval is evidence, and amending one is a different fact.
-          items: { $ref: '#/components/schemas/ApprovalDecision' }
+
+            '
+          items:
+            $ref: '#/components/schemas/ApprovalDecision'
         escalations:
           type: array
-          description: >
-            11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver
+          description: '11.1.48. Who was asked, when, and why it moved up. **Escalation adds an approver
             rather than replacing one**, so the original stays in the record.
+
+            '
           items:
             type: object
             properties:
-              at: { type: string, format: date-time }
-              reason: { type: string }
-              fromLevel: { type: integer }
-              toLevel: { type: integer }
-              wasAutomatic: { type: boolean }
-        resubmittedFromId: { type: string, nullable: true }
-        reopenedFromId: { type: string, nullable: true }
-        slaDueAt: { type: string, format: date-time, nullable: true }
-        slaBreached: { type: boolean }
-        expiresAt: { type: string, format: date-time, nullable: true }
-        requestedAt: { type: string, format: date-time }
-        completedAt: { type: string, format: date-time, nullable: true }
-
+              at:
+                type: string
+                format: date-time
+              reason:
+                type: string
+              fromLevel:
+                type: integer
+              toLevel:
+                type: integer
+              wasAutomatic:
+                type: boolean
+        resubmittedFromId:
+          type: string
+          nullable: true
+        reopenedFromId:
+          type: string
+          nullable: true
+        slaDueAt:
+          type: string
+          format: date-time
+          nullable: true
+        slaBreached:
+          type: boolean
+        expiresAt:
+          type: string
+          format: date-time
+          nullable: true
+        requestedAt:
+          type: string
+          format: date-time
+        completedAt:
+          type: string
+          format: date-time
+          nullable: true
     ApprovalDelegation:
       type: object
-      x-ticvai-persistence: "approvals.delegation"
-      required: [delegatorPrincipalId, delegatePrincipalId, from, to]
+      x-ticvai-persistence: approvals.delegation
+      required:
+      - delegatorPrincipalId
+      - delegatePrincipalId
+      - from
+      - to
       properties:
-        id: { type: string, format: uuid, readOnly: true }
-        delegatorPrincipalId: { type: string, format: uuid }
-        delegatePrincipalId: { type: string, format: uuid }
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        delegatorPrincipalId:
+          type: string
+          format: uuid
+        delegatePrincipalId:
+          type: string
+          format: uuid
         kinds:
           type: array
           description: Absent means everything the delegator may approve.
-          items: { $ref: '#/components/schemas/ApprovalKind' }
+          items:
+            $ref: '#/components/schemas/ApprovalKind'
         maxAmount:
           allOf:
-            - $ref: '../shared/common.yaml#/components/schemas/Money'
+          - $ref: ../shared/common.yaml#/components/schemas/Money
           description: A delegate may be given less authority than the delegator, never more.
-        from: { type: string, format: date-time }
+        from:
+          type: string
+          format: date-time
         to:
           type: string
           format: date-time
-          description: >
-            **Required.** An open-ended delegation is an approver who quietly stopped approving
+          description: '**Required.** An open-ended delegation is an approver who quietly stopped approving
             and a delegate who does not know they still hold it.
-        reason: { type: string }
-        isActive: { type: boolean, readOnly: true }
 
+            '
+        reason:
+          type: string
+        isActive:
+          type: boolean
+          readOnly: true
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `venue` scope.**'
     ApprovalRefusedProblem:
       allOf:
-        - $ref: '../shared/common.yaml#/components/schemas/Problem'
-        - type: object
-          x-ticvai-persistence: "none — error shape"
-          properties:
-            refusedReason:
-              type: string
-              enum:
-                - approverIsRequester
-                - notInApproverChain
-                - insufficientPermission
-                - mfaRequired
-                - signatureRequired
-                - delegationExpired
-                - alreadyDecidedAtThisLevel
-
+      - $ref: ../shared/common.yaml#/components/schemas/Problem
+      - type: object
+        x-ticvai-persistence: none — error shape
+        properties:
+          refusedReason:
+            type: string
+            enum:
+            - approverIsRequester
+            - notInApproverChain
+            - insufficientPermission
+            - mfaRequired
+            - signatureRequired
+            - delegationExpired
+            - alreadyDecidedAtThisLevel
     ApprovalAnalytics:
       type: object
-      x-ticvai-persistence: "none — aggregated from approvals.request"
+      x-ticvai-persistence: none — aggregated from approvals.request
       properties:
-        from: { type: string, format: date }
-        to: { type: string, format: date }
-        groupBy: { type: string }
+        from:
+          type: string
+          format: date
+        to:
+          type: string
+          format: date
+        groupBy:
+          type: string
         rows:
           type: array
           items:
             type: object
             properties:
-              key: { type: string }
-              raised: { type: integer }
-              approved: { type: integer }
-              rejected: { type: integer }
-              withdrawn: { type: integer }
+              key:
+                type: string
+              raised:
+                type: integer
+              approved:
+                type: integer
+              rejected:
+                type: integer
+              withdrawn:
+                type: integer
               expired:
                 type: integer
-                description: >
-                  **Requests nobody answered.** Usually a routing defect rather than a busy
+                description: '**Requests nobody answered.** Usually a routing defect rather than a busy
                   approver, and the number that says the matrix names the wrong person.
-              escalated: { type: integer }
-              slaBreached: { type: integer }
-              medianMinutes: { type: number }
-              p95Minutes: { type: number }
+
+                  '
+              escalated:
+                type: integer
+              slaBreached:
+                type: integer
+              medianMinutes:
+                type: number
+              p95Minutes:
+                type: number
+
+    RulesWorkflowCommandCenterView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Rules & Workflow Command Center displays.** Read from the workshop pack''s own
+        display and configuration directory for this screen; each property names the sentence it came from.
+        **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        activeRules:
+          type: integer
+          description: Active Rules
+        activeWorkflows:
+          type: integer
+          description: Active Workflows
+        approvalWorkflows:
+          type: integer
+          description: Approval Workflows
+        draftConfigurations:
+          type: integer
+          description: Draft Configurations
+        pendingApproval:
+          type: integer
+          description: Pending Approval
+        scheduledChanges:
+          type: integer
+          description: Scheduled Changes
+        rulesWithErrors:
+          type: integer
+          description: Rules With Errors
+        workflowsWithWarnings:
+          type: integer
+          description: Workflows With Warnings
+        recentlyModified:
+          type: string
+          description: Recently Modified
+        modulesCovered:
+          type: string
+          description: Modules Covered
+        ruleWorkflowId:
+          type: string
+          description: Rule/Workflow ID
+        name:
+          type: string
+          description: Name
+        type:
+          type: string
+          description: Type
+        sourceModule:
+          type: string
+          description: Source Module
+        businessProcess:
+          type: string
+          description: Business Process
+        version:
+          type: string
+          description: Version
+        owner:
+          type: string
+          description: Owner
+        effectiveDate:
+          type: string
+          format: date-time
+          description: Effective Date
+        status:
+          type: integer
+          description: Status
+        lastModified:
+          type: string
+          format: date-time
+          description: Last Modified
+        usage:
+          type: string
+          description: Usage
+        businessRule:
+          type: string
+          description: Business Rule
+        approvalWorkflow:
+          type: string
+          description: Approval Workflow
+        operationalWorkflow:
+          type: string
+          description: Operational Workflow
+        decisionRule:
+          type: string
+          description: Decision Rule
+        validationRule:
+          type: string
+          description: Validation Rule
+        escalationRule:
+          type: string
+          description: Escalation Rule
+        automation:
+          type: string
+          description: Automation
+        crossModuleWorkflow:
+          type: string
+          description: Cross-Module Workflow
+        suspendedRetired:
+          type: string
+          description: Suspended → Retired
+    VisualBusinessRuleBuilderView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Visual Business Rule Builder displays.** Read from the workshop pack''s own display
+        and configuration directory for this screen; each property names the sentence it came from. **Not
+        a row** - the screen is a view over the module''s existing state.'
+      properties:
+        equals:
+          type: string
+          description: Equals
+        notEquals:
+          type: string
+          description: Not Equals
+        inList:
+          type: string
+          description: In List
+        exists:
+          type: string
+          description: Exists
+        doesNotExist:
+          type: string
+          description: Does Not Exist
+        beforeAfter:
+          type: string
+          description: Before/After
+        percentageThreshold:
+          type: integer
+          description: Percentage Threshold
+        boolean:
+          type: string
+          description: Boolean
+        cancelled:
+          type: integer
+          description: cancelled
+    VisualBusinessRuleBuilderInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
+        so nothing the package stores today is what this configures
+      description: '**What Visual Business Rule Builder submits.** The configurable fields from the pack''s
+        directory for this screen; the metrics the screen displays are deliberately absent, because a figure
+        the system computed is not a figure a client may send back.'
+      properties:
+        equals:
+          type: string
+          description: Equals
+        notEquals:
+          type: string
+          description: Not Equals
+        inList:
+          type: string
+          description: In List
+        exists:
+          type: string
+          description: Exists
+        doesNotExist:
+          type: string
+          description: Does Not Exist
+        beforeAfter:
+          type: string
+          description: Before/After
+        percentageThreshold:
+          type: integer
+          description: Percentage Threshold
+        boolean:
+          type: string
+          description: Boolean
+        cancelled:
+          type: integer
+          description: cancelled
+    ConditionsDecisionLogicDecisionTablesView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Conditions, Decision Logic & Decision Tables displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        anyCancelledAutoApprove:
+          type: string
+          description: Any Cancelled Auto Approve (the pack shows 250, AED 251–)
+        aed251:
+          type: string
+          description: AED 251–
+        manager:
+          type: string
+          description: Manager +
+        priority:
+          type: string
+          description: Priority
+        sequence:
+          type: string
+          description: Sequence
+        specificity:
+          type: string
+          description: Specificity
+        stopProcessing:
+          type: string
+          description: Stop Processing
+        continueEvaluation:
+          type: string
+          description: Continue Evaluation
+        contradictoryRules:
+          type: string
+          description: Contradictory Rules
+        overlappingConditions:
+          type: string
+          description: Overlapping Conditions
+        unreachableOutcomes:
+          type: string
+          description: Unreachable Outcomes
+        circularLogic:
+          type: string
+          description: Circular Logic
+        missingOutcomes:
+          type: string
+          description: Missing Outcomes
+    VisualWorkflowDesignerView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Visual Workflow Designer displays.** Read from the workshop pack''s own display
+        and configuration directory for this screen; each property names the sentence it came from. **Not
+        a row** - the screen is a view over the module''s existing state.'
+      properties:
+        start:
+          type: string
+          description: Start
+        task:
+          type: string
+          description: Task
+        decision:
+          type: string
+          description: Decision
+        approval:
+          type: string
+          description: Approval
+        systemAction:
+          type: string
+          description: System Action
+        notification:
+          type: string
+          description: Notification
+        wait:
+          type: string
+          description: Wait
+        timer:
+          type: string
+          description: Timer
+        parallelBranch:
+          type: string
+          description: Parallel Branch
+        escalation:
+          type: string
+          description: Escalation
+        subWorkflow:
+          type: string
+          description: Sub-Workflow
+        end:
+          type: string
+          description: End
+        yesNo:
+          type: string
+          description: ↙ YES ↘ NO
+        workflowName:
+          type: string
+          description: Workflow Name
+        module:
+          type: string
+          description: Module
+        businessProcess:
+          type: string
+          description: Business Process
+        owner:
+          type: string
+          description: Owner
+        version:
+          type: string
+          description: Version
+        priority:
+          type: string
+          description: Priority
+        effectiveDates:
+          type: string
+          description: Effective Dates
+        deadEnds:
+          type: string
+          description: Dead Ends
+        missingOutcomes:
+          type: string
+          description: Missing Outcomes
+        circularLoops:
+          type: string
+          description: Circular Loops
+        missingAssignee:
+          type: string
+          description: Missing Assignee
+        invalidActions:
+          type: string
+          description: Invalid Actions
+    VisualWorkflowDesignerInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
+        is approvals.decision at 4%, so this is not an update to anything the package stores today and no
+        new table has been decided
+      description: '**What Visual Workflow Designer submits.** The configurable fields from the pack''s
+        directory for this screen; the metrics the screen displays are deliberately absent, because a figure
+        the system computed is not a figure a client may send back.'
+      properties:
+        start:
+          type: string
+          description: Start
+        task:
+          type: string
+          description: Task
+        decision:
+          type: string
+          description: Decision
+        approval:
+          type: string
+          description: Approval
+        systemAction:
+          type: string
+          description: System Action
+        notification:
+          type: string
+          description: Notification
+        wait:
+          type: string
+          description: Wait
+        timer:
+          type: string
+          description: Timer
+        parallelBranch:
+          type: string
+          description: Parallel Branch
+        escalation:
+          type: string
+          description: Escalation
+        subWorkflow:
+          type: string
+          description: Sub-Workflow
+        end:
+          type: string
+          description: End
+        yesNo:
+          type: string
+          description: ↙ YES ↘ NO
+        workflowName:
+          type: string
+          description: Workflow Name
+        module:
+          type: string
+          description: Module
+        businessProcess:
+          type: string
+          description: Business Process
+        owner:
+          type: string
+          description: Owner
+        version:
+          type: string
+          description: Version
+        priority:
+          type: string
+          description: Priority
+        effectiveDates:
+          type: string
+          description: Effective Dates
+        deadEnds:
+          type: string
+          description: Dead Ends
+        missingOutcomes:
+          type: string
+          description: Missing Outcomes
+        circularLoops:
+          type: string
+          description: Circular Loops
+        missingAssignee:
+          type: string
+          description: Missing Assignee
+        invalidActions:
+          type: string
+          description: Invalid Actions
+    ApprovalMatrixMultiLevelApprovalConfigurationView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Approval Matrix & Multi-Level Approval Configuration displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names the
+        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        singleApproval:
+          type: string
+          description: Single Approval
+        sequentialApproval:
+          type: string
+          description: Sequential Approval
+        parallelApproval:
+          type: string
+          description: Parallel Approval
+        anyOneApproval:
+          type: string
+          description: Any-One Approval
+        conditionalApproval:
+          type: string
+          description: Conditional Approval
+        multiLevelApproval:
+          type: string
+          description: Multi-Level Approval
+        exampleDiscount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Example — Discount
+        noApproval:
+          type: string
+          description: No Approval (the pack shows 10.01–15%)
+        salesManager:
+          type: string
+          description: Sales Manager (the pack shows 15.01–20%)
+        commercialDirectorCfo:
+          type: string
+          description: Commercial Director + CFO
+        exampleProcurement:
+          type: string
+          description: Example — Procurement
+        aed10k50k:
+          type: string
+          description: AED 10K–50K
+        departmentHeadFinance:
+          type: string
+          description: Department Head → Finance
+        aed50k100k:
+          type: string
+          description: AED 50K–100K
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Amount
+        percentage:
+          type: number
+          description: Percentage
+        module:
+          type: string
+          description: Module
+        product:
+          type: string
+          description: Product
+        venue:
+          type: string
+          description: Venue
+        department:
+          type: string
+          description: Department
+        customerType:
+          type: string
+          description: Customer Type
+        risk:
+          type: string
+          description: Risk
+        exceptionType:
+          type: string
+          description: Exception Type
+        legalEntity:
+          type: string
+          description: Legal Entity
+        sequentialParallel:
+          type: string
+          description: Sequential/Parallel
+        minimumApprovals:
+          type: string
+          description: Minimum Approvals
+        rejectionBehavior:
+          type: string
+          description: Rejection Behavior
+        requestChanges:
+          type: string
+          description: Request Changes
+        delegate:
+          type: string
+          description: Delegate
+        reassign:
+          type: string
+          description: Reassign
+        skipConditions:
+          type: string
+          description: Skip Conditions
+        approveAed18000:
+          type: string
+          description: “Approve AED 18,000?”
+    ApprovalMatrixMultiLevelApprovalConfigurationInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
+        is approvals.request at 3%, so this is not an update to anything the package stores today and no
+        new table has been decided
+      description: '**What Approval Matrix & Multi-Level Approval Configuration submits.** The configurable
+        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
+        absent, because a figure the system computed is not a figure a client may send back.'
+      properties:
+        singleApproval:
+          type: string
+          description: Single Approval
+        sequentialApproval:
+          type: string
+          description: Sequential Approval
+        parallelApproval:
+          type: string
+          description: Parallel Approval
+        anyOneApproval:
+          type: string
+          description: Any-One Approval
+        conditionalApproval:
+          type: string
+          description: Conditional Approval
+        multiLevelApproval:
+          type: string
+          description: Multi-Level Approval
+        exampleDiscount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Example — Discount
+        commercialDirectorCfo:
+          type: string
+          description: Commercial Director + CFO
+        exampleProcurement:
+          type: string
+          description: Example — Procurement
+        aed10k50k:
+          type: string
+          description: AED 10K–50K
+        departmentHeadFinance:
+          type: string
+          description: Department Head → Finance
+        aed50k100k:
+          type: string
+          description: AED 50K–100K
+        amount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Amount
+        percentage:
+          type: number
+          description: Percentage
+        module:
+          type: string
+          description: Module
+        product:
+          type: string
+          description: Product
+        venue:
+          type: string
+          description: Venue
+        department:
+          type: string
+          description: Department
+        customerType:
+          type: string
+          description: Customer Type
+        risk:
+          type: string
+          description: Risk
+        exceptionType:
+          type: string
+          description: Exception Type
+        legalEntity:
+          type: string
+          description: Legal Entity
+        sequentialParallel:
+          type: string
+          description: Sequential/Parallel
+        minimumApprovals:
+          type: string
+          description: Minimum Approvals
+        rejectionBehavior:
+          type: string
+          description: Rejection Behavior
+        requestChanges:
+          type: string
+          description: Request Changes
+        delegate:
+          type: string
+          description: Delegate
+        reassign:
+          type: string
+          description: Reassign
+        skipConditions:
+          type: string
+          description: Skip Conditions
+        approveAed18000:
+          type: string
+          description: “Approve AED 18,000?”
+    RolesAuthorityDelegationApprovalLimitsView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Roles, Authority, Delegation & Approval Limits displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        user:
+          type: string
+          description: User
+        role:
+          type: string
+          description: Role
+        position:
+          type: string
+          description: Position
+        department:
+          type: string
+          description: Department
+        venue:
+          type: string
+          description: Venue
+        businessUnit:
+          type: string
+          description: Business Unit
+        legalEntity:
+          type: string
+          description: Legal Entity
+        region:
+          type: string
+          description: Region
+        delegator:
+          type: string
+          description: Delegator
+        delegate:
+          type: string
+          description: Delegate
+        scope:
+          type: string
+          description: Scope
+        start:
+          type: string
+          description: Start
+        end:
+          type: string
+          description: End
+        reason:
+          type: string
+          description: Reason
+        leave:
+          type: string
+          description: Leave
+        travel:
+          type: string
+          description: Travel
+        vacancy:
+          type: string
+          description: Vacancy
+        eventOperations:
+          type: string
+          description: Event operations
+        requesterCannotApproveOwnRequest:
+          type: string
+          description: Requester cannot approve own request
+        userActive:
+          type: integer
+          description: User active
+        requiredRole:
+          type: string
+          description: Required role
+        authorityAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Authority amount
+        businessScope:
+          type: string
+          description: Business scope
+        delegationValidity:
+          type: string
+          description: Delegation validity
+    RolesAuthorityDelegationApprovalLimitsInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
+        is approvals.decision at 4%, so this is not an update to anything the package stores today and no
+        new table has been decided
+      description: '**What Roles, Authority, Delegation & Approval Limits submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
+      properties:
+        user:
+          type: string
+          description: User
+        role:
+          type: string
+          description: Role
+        position:
+          type: string
+          description: Position
+        department:
+          type: string
+          description: Department
+        venue:
+          type: string
+          description: Venue
+        businessUnit:
+          type: string
+          description: Business Unit
+        legalEntity:
+          type: string
+          description: Legal Entity
+        region:
+          type: string
+          description: Region
+        delegator:
+          type: string
+          description: Delegator
+        delegate:
+          type: string
+          description: Delegate
+        scope:
+          type: string
+          description: Scope
+        start:
+          type: string
+          description: Start
+        end:
+          type: string
+          description: End
+        reason:
+          type: string
+          description: Reason
+        leave:
+          type: string
+          description: Leave
+        travel:
+          type: string
+          description: Travel
+        vacancy:
+          type: string
+          description: Vacancy
+        eventOperations:
+          type: string
+          description: Event operations
+        requesterCannotApproveOwnRequest:
+          type: string
+          description: Requester cannot approve own request
+        userActive:
+          type: integer
+          description: User active
+        requiredRole:
+          type: string
+          description: Required role
+        authorityAmount:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Authority amount
+        businessScope:
+          type: string
+          description: Business scope
+        delegationValidity:
+          type: string
+          description: Delegation validity
+    SlaEscalationReminderTimeoutRulesView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What SLA, Escalation, Reminder & Timeout Rules displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        responseSla:
+          type: string
+          description: Response SLA
+        approvalSla:
+          type: string
+          description: Approval SLA
+        taskSla:
+          type: string
+          description: Task SLA
+        resolutionSla:
+          type: string
+          description: Resolution SLA
+        systemActionTimeout:
+          type: string
+          description: System Action Timeout
+        target4Hours:
+          type: string
+          description: 'Target: 4 hours'
+        at50:
+          type: number
+          description: At 50%
+        at75:
+          type: number
+          description: At 75%
+        at100:
+          type: number
+          description: At 100%
+        calendarHours:
+          type: string
+          description: Calendar Hours
+        businessHours:
+          type: string
+          description: Business Hours
+        workingDays:
+          type: string
+          description: Working Days
+        venueCalendar:
+          type: string
+          description: Venue Calendar
+        holidayCalendar:
+          type: string
+          description: Holiday Calendar
+        reassign:
+          type: string
+          description: Reassign
+        raisePriority:
+          type: string
+          description: Raise Priority
+        channelsType:
+          type: string
+          enum:
+            - email
+            - push
+            - inApp
+            - smsWhereAppropriate
+          description: Vocabulary listed under Reminder Channels.
+    TriggerActionCrossModuleOrchestrationConfigurationView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Trigger, Action & Cross-Module Orchestration Configuration displays.** Read from
+        the workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        authorizedUserStartsWorkflow:
+          type: string
+          description: Authorized user starts workflow
+        executeRefund:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Execute Refund
+        callApprovedApi:
+          type: string
+          description: Call Approved API
+        callApprovedService:
+          type: string
+          description: Call Approved Service
+        startSubWorkflow:
+          type: string
+          description: Start Sub-Workflow
+        workflowAuthority:
+          type: string
+          description: Workflow Authority
+        userSystemAuthority:
+          type: string
+          description: User/System Authority
+        modulePolicy:
+          type: string
+          description: Module Policy
+        businessRule:
+          type: string
+          description: Business Rule
+        rollbackWhereSupported:
+          type: string
+          description: Rollback where supported
+        compensationAction:
+          type: string
+          description: Compensation Action
+        exceptionQueue:
+          type: string
+          description: Exception Queue
+        humanIntervention:
+          type: string
+          description: Human Intervention
+        refunds:
+          type: string
+          description: Refunds
+        orders:
+          type: string
+          description: Orders
+        payments:
+          type: string
+          description: Payments
+        approvals:
+          type: string
+          description: Approvals
+        tickets:
+          type: string
+          description: Tickets
+    TriggerActionCrossModuleOrchestrationConfigurationInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
+        so nothing the package stores today is what this configures
+      description: '**What Trigger, Action & Cross-Module Orchestration Configuration submits.** The configurable
+        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
+        absent, because a figure the system computed is not a figure a client may send back.'
+      properties:
+        authorizedUserStartsWorkflow:
+          type: string
+          description: Authorized user starts workflow
+        executeRefund:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Execute Refund
+        callApprovedApi:
+          type: string
+          description: Call Approved API
+        callApprovedService:
+          type: string
+          description: Call Approved Service
+        startSubWorkflow:
+          type: string
+          description: Start Sub-Workflow
+        workflowAuthority:
+          type: string
+          description: Workflow Authority
+        userSystemAuthority:
+          type: string
+          description: User/System Authority
+        modulePolicy:
+          type: string
+          description: Module Policy
+        businessRule:
+          type: string
+          description: Business Rule
+        rollbackWhereSupported:
+          type: string
+          description: Rollback where supported
+        compensationAction:
+          type: string
+          description: Compensation Action
+        exceptionQueue:
+          type: string
+          description: Exception Queue
+        humanIntervention:
+          type: string
+          description: Human Intervention
+        refunds:
+          type: string
+          description: Refunds
+        orders:
+          type: string
+          description: Orders
+        payments:
+          type: string
+          description: Payments
+        approvals:
+          type: string
+          description: Approvals
+        tickets:
+          type: string
+          description: Tickets
+    WorkflowTestingSimulationImpactAnalysisView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Workflow Testing, Simulation & Impact Analysis displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        manualTestCase:
+          type: string
+          description: Manual Test Case
+        sampleTransaction:
+          type: string
+          description: Sample Transaction
+        historicalReplay:
+          type: string
+          description: Historical Replay
+        scenarioSimulation:
+          type: string
+          description: Scenario Simulation
+        batchTest:
+          type: string
+          description: Batch Test
+        refundAed1500:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: 'Refund: AED 1,500'
+        customerGold:
+          type: string
+          description: 'Customer: Gold'
+        eventActive:
+          type: integer
+          description: 'Event: Active'
+        reasonCustomerRequest:
+          type: string
+          description: 'Reason: Customer Request'
+        rulesEvaluated:
+          type: string
+          description: Rules Evaluated
+        conditionsMatched:
+          type: string
+          description: Conditions Matched
+        decisions:
+          type: integer
+          description: Decisions
+        approvalPath:
+          type: string
+          description: Approval Path
+        actions:
+          type: integer
+          description: Actions
+        notifications:
+          type: integer
+          description: Notifications
+        sla:
+          type: string
+          description: SLA
+        expectedOutcome:
+          type: string
+          description: Expected Outcome
+    WorkflowTestingSimulationImpactAnalysisInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
+        so nothing the package stores today is what this configures
+      description: '**What Workflow Testing, Simulation & Impact Analysis submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
+      properties:
+        manualTestCase:
+          type: string
+          description: Manual Test Case
+        sampleTransaction:
+          type: string
+          description: Sample Transaction
+        historicalReplay:
+          type: string
+          description: Historical Replay
+        scenarioSimulation:
+          type: string
+          description: Scenario Simulation
+        batchTest:
+          type: string
+          description: Batch Test
+        refundAed1500:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: 'Refund: AED 1,500'
+        customerGold:
+          type: string
+          description: 'Customer: Gold'
+        eventActive:
+          type: integer
+          description: 'Event: Active'
+        reasonCustomerRequest:
+          type: string
+          description: 'Reason: Customer Request'
+    VersioningGovernanceApprovalPublicationView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Versioning, Governance, Approval & Publication displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        v10Retired:
+          type: string
+          description: v1.0 — Retired
+        v11Active:
+          type: integer
+          description: v1.1 — Active
+        v20Draft:
+          type: string
+          description: v2.0 — Draft
+        version:
+          type: string
+          description: Version
+        changedBy:
+          type: string
+          description: Changed By
+        changeDate:
+          type: string
+          format: date-time
+          description: Change Date
+        changeReason:
+          type: string
+          description: Change Reason
+        businessOwner:
+          type: string
+          description: Business Owner
+        technicalOwner:
+          type: string
+          description: Technical Owner
+        riskClassification:
+          type: string
+          description: Risk Classification
+        testResults:
+          type: string
+          description: Test Results
+        approval:
+          type: string
+          description: Approval
+        v11V20:
+          type: string
+          description: v1.1 ↔ v2.0
+        conditions:
+          type: string
+          description: Conditions
+        thresholds:
+          type: string
+          description: Thresholds
+        approvers:
+          type: string
+          description: Approvers
+        actions:
+          type: string
+          description: Actions
+        sla:
+          type: string
+          description: SLA
+        escalation:
+          type: string
+          description: Escalation
+        integrations:
+          type: string
+          description: Integrations
+        selectedTenant:
+          type: string
+          description: Selected Tenant
+        selectedVenue:
+          type: string
+          description: Selected Venue
+        selectedBrand:
+          type: string
+          description: Selected Brand
+        controlledRollout:
+          type: string
+          description: Controlled Rollout
+        technicallySafe:
+          type: string
+          description: technically safe
+        whoCreated:
+          type: string
+          format: date-time
+          description: Who created
+        whoChanged:
+          type: string
+          description: Who changed
+        whoTested:
+          type: string
+          description: Who tested
+        whoApproved:
+          type: string
+          description: Who approved
+        whoPublished:
+          type: string
+          description: Who published
+        whatChanged:
+          type: string
+          description: What changed
+        businessTransaction:
+          type: string
+          description: business transaction
+    VersioningGovernanceApprovalPublicationInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
+        so nothing the package stores today is what this configures
+      description: '**What Versioning, Governance, Approval & Publication submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
+      properties:
+        v10Retired:
+          type: string
+          description: v1.0 — Retired
+        v11Active:
+          type: integer
+          description: v1.1 — Active
+        v20Draft:
+          type: string
+          description: v2.0 — Draft
+        version:
+          type: string
+          description: Version
+        changedBy:
+          type: string
+          description: Changed By
+        changeDate:
+          type: string
+          format: date-time
+          description: Change Date
+        changeReason:
+          type: string
+          description: Change Reason
+        businessOwner:
+          type: string
+          description: Business Owner
+        technicalOwner:
+          type: string
+          description: Technical Owner
+        riskClassification:
+          type: string
+          description: Risk Classification
+        testResults:
+          type: string
+          description: Test Results
+        approval:
+          type: string
+          description: Approval
+        conditions:
+          type: string
+          description: Conditions
+        thresholds:
+          type: string
+          description: Thresholds
+        approvers:
+          type: string
+          description: Approvers
+        actions:
+          type: string
+          description: Actions
+        sla:
+          type: string
+          description: SLA
+        escalation:
+          type: string
+          description: Escalation
+        integrations:
+          type: string
+          description: Integrations
+        selectedTenant:
+          type: string
+          description: Selected Tenant
+        selectedVenue:
+          type: string
+          description: Selected Venue
+        selectedBrand:
+          type: string
+          description: Selected Brand
+        controlledRollout:
+          type: string
+          description: Controlled Rollout
+        technicallySafe:
+          type: string
+          description: technically safe
+        whoCreated:
+          type: string
+          format: date-time
+          description: Who created
+        whoChanged:
+          type: string
+          description: Who changed
+        whoTested:
+          type: string
+          description: Who tested
+        whoApproved:
+          type: string
+          description: Who approved
+        whoPublished:
+          type: string
+          description: Who published
+        whatChanged:
+          type: string
+          description: What changed
+        businessTransaction:
+          type: string
+          description: business transaction
+    WorkflowOperationsCommandCenterView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Workflow Operations Command Center displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        workflowsRunning:
+          type: string
+          description: Workflows Running
+        startedToday:
+          type: string
+          description: Started Today
+        completedToday:
+          type: string
+          description: Completed Today
+        pendingApprovals:
+          type: integer
+          description: Pending Approvals
+        waitingTasks:
+          type: integer
+          description: Waiting Tasks
+        slaAtRisk:
+          type: string
+          description: SLA At Risk
+        slaBreached:
+          type: string
+          description: SLA Breached
+        failedWorkflows:
+          type: integer
+          description: Failed Workflows
+        escalated:
+          type: string
+          description: Escalated
+        automatedExecutions:
+          type: integer
+          description: Automated Executions
+        averageCompletionTime:
+          type: string
+          format: date-time
+          description: Average Completion Time
+        automationSuccessRate:
+          type: number
+          description: Automation Success Rate
+        workflowInstanceId:
+          type: string
+          description: Workflow Instance ID
+        workflow:
+          type: string
+          description: Workflow
+        module:
+          type: string
+          description: Module
+        businessObject:
+          type: string
+          description: Business Object
+        initiatedBy:
+          type: string
+          description: Initiated By
+        started:
+          type: string
+          description: Started
+        currentStep:
+          type: string
+          description: Current Step
+        owner:
+          type: string
+          description: Owner
+        priority:
+          type: string
+          description: Priority
+        sla:
+          type: string
+          description: SLA
+        status:
+          type: integer
+          description: Status
+        ticketing:
+          type: string
+          description: Ticketing
+        pricing:
+          type: string
+          description: Pricing
+        finance:
+          type: string
+          description: Finance
+        procurement:
+          type: string
+          description: Procurement
+        crm:
+          type: string
+          description: CRM
+        resourceManagement:
+          type: string
+          description: Resource Management
+        fB:
+          type: string
+          description: F&B
+        retail:
+          type: string
+          description: Retail
+        groupSales:
+          type: integer
+          description: Group Sales
+        customerService:
+          type: string
+          description: Customer Service
+        membership:
+          type: string
+          description: Membership
+        wallet:
+          type: string
+          description: Wallet
+        waiver:
+          type: string
+          description: Waiver
+        subscriptionLicensing:
+          type: string
+          description: Subscription & Licensing
+    UnifiedApprovalInboxDecisionWorkspaceView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Unified Approval Inbox & Decision Workspace displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        approvalId:
+          type: string
+          description: Approval ID
+        requestType:
+          type: string
+          description: Request Type
+        sourceModule:
+          type: string
+          description: Source Module
+        requester:
+          type: string
+          description: Requester
+        amountImpact:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Amount/Impact
+        priority:
+          type: string
+          description: Priority
+        submitted:
+          type: string
+          description: Submitted
+        slaRemaining:
+          type: string
+          description: SLA Remaining
+        approvalLevel:
+          type: string
+          description: Approval Level
+        status:
+          type: integer
+          description: Status
+        discountException18:
+          type: number
+          description: Discount Exception — 18%
+        purchaseOrderAed72000:
+          type: string
+          description: Purchase Order — AED 72,000
+        overtimeRequest18Hours:
+          type: string
+          description: Overtime Request — 18 Hours
+        whatIsBeingRequested:
+          type: string
+          description: What is being requested?
+        whyIsApprovalRequired:
+          type: string
+          description: Why is approval required?
+        documentsCommentsHistory:
+          type: string
+          description: Documents, comments, history
+    UnifiedApprovalInboxDecisionWorkspaceInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
+        so nothing the package stores today is what this configures
+      description: '**What Unified Approval Inbox & Decision Workspace submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
+      properties:
+        discountException18:
+          type: number
+          description: Discount Exception — 18%
+        purchaseOrderAed72000:
+          type: string
+          description: Purchase Order — AED 72,000
+        overtimeRequest18Hours:
+          type: string
+          description: Overtime Request — 18 Hours
+        whatIsBeingRequested:
+          type: string
+          description: What is being requested?
+        whyIsApprovalRequired:
+          type: string
+          description: Why is approval required?
+        documentsCommentsHistory:
+          type: string
+          description: Documents, comments, history
+    WorkflowInstanceMonitorProcessTimelineView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Workflow Instance Monitor & Process Timeline displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        workflowInstance:
+          type: string
+          description: Workflow Instance
+        workflowName:
+          type: string
+          description: Workflow Name
+        version:
+          type: string
+          description: Version
+        sourceModule:
+          type: string
+          description: Source Module
+        businessObject:
+          type: string
+          description: Business Object
+        initiatedBy:
+          type: string
+          description: Initiated By
+        startTime:
+          type: string
+          format: date-time
+          description: Start Time
+        currentStatus:
+          type: integer
+          description: Current Status
+        currentStep:
+          type: string
+          description: Current Step
+        sla:
+          type: string
+          description: SLA
+        step:
+          type: string
+          description: Step
+        type:
+          type: string
+          description: Type
+        started:
+          type: string
+          description: Started
+        completed:
+          type: string
+          description: Completed
+        assignedTo:
+          type: string
+          description: Assigned To
+        input:
+          type: string
+          description: Input
+        output:
+          type: string
+          description: Output
+        decision:
+          type: string
+          description: Decision
+        duration:
+          type: string
+          format: date-time
+          description: Duration
+        status:
+          type: string
+          description: Status
+        ruleEvaluations:
+          type: integer
+          description: Rule evaluations
+        assignments:
+          type: integer
+          description: Assignments
+        approvals:
+          type: integer
+          description: Approvals
+        rejections:
+          type: integer
+          description: Rejections
+        escalations:
+          type: integer
+          description: Escalations
+        notifications:
+          type: integer
+          description: Notifications
+        apiCalls:
+          type: integer
+          description: API calls
+        systemActions:
+          type: integer
+          description: System actions
+        errors:
+          type: integer
+          description: Errors
+        reassign:
+          type: string
+          description: Reassign
+        skipStepWhereExplicitlyAllowed:
+          type: boolean
+          description: Skip Step where explicitly allowed
+    WorkflowExceptionFailureRecoveryCenterView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Workflow Exception, Failure & Recovery Center displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        businessRuleFailure:
+          type: string
+          description: Business Rule Failure
+        missingData:
+          type: string
+          description: Missing Data
+        missingApprover:
+          type: string
+          description: Missing Approver
+        permissionFailure:
+          type: string
+          description: Permission Failure
+        integrationFailure:
+          type: string
+          description: Integration Failure
+        timeout:
+          type: string
+          description: Timeout
+        actionFailure:
+          type: string
+          description: Action Failure
+        invalidState:
+          type: string
+          description: Invalid State
+        serviceUnavailable:
+          type: string
+          description: Service Unavailable
+        configurationError:
+          type: string
+          description: Configuration Error
+        exceptionId:
+          type: string
+          description: Exception ID
+        workflow:
+          type: string
+          description: Workflow
+        instance:
+          type: string
+          description: Instance
+        module:
+          type: string
+          description: Module
+        failedStep:
+          type: integer
+          description: Failed Step
+        errorType:
+          type: string
+          description: Error Type
+        time:
+          type: string
+          format: date-time
+          description: Time
+        businessImpact:
+          type: string
+          description: Business Impact
+        priority:
+          type: string
+          description: Priority
+        owner:
+          type: string
+          description: Owner
+        reassign:
+          type: string
+          description: Reassign
+        correctData:
+          type: string
+          description: Correct Data
+        useApprovedAlternative:
+          type: string
+          description: Use Approved Alternative
+        disappear:
+          type: string
+          description: disappear
+    SlaEscalationBottleneckMonitorView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What SLA, Escalation & Bottleneck Monitor displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        withinSla:
+          type: string
+          description: Within SLA
+        atRisk:
+          type: string
+          description: At Risk
+        breached:
+          type: string
+          description: Breached
+        escalated:
+          type: string
+          description: Escalated
+        averageProcessingTime:
+          type: string
+          format: date-time
+          description: Average Processing Time
+        averageApprovalTime:
+          type: string
+          format: date-time
+          description: Average Approval Time
+        longestWaitingStep:
+          type: string
+          description: Longest Waiting Step
+        workflow:
+          type: string
+          description: Workflow
+        instance:
+          type: string
+          description: Instance
+        currentStep:
+          type: string
+          description: Current Step
+        owner:
+          type: string
+          description: Owner
+        started:
+          type: string
+          description: Started
+        target:
+          type: string
+          description: Target
+        timeRemaining:
+          type: string
+          format: date-time
+          description: Time Remaining
+        risk:
+          type: string
+          description: Risk
+        escalationLevel:
+          type: string
+          description: Escalation Level
+        averageWorkflow112Hours:
+          type: number
+          description: 'Average workflow: 11.2 hours'
+        departmentHead42Min:
+          type: string
+          description: Department Head — 42 min
+        finance21Hrs:
+          type: string
+          description: Finance — 2.1 hrs
+        cfo78Hrs:
+          type: string
+          description: CFO — 7.8 hrs
+        execution18Min:
+          type: string
+          description: Execution — 18 min
+        primaryBottleneckCfoApproval:
+          type: string
+          description: 'Primary Bottleneck: CFO Approval'
+        firstReminder:
+          type: string
+          description: First Reminder
+        secondReminder:
+          type: string
+          description: Second Reminder
+        managerEscalation:
+          type: string
+          description: Manager Escalation
+        executiveEscalation:
+          type: string
+          description: Executive Escalation
+        finalOutcome:
+          type: string
+          description: Final Outcome
+        reassign:
+          type: string
+          description: Reassign
+        changePriority:
+          type: string
+          description: Change Priority
+    AutomationExecutionAutonomousActionMonitorView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Automation Execution & Autonomous Action Monitor displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        automatedActionsToday:
+          type: string
+          description: Automated Actions Today
+        successful:
+          type: string
+          description: Successful
+        failed:
+          type: integer
+          description: Failed
+        humanConfirmationRequired:
+          type: boolean
+          description: Human Confirmation Required
+        reversed:
+          type: string
+          description: Reversed
+        suspended:
+          type: string
+          description: Suspended
+        estimatedManualActionsAvoided:
+          type: string
+          description: Estimated Manual Actions Avoided
+        estimatedTimeSaved:
+          type: string
+          format: date-time
+          description: Estimated Time Saved
+        automation:
+          type: string
+          description: Automation
+        businessObject:
+          type: string
+          description: Business Object
+        rule:
+          type: string
+          description: Rule
+        action:
+          type: string
+          description: Action
+        result:
+          type: string
+          description: Result
+        confidenceWhereAiAssisted:
+          type: string
+          description: Confidence where AI-assisted
+        executionTime:
+          type: string
+          format: date-time
+          description: Execution Time
+        status:
+          type: integer
+          description: Status
+        triggerT24Hours:
+          type: string
+          description: 'Trigger: T−24 hours'
+        participantsEvaluated842:
+          type: string
+          description: 'Participants evaluated: 842'
+        incomplete118:
+          type: string
+          description: 'Incomplete: 118'
+        messagesTriggered118:
+          type: string
+          description: 'Messages triggered: 118'
+        successful116:
+          type: string
+          description: 'Successful: 116'
+        failed2:
+          type: integer
+          description: 'Failed: 2'
+        inspectRule:
+          type: string
+          description: Inspect Rule
+        inspectExecution:
+          type: string
+          description: Inspect Execution
+    AutomationExecutionAutonomousActionMonitorInput:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
+        so nothing the package stores today is what this configures
+      description: '**What Automation Execution & Autonomous Action Monitor submits.** The configurable
+        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
+        absent, because a figure the system computed is not a figure a client may send back.'
+      properties:
+        triggerT24Hours:
+          type: string
+          description: 'Trigger: T−24 hours'
+        participantsEvaluated842:
+          type: string
+          description: 'Participants evaluated: 842'
+        incomplete118:
+          type: string
+          description: 'Incomplete: 118'
+        messagesTriggered118:
+          type: string
+          description: 'Messages triggered: 118'
+        successful116:
+          type: string
+          description: 'Successful: 116'
+        failed2:
+          type: integer
+          description: 'Failed: 2'
+        inspectRule:
+          type: string
+          description: Inspect Rule
+        inspectExecution:
+          type: string
+          description: Inspect Execution
+    CrossModuleOrchestrationMonitorView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Cross-Module Orchestration Monitor displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        bookingConfirmed:
+          type: string
+          description: Booking confirmed ✓
+        reserve420Tickets:
+          type: string
+          description: Reserve 420 tickets ✓
+        reserve4Guides:
+          type: string
+          description: Reserve 4 guides ✓
+        reserve420Meals:
+          type: string
+          description: Reserve 420 meals ✓
+        service:
+          type: string
+          description: Service
+        action:
+          type: string
+          description: Action
+        status:
+          type: string
+          description: Status
+        started:
+          type: string
+          description: Started
+        completed:
+          type: string
+          description: Completed
+        duration:
+          type: string
+          format: date-time
+          description: Duration
+        inputOutput:
+          type: string
+          description: Input/Output
+        waits:
+          type: string
+          description: Waits
+        retries:
+          type: integer
+          description: Retries
+        rollsBack:
+          type: string
+          description: Rolls back
+        continuesPartially:
+          type: string
+          description: Continues partially
+        requiresHumanIntervention:
+          type: string
+          description: Requires human intervention
+        aCommonCorrelationWorkflowId:
+          type: string
+          description: a common correlation/workflow ID
+    WorkflowAnalyticsProcessPerformanceView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Workflow Analytics & Process Performance displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        workflowVolume:
+          type: integer
+          description: Workflow Volume
+        completionRate:
+          type: number
+          description: Completion Rate
+        failureRate:
+          type: number
+          description: Failure Rate
+        averageCompletionTime:
+          type: string
+          format: date-time
+          description: Average Completion Time
+        approvalTime:
+          type: string
+          format: date-time
+          description: Approval Time
+        automationRate:
+          type: number
+          description: Automation Rate
+        escalationRate:
+          type: number
+          description: Escalation Rate
+        rejectionRate:
+          type: number
+          description: Rejection Rate
+        reworkRate:
+          type: number
+          description: Rework Rate
+        slaCompliance:
+          type: string
+          description: SLA Compliance
+        averageApprovalTime:
+          type: string
+          format: date-time
+          description: Average Approval Time
+        approvalRate:
+          type: number
+          description: Approval Rate
+        requestChangesRate:
+          type: number
+          description: Request Changes Rate
+        delegationRate:
+          type: number
+          description: Delegation Rate
+        workflowV14VsV15:
+          type: string
+          description: Workflow v1.4 vs v1.5
+        v1448Hours:
+          type: string
+          description: v1.4 — 4.8 hours
+        v1529Hours:
+          type: string
+          description: v1.5 — 2.9 hours
+        manualStepsRemoved:
+          type: string
+          description: Manual Steps Removed
+        processingTimeSaved:
+          type: string
+          format: date-time
+          description: Processing Time Saved
+        workloadReduced:
+          type: string
+          description: Workload Reduced
+        costSavingWhereMeasurable:
+          $ref: ../shared/common.yaml#/components/schemas/Money
+          description: Cost Saving where measurable
+    ProcessOptimizationAutomationOpportunityCenterView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What Process Optimization & Automation Opportunity Center displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names the
+        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        repetitiveApproval:
+          type: string
+          description: Repetitive Approval
+        unnecessaryApproval:
+          type: string
+          description: Unnecessary Approval
+        highManualWork:
+          type: string
+          description: High Manual Work
+        excessiveRework:
+          type: string
+          description: Excessive Rework
+        longWaitingTime:
+          type: string
+          format: date-time
+          description: Long Waiting Time
+        highFailureRate:
+          type: number
+          description: High Failure Rate
+        lowRiskManualAction:
+          type: string
+          description: Low-Risk Manual Action
+        processBottleneck:
+          type: string
+          description: Process Bottleneck
+        process:
+          type: string
+          description: Process
+        module:
+          type: string
+          description: Module
+        monthlyVolume:
+          type: integer
+          description: Monthly Volume
+        currentSteps:
+          type: integer
+          description: Current Steps
+        averageDuration:
+          type: string
+          format: date-time
+          description: Average Duration
+        manualSteps:
+          type: integer
+          description: Manual Steps
+        approvalRate:
+          type: number
+          description: Approval Rate
+        exceptionRate:
+          type: number
+          description: Exception Rate
+        estimatedOpportunity:
+          type: string
+          description: Estimated Opportunity
+        monthlyRequests4820:
+          type: string
+          description: 'Monthly Requests: 4,820'
+        approvalRate992:
+          type: number
+          description: 'Approval Rate: 99.2%'
+        averageApprovalDelay18Hours:
+          type: number
+          description: 'Average Approval Delay: 1.8 hours'
+    AiWorkflowIntelligenceAutonomousGovernanceCenterView:
+      type: object
+      x-ticvai-drafted-shape: true
+      x-ticvai-persistence: none — projection over approvals state, assembled at read time from tables that
+        already exist
+      description: '**What AI Workflow Intelligence & Autonomous Governance Center displays.** Read from
+        the workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      properties:
+        rules:
+          type: string
+          description: Rules
+        workflows:
+          type: string
+          description: Workflows
+        approvals:
+          type: string
+          description: Approvals
+        executionHistory:
+          type: string
+          description: Execution History
+        sla:
+          type: string
+          description: SLA
+        exceptions:
+          type: string
+          description: Exceptions
+        automation:
+          type: string
+          description: Automation
+        processPerformance:
+          type: string
+          description: Process Performance
+        approverBehavior:
+          type: string
+          description: Approver Behavior
+        moduleActivity:
+          type: string
+          description: Module Activity
+        businessOutcomes:
+          type: string
+          description: Business Outcomes
+        clarificationExecute:
+          type: string
+          description: Clarification → Execute
+        aiIdentifiesExcessiveRework:
+          type: string
+          description: AI identifies excessive rework
+        by34Hours:
+          type: string
+          description: by 3.4 hours
+        aiModel:
+          type: string
+          description: AI Model
+        aiService:
+          type: string
+          description: AI Service
+        useCase:
+          type: string
+          description: Use Case
+        autonomyLevel:
+          type: string
+          description: Autonomy Level
+        decisionScope:
+          type: string
+          description: Decision Scope
+        confidenceThreshold:
+          type: integer
+          description: Confidence Threshold
+        humanApprovalRequirement:
+          type: string
+          description: Human Approval Requirement
+        executionVolume:
+          type: integer
+          description: Execution Volume
+        exceptionRate:
+          type: number
+          description: Exception Rate
+        lastReview:
+          type: string
+          format: date-time
+          description: Last Review
+        owner:
+          type: string
+          description: Owner
+        humanSystemDecisionFinalAction:
+          type: string
+          description: Human/System Decision → Final Action
+        crossModuleOrchestrationMonitorMultiModuleExecution:
+          type: string
+          description: Cross-Module Orchestration Monitor Multi-module execution
+        area13CompleteArchitecture:
+          type: string
+          description: Area 13 — Complete Architecture
+        employeeApp:
+          type: string
+          description: Employee App

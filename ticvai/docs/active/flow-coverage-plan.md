@@ -72,7 +72,7 @@ the spread says where to look.
 | InventoryService | 50 | 48 | 96% |
 
 **`InventoryService` at 96% and `CrossRegionService` at 31%** — and the difference is not risk, it is
-attention. Inventory was walked four times across three passes; cross-cell has one flow and it is
+attention. Inventory was walked four times across three passes; cross-region has one flow and it is
 the only service that reaches another jurisdiction.
 
 ---

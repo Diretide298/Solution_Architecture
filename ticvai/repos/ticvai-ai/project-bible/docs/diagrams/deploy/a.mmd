@@ -1,0 +1,27 @@
+flowchart TB
+  subgraph T1["Tenant A — dedicated cell, uae-1"]
+    direction TB
+    A1["Postgres 2 vCPU / 4 GB<br/>max_conn 200"]
+    A2["Redis 1 GB"]
+    A3["16 services x 1 replica"]
+    A3 --> A1
+    A3 --> A2
+  end
+  subgraph T2["Tenant B — dedicated cell, uae-1"]
+    B1["Postgres"]
+    B2["Redis"]
+    B3["16 services x 1"]
+    B3 --> B1
+    B3 --> B2
+  end
+  subgraph T3["Tenant B — dedicated cell, sau-1"]
+    C1["Postgres"]
+    C2["Redis"]
+    C3["16 services x 1"]
+    C3 --> C1
+    C3 --> C2
+  end
+  CP["Control plane<br/>PlatformService"] -.provisions.-> T1
+  CP -.-> T2
+  CP -.-> T3
+  T2 <-.pseudonymous link only.-> T3

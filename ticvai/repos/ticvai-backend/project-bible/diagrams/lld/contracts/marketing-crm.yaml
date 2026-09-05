@@ -1,5 +1,5 @@
 id: LLD-marketing-crm
-title: marketing-crm — 96 operations
+title: marketing-crm — 166 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -40,7 +40,9 @@ operations:
   path: /cases/{caseId}/messages
   scope: venue
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -66,7 +68,8 @@ operations:
   path: /consent/suppression-list
   scope: tenant
   permission: GUEST_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -79,7 +82,8 @@ operations:
   path: /guests/{subjectId}/wishlist
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -92,7 +96,8 @@ operations:
   path: /guests/{subjectId}/loyalty/adjust
   scope: venue
   permission: LEDGER_POST
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -100,12 +105,33 @@ operations:
   writes:
   - cache:idempotency
   - marketing.loyalty_position
+- operation: approvePrivacyTesting
+  verb: PUT
+  path: /privacy-testing
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveWaiverTesting
+  verb: PUT
+  path: /waiver-testing
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: claimConversation
   verb: POST
   path: /conversations/{conversationId}/claim
   scope: tenant
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -119,7 +145,8 @@ operations:
   path: /conversations/{conversationId}/close
   scope: tenant
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -133,7 +160,8 @@ operations:
   path: /campaigns
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -148,7 +176,10 @@ operations:
   path: /cases
   scope: venue
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: true
   reads:
   - cache:idempotency
@@ -156,6 +187,16 @@ operations:
   writes:
   - cache:idempotency
   - marketing.case
+- operation: createCaseClassificationIntelligent
+  verb: POST
+  path: /case-classification-intelligent
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createChallenge
   verb: POST
   path: /challenges
@@ -221,7 +262,8 @@ operations:
   path: /loyalty/programmes
   scope: tenant
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -234,7 +276,8 @@ operations:
   path: /message-templates
   scope: tenant
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -263,7 +306,8 @@ operations:
   path: /segments
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -293,7 +337,8 @@ operations:
   path: /kiosk-assists/{sessionId}/end
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - device
   offline: false
   reads:
   - cache:idempotency
@@ -306,7 +351,9 @@ operations:
   path: /cases/{caseId}/escalate
   scope: venue
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -319,7 +366,8 @@ operations:
   path: /campaigns/{campaignId}
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.campaign
@@ -329,7 +377,8 @@ operations:
   path: /campaigns/{campaignId}/performance
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.attribution_touch
@@ -341,7 +390,9 @@ operations:
   path: /cases/{caseId}
   scope: venue
   permission: CASE_VIEW
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - marketing.case
@@ -352,7 +403,8 @@ operations:
   path: /guests/{subjectId}/consents/history
   scope: venue
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.consent_record
@@ -362,7 +414,8 @@ operations:
   path: /conversations/{conversationId}
   scope: tenant
   permission: CASE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.conversation
@@ -374,7 +427,9 @@ operations:
   path: /guests/{subjectId}/consents
   scope: venue
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - marketing.consent_purpose
@@ -386,7 +441,8 @@ operations:
   path: /guests/{subjectId}/loyalty
   scope: venue
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.loyalty_position
@@ -396,7 +452,9 @@ operations:
   path: /guests/{subjectId}
   scope: venue
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - marketing.consent_record
@@ -435,17 +493,31 @@ operations:
   path: /loyalty/position
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - marketing.loyalty_programme
+  writes: []
+- operation: getMarketingSubscription
+  verb: GET
+  path: /marketing-subscriptions
+  scope: tenant
+  permission: MARKETING_VIEW
+  audience:
+  - guest
+  offline: false
+  reads:
+  - marketing.subscription
   writes: []
 - operation: getMessageStatus
   verb: GET
   path: /messages/{messageId}
   scope: venue
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - marketing.message_dispatch
@@ -468,7 +540,8 @@ operations:
   path: /consent/suppression-list
   scope: tenant
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.suppression
@@ -494,7 +567,8 @@ operations:
   path: /guests/{subjectId}/wishlist
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - marketing.wishlist_item
@@ -504,7 +578,8 @@ operations:
   path: /conversations/{conversationId}/handover
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -513,6 +588,7 @@ operations:
   writes:
   - cache:idempotency
   - marketing.conversation
+  - platform.outbox
 - operation: identifyGuest
   verb: POST
   path: /guests/identify
@@ -534,7 +610,8 @@ operations:
   path: /campaigns/{campaignId}/launch
   scope: venue
   permission: MARKETING_SEND
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -542,55 +619,313 @@ operations:
   writes:
   - cache:idempotency
   - marketing.campaign
+- operation: listAgentWorkloadAvailability
+  verb: GET
+  path: /agent-workload-availability
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBusinessEventNotification
+  verb: GET
+  path: /business-event-notification
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listCampaigns
   verb: GET
   path: /campaigns
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.campaign
+  writes: []
+- operation: listCaseResolutionClosure
+  verb: GET
+  path: /case-resolution-closure
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listCases
   verb: GET
   path: /cases
   scope: venue
   permission: CASE_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
+  - partner
   offline: false
   reads:
   - marketing.case
+  writes: []
+- operation: listCommunicationService
+  verb: GET
+  path: /communication-service
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listComplianceEvidenceWaiver
+  verb: GET
+  path: /compliance-evidence-waiver
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listConsentEvidenceWithdrawal
+  verb: GET
+  path: /consent-evidence-withdrawal
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listConsentPreferenceCommunication
+  verb: GET
+  path: /consent-preference-communication
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listConsentPurposes
   verb: GET
   path: /consent-purposes
   scope: tenant
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: true
   reads:
   - cache:resolution
   - marketing.consent_purpose
   writes:
   - cache:resolution
+- operation: listContact
+  verb: GET
+  path: /contact
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listContactAutomation
+  verb: GET
+  path: /contact-automation
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listConversations
   verb: GET
   path: /conversations
   scope: tenant
   permission: CASE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - identity.principal
   - marketing.conversation
+  writes: []
+- operation: listCookieBannerPreference
+  verb: GET
+  path: /cookie-banner-preference
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCookieTrackingDigital
+  verb: GET
+  path: /cookie-tracking-digital
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerPrivacyConsent
+  verb: GET
+  path: /customer-privacy-consent
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerSatisfactionFeedback
+  verb: GET
+  path: /customer-satisfaction-feedback
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerService
+  verb: GET
+  path: /customer-service
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerServiceProfile
+  verb: GET
+  path: /customer-service-profile
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDataProcessingPurpose
+  verb: GET
+  path: /data-processing-purpose
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDataRetentionExpiry
+  verb: GET
+  path: /data-retention-expiry
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDataSubjectCustomer
+  verb: GET
+  path: /data-subject-customer
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDeletionAnonymizationRestriction
+  verb: GET
+  path: /deletion-anonymization-restriction
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDeliveryCommunicationPlatform
+  verb: GET
+  path: /delivery-communication-platform
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDeliveryQueueFailure
+  verb: GET
+  path: /delivery-queue-failure
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDigitalSigningCollection
+  verb: GET
+  path: /digital-signing-collection
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicFieldQuestion
+  verb: GET
+  path: /dynamic-field-question
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEscalationCollaborationInternal
+  verb: GET
+  path: /escalation-collaboration-internal
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEscalationCriticalCase
+  verb: GET
+  path: /escalation-critical-case
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listGuestDevices
   verb: GET
   path: /guests/{subjectId}/devices
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - marketing.guest_device
@@ -613,7 +948,6 @@ operations:
   permission: CASE_VIEW
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - marketing.lost_item
@@ -624,7 +958,9 @@ operations:
   path: /loyalty/programmes
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: true
   reads:
   - marketing.loyalty_programme
@@ -634,7 +970,8 @@ operations:
   path: /message-templates
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.message_template
@@ -650,6 +987,26 @@ operations:
   reads:
   - marketing.message_trigger
   writes: []
+- operation: listMinorGuardianGroup
+  verb: GET
+  path: /minor-guardian-group
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMissingExpiredInvalid
+  verb: GET
+  path: /missing-expired-invalid
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listMyCases
   verb: GET
   path: /my/cases
@@ -662,22 +1019,124 @@ operations:
   - marketing.case
   - pii.subject
   writes: []
+- operation: listParticipantWaiverStatus
+  verb: GET
+  path: /participant-waiver-statu
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPrivacy
+  verb: GET
+  path: /privacy
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPrivacyCompliance
+  verb: GET
+  path: /privacy-compliance
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPrivacyConsent
+  verb: GET
+  path: /privacy-consent
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPrivacyEvidenceCompliance
+  verb: GET
+  path: /privacy-evidence-compliance
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPrivacyNoticePolicy
+  verb: GET
+  path: /privacy-notice-policy
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductEventExperience
+  verb: GET
+  path: /product-event-experience
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProviderHealthUsage
+  verb: GET
+  path: /provider-health-usage
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listQualityAgentEvaluation
+  verb: GET
+  path: /quality-agent-evaluation
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listReviews
   verb: GET
   path: /reviews
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.review
+  writes: []
+- operation: listRoutingPriorityThrottling
+  verb: GET
+  path: /routing-priority-throttling
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listSegmentMembers
   verb: GET
   path: /segments/{segmentId}/members
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.guest_profile
@@ -687,10 +1146,131 @@ operations:
   path: /segments
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.segment
+  writes: []
+- operation: listServiceRootCause
+  verb: GET
+  path: /service-root-cause
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSiteWaiverException
+  verb: GET
+  path: /site-waiver-exception
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSlaPolicyService
+  verb: GET
+  path: /sla-policy-service
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSystemTransactionalTemplate
+  verb: GET
+  path: /system-transactional-template
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUnifiedInteractionCommunication
+  verb: GET
+  path: /unified-interaction-communication
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVersioningEffectiveDate
+  verb: GET
+  path: /versioning-effective-date
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWaiver
+  verb: GET
+  path: /waiver
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWaiverComplianceOperational
+  verb: GET
+  path: /waiver-compliance-operational
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWaiverComplianceRisk
+  verb: GET
+  path: /waiver-compliance-risk
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWaiverConsent
+  verb: GET
+  path: /waiver-consent
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWaiverTemplateMaster
+  verb: GET
+  path: /waiver-template-master
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWaiverTriggerEligibility
+  verb: GET
+  path: /waiver-trigger-eligibility
+  scope: venue
+  permission: MARKETING_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: matchGuest
   verb: POST
@@ -724,7 +1304,8 @@ operations:
   path: /guests/{subjectId}/merge
   scope: venue
   permission: GUEST_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -754,7 +1335,8 @@ operations:
   path: /campaigns/{campaignId}/pause
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -767,7 +1349,8 @@ operations:
   path: /segments/{segmentId}/preview
   scope: venue
   permission: MARKETING_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -794,7 +1377,8 @@ operations:
   path: /guests/{subjectId}/consents
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -809,7 +1393,6 @@ operations:
   permission: CASE_MANAGE
   audience:
   - staff
-  - guest
   offline: true
   reads:
   - cache:idempotency
@@ -870,7 +1453,8 @@ operations:
   path: /guests/{subjectId}/devices
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -883,7 +1467,8 @@ operations:
   path: /guests/{subjectId}/wishlist/{itemId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -896,7 +1481,9 @@ operations:
   path: /cases/{caseId}/reopen
   scope: venue
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -939,7 +1526,8 @@ operations:
   path: /reviews/{reviewId}/respond
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -969,7 +1557,8 @@ operations:
   path: /guests/{subjectId}/devices/{deviceId}
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -982,7 +1571,8 @@ operations:
   path: /guests
   scope: venue
   permission: GUEST_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - marketing.guest_profile
@@ -992,7 +1582,9 @@ operations:
   path: /conversations/{conversationId}/messages
   scope: tenant
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -1006,7 +1598,9 @@ operations:
   path: /messages
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - service
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -1019,7 +1613,8 @@ operations:
   path: /agent-availability
   scope: tenant
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1043,12 +1638,53 @@ operations:
   - cache:idempotency
   - marketing.case
   - marketing.conversation
+- operation: setCaseInvestigationResolution
+  verb: PUT
+  path: /case-investigation-resolution
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setChannelProvider
+  verb: PUT
+  path: /channel-provider
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCommunicationPreferenceMarketing
+  verb: PUT
+  path: /communication-preference-marketing
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setConsentCapturePoint
+  verb: PUT
+  path: /consent-capture-point
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setConsentPurposes
   verb: PUT
   path: /consent-purposes
   scope: tenant
   permission: GUEST_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1057,6 +1693,68 @@ operations:
   - cache:idempotency
   - cache:resolution
   - marketing.consent_purpose
+- operation: setCustomerServiceCopilot
+  verb: PUT
+  path: /customer-service-copilot
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDataDiscoveryAccess
+  verb: PUT
+  path: /data-discovery-access
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDigitalWaiverForm
+  verb: PUT
+  path: /digital-waiver-form
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setIntelligentRoutingSkill
+  verb: PUT
+  path: /intelligent-routing-skill
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setLocalizationBrandingCustomer
+  verb: PUT
+  path: /localization-branding-customer
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMarketingSubscription
+  verb: PUT
+  path: /marketing-subscriptions
+  scope: tenant
+  permission: MARKETING_VIEW
+  audience:
+  - guest
+  offline: false
+  reads:
+  - marketing.subscription
+  writes:
+  - marketing.subscription
 - operation: setMessageTrigger
   verb: POST
   path: /message-triggers
@@ -1072,6 +1770,56 @@ operations:
   writes:
   - cache:idempotency
   - marketing.message_trigger
+- operation: setMinorGuardianAge
+  verb: PUT
+  path: /minor-guardian-age
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setOrderBookingTicket
+  verb: PUT
+  path: /order-booking-ticket
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPrivacyComplianceException
+  verb: PUT
+  path: /privacy-compliance-exception
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setRefundCompensationService
+  verb: PUT
+  path: /refund-compensation-service
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setSenderIdentityDomain
+  verb: PUT
+  path: /sender-identity-domain
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setSeoMetadata
   verb: PUT
   path: /seo-metadata
@@ -1087,12 +1835,33 @@ operations:
   - cache:idempotency
   - cache:resolution
   - control.seo_metadata
+- operation: setSignatorySignatureGuardian
+  verb: PUT
+  path: /signatory-signature-guardian
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setWaiverVerificationValidation
+  verb: PUT
+  path: /waiver-verification-validation
+  scope: venue
+  permission: MARKETING_MANAGE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: startKioskAssist
   verb: POST
   path: /kiosk-assists
   scope: venue
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1106,7 +1875,8 @@ operations:
   path: /campaigns/{campaignId}/stop
   scope: venue
   permission: MARKETING_SEND
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1123,7 +1893,6 @@ operations:
   permission: GUEST_VIEW
   audience:
   - staff
-  - guest
   offline: true
   reads:
   - cache:idempotency
@@ -1139,7 +1908,8 @@ operations:
   path: /reviews
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -1152,7 +1922,8 @@ operations:
   path: /campaigns/{campaignId}/test-send
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1165,7 +1936,8 @@ operations:
   path: /conversations/{conversationId}/transfer
   scope: tenant
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1179,7 +1951,8 @@ operations:
   path: /campaigns/{campaignId}/unschedule
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1192,7 +1965,8 @@ operations:
   path: /campaigns/{campaignId}
   scope: venue
   permission: MARKETING_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -1207,7 +1981,9 @@ operations:
   path: /cases/{caseId}
   scope: venue
   permission: CASE_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -1235,7 +2011,8 @@ operations:
   path: /guests/{subjectId}
   scope: venue
   permission: GUEST_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

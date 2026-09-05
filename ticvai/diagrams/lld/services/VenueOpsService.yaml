@@ -89,7 +89,7 @@ operationsByContract:
     permission: WORK_ORDER_MANAGE
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createAsset
     verb: POST
     path: /assets
@@ -337,7 +337,7 @@ operationsByContract:
     permission: WORK_ORDER_VERIFY
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
 - contract: queue
   count: 21
   operations:
@@ -932,9 +932,9 @@ tables:
   - games
   foreignWriters: null
 - table: games.credit_ledger
-  columns: 1
+  columns: 2
   store: postgres
-  parent: games.card
+  parent: null
   writtenBy:
   - games
   foreignWriters: null
@@ -960,7 +960,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.reader_profile
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -974,7 +974,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.redemption_line
-  columns: 5
+  columns: 6
   store: postgres
   parent: games.redemption
   writtenBy: []
@@ -1008,7 +1008,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.inspection_template_item
-  columns: 10
+  columns: 11
   store: postgres
   parent: maintenance.inspection_template
   writtenBy: []
@@ -1070,7 +1070,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.qualification
-  columns: 6
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1159,6 +1159,7 @@ screens:
 - P02:GST-053 Build Your Own Itinerary
 - P02:GST-054 AI Optimized Itinerary
 - P02:GST-059 Plan My Day – In Progress
+- P02:GST-070 Reserve a Table or Cabana
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-010 Add to Existing Ticket
 - P06:EMP-003 Home — on duty
@@ -1179,6 +1180,7 @@ screens:
 - P08:BO-003 Queue Integration Setup
 - P08:BO-004 Manual Wait Time Entry
 - P08:BO-005 Queue Monitor
+- P08:BO-019 Closures & Blackouts
 - P08:BO-027 Reissue & Media Replacement
 - P08:BO-030 Work Order Verification
 - P08:BO-031 Asset Register
@@ -1194,8 +1196,10 @@ screens:
 - P08:BO-097 Check Out & Check In
 - P08:BO-098 Qualifications
 - P08:BO-099 Session Manifest
+- P08:BO-108 Venue Operations
 - P08:BO-125 Product & Category Button Configuration
 - P11:ACC-006 Reviewer Queue
+- P12:SUP-020 Queue Configuration & Management
 - P13:CMS-002 Brand Kit
 - P13:CMS-004 Logo & Assets
 - P13:CMS-010 Media Library

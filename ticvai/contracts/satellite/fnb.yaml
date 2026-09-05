@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 80
+  x-ticvai-screen-count: 81
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -26,7 +26,7 @@ info:
     \ truth for one bounded context: server code, client code and mock servers are generated from it,\
     \ never the other way round. If a field is not here, it does not exist.\n**Contracts are split into\
     \ two tiers.**\n- **Spine** — the eight contexts everything else depends on: tenancy, identity,\n\
-    \  catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here\n  requires\
+    \  catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here\n  requires\
     \ a formal change request, because every satellite has pinned against it.\n- **Satellite** — a domain\
     \ that builds on the spine and can move independently.\n  Cheaper to change.\n\n**`paths` are operations.**\
     \ Each one declares four TICVAI extensions, and Redocly rejects any that does not:\n| Extension |\
@@ -2803,6 +2803,7 @@ paths:
     post:
       operationId: joinRestaurantWaitlist
       x-ticvai-consumed-by:
+        - "P02 GST-070 Reserve a Table or Cabana"
         - "P06 EMP-056 Walk-In & Waitlist Management"
         - "P06 EMP-058 Live Table & Service Management"
       summary: Add a party to an outlet's waitlist
@@ -2918,6 +2919,7 @@ paths:
     post:
       operationId: createTableReservation
       x-ticvai-consumed-by:
+        - "P02 GST-070 Reserve a Table or Cabana"
         - "P06 EMP-055 Create / Edit Reservation"
       x-ticvai-audience:
       - guest
@@ -2971,6 +2973,8 @@ paths:
         format: uuid
     patch:
       operationId: updateTableReservation
+      x-ticvai-consumed-by:
+        - "P02 GST-070 Reserve a Table or Cabana"
       x-ticvai-audience:
       - guest
       summary: Change or cancel a booking
@@ -3617,6 +3621,7 @@ paths:
         - "P04 POS-024 Outlet Setup"
         - "P08 BO-007 Product Directory"
         - "P08 BO-045 Menu Management"
+        - "P08 BO-104 Food & Beverage"
         - "P08 BO-109 Menu Builder & POS Layout Designer"
         - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
@@ -3666,6 +3671,7 @@ paths:
       operationId: createMenu
       x-ticvai-consumed-by:
         - "P08 BO-045 Menu Management"
+        - "P08 BO-104 Food & Beverage"
         - "P13 CMS-009 Navigation & Menus"
       x-ticvai-audience:
       - staff
@@ -5726,6 +5732,18 @@ components:
             signs what a cook should not.
 
             '
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `venue` scope.**'
     ColdChainEvent:
       type: object
       x-ticvai-persistence: fnb.cold_chain_event
@@ -6705,6 +6723,18 @@ components:
                 type: boolean
               isAvailable:
                 type: boolean
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `venue` scope.**'
     FnbOrderStatus:
       type: string
       description: 'The full lifecycle from 4.6.35. Nine states, not six — the earlier enum collapsed

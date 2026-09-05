@@ -1,0 +1,162 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; background: #EEF1F6; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+a { color: #0D6EFD; text-decoration: none; }
+a:hover { color: #0A55C7; }
+.chip { display: inline-flex; gap: 7px; align-items: center; border: 1px solid #E5E7EB; border-radius: 999px; padding: 5px 11px; background: #FFFFFF; }
+.chipid { font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; color: #6E7681; }
+.chipnm { font-size: 11.5px; font-weight: 700; color: #1F2937; }
+.sect { background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 18px 22px 20px; }
+.eyebrow { font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+</style>
+</helmet>
+
+<div style="font-family: Manrope, system-ui, sans-serif; color: #1F2937; background: #EEF1F6; padding: 44px 40px 56px">
+  <div style="max-width: 1160px; margin: 0 auto">
+
+    <div style="border-bottom: 1px solid #DCE3ED; padding-bottom: 22px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: .14em; color: #96650A; text-transform: uppercase">Tier 2 &middot; recurring by construction</div>
+      <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -.02em; margin: 8px 0 10px; line-height: 1.08">The same job, once per platform</h1>
+      <p style="font-size: 14px; line-height: 1.65; color: #4B5563; max-width: 82ch; margin: 0; text-wrap: pretty">These are not accidental collisions. Each is a capability that was given its own screens on every platform that touches it &mdash; so the same report engine, stock ledger and kitchen queue are specified three, four and five times over, each time with slightly different operations and a different name.</p>
+    </div>
+
+    <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 14px">
+
+      <div class="sect" style="border-left: 3px solid #C02626">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap">
+          <div class="eyebrow" style="color: #C02626">One report engine, twenty-five surfaces</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">P04 &middot; P08 &middot; P09 &middot; P10 &middot; P12 &middot; P15 &middot; P16</div>
+        </div>
+        <p style="font-size: 12.5px; line-height: 1.65; color: #4B5563; margin: 9px 0 12px; max-width: 88ch; text-wrap: pretty">Twenty-five screens call <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">runReport</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">getDashboard</span> or <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">getFinancialReport</span>. <strong>Nine of the ten P16 Venue Analytics screens are among them</strong> &mdash; the platform is a set of saved report configurations, not a distinct product. Four of them are the whole of P08's reporting section under different titles, and BO-029 Report Builder already builds the rest.</p>
+        <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase; margin-bottom: 9px">P16 &mdash; nine of ten are a report</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px">
+              <span class="chip"><span class="chipid">ANL-002</span><span class="chipnm">Sales, Revenue &amp; Channel</span></span>
+              <span class="chip"><span class="chipid">ANL-003</span><span class="chipnm">Operational Performance</span></span>
+              <span class="chip"><span class="chipid">ANL-004</span><span class="chipnm">Product Performance</span></span>
+              <span class="chip"><span class="chipid">ANL-005</span><span class="chipnm">Cost, Margin &amp; Profitability</span></span>
+              <span class="chip"><span class="chipid">ANL-006</span><span class="chipnm">Inventory &amp; Waste Intelligence</span></span>
+              <span class="chip"><span class="chipid">ANL-007</span><span class="chipnm">Guest &amp; Conversion Intelligence</span></span>
+            </div>
+            <p style="font-size: 11.5px; line-height: 1.6; color: #6B7280; margin: 10px 0 0; text-wrap: pretty">Every one of these six is <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">getDashboard&nbsp;+&nbsp;runReport</span> plus at most three operations that fetch the figures. The difference between them is the report they load. ANL-010 is the exception on the platform &mdash; it calls neither.</p>
+          </div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase; margin-bottom: 9px">The same reporting screen elsewhere</div>
+            <div style="display: flex; flex-wrap: wrap; gap: 6px">
+              <span class="chip"><span class="chipid">BO-029</span><span class="chipnm">Report Builder</span></span>
+              <span class="chip"><span class="chipid">BO-058</span><span class="chipnm">Reporting Home</span></span>
+              <span class="chip"><span class="chipid">BO-059</span><span class="chipnm">Sales Reports</span></span>
+              <span class="chip"><span class="chipid">BO-061</span><span class="chipnm">Scheduled Reports</span></span>
+              <span class="chip"><span class="chipid">POS-008</span><span class="chipnm">Reports</span></span>
+              <span class="chip"><span class="chipid">PTR-018</span><span class="chipnm">Reports &amp; Sales Performance</span></span>
+              <span class="chip"><span class="chipid">SUP-008</span><span class="chipnm">Agent Performance &amp; SLA View</span></span>
+            </div>
+            <p style="font-size: 11.5px; line-height: 1.6; color: #6B7280; margin: 10px 0 0; text-wrap: pretty">BO-029, BO-059, BO-061 and PTR-018 share an <strong>identical nine-operation signature</strong>. They are one report screen scoped four ways.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="sect" style="border-left: 3px solid #96650A">
+        <div style="display: flex; justify-content: space-between; align-items: baseline; gap: 14px; flex-wrap: wrap">
+          <div class="eyebrow" style="color: #96650A">The stock ledger, drawn for the floor and for the desk</div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">P06 &middot; P08</div>
+        </div>
+        <p style="font-size: 12.5px; line-height: 1.65; color: #4B5563; margin: 9px 0 12px; max-width: 88ch; text-wrap: pretty">P06's <em>Stock on the Floor</em> module (10 screens) uses 27 operations; <strong>19 of them &mdash; 70&#37; &mdash; are already used by P08's Stock &amp; Supply</strong> (15 screens, 60 operations). The two modules step through the same lifecycle in the same order under different titles.</p>
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 26px minmax(0, 1fr); align-items: center; font-size: 12px">
+          <div style="text-align: right; padding: 0 10px 8px 0; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase">P06 Staff App</div>
+          <div></div>
+          <div style="padding: 0 0 8px 10px; font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase">P08 Back Office</div>
+
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 10px 7px 0; text-align: right"><span style="font-weight: 700">Receiving &amp; Store Put-Away</span> <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">EMP-065</span></div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #96650A">&asymp;</div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0 7px 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">BO-052</span> <span style="font-weight: 700">Goods Receipt</span></div>
+
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 10px 7px 0; text-align: right"><span style="font-weight: 700">Stock Count &amp; Cycle Count Management</span> <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">EMP-066</span></div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #96650A">&asymp;</div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0 7px 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">BO-079</span> <span style="font-weight: 700">Stock Count</span> <span style="font-size: 11px; color: #C02626; font-weight: 600">all five count operations shared</span></div>
+
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 10px 7px 0; text-align: right"><span style="font-weight: 700">Requisition &amp; Smart Store Replenishment</span> <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">EMP-063</span></div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #96650A">&asymp;</div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0 7px 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">BO-078</span> <span style="font-weight: 700">Requisitions</span></div>
+
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 10px 7px 0; text-align: right"><span style="font-weight: 700">Store-to-Store &amp; Warehouse Transfers</span> <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">EMP-064</span></div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #96650A">&asymp;</div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0 7px 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">BO-080</span> <span style="font-weight: 700">Stock Transfers</span></div>
+
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 10px 7px 0; text-align: right"><span style="font-weight: 700">Barcode, RFID, Serialized Stock &amp; Traceability</span> <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">EMP-069</span></div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #C02626">&equiv;</div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0 7px 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">BO-114</span> <span style="font-weight: 700">Variants, Attributes, Barcode &amp; RFID Management</span> <span style="font-size: 11px; color: #C02626; font-weight: 600">identical signature</span></div>
+
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 10px 7px 0; text-align: right"><span style="font-weight: 700">Inventory Exceptions, AI Replenishment &amp; Action Center</span> <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">EMP-070</span></div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0; text-align: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #C02626">&equiv;</div>
+          <div style="border-top: 1px solid #E5E7EB; padding: 7px 0 7px 10px"><span style="font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">BO-141</span> <span style="font-weight: 700">Operational Alerts, AI Replenishment &amp; Action Center</span> <span style="font-size: 11px; color: #C02626; font-weight: 600">identical signature</span></div>
+        </div>
+        <p style="font-size: 11.5px; line-height: 1.6; color: #6B7280; margin: 12px 0 0; text-wrap: pretty">The eight operations P06 has that P08 does not are the ones that argue for keeping it: <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">logTemperature</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">logColdChain</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">getHaccpStatus</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">signCorrectiveAction</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">setDailyCount</span>. That is a food-safety round, done standing up with a device &mdash; a real second surface, and much smaller than ten screens.</p>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px">
+        <div class="sect" style="border-left: 3px solid #96650A">
+          <div class="eyebrow" style="color: #96650A">The kitchen queue, in three places</div>
+          <p style="font-size: 12.5px; line-height: 1.65; color: #4B5563; margin: 9px 0 11px; text-wrap: pretty">P15 is a ten-screen platform for the kitchen. It uses 24 operations and <strong>17 of them already appear on other platforms</strong> &mdash; nine in P08's F&amp;B section, seven at the point of sale.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px">
+            <span class="chip"><span class="chipid">KIT-002</span><span class="chipnm">Kitchen Display System</span></span>
+            <span class="chip"><span class="chipid">BO-046</span><span class="chipnm">Kitchen Display</span></span>
+            <span class="chip"><span class="chipid">POS-022</span><span class="chipnm">Send to Kitchen</span></span>
+            <span class="chip"><span class="chipid">BO-135</span><span class="chipnm">Order Routing &amp; KDS/Printer Rules</span></span>
+            <span class="chip"><span class="chipid">BO-134</span><span class="chipnm">Kitchen &amp; Preparation Stations</span></span>
+            <span class="chip"><span class="chipid">KIT-005</span><span class="chipnm">Kitchen Station Workload &amp; Dynamic Routing</span></span>
+          </div>
+          <p style="font-size: 11.5px; line-height: 1.6; color: #6B7280; margin: 11px 0 0; text-wrap: pretty">KIT-005 and BO-134 are the same two operations exactly &mdash; the kitchen configures its stations from the kitchen, and the back office configures them again. Setup belongs in one place; the kitchen queue itself belongs on the kitchen screen.</p>
+        </div>
+
+        <div class="sect" style="border-left: 3px solid #0D6EFD">
+          <div class="eyebrow" style="color: #0D6EFD">One people directory, three owners</div>
+          <p style="font-size: 12.5px; line-height: 1.65; color: #4B5563; margin: 9px 0 11px; text-wrap: pretty">Three screens on three platforms declare exactly <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">listPrincipals</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">getPrincipal</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">createPrincipal</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">updatePrincipal</span> &mdash; the same four operations over the same records.</p>
+          <div style="display: flex; flex-wrap: wrap; gap: 6px">
+            <span class="chip"><span class="chipid">BO-053</span><span class="chipnm">Staff Directory</span></span>
+            <span class="chip"><span class="chipid">ADM-020</span><span class="chipnm">Platform User Directory</span></span>
+            <span class="chip"><span class="chipid">PTR-003</span><span class="chipnm">Profile &amp; Company Details</span></span>
+          </div>
+          <p style="font-size: 11.5px; line-height: 1.6; color: #6B7280; margin: 11px 0 0; text-wrap: pretty">The scope differs &mdash; a venue's staff, the platform's users, a partner's own people &mdash; and that is exactly the shape of one screen with a scope, not three screens with three sets of empty and permission states.</p>
+        </div>
+      </div>
+
+      <div class="sect">
+        <div class="eyebrow" style="color: #6E7681">Naming formulas that recur without meaning anything</div>
+        <p style="font-size: 12.5px; line-height: 1.6; color: #6B7280; margin: 9px 0 14px; max-width: 88ch; text-wrap: pretty">Counts are screens whose name <em>contains</em> the phrase. When the same word appears on this many screens it has stopped describing them. Each of these formulas is a place where a screen was created because a section needed a heading, not because a user needed a page.</p>
+        <div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px">
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">33</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">&hellip; Management</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">Across eight platforms. Almost always a list plus a form.</div></div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">12</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">&hellip; Configuration</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">Settings forms split by section rather than by who may change them.</div></div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">8</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">&hellip; Dashboard</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">Ten screens share one purpose sentence with these.</div></div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">7</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">&hellip; Monitor</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">EMP-031 &ldquo;Queue monitor&rdquo; and BO-005 &ldquo;Queue Monitor&rdquo;.</div></div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">6</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">&hellip; Directory</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">Queue, Product, Shift, Staff, Tenant, Platform User.</div></div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">4</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">&hellip; Command Center</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">EMP-051, EMP-061, KIT-001, ANL-001 &mdash; all landing pages.</div></div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">3</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">&hellip; AI &amp; Action Center</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">EMP-070, BO-141, ANL-009. Two share a signature exactly.</div></div>
+          <div style="border: 1px solid #E5E7EB; border-radius: 10px; padding: 12px 14px; background: #FCFDFE"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 20px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">15</div><div style="font-size: 12px; font-weight: 700; margin-top: 2px">AI surfaces</div><div style="font-size: 11px; color: #6B7280; line-height: 1.5; margin-top: 4px">Concierge, assistant, advice &mdash; eight platforms, no shared component.</div></div>
+        </div>
+      </div>
+
+      <div class="sect" style="background: #0C2340; border-color: #0C2340; color: #E8EFF7">
+        <div class="eyebrow" style="color: #00D4C4">The counter-example, so the method is checkable</div>
+        <p style="font-size: 12.5px; line-height: 1.65; color: #A9C2DC; margin: 9px 0 0; max-width: 90ch; text-wrap: pretty">P06's <em>Floor Service</em> module looks like the same kind of duplicate &mdash; ten screens over restaurant tables, sitting next to P08's F&amp;B section. It is not. The two share <strong>two operations out of twenty-nine each</strong>. Table service is genuinely a different job from F&amp;B configuration, and this module survives the audit unchanged. The same test is what puts the other clusters on this page.</p>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

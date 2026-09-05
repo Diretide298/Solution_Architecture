@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 52 operations, 35 tables
+title: TenancyService — 76 operations, 38 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,28 +20,311 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 52
+  operations: 76
   inAFlow: 32
   percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
     unwalked rather than under-documented.'
 schemas:
 - schema: platform
-  tables: 24
+  tables: 25
   stores:
   - postgres
   largestTable: platform.wallet_authorisation
 - schema: workforce
-  tables: 5
+  tables: 6
   stores:
   - postgres
   largestTable: workforce.rota_assignment
 - schema: approvals
-  tables: 6
+  tables: 7
   stores:
   - postgres
   largestTable: approvals.request
 operationsByContract:
+- contract: approvals
+  count: 35
+  operations:
+  - operation: approveMatrixMultiLevel
+    verb: PUT
+    path: /matrix-multi-level
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveRoleAuthorityDelegation
+    verb: PUT
+    path: /role-authority-delegation
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveUnifiedDecision
+    verb: PUT
+    path: /unified-decision
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveVersioningGovernance
+    verb: PUT
+    path: /versioning-governance
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: createApprovalDelegation
+    verb: POST
+    path: /delegations
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 3
+    writes: 2
+  - operation: createApprovalRequest
+    verb: POST
+    path: /approval-requests
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 5
+    writes: 2
+  - operation: createAutomationAutonomouAction
+    verb: POST
+    path: /automation-autonomou-action
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: decideApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/decide
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 4
+    writes: 4
+  - operation: escalateApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/escalate
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 3
+    writes: 3
+  - operation: evaluateApprovalRequirement
+    verb: POST
+    path: /approval-requests/evaluate
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 6
+    writes: 1
+  - operation: getApprovalAnalytics
+    verb: GET
+    path: /approval-analytics
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 3
+    writes: 0
+  - operation: issueAccreditationBadge
+    verb: POST
+    path: /accreditation-badges
+    scope: venue
+    permission: APPROVAL_ACT
+    offline: false
+    reads: 1
+    writes: 1
+  - operation: listAccreditationBadges
+    verb: GET
+    path: /accreditation-badges
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listApprovalDelegations
+    verb: GET
+    path: /delegations
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApprovalMatrices
+    verb: GET
+    path: /approval-matrices
+    scope: venue
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listApprovalRequests
+    verb: GET
+    path: /approval-requests
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 2
+    writes: 0
+  - operation: listConditionDecisionLogic
+    verb: GET
+    path: /condition-decision-logic
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCrossModuleOrchestration
+    verb: GET
+    path: /cross-module-orchestration
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listProcessAutomationOpportunity
+    verb: GET
+    path: /process-automation-opportunity
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRuleWorkflow
+    verb: GET
+    path: /rule-workflow
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listSlaEscalationBottleneck
+    verb: GET
+    path: /sla-escalation-bottleneck
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listSlaEscalationReminder
+    verb: GET
+    path: /sla-escalation-reminder
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listWorkflow
+    verb: GET
+    path: /workflow
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listWorkflowAutonomouGovernance
+    verb: GET
+    path: /workflow-autonomou-governance
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listWorkflowExceptionFailure
+    verb: GET
+    path: /workflow-exception-failure
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listWorkflowInstanceProcess
+    verb: GET
+    path: /workflow-instance-process
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listWorkflowProcessPerformance
+    verb: GET
+    path: /workflow-process-performance
+    scope: venue
+    permission: APPROVAL_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: resubmitApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/resubmit
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: revokeApprovalDelegation
+    verb: DELETE
+    path: /delegations/{delegationId}
+    scope: venue
+    permission: APPROVAL_DECIDE
+    offline: false
+    reads: 2
+    writes: 2
+  - operation: setApprovalMatrix
+    verb: PUT
+    path: /approval-matrices
+    scope: venue
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 2
+    writes: 3
+  - operation: setTriggerActionCross
+    verb: PUT
+    path: /trigger-action-cross
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setVisualBusinessRule
+    verb: PUT
+    path: /visual-business-rule
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setVisualWorkflow
+    verb: PUT
+    path: /visual-workflow
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulateWorkflowTestingImpact
+    verb: PUT
+    path: /workflow-testing-impact
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: withdrawApprovalRequest
+    verb: POST
+    path: /approval-requests/{requestId}/withdraw
+    scope: venue
+    permission: APPROVAL_REQUEST
+    offline: false
+    reads: 2
+    writes: 2
 - contract: tenancy
   count: 27
   operations:
@@ -261,115 +544,8 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-- contract: approvals
-  count: 13
-  operations:
-  - operation: createApprovalDelegation
-    verb: POST
-    path: /delegations
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 3
-    writes: 2
-  - operation: createApprovalRequest
-    verb: POST
-    path: /approval-requests
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 5
-    writes: 2
-  - operation: decideApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/decide
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 4
-    writes: 3
-  - operation: escalateApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/escalate
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 3
-    writes: 3
-  - operation: evaluateApprovalRequirement
-    verb: POST
-    path: /approval-requests/evaluate
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 6
-    writes: 1
-  - operation: getApprovalAnalytics
-    verb: GET
-    path: /approval-analytics
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 3
-    writes: 0
-  - operation: listApprovalDelegations
-    verb: GET
-    path: /delegations
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listApprovalMatrices
-    verb: GET
-    path: /approval-matrices
-    scope: venue
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: listApprovalRequests
-    verb: GET
-    path: /approval-requests
-    scope: venue
-    permission: APPROVAL_VIEW
-    offline: false
-    reads: 2
-    writes: 0
-  - operation: resubmitApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/resubmit
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: revokeApprovalDelegation
-    verb: DELETE
-    path: /delegations/{delegationId}
-    scope: venue
-    permission: APPROVAL_DECIDE
-    offline: false
-    reads: 2
-    writes: 2
-  - operation: setApprovalMatrix
-    verb: PUT
-    path: /approval-matrices
-    scope: venue
-    permission: APPROVAL_CONFIGURE
-    offline: false
-    reads: 2
-    writes: 3
-  - operation: withdrawApprovalRequest
-    verb: POST
-    path: /approval-requests/{requestId}/withdraw
-    scope: venue
-    permission: APPROVAL_REQUEST
-    offline: false
-    reads: 2
-    writes: 2
 - contract: workforce
-  count: 12
+  count: 14
   operations:
   - operation: acknowledgeAnnouncement
     verb: POST
@@ -435,6 +611,22 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 0
+  - operation: listShiftSwapRequests
+    verb: GET
+    path: /shift-swaps
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
+  - operation: listTrainingRecords
+    verb: GET
+    path: /training-records
+    scope: venue
+    permission: WORKFORCE_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: publishAnnouncement
     verb: POST
     path: /announcements
@@ -482,6 +674,13 @@ tables:
   owned: false
   why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
     by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- table: approvals.accreditation_badge
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
 - table: approvals.decision
   columns: 13
   store: postgres
@@ -490,16 +689,16 @@ tables:
   - approvals
   foreignWriters: null
 - table: approvals.delegation
-  columns: 8
+  columns: 9
   store: postgres
   parent: null
   writtenBy:
   - approvals
   foreignWriters: null
 - table: approvals.escalation
-  columns: 1
+  columns: 2
   store: postgres
-  parent: approvals.request
+  parent: null
   writtenBy:
   - approvals
   foreignWriters: null
@@ -528,16 +727,16 @@ tables:
   - approvals
   foreignWriters: null
 - table: platform.audit_read
-  columns: 2
+  columns: 3
   store: postgres
-  parent: identity.principal
+  parent: null
   writtenBy:
   - tenancy
   foreignWriters: null
 - table: platform.audit_record
-  columns: 2
+  columns: 3
   store: postgres
-  parent: identity.principal
+  parent: null
   writtenBy:
   - inventory
   - tenancy
@@ -562,9 +761,17 @@ tables:
   store: postgres
   parent: null
   writtenBy:
-  - cross-cell
+  - cross-region
   foreignWriters:
-  - cross-cell
+  - cross-region
+- table: platform.dead_letter
+  columns: 11
+  store: postgres
+  parent: null
+  writtenBy:
+  - platform-ops
+  foreignWriters:
+  - platform-ops
 - table: platform.denomination
   columns: 8
   store: postgres
@@ -579,7 +786,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.device_heartbeat
-  columns: 1
+  columns: 2
   store: postgres
   parent: platform.device
   writtenBy: []
@@ -589,19 +796,19 @@ tables:
   store: postgres
   parent: null
   writtenBy:
-  - cross-cell
+  - cross-region
   - identity
   foreignWriters:
-  - cross-cell
+  - cross-region
   - identity
 - table: platform.guest_link
   columns: 5
   store: postgres
   parent: null
   writtenBy:
-  - cross-cell
+  - cross-region
   foreignWriters:
-  - cross-cell
+  - cross-region
 - table: platform.offline_policy
   columns: 8
   store: postgres
@@ -617,11 +824,36 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.outbox
-  columns: 0
+  columns: 11
   store: postgres
   parent: null
-  writtenBy: []
-  foreignWriters: null
+  writtenBy:
+  - access
+  - approvals
+  - catalogue
+  - finance
+  - fnb
+  - inventory
+  - maintenance
+  - marketing-crm
+  - orders
+  - platform-ops
+  - shift
+  - subscription
+  - white-label
+  foreignWriters:
+  - access
+  - catalogue
+  - finance
+  - fnb
+  - inventory
+  - maintenance
+  - marketing-crm
+  - orders
+  - platform-ops
+  - shift
+  - subscription
+  - white-label
 - table: platform.outlet
   columns: 9
   store: postgres
@@ -637,7 +869,7 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.region_settings
-  columns: 10
+  columns: 11
   store: postgres
   parent: null
   writtenBy:
@@ -653,13 +885,13 @@ tables:
   - tenancy
   foreignWriters: null
 - table: platform.sale_board_page
-  columns: 3
+  columns: 4
   store: postgres
   parent: platform.sale_board
   writtenBy: []
   foreignWriters: null
 - table: platform.sale_board_tile
-  columns: 1
+  columns: 2
   store: postgres
   parent: null
   writtenBy: []
@@ -671,7 +903,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: platform.tenant
-  columns: 1
+  columns: 2
   store: postgres
   parent: null
   writtenBy: []
@@ -688,9 +920,9 @@ tables:
   store: postgres
   parent: null
   writtenBy:
-  - cross-cell
+  - cross-region
   foreignWriters:
-  - cross-cell
+  - cross-region
 - table: platform.workstation
   columns: 18
   store: postgres
@@ -706,7 +938,7 @@ tables:
   - workforce
   foreignWriters: null
 - table: workforce.announcement_receipt
-  columns: 2
+  columns: 3
   store: postgres
   parent: workforce.announcement
   writtenBy:
@@ -732,6 +964,12 @@ tables:
   parent: null
   writtenBy:
   - workforce
+  foreignWriters: null
+- table: workforce.training_record
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy: []
   foreignWriters: null
 readsFrom:
 - service: IdentityService
@@ -769,6 +1007,7 @@ screens:
 - P06:EMP-037 Notifications
 - P06:EMP-038 Broadcast to team
 - P06:EMP-039 Announcements
+- P06:EMP-041 Training
 - P06:EMP-043 Device settings
 - P06:EMP-047 Emergency mode
 - P08:BO-035 Override Audit
@@ -779,6 +1018,7 @@ screens:
 - P08:BO-056 Time & Attendance
 - P08:BO-063 Opening Hours & Calendar
 - P08:BO-064 Zones & Areas
+- P08:BO-065 Venue Configuration
 - P08:BO-066 Notification Settings
 - P08:BO-068 Audit Log
 - P08:BO-071 Planned Maintenance
@@ -816,7 +1056,30 @@ screens:
 - P08:BO-136 F&B Global Settings & Controls
 - P08:BO-142 Store Rules, Controls & Permissions
 - P08:BO-143 Retail Global Settings & Controls
+- P08:BO-206 Offline Validation Policy Builder
 - P09:ADM-006 Tenant Hierarchy Explorer
+- P09:ADM-036 Platform Notification Broadcast
+- P09:ADM-145 Promotion Approval Inbox
+- P09:ADM-238 Rules & Workflow Command Center
+- P09:ADM-239 Visual Business Rule Builder
+- P09:ADM-240 Conditions, Decision Logic & Decision Tables
+- P09:ADM-241 Visual Workflow Designer
+- P09:ADM-242 Approval Matrix & Multi-Level Approval Configuration
+- P09:ADM-243 Roles, Authority, Delegation & Approval Limits
+- P09:ADM-244 SLA, Escalation, Reminder & Timeout Rules
+- P09:ADM-245 Trigger, Action & Cross-Module Orchestration Configuration
+- P09:ADM-246 Workflow Testing, Simulation & Impact Analysis
+- P09:ADM-247 Versioning, Governance, Approval & Publication
+- P09:ADM-248 Workflow Operations Command Center
+- P09:ADM-249 Unified Approval Inbox & Decision Workspace
+- P09:ADM-250 Workflow Instance Monitor & Process Timeline
+- P09:ADM-251 Workflow Exception, Failure & Recovery Center
+- P09:ADM-252 SLA, Escalation & Bottleneck Monitor
+- P09:ADM-253 Automation Execution & Autonomous Action Monitor
+- P09:ADM-254 Cross-Module Orchestration Monitor
+- P09:ADM-255 Workflow Analytics & Process Performance
+- P09:ADM-256 Process Optimization & Automation Opportunity Center
+- P09:ADM-257 AI Workflow Intelligence & Autonomous Governance Center
 - P11:ACC-002 Registration Form
 - P11:ACC-005 Accreditation Badge
 - P11:ACC-007 Reviewer Application Detail

@@ -1,9 +1,3 @@
-# P07 — Staff Scanner — Access Control
-#
-# Derived from the wireframe board on 14 August. **Purposes and navigation are real;
-# components, states and operations are not yet written.** Every screen carries
-# wireframe.status drafted so the gap is visible rather than implied.
-
 platform:
   code: P07
   audience: staff
@@ -71,24 +65,29 @@ screens:
         impliedBy: listMfaMethods
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: login
   states:
     loading: Session check against the local store, then the server if reachable
     emptyFirstRun: Not applicable
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `PERMISSION_VIEW`, `SHIFT_OPEN` to read permissions; a person without it sees the reason
-      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
-      with the wrong question.
+      needs `PERMISSION_VIEW`, `SHIFT_OPEN` to read permissions; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Sign-in failed. The reason is shown — wrong PIN reads differently from no network
-    offline: '**Signs in against the cached principal list from the last bundle.** A steward locked
-      out at 08:00 because the venue wifi is down is a gate that does not open'
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    offline: '**Signs in against the cached principal list from the last bundle.** A steward locked out
+      at 08:00 because the venue wifi is down is a gate that does not open'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-002
@@ -100,18 +99,17 @@ screens:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-001
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **createCashMovement removed 18 August** — attached by module resemblance,
-    not by what this screen does. A screen that does not handle money should not be able to move it
-    (CF-87''s class). **Sign in.** The session carries the workstation, so the device cannot scan before
-    it knows who is holding it. **Declared 20 August** — `isEntryPoint` existed in the schema and five
-    platforms used none, so every screen in them read as unreachable. **`selectRole` and `resolvePermissions`
-    wired 24 August.** ADR-0002 makes authorisation user-driven and **a sign-in screen that does not
-    resolve a role is a sign-in that grants nothing** — found by walking F61. **Removed 24 August**:
-    acceptShiftVariance, approveShiftOpen, closeShift, forceLogout, getShift, listActiveSessions, listCashMovements,
-    listShifts, openShift, recordNoSale, reopenShift, resumeShift, revokeAllSessions, suspendShift.
-    **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens.
-    A till does not cancel a performance, a staff app does not create roles, and **a scanner does not
-    run a cash shift.**'
+    still to be written. **createCashMovement removed 18 August** — attached by module resemblance, not
+    by what this screen does. A screen that does not handle money should not be able to move it (CF-87''s
+    class). **Sign in.** The session carries the workstation, so the device cannot scan before it knows
+    who is holding it. **Declared 20 August** — `isEntryPoint` existed in the schema and five platforms
+    used none, so every screen in them read as unreachable. **`selectRole` and `resolvePermissions` wired
+    24 August.** ADR-0002 makes authorisation user-driven and **a sign-in screen that does not resolve
+    a role is a sign-in that grants nothing** — found by walking F61. **Removed 24 August**: acceptShiftVariance,
+    approveShiftOpen, closeShift, forceLogout, getShift, listActiveSessions, listCashMovements, listShifts,
+    openShift, recordNoSale, reopenShift, resumeShift, revokeAllSessions, suspendShift. **Bulk-attach
+    residue** — the 18 August defect that put identical operation sets on unrelated screens. A till does
+    not cancel a performance, a staff app does not create roles, and **a scanner does not run a cash shift.**'
   implementation:
     app: venue-scanner
     route: /access/sign-in
@@ -183,6 +181,11 @@ screens:
         impliedBy: setTurnstileMode
         label: Save turnstile mode
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setTurnstileMode
   states:
     loading: Access points from the bundle
     emptyFirstRun: No access points configured for this venue — a configuration error, shown as one
@@ -192,18 +195,18 @@ screens:
       the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Cannot load. The last selection is offered
     offline: Fully offline. The access point list is in the bundle
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -217,8 +220,12 @@ screens:
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
-    is created in the back office and a geofence is a venue decision — a handheld at a lane that can
-    redefine the lane is a handheld that can admit anywhere.'
+    is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
+    the lane is a handheld that can admit anywhere. **`setTurnstileMode` belongs here and flow F06 is
+    why.** It was taken off on 4 September on the reasoning that this screen only reads — but F06 *guest
+    enters the venue* step 2 is ''confirms access point and direction'', and confirming the direction
+    IS setting the mode. The flow is the authority on the journey; the screen was right and the tidy-up
+    was wrong.'
   implementation:
     app: venue-scanner
     route: /access/access-point-direction
@@ -229,24 +236,24 @@ screens:
     contract: access
     purpose: From the flow it appears in
     trigger: onLoad
-  - operationId: setTurnstileMode
-    contract: access
-    purpose: From the flow it appears in
-    trigger: onLoad
   - operationId: getAccessPoint
     contract: access
     purpose: Read an access point
     trigger: onLoad
+  - operationId: setTurnstileMode
+    contract: access
+    purpose: Confirm the direction this gate runs in
+    trigger: onAction
   density: comfortable
   entryState:
     params:
     - name: accessPointId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `accessPointId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `accessPointId`.'
   requiresModule: access
   statesDerived: true
 - id: SCN-003
@@ -282,43 +289,46 @@ screens:
         impliedBy: listBlacklist
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Instant. This screen must never wait
     emptyFirstRun: Not applicable
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 2 more to use accesses; a
-      person without it sees the reason and who to ask, because an empty table reads as *there is no
-      data* and sends somebody to support with the wrong question.
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 2 more to use accesses; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Camera or scanner hardware failed — distinct from a bad scan, and it needs a different response
-    offline: '**Same loop, different truth. Amber says so.** Was a separate screen until 18 August,
-      and the screen already had an `offline` state — two places describing one condition is two places
-      to disagree.'
-    outcomeAdmitted: '**Admitted.** Readable at arm''s length and gone in 1.5 seconds. Was a screen
-      at `/access/admitted` until 18 August — **a route you navigate to is not a thing that disappears
-      in 1.5 seconds**, and a scanner that pushes a page per scan is a scanner that cannot do 40 guests
-      a minute.'
+    offline: '**Same loop, different truth. Amber says so.** Was a separate screen until 18 August, and
+      the screen already had an `offline` state — two places describing one condition is two places to
+      disagree.'
+    outcomeAdmitted: '**Admitted.** Readable at arm''s length and gone in 1.5 seconds. Was a screen at
+      `/access/admitted` until 18 August — **a route you navigate to is not a thing that disappears in
+      1.5 seconds**, and a scanner that pushes a page per scan is a scanner that cannot do 40 guests a
+      minute.'
     outcomeDenied: '**Denied, with a reason and a next action — never a boolean.** The reason is what
-      the operator reads aloud, and it decides whether the next step is an override, a lookup or an
-      apology.'
-    outcomeBlacklisted: '**Blacklisted — denies outright regardless of entitlement.** Separated from
-      `outcomeDenied` because the operator response differs: a denied guest may be helped, a blacklisted
-      one is a security matter and the screen must not suggest an override.'
-    overrideDialog: '**Override — a confirm dialog on `outcomeDenied`, not a screen.** The operation
-      most likely to be examined after an incident, so it captures a reason and a principal. **A modal,
-      because an override is a decision taken while looking at the denial**, not a page you navigate
-      to afterwards.'
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+      the operator reads aloud, and it decides whether the next step is an override, a lookup or an apology.'
+    outcomeBlacklisted: '**Blacklisted — denies outright regardless of entitlement.** Separated from `outcomeDenied`
+      because the operator response differs: a denied guest may be helped, a blacklisted one is a security
+      matter and the screen must not suggest an override.'
+    overrideDialog: '**Override — a confirm dialog on `outcomeDenied`, not a screen.** The operation most
+      likely to be examined after an incident, so it captures a reason and a principal. **A modal, because
+      an override is a decision taken while looking at the denial**, not a page you navigate to afterwards.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -335,8 +345,8 @@ screens:
     for something gone in 1.5 seconds is a page load per guest**, and at a gate doing 40 a minute that
     is the whole problem. Every absorbed screen kept its copy as a named state. **Authoring operations
     removed 24 August**: addBlacklistEntry, removeBlacklistEntry. **A scanner reads the gate configuration;
-    it does not write it.** An access point is created in the back office and a geofence is a venue
-    decision — a handheld at a lane that can redefine the lane is a handheld that can admit anywhere.'
+    it does not write it.** An access point is created in the back office and a geofence is a venue decision
+    — a handheld at a lane that can redefine the lane is a handheld that can admit anywhere.'
   implementation:
     app: venue-scanner
     route: /access/ready-to-scan
@@ -372,7 +382,7 @@ screens:
     purpose: Admit a group on one read
     trigger: onAction
   - operationId: consumeCrossRegionEntitlement
-    contract: cross-cell
+    contract: cross-region
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
   - operationId: listBlacklist
@@ -386,11 +396,11 @@ screens:
       from: deepLink
     - name: rightId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `mediaCode`, `rightId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `mediaCode`, `rightId`.'
   requiresModule: access
   statesDerived: true
 - id: SCN-007
@@ -421,38 +431,47 @@ screens:
         impliedBy: lookupTicket
         label: Search
         notes: A search that returns nothing must say so differently from a search not yet run.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: validateGroupAccess
   states:
     loading: Party resolution from the bundle
     emptyFirstRun: Party of one — falls through to a normal scan
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
-      person without it sees the reason and who to ask, because an empty table reads as *there is no
-      data* and sends somebody to support with the wrong question.
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Group could not be resolved
     offline: Fully offline. Admits what is valid and states the shortfall
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
     - SCN-002
     - SCN-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - SCN-003
+    notes: '**Reached from SCN-003** — a group is admitted from the scan that found it. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-007
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   implementation:
     app: venue-scanner
     route: /access/group-admission
@@ -518,39 +537,48 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Reference lookup, local first
     emptyFirstRun: No match for that reference
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
-      person without it sees the reason and who to ask, because an empty table reads as *there is no
-      data* and sends somebody to support with the wrong question.
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Not found. Offers SCN-009 by name instead
-    offline: Searches the bundle only. A reference issued after the last sync will not be found, and
-      the screen says so rather than denying
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    offline: Searches the bundle only. A reference issued after the last sync will not be found, and the
+      screen says so rather than denying
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
     - SCN-002
     - SCN-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - SCN-003
+    notes: '**Reached from SCN-003** — manual entry is what a failed scan falls back to. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-008
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   implementation:
     app: venue-scanner
     route: /access/manual-entry
@@ -616,38 +644,51 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Name search across the bundle
     emptyFirstRun: No match
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
-      person without it sees the reason and who to ask, because an empty table reads as *there is no
-      data* and sends somebody to support with the wrong question.
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Search unavailable
     offline: Bundle only, and the bundle age is shown beside the results
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
     - SCN-002
     - SCN-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - SCN-003
+    - SCN-008
+    notes: '**Reached from SCN-003** — a lookup answers a scan that did not resolve. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.
+      **Also reached from SCN-008 Manual entry** — flow F62 *a ticket will not scan* goes scan, manual
+      entry, lookup, and declaring the navigation non-inferred is what turned that missing edge from a
+      warning into a failure.'
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-009
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   implementation:
     app: venue-scanner
     route: /access/ticket-lookup
@@ -702,17 +743,22 @@ screens:
         derived: true
         impliedBy: consumeCrossRegionEntitlement
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: consumeCrossRegionEntitlement
   states:
     loading: Right resolution, which may cross cells
     emptyFirstRun: No delegated right on this media
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ACCESS_VALIDATE`, `TICKET_LOOKUP` to use accesses; a person without it sees the reason
-      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
-      with the wrong question.
+      needs `ACCESS_VALIDATE`, `TICKET_LOOKUP` to use accesses; a person without it sees the reason and
+      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
+      the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.'
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Cross-cell lookup failed
     offline: '**Not available offline.** A delegated right issued in another region cannot be verified
       from a local bundle, and admitting on trust is how a pass gets used twice in two countries'
@@ -721,12 +767,17 @@ screens:
     - SCN-001
     - SCN-002
     - SCN-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - SCN-003
+    notes: '**Reached from SCN-003** — a delegated right is checked against the scan presenting it. Stated
+      on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
+      graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-011
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   implementation:
     app: venue-scanner
     route: /access/delegated-right
@@ -734,11 +785,11 @@ screens:
     status: notStarted
   apis:
   - operationId: getCrossRegionEntitlement
-    contract: cross-cell
+    contract: cross-region
     purpose: From the flow it appears in
     trigger: onLoad
   - operationId: consumeCrossRegionEntitlement
-    contract: cross-cell
+    contract: cross-region
     purpose: Consume entries against a right, locally authoritative
     trigger: onAction
   density: comfortable
@@ -746,11 +797,11 @@ screens:
     params:
     - name: rightId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `rightId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `rightId`.'
   requiresModule: core
   statesDerived: true
 - id: SCN-013
@@ -781,38 +832,48 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Journal loads locally
     emptyFirstRun: Nothing journalled
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
-      person without it sees the reason and who to ask, because an empty table reads as *there is no
-      data* and sends somebody to support with the wrong question.
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Journal unreadable — the most serious failure on the device
     offline: The journal is the offline record. It is why an offline admit is recoverable
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
     - SCN-002
     - SCN-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - SCN-002
+    notes: '**Reached from SCN-002** — the journal is reached from the access point it belongs to. Stated
+      on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
+      graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-013
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   implementation:
     app: venue-scanner
     route: /access/offline-journal
@@ -883,41 +944,50 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: syncScans
   states:
     loading: Sync in progress, with a count
     emptyFirstRun: Nothing to sync
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
       needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `ORDER_CREATE` and 3 more to use accesses; a person
-      without it sees the reason and who to ask, because an empty table reads as *there is no data*
-      and sends somebody to support with the wrong question.
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Sync failed. **The journal is kept** — a failed sync must never discard what it was carrying
     offline: Not applicable. This screen exists to end the offline period
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
     - SCN-002
     - SCN-003
-    inferred: true
+    inferred: false
     fromFlows: true
+    entryFrom:
+    - SCN-013
+    notes: '**Reached from SCN-013** — reconciliation follows the journal it reconciles. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-014
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not
-    navigate to a back office and a guest app does not navigate to either** — those are device handovers,
-    and a flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+    still to be written. **Cross-platform navigation removed 24 August**: ADM-003. **A till does not navigate
+    to a back office and a guest app does not navigate to either** — those are device handovers, and a
+    flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
   implementation:
     app: venue-scanner
     route: /access/sync-reconciliation
@@ -991,27 +1061,32 @@ screens:
         derived: true
         impliedBy: overrideAccess
         notes: The act the screen exists for.
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: overrideAccess
   states:
     loading: Downloading. Size and progress shown
     emptyFirstRun: Not applicable
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a
-      person without it sees the reason and who to ask, because an empty table reads as *there is no
-      data* and sends somebody to support with the wrong question.
+      needs `ACCESS_OVERRIDE`, `ACCESS_VALIDATE`, `REPORT_VIEW_VENUE` and 1 more to use accesses; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Download failed. The previous bundle stays in place
     offline: Cannot refresh. The existing bundle continues to be used and its age is shown
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
@@ -1022,8 +1097,8 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-015
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations
-    still to be written.
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
   implementation:
     app: venue-scanner
     route: /access/offline-package
@@ -1084,6 +1159,11 @@ screens:
         impliedBy: listAccessPoints
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: setTurnstileMode
   states:
     loading: Current mode from the device
     emptyFirstRun: Not applicable
@@ -1093,8 +1173,8 @@ screens:
       the wrong question.
 
 
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the
-      same terminal is the way through.
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
 
 
       **Also reached when `access` is not licensed.** The tenant has not bought this module, which is
@@ -1102,24 +1182,29 @@ screens:
     error: Turnstile unreachable — the mode is a request, not a confirmed hardware state
     offline: '**Requests only.** Hardware control is out of contract and the vendor SDK is outstanding
       (CF-33)'
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from
-      here** — an empty list with the filter state hidden elsewhere is a person who thinks the data
-      is gone. **Added 25 August with the derived list component**: a screen that lists has to say what
-      it shows when the list is empty, and this screen gained the list before it gained the sentence.'
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   navigation:
     exitTo:
     - SCN-001
     - SCN-002
     - SCN-003
-    inferred: true
+    inferred: false
+    entryFrom:
+    - SCN-002
+    notes: '**Reached from SCN-002** — gate mode is set for the access point being worked. Stated on 4
+      September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
+      graph entirely.'
   wireframe:
     status: generated
     board: wireframes/P07 Venue Scanner.dc.html#scn-016
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Authoring operations removed 24 August**: createAccessPoint, setAccessPointGeofence,
     updateAccessPoint. **A scanner reads the gate configuration; it does not write it.** An access point
-    is created in the back office and a geofence is a venue decision — a handheld at a lane that can
-    redefine the lane is a handheld that can admit anywhere.'
+    is created in the back office and a geofence is a venue decision — a handheld at a lane that can redefine
+    the lane is a handheld that can admit anywhere.'
   implementation:
     app: venue-scanner
     route: /access/gate-mode
@@ -1143,10 +1228,10 @@ screens:
     params:
     - name: accessPointId
       from: deepLink
-    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No
-      silent redirect — a supervisor following a link from an alert needs to know whether the record
-      moved, closed or never existed, because those are three different next actions. **The scope is
-      resolved from the session, never from the link**: a link cannot move somebody to a venue they
-      do not hold. Arrives with `accessPointId`.'
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `accessPointId`.'
   requiresModule: access
   statesDerived: true

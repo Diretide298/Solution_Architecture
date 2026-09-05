@@ -13,7 +13,7 @@
 | Identity & AuthZ | Principal, Role, Grant, Session |
 | Product & Entitlement | Product, Component, Attribute, Price List, Envelope, Event, Performance, Entitlement |
 | Order & Payment | Order, OrderLine, Payment, Refund, Void, Till, Shift, DepositBox |
-| Access Control | AccessPoint, AdmissionProfile, ScanEvent, Media |
+| Access Control | AccessPoint, AdmissionRules, ScanEvent, Media |
 | Finance & Ledger | Account, JournalEntry, TaxCode, RecognitionSchedule |
 
 **Schema per module, database per tenant.** Each service connects with a role granted access only to its own schema — enforced by Postgres grants, not convention.

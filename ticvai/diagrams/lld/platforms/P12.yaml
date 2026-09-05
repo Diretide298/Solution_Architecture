@@ -1,5 +1,5 @@
 id: LLD-P12
-title: P12 Venue Support — Agent Console — 8 screens
+title: P12 Venue Support — Agent Console — 28 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -20,24 +20,30 @@ deployment:
 why: null
 modulesUsed:
 - module: marketing
-  screens: 5
+  screens: 25
 - module: core
   screens: 2
 - module: analytics
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 34
+  operationCalls: 53
 - service: IdentityService
   operationCalls: 8
 - service: ReportingService
   operationCalls: 8
+- service: AiService
+  operationCalls: 1
+- service: WhiteLabelService
+  operationCalls: 1
 - service: LedgerService
   operationCalls: 1
+- service: VenueOpsService
+  operationCalls: 1
 coverage:
-  screens: 8
+  screens: 28
   inAFlow: 3
-  drawn: 8
+  drawn: 28
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -207,7 +213,9 @@ screens:
   requiresModule: core
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listFaqs
+  - listKnowledgeCollections
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -283,4 +291,442 @@ screens:
   - SUP-003
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-008
+  inFlows: null
+- screen: SUP-009
+  name: Customer Service Command Center
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerService
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-001
+  - SUP-010
+  - SUP-011
+  - SUP-012
+  - SUP-013
+  - SUP-014
+  - SUP-015
+  - SUP-016
+  - SUP-017
+  - SUP-018
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-009
+  inFlows: null
+- screen: SUP-010
+  name: Customer 360° Service Profile
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerServiceProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-010
+  inFlows: null
+- screen: SUP-011
+  name: Unified Interaction & Communication History
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listUnifiedInteractionCommunication
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-011
+  inFlows: null
+- screen: SUP-012
+  name: Case Creation, Classification & Intelligent Routing
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - createCaseClassificationIntelligent
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-012
+  inFlows: null
+- screen: SUP-013
+  name: Case Investigation & Resolution Workspace
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setCaseInvestigationResolution
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-013
+  inFlows: null
+- screen: SUP-014
+  name: Order, Booking & Ticket Service Workspace
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setOrderBookingTicket
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-014
+  inFlows: null
+- screen: SUP-015
+  name: Refund, Compensation & Service Exception Workspace
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setRefundCompensationService
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-015
+  inFlows: null
+- screen: SUP-016
+  name: Escalation, Collaboration & Internal Resolution
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listEscalationCollaborationInternal
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-016
+  inFlows: null
+- screen: SUP-017
+  name: Case Resolution, Closure & Customer Feedback
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCaseResolutionClosure
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-017
+  inFlows: null
+- screen: SUP-018
+  name: AI Customer Service Copilot & Knowledge Workspace
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setCustomerServiceCopilot
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-009
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-018
+  inFlows: null
+- screen: SUP-019
+  name: Contact Center Operations Command Center
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listContact
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-001
+  - SUP-020
+  - SUP-021
+  - SUP-022
+  - SUP-023
+  - SUP-024
+  - SUP-025
+  - SUP-026
+  - SUP-027
+  - SUP-028
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-019
+  inFlows: null
+- screen: SUP-020
+  name: Queue Configuration & Management
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listQueues
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-020
+  inFlows: null
+- screen: SUP-021
+  name: Intelligent Routing, Skills & Assignment Engine
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setIntelligentRoutingSkill
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-021
+  inFlows: null
+- screen: SUP-022
+  name: SLA Policy & Service-Level Management
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listSlaPolicyService
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-022
+  inFlows: null
+- screen: SUP-023
+  name: Agent Workload, Availability & Workforce Control
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listAgentWorkloadAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-023
+  inFlows: null
+- screen: SUP-024
+  name: Escalation & Critical Case Monitor
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listEscalationCriticalCase
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-024
+  inFlows: null
+- screen: SUP-025
+  name: Quality Management & Agent Evaluation
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listQualityAgentEvaluation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-025
+  inFlows: null
+- screen: SUP-026
+  name: Customer Satisfaction, Feedback & Voice of Customer
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerSatisfactionFeedback
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-026
+  inFlows: null
+- screen: SUP-027
+  name: Service Analytics & Root-Cause Intelligence
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listServiceRootCause
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-027
+  inFlows: null
+- screen: SUP-028
+  name: AI Contact Center Intelligence & Automation Studio
+  module: Support
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listContactAutomation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - SUP-019
+  boardFrames: null
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-028
   inFlows: null

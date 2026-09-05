@@ -1,0 +1,15 @@
+digraph sd {
+  rankdir=TB; bgcolor="transparent"; ranksep=0.5;
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=12 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=10 color="#5A6577"];
+  subgraph cluster_r { label="Shared setup — the country"; style="rounded,filled"; fillcolor="#E2EFDA"; fontname="Helvetica"; fontsize=13;
+    r1 [label="Ticket sales and everything central" fillcolor="#FFFFFF"]; }
+  { rank=same;
+    subgraph cluster_v1 { label="At Venue 1"; style="rounded,filled"; fillcolor="#DDEBF7"; fontsize=12;
+      v1 [label="Food, shops, stock\n+ its own small database" fillcolor="#FFFFFF"]; }
+    subgraph cluster_v2 { label="At Venue 2"; style="rounded,filled"; fillcolor="#DDEBF7"; fontsize=12;
+      v2 [label="Food, shops, stock\n+ its own small database" fillcolor="#FFFFFF"]; } }
+  r1 -> v1 [label="menus and prices sent down" style=dashed color="#1B7A3D"];
+  v1 -> r1 [label="sales sent up when the\nnetwork returns" color="#B00020"];
+  r1 -> v2 [style=dashed color="#1B7A3D"]; v2 -> r1 [color="#B00020"];
+}

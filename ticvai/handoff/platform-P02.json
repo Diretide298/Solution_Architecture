@@ -7,33 +7,25 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-01",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 63,
-  "operations": 101,
-  "contracts": 15,
+  "screens": 71,
+  "operations": 132,
+  "contracts": 16,
   "modules": 16,
   "undrawn": 0,
-  "operationsWithNoScreen": 28
+  "operationsWithNoScreen": 0
  },
  "waves": {
   "wave1": 20,
-  "wave2": 27,
+  "wave2": 35,
   "wave3": 16
  },
  "modules": [
   {
-   "module": "Engagement & Support",
-   "screens": 11,
-   "waves": [
-    2,
-    3
-   ]
-  },
-  {
    "module": "Account & Self-Service",
-   "screens": 9,
+   "screens": 14,
    "waves": [
     1,
     2,
@@ -41,9 +33,26 @@
    ]
   },
   {
-   "module": "In-venue Services",
-   "screens": 9,
+   "module": "Engagement & Support",
+   "screens": 12,
    "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "In-venue Services",
+   "screens": 10,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Booking & Selection",
+   "screens": 8,
+   "waves": [
+    1,
     2,
     3
    ]
@@ -54,15 +63,6 @@
    "waves": [
     1,
     2
-   ]
-  },
-  {
-   "module": "Booking & Selection",
-   "screens": 7,
-   "waves": [
-    1,
-    2,
-    3
    ]
   },
   {
@@ -146,28 +146,28 @@
  ],
  "contracts": [
   {
+   "contract": "marketing-crm",
+   "operations": 24
+  },
+  {
    "contract": "identity",
-   "operations": 20
+   "operations": 23
   },
   {
    "contract": "orders",
-   "operations": 15
-  },
-  {
-   "contract": "marketing-crm",
-   "operations": 14
+   "operations": 21
   },
   {
    "contract": "fnb",
-   "operations": 9
+   "operations": 12
   },
   {
    "contract": "catalogue",
-   "operations": 9
+   "operations": 11
   },
   {
    "contract": "access",
-   "operations": 8
+   "operations": 11
   },
   {
    "contract": "promotions",
@@ -175,6 +175,10 @@
   },
   {
    "contract": "retail",
+   "operations": 5
+  },
+  {
+   "contract": "ai",
    "operations": 4
   },
   {
@@ -186,12 +190,12 @@
    "operations": 3
   },
   {
-   "contract": "ai",
+   "contract": "white-label",
    "operations": 3
   },
   {
-   "contract": "white-label",
-   "operations": 3
+   "contract": "resources",
+   "operations": 2
   },
   {
    "contract": "venue-map",
@@ -773,179 +777,82 @@
    "route": "/newsletter-preferences",
    "operations": 2,
    "drawn": true
+  },
+  {
+   "id": "GST-066",
+   "name": "Privacy & My Data",
+   "module": "Account & Self-Service",
+   "wave": 2,
+   "route": "/account/privacy-my-data",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "GST-067",
+   "name": "Refunds & Resale",
+   "module": "Account & Self-Service",
+   "wave": 2,
+   "route": "/account/refunds-resale",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-068",
+   "name": "Help & My Cases",
+   "module": "Engagement & Support",
+   "wave": 2,
+   "route": "/account/help-my-cases",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-069",
+   "name": "Face Pass",
+   "module": "Account & Self-Service",
+   "wave": 2,
+   "route": "/account/face-pass",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "GST-070",
+   "name": "Reserve a Table or Cabana",
+   "module": "In-venue Services",
+   "wave": 2,
+   "route": "/account/reserve-table-cabana",
+   "operations": 7,
+   "drawn": true
+  },
+  {
+   "id": "GST-071",
+   "name": "Payment Methods",
+   "module": "Account & Self-Service",
+   "wave": 2,
+   "route": "/account/payment-methods",
+   "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "GST-072",
+   "name": "Share & Group Booking",
+   "module": "Booking & Selection",
+   "wave": 2,
+   "route": "/account/share-group-booking",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "GST-073",
+   "name": "Security & Sign-in",
+   "module": "Account & Self-Service",
+   "wave": 2,
+   "route": "/account/security-sign-in",
+   "operations": 1,
+   "drawn": true
   }
  ],
  "gaps": {
-  "operationsWithNoScreen": [
-   {
-    "operation": "enrolFacePass",
-    "contract": "access",
-    "verb": "POST",
-    "summary": "Register a facial profile against an entitlement"
-   },
-   {
-    "operation": "getFacePassEnrolment",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Whether a pass has a face registered, and when"
-   },
-   {
-    "operation": "revokeFacePass",
-    "contract": "access",
-    "verb": "DELETE",
-    "summary": "Remove a facial profile"
-   },
-   {
-    "operation": "freezeEntitlement",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Pause a membership at the guest's request"
-   },
-   {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
-   },
-   {
-    "operation": "updateTableReservation",
-    "contract": "fnb",
-    "verb": "PATCH",
-    "summary": "Change or cancel a booking"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "deleteGuestAccount",
-    "contract": "identity",
-    "verb": "DELETE",
-    "summary": "Self-service account deletion"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
-   },
-   {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
-   },
-   {
-    "operation": "recordLostItem",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Report something lost, or hand something in"
-   },
-   {
-    "operation": "respondToInvitation",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Accept or decline"
-   },
-   {
-    "operation": "submitForm",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
-   },
-   {
-    "operation": "convertToTermProduct",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Turn a visit into a membership or season pass"
-   },
-   {
-    "operation": "createCart",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Start a cart"
-   },
-   {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
-   },
-   {
-    "operation": "quoteUpgrade",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "What an upgrade costs, pro-rata"
-   },
-   {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
-   },
-   {
-    "operation": "transferWalletBalance",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Send balance to another guest"
-   },
-   {
-    "operation": "assignSeats",
-    "contract": "seating",
-    "verb": "POST",
-    "summary": "Pick and hold the best available seats"
-   }
-  ],
+  "operationsWithNoScreen": [],
   "modulesSplitAcrossWaves": [
    {
     "module": "Account & Self-Service",

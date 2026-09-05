@@ -1,0 +1,12 @@
+digraph sc {
+  rankdir=LR; bgcolor="transparent";
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=12 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=10 color="#5A6577"];
+  subgraph cluster_e { label="Rented for the sale, then switched off"; style="rounded,filled"; fillcolor="#FDECEC"; fontname="Helvetica"; fontsize=13;
+    e1 [label="Ticket sales only\nmany copies" fillcolor="#E2EFDA"];
+    e2 [label="A big temporary database" fillcolor="#FFFFFF"]; e1 -> e2; }
+  subgraph cluster_p { label="The permanent platform"; style="rounded,filled"; fillcolor="#F4F7FB"; fontsize=13;
+    p1 [label="Normal running" fillcolor="#E2EFDA"]; }
+  p1 -> e1 [label="a copy of what is on sale" style=dashed color="#8A6D00"];
+  e1 -> p1 [label="the sales move back afterwards\n(still being designed)" color="#B00020" penwidth=2];
+}

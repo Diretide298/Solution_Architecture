@@ -1,5 +1,5 @@
 id: LLD-workforce
-title: workforce — 12 operations
+title: workforce — 14 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -115,6 +115,28 @@ operations:
   reads:
   - identity.principal
   - workforce.rota_assignment
+  writes: []
+- operation: listShiftSwapRequests
+  verb: GET
+  path: /shift-swaps
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.shift_swap
+  writes: []
+- operation: listTrainingRecords
+  verb: GET
+  path: /training-records
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.training_record
   writes: []
 - operation: publishAnnouncement
   verb: POST

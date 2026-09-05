@@ -26,7 +26,7 @@ nothing to validate it against.
 
 | It needs | We have |
 |---|---|
-| Zone and time-bounded access | `access.admission_profile` — allowed access points, open and close windows, max duration |
+| Zone and time-bounded access | `access.admission_rules` — allowed access points, open and close windows, max duration |
 | Validated at a gate, offline | `validateAccess`, `scan_event`, the offline bundle |
 | QR, NFC, RFID, printed badge | `MediaKind` — all four |
 | Immediate revocation | `access.blacklist`, in the offline bundle |

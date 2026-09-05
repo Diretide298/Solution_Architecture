@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="crossorigin" />
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet" />
+<style>
+  html, body { margin: 0; padding: 0; background: #1a1a1a; }
+  body { font-family: "Plus Jakarta Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+  a { color: #48cfcb; text-decoration: none; }
+  a:hover { color: #2bb3b0; text-decoration: underline; }
+</style>
+</helmet>
+
+<div style="--bg:#1a1a1a;--panel:#1f1f1f;--card:#242424;--raised:#202020;--line:#3a3a3a;--div:#333333;--text:#ededed;--dim:#9a9a9a;--faint:#787878;--ac:#2bb3b0;--acb:#48cfcb;--acs:#123a3a;--acl:#2c7c7d;--amber:#d9a143;--red:#d96c63;--warm:#2b2418;--warmt:#d9bc7c;--green:#7fbf8f;--mono:'JetBrains Mono',ui-monospace,monospace; background: var(--bg); color: var(--text); min-height: 100vh; font-size: 14px; line-height: 1.5;" onMouseOver="{{ onTipIn }}" onMouseOut="{{ onTipOut }}">
+
+  <div style="{{ tipStyle }}">{{ tip }}</div>
+
+  <header style="display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 22px; background: #111111; border-bottom: 1px solid #3a3a3a; position: sticky; top: 0; z-index: 20;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <img src="brand/adam-lockup-night.png" alt="Adam" style="height: 22px; display: block;" />
+      <span style="font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--faint); white-space: nowrap;">the shared cell, at rest</span>
+    </div>
+    <div style="display: flex; align-items: center; gap: 8px; font-size: 11.5px;">
+      <a href="Burst Simulator.dc.html" style="font-family: var(--mono); font-size: 11px; color: var(--acb); border: 1px solid var(--acl); border-radius: 6px; padding: 3px 9px;">the burst environment →</a>
+      <span style="font-family: var(--mono); color: var(--faint); border: 1px solid #3a3a3a; border-radius: 6px; padding: 3px 9px;">scenario (b)</span>
+      <span style="font-family: var(--mono); color: var(--faint); border: 1px solid #3a3a3a; border-radius: 6px; padding: 3px 9px;">ADR-0014</span>
+    </div>
+  </header>
+
+  <main style="max-width: 1440px; margin: 0 auto; padding: 26px 22px 80px;">
+
+    <section style="display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 34px; align-items: end; padding-bottom: 20px; border-bottom: 1px solid var(--line);">
+      <div>
+        <p style="margin: 0 0 9px; font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--green);">Deployment · the default, 363 days of the year</p>
+        <h1 style="margin: 0; font-size: 34px; font-weight: 800; letter-spacing: -0.025em; line-height: 1.1; text-wrap: pretty;">Two across the board, and nothing dramatic</h1>
+        <p style="margin: 12px 0 0; max-width: 62ch; font-size: 14px; line-height: 1.65; color: var(--dim); text-wrap: pretty;">This is the state every flash sale starts from and returns to. Sixteen services at a floor of two, one database, one pooler — the whole platform running at a pace a kitchen can keep up with. Floor here is survivability rather than peak: the autoscaler has all day to react to a busy afternoon, so paying for the peak all night buys nothing.</p>
+      </div>
+      <div style="display: grid; gap: 7px; font-family: var(--mono); font-size: 11px; line-height: 1.6; color: var(--faint);">
+        <div data-tip="{{ algoTip }}"><span style="color: var(--dim);">sizing</span> {{ algoLine }}</div>
+        <div data-tip="One cell per jurisdiction holding many tenants. control.cell carries region_id, country_code and tenant_id — null on a shared cell, which holds many."><span style="color: var(--dim);">shape</span> ADR-0014 · a cell is a deployment and a legal boundary</div>
+        <div data-tip="Billed by the month and always on: $3,485 on Amazon, $2,874 on Google. Across 200 customers at 3 venues each that is $96,910 a month, against $189,600 if every customer had their own."><span style="color: var(--dim);">cost</span> $3,485 a month · always on</div>
+        <div data-tip="rpsPerReplica comes from ADR-0032's autoscale triggers and is a hypothesis until tools/bench.py runs. Everything else here is arithmetic on top of it." style="color: var(--warmt); border-top: 1px solid var(--line); padding-top: 7px; margin-top: 2px;">the per-replica rates are a hypothesis until bench.py runs</div>
+      </div>
+    </section>
+
+    <section style="margin-top: 20px; display: flex; align-items: baseline; gap: 6px 14px; flex-wrap: wrap;">
+      <span style="font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); white-space: nowrap;">cell size</span>
+      <sc-for list="{{ cells }}" as="c" hint-placeholder-count="3">
+        <button type="button" onClick="{{ c.on }}" data-tip="{{ c.tip }}" style="{{ c.style }}">{{ c.label }}</button>
+      </sc-for>
+      <span style="width: 12px;"></span>
+      <span style="font-family: var(--mono); font-size: 9px; letter-spacing: .1em; text-transform: uppercase; color: var(--faint); white-space: nowrap;">load</span>
+      <sc-for list="{{ loads }}" as="l" hint-placeholder-count="2">
+        <button type="button" onClick="{{ l.on }}" data-tip="{{ l.tip }}" style="{{ l.style }}">{{ l.label }}</button>
+      </sc-for>
+    </section>
+
+    <section style="margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px;">
+      <sc-for list="{{ totals }}" as="t" hint-placeholder-count="5">
+        <div data-tip="{{ t.tip }}" style="border: 1px solid var(--line); border-radius: 10px; background: var(--card); padding: 13px 16px;">
+          <div style="font-family: var(--mono); font-size: 22px; font-weight: 500; font-variant-numeric: tabular-nums; line-height: 1.1; color: {{ t.colour }};">{{ t.v }}</div>
+          <div style="margin-top: 4px; font-size: 11.5px; font-weight: 600; color: var(--dim);">{{ t.k }}</div>
+          <div style="margin-top: 3px; font-family: var(--mono); font-size: 10px; line-height: 1.5; color: var(--faint);">{{ t.n }}</div>
+        </div>
+      </sc-for>
+    </section>
+
+    <!-- the sixteen services, and their instances -->
+    <section style="margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 6px 14px; flex-wrap: wrap;">
+        <h2 data-tip="All sixteen, each with the replicas the algorithm gives it at this load. Two is the floor and most of them stay there — the shares are flat enough that no single service dominates the way Catalogue dominates a sale." style="margin: 0; font-size: 15px; font-weight: 700; white-space: nowrap;">Sixteen services, and what each one runs</h2>
+        <span style="font-family: var(--mono); font-size: 10.5px; color: var(--faint);">{{ mixHead }}</span>
+      </div>
+      <p data-tip="The algorithm is max(floor, implied by load), and either term can win. A service at 14.9% of the mix asks for more than the floor once the cell is busy; a service at 2.4% asks for one whatever the load, and one replica is no redundancy — so the floor decides it. That is the difference between the two paths: under a sale Catalogue is 64% of the calls and load decides almost everything, while here the shares are flat and survivability decides most of it." style="margin: 8px 0 0; max-width: 92ch; font-size: 12px; line-height: 1.6; color: var(--dim); text-wrap: pretty;">{{ drivenNote }}</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 10px; margin-top: 14px;">
+        <sc-for list="{{ services }}" as="sv" hint-placeholder-count="16">
+          <div data-tip="{{ sv.tip }}" style="{{ sv.box }}">
+            <div style="display: flex; align-items: baseline; justify-content: space-between; gap: 8px;">
+              <span style="font-size: 12.5px; font-weight: 700; color: var(--text); white-space: nowrap;">{{ sv.name }}</span>
+              <span style="font-family: var(--mono); font-size: 9.5px; color: var(--faint); white-space: nowrap;">{{ sv.tier }}</span>
+            </div>
+            <div style="display: flex; align-items: flex-end; gap: 12px; margin-top: 9px;">
+              <div style="flex: 0 0 42px; text-align: center;">
+                <div style="{{ sv.countStyle }}">{{ sv.n }}</div>
+                <div style="font-family: var(--mono); font-size: 9px; color: var(--faint); margin-top: 2px; white-space: nowrap;">{{ sv.floorNote }}</div>
+              </div>
+              <div style="flex: 1 1 auto; min-width: 0;">
+                <div style="display: flex; gap: 3px;">
+                  <sc-for list="{{ sv.dots }}" as="d" hint-placeholder-count="2">
+                    <span style="{{ d.style }}"></span>
+                  </sc-for>
+                </div>
+                <div style="display: flex; justify-content: space-between; gap: 8px; margin-top: 7px; font-family: var(--mono); font-size: 10px; color: var(--dim);">
+                  <span style="white-space: nowrap;">{{ sv.share }} of the mix</span>
+                  <span style="white-space: nowrap;">{{ sv.rps }} rps</span>
+                  <span style="{{ sv.drivenStyle }}">{{ sv.drivenBy }}</span>
+                </div>
+                <div style="height: 4px; border-radius: 2px; background: rgba(255,255,255,.06); margin-top: 5px; overflow: hidden;">
+                  <span style="{{ sv.barStyle }}"></span>
+                </div>
+              </div>
+            </div>
+            <p style="margin: 9px 0 0; font-family: var(--mono); font-size: 9.5px; line-height: 1.5; color: var(--faint);">{{ sv.maths }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- the machines under them -->
+    <section style="margin-top: 18px; border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+      <h2 data-tip="One cell: a primary, a pooler and the shared tier. Venues are list partitions on venue_id rather than databases of their own — ADR-0005 rejected database-per-venue because five cross-venue features become distributed transactions." style="margin: 0; font-size: 15px; font-weight: 700;">One database, one pooler, and the tier beside them</h2>
+      <p style="margin: 7px 0 14px; max-width: 92ch; font-size: 12.5px; line-height: 1.6; color: var(--dim); text-wrap: pretty;">pgbouncer is not optional here either: twenty Catalogue replicas at twenty connections each is four hundred against a primary that will not want them. Transaction pooling is what makes horizontal scaling of the shared tier possible at all — without it the tier stops scaling around six replicas and the bottleneck looks like the database when it is the pool.</p>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px;">
+        <sc-for list="{{ machines }}" as="m" hint-placeholder-count="4">
+          <div data-tip="{{ m.tip }}" style="border: 1px solid var(--div); border-radius: 10px; background: var(--card); padding: 13px 15px;">
+            <div style="font-size: 12.5px; font-weight: 700; color: var(--text);">{{ m.name }}</div>
+            <div style="font-family: var(--mono); font-size: 9.5px; color: var(--faint); margin-top: 4px;">{{ m.spec }}</div>
+            <p style="margin: 8px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dim); text-wrap: pretty;">{{ m.note }}</p>
+          </div>
+        </sc-for>
+      </div>
+    </section>
+
+    <!-- what sits at the venue -->
+    <section style="margin-top: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 18px; align-items: start;">
+      <div style="border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+        <h2 data-tip="A service is shared and horizontally scaled when its load is a function of requests. It is scoped when its load is a function of how many of something exist. It sits at the region when the law does — derived from the contracts rather than assumed: every one of the 1,025 operations declares the scope it resolves at." style="margin: 0 0 3px; font-size: 15px; font-weight: 700;">Where each service sits</h2>
+        <p style="margin: 0 0 14px; font-size: 11.5px; line-height: 1.55; color: var(--faint);">The rule the whole arrangement rests on, and it is derived from the contracts.</p>
+        <div style="display: grid; gap: 10px;">
+          <sc-for list="{{ placement }}" as="p" hint-placeholder-count="3">
+            <div data-tip="{{ p.tip }}" style="border-left: 2px solid {{ p.colour }}; padding: 2px 0 2px 12px;">
+              <div style="font-size: 12.5px; font-weight: 700; color: var(--text);">{{ p.name }}</div>
+              <div style="font-family: var(--mono); font-size: 10px; color: var(--faint); margin-top: 2px;">{{ p.who }}</div>
+              <p style="margin: 5px 0 0; font-size: 11.5px; line-height: 1.55; color: var(--dim); text-wrap: pretty;">{{ p.note }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+
+      <div style="border: 1px solid var(--line); border-radius: 14px; background: var(--panel); padding: 16px 18px;">
+        <h2 data-tip="Three of the four hosting options run all the time and are billed monthly. Only the flash-sale environment is billed by the hour." style="margin: 0 0 3px; font-size: 15px; font-weight: 700;">What always-on costs</h2>
+        <p style="margin: 0 0 14px; font-size: 11.5px; line-height: 1.55; color: var(--faint);">TICVAI_Hosting_Summary, per month.</p>
+        <div style="display: grid; gap: 9px;">
+          <sc-for list="{{ costs }}" as="c" hint-placeholder-count="4">
+            <div data-tip="{{ c.tip }}" style="display: grid; grid-template-columns: minmax(0, 1fr) 92px; gap: 12px; align-items: baseline; padding-bottom: 8px; border-bottom: 1px solid var(--div);">
+              <span style="font-size: 12px; color: var(--dim);">{{ c.k }}</span>
+              <span style="font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; text-align: right; color: {{ c.colour }};">{{ c.v }}</span>
+            </div>
+          </sc-for>
+        </div>
+        <p style="margin: 12px 0 0; font-size: 11.5px; line-height: 1.6; color: var(--warmt); text-wrap: pretty;">A museum on its own private setup costs $948 a month — more than three times its share of a shared one, for a venue serving about one guest per second. Across two hundred customers that decision is $97,000 a month against $190,000. Same software, same performance, twice the cost.</p>
+      </div>
+    </section>
+
+    <section style="margin-top: 18px; border: 1px solid var(--red); border-radius: 14px; background: var(--warm); padding: 16px 18px;">
+      <h2 style="margin: 0 0 6px; font-size: 15px; font-weight: 700; color: var(--warmt);">The trade, stated rather than assumed</h2>
+      <p style="margin: 0; max-width: 96ch; font-size: 12.5px; line-height: 1.65; color: var(--warmt); text-wrap: pretty;">Blast radius is the cell — every tenant in it. <span style="font-family: var(--mono); font-size: 11.5px;">scope_path</span> partitioning is correctness, not isolation: a bug reaches one tenant’s rows; an outage reaches all of them. Data is kept properly separate so nobody can see anyone else’s, but availability is shared even though privacy is not. And one thing worth knowing before it is promised — restoring one customer’s data to last Tuesday would restore everybody’s. That belongs in a tenant contract rather than in an architecture document nobody reads.</p>
+    </section>
+
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440}}">
+const M = {};
+let ready = false;
+
+class Component extends DCLogic {
+  state = { cfg: null, tip: null, tipRect: null };
+
+  componentDidMount() {
+    import('./burst-model.js').then((mod) => {
+      Object.assign(M, mod);
+      ready = true;
+      this.setState({ cfg: { ...M.DEFAULTS } });
+    });
+  }
+
+  set(patch) { this.setState({ cfg: { ...this.state.cfg, ...patch } }); }
+
+  renderVals() {
+    if (!ready || !this.state.cfg) return {};
+    const cfg = this.state.cfg;
+    const fmt = (n) => Math.round(n).toLocaleString('en-GB');
+    const normal = M.normalSizing(cfg);
+    const cell = normal.cell;
+    const atFloor = normal.services.every((x) => x.n === M.SIZING.normalFloor);
+
+    const pill = (on, label, tip, act) => ({
+      label, tip, on: act,
+      style: `border: 1px solid ${on ? 'var(--acl)' : 'var(--line)'}; background: ${on ? 'var(--acs)' : 'var(--card)'}; color: ${on ? 'var(--acb)' : 'var(--faint)'}; border-radius: 7px; padding: 5px 10px; font-family: var(--mono); font-size: 10.5px; cursor: pointer;`,
+    });
+
+    const cells = M.SIZING.cells.map((c) => pill(
+      cfg.cell === c.key, c.key,
+      `${c.venues.small} small, ${c.venues.medium} medium and ${c.venues.large} large venues sharing one cell — ${fmt(c.meanRps)} requests a second at the mean and ${fmt(c.peakRps)} at the peak, carried by ${c.atFloor} replicas at the floor and ${c.atPeak} at the peak.`,
+      () => this.set({ cell: c.key }),
+    ));
+
+    const loads = [['mean', 'at the mean'], ['peak', 'a busy afternoon']].map(([k, label]) => pill(
+      (cfg.normalLoad ?? 'mean') === k, label,
+      k === 'mean'
+        ? `${fmt(cell.meanRps)} requests a second — what the cell carries most of the time. Every tier spends its day between 1 and 50 requests a second a venue; the whole sizing question is the window.`
+        : `${fmt(cell.peakRps)} requests a second — the cell's own busy afternoon, which is not an on-sale. Even here most services stay at the floor, because the shares are flat.`,
+      () => this.set({ normalLoad: k }),
+    ));
+
+    const totals = [
+      {
+        v: String(normal.replicas), k: 'replicas running', colour: 'var(--green)',
+        n: atFloor ? 'two across the board' : `${normal.services.filter((x) => x.n > M.SIZING.normalFloor).length} above the floor`,
+        tip: `Sixteen services sized by the stated algorithm at ${fmt(normal.rps)} requests a second. ${atFloor ? 'Every one of them lands on the floor of two, which is what "two across the board" means: the load is nowhere near a replica\u2019s capacity, so what sets the count is surviving the loss of one.' : `${normal.services.filter((x) => x.n > M.SIZING.normalFloor).map((x) => `${x.name.replace('Service', '')} ${x.n}`).join(', ')} are above the floor; the rest are still at two.`}`,
+      },
+      {
+        v: fmt(normal.rps), k: 'requests a second', colour: 'var(--text)',
+        n: `${normal.load} \u00b7 ${cell.key}`,
+        tip: `${cell.venues.small} small, ${cell.venues.medium} medium and ${cell.venues.large} large venues. At the mean this cell carries ${fmt(cell.meanRps)} and on a busy afternoon ${fmt(cell.peakRps)} \u2014 against a burst environment sized for 5,000.`,
+      },
+      {
+        v: '16', k: 'services', colour: 'var(--text)',
+        n: '998 operations, 373 tables',
+        tip: 'All sixteen run here, which is the difference from the burst environment: that one runs three and leaves thirteen out, because six of them see no part of a ticket sale and four more are answered from this cell.',
+      },
+      {
+        v: `${normal.services.reduce((a, x) => a + x.n, 0) + 3}`, k: 'containers', colour: 'var(--text)',
+        n: 'plus the primary, the pooler and the cache',
+        tip: 'One container a replica, and three more for postgres, pgbouncer and redis. Venue services also sit at the venue rather than here \u2014 123 of their operations work offline, and a kitchen runs at the speed of a kitchen.',
+      },
+      {
+        v: M.money(M.HOSTING.shared.aws), k: 'a month, always on', colour: 'var(--acb)',
+        n: `$${fmt(M.HOSTING.shared.gcp)} on Google`,
+        tip: `${M.HOSTING.shared.name}, ${M.HOSTING.shared.billing}. A venue's share is about $${M.HOSTING.venueShare.small} a month for a museum, $${M.HOSTING.venueShare.medium} for a theme park and $${fmt(M.HOSTING.venueShare.large)} for a stadium on an ordinary day.`,
+      },
+    ];
+
+    const TIER = {
+      OrderService: 'commerce', FnbService: 'operations', CatalogueService: 'commerce',
+      VenueOpsService: 'operations', InventoryService: 'operations', MarketingService: 'engagement',
+      PlatformService: 'platform', TenancyService: 'foundation', LedgerService: 'commerce',
+      IdentityService: 'foundation', AccessService: 'commerce', WhiteLabelService: 'platform',
+      ReportingService: 'platform', RetailService: 'operations', AiService: 'engagement',
+      CrossRegionService: 'platform',
+    };
+    const peakShare = Math.max(...normal.services.map((x) => x.share));
+    const inSale = new Set(M.CLUSTERS.map((c) => c.name));
+
+    const services = normal.services.map((x) => {
+      const above = x.n > M.SIZING.normalFloor;
+      const sale = inSale.has(x.name);
+      return {
+        name: x.name.replace('Service', ''),
+        tier: TIER[x.name] ?? '',
+        n: String(x.n),
+        floorNote: above ? `floor ${M.SIZING.normalFloor}` : 'the floor',
+        share: `${x.share}%`,
+        rps: fmt(x.rpsAtLoad),
+        maths: `${x.share}% of ${fmt(normal.rps)} = ${fmt(x.rpsAtLoad)} rps \u00f7 (${x.rpsPerReplica} \u00d7 ${Math.round(M.SIZING.targetUtilisation * 100)}%) = ${x.impliedByLoad}, floored at ${M.SIZING.normalFloor}`,
+        drivenBy: x.drivenBy === 'load' ? 'load' : 'floor',
+        drivenStyle: `white-space: nowrap; color: ${x.drivenBy === 'load' ? 'var(--acb)' : 'var(--green)'};`,
+        util: `${Math.round(x.utilisationAtSteady * 100)}%`,
+        scaleOutAt: x.scaleOutAt,
+        box: `border: 1px solid ${above ? 'var(--acl)' : 'var(--div)'}; border-radius: 10px; background: var(--card); padding: 12px 14px;`,
+        countStyle: `font-family: var(--mono); font-size: 24px; font-weight: 500; line-height: 1; color: ${above ? 'var(--acb)' : 'var(--green)'};`,
+        barStyle: `display: block; height: 100%; border-radius: 2px; width: ${((x.share / peakShare) * 100).toFixed(1)}%; background: ${above ? 'var(--acb)' : '#6a6a6a'};`,
+        dots: Array.from({ length: x.n }, () => ({
+          style: `width: 11px; height: 16px; border-radius: 2px; display: block; background: ${above ? 'var(--acb)' : 'var(--green)'};`,
+        })),
+        tip: `${x.name} \u2014 ${x.share}% of the normal mix, so ${fmt(x.rpsAtLoad)} of the cell's ${fmt(normal.rps)} requests a second. One replica carries ${x.rpsPerReplica} rps flat out and is held at ${Math.round(M.SIZING.targetUtilisation * 100)}%, so ${x.scaleOutAt} usable each \u2014 the load implies ${x.impliedByLoad} and against a floor of ${M.SIZING.normalFloor} it runs ${x.n}, driven by ${x.drivenBy}. At that count each replica sits at ${Math.round(x.utilisationAtSteady * 100)}%, and the autoscaler adds another above ${x.scaleOutAt} rps a replica. ${sale ? 'It is also one of the three deployed into a burst environment, where its share is completely different.' : inSale.size && ['TenancyService', 'RetailService', 'MarketingService', 'AccessService'].includes(x.name) ? 'During an on-sale it stays here and answers the burst environment from this cell \u2014 on the path without being the load.' : 'It sees no part of a ticket sale, which is why a burst environment does not deploy it at all.'} The per-replica rate is ADR-0032's autoscale trigger and a hypothesis until tools/bench.py runs.`,
+      };
+    });
+
+    const machines = [
+      {
+        name: 'postgres primary', spec: 'one database a tenant \u00b7 venues are partitions',
+        note: 'Every row carries a scope path, and a venue is a list partition on venue_id rather than a database of its own.',
+        tip: 'ADR-0005 rejected database-per-venue: five cross-venue features become distributed transactions. One database a tenant, with venues as partitions inside it.',
+      },
+      {
+        name: 'pgbouncer', spec: 'transaction pooling \u00b7 5,000 clients \u2192 80 server',
+        note: 'Not optional. Without it the shared tier stops scaling around six replicas and the bottleneck looks like the database when it is the pool.',
+        tip: 'Twenty Catalogue replicas at twenty connections each is four hundred against a primary that will not want them. Transaction pooling is what makes horizontal scaling of the shared tier possible at all.',
+      },
+      {
+        name: 'reporting replica', spec: 'analytical \u00b7 minutes behind \u00b7 in-cell, in-region',
+        note: 'Analytical reads are served here and cannot fall back to the primary even when it is unavailable — they fail with a lag error instead.',
+        tip: 'ADR-0016. Cross-cell reporting comes from the central warehouse, because no cell may read another for reporting: that is data residency, not performance.',
+      },
+      {
+        name: 'redis', spec: 'session registry \u00b7 cache',
+        note: 'A session is a token with a validity window rather than a row, so the registry lives here and not in Postgres.',
+        tip: 'ADR-0004. ActiveSession and Session both declare persistence: none — Redis session registry.',
+      },
+    ];
+
+    const placement = [
+      {
+        name: 'Shared, and horizontally scaled', colour: 'var(--acb)',
+        who: 'Catalogue 4\u201320 \u00b7 Order 4\u201316 \u00b7 Identity 3\u20138 \u00b7 Access 2\u20136',
+        note: 'Load is a function of requests, so these scale on RPS. They are also the four that carry a burst \u2014 which is why a flash sale replicates three of them and answers the fourth from here.',
+        tip: 'A service is shared and horizontally scaled when its load is a function of requests. Derived from the contracts: every one of the 1,025 operations declares the scope it resolves at.',
+      },
+      {
+        name: 'At the venue', colour: 'var(--green)',
+        who: 'F&B \u00b7 Inventory \u00b7 Retail \u00b7 VenueOps',
+        note: '123 of their operations work offline, and a kitchen runs at the speed of a kitchen: no spike makes food faster. A venue keeps trading when its own internet fails.',
+        tip: 'Load here is a function of how many of something exist rather than of requests, so these are scoped rather than scaled. Scenario (d\u2032) moves their databases to the venue as well, at 1.8 times the cost, for a venue that must trade through a countrywide outage.',
+      },
+      {
+        name: 'At the region', colour: 'var(--warmt)',
+        who: 'Ledger \u00b7 CrossRegion',
+        note: 'Currency, fiscal year and tax are region properties, so these sit where the law does.',
+        tip: 'ADR-0018. A cell sits in one region and holds one tenant or many; region-scoped services follow the jurisdiction rather than the tenant.',
+      },
+    ];
+
+    const costs = [
+      { k: '2 \u00b7 Shared \u2014 one cell per country', v: M.money(M.HOSTING.shared.aws), colour: 'var(--acb)',
+        tip: 'The default and the recommendation. Cheapest by a wide margin, one thing to update instead of two hundred, and the ticket-selling tier borrows capacity from quiet customers when a busy one needs it.' },
+      { k: '1 \u00b7 Private \u2014 a customer\u2019s own', v: M.money(M.HOSTING.private.aws), colour: 'var(--text)',
+        tip: 'Right when a contract requires it, a customer is alone in a jurisdiction, or they are big enough to fill it. Costs about the same for a museum as for a theme park, because the machinery is sized for the software rather than the traffic.' },
+      { k: '4 \u00b7 Shared + venue equipment', v: M.money(M.HOSTING.venueLocal.aws), colour: 'var(--text)',
+        tip: '1.8 times option 2, and almost all of the difference is six hundred small databases to look after. Take it only for a venue that must trade through an outage at the country level.' },
+      { k: 'the search index, shared', v: M.money(M.HOSTING.searchIndexMonthly), colour: 'var(--text)',
+        tip: 'The only part of the AI Concierge we pay for; the model runs on the customer\u2019s own provider account, capped. The cheapest part of the system and the only one whose UAE compliance position is unsettled.' },
+      { k: '3 \u00b7 A flash sale, by the hour', v: `${M.money(M.HOSTING.burstHourly.aws)}/h`, colour: 'var(--warmt)',
+        tip: 'Rented for the sale and returned. A sixty-thousand-seat stadium selling out costs about twenty-four dollars in machinery \u2014 the risk is not the cost, it is forgetting.' },
+    ];
+
+    const tip = this.state.tip;
+    const rect = this.state.tipRect;
+    const tipStyle = tip && rect
+      ? `position: fixed; z-index: 60; left: ${Math.max(10, Math.min(rect.left, (typeof window !== 'undefined' ? window.innerWidth : 1440) - 380))}px; top: ${rect.bottom + 10}px; max-width: 360px; padding: 10px 13px; border: 1px solid var(--acl); border-radius: 9px; background: #101010; box-shadow: 0 12px 34px rgba(0,0,0,.6); font-size: 11.5px; line-height: 1.6; color: var(--text); pointer-events: none;`
+      : 'display: none;';
+
+    return {
+      cells, loads, totals, services, machines, placement, costs,
+      mixHead: `${fmt(normal.rps)} rps \u00b7 ${normal.load} \u00b7 floor ${M.SIZING.normalFloor} \u00b7 ${normal.replicas} replicas \u00b7 ${normal.services.filter((x) => x.drivenBy === 'load').length} driven by load`,
+      drivenNote: (() => {
+        const load = normal.services.filter((x) => x.drivenBy === 'load');
+        const floor = normal.services.filter((x) => x.drivenBy !== 'load');
+        if (!load.length) return `Not one of the sixteen is driven by load at ${fmt(normal.rps)} requests a second — every share implies a single replica, and a single replica is no redundancy, so the survivability floor of ${M.SIZING.normalFloor} decides all of them. That is what "two across the board" is: a count set by surviving the loss of one rather than by traffic.`;
+        if (!floor.length) return `All sixteen are driven by load at ${fmt(normal.rps)} requests a second — the cell is busy enough that every share asks for more than the floor of ${M.SIZING.normalFloor}.`;
+        return `${load.length} of the sixteen are driven by load: ${load.map((x) => `${x.name.replace('Service', '')} ${x.n}`).join(', ')}. The other ${floor.length} are not — their shares imply one replica and one replica is no redundancy, so the survivability floor of ${M.SIZING.normalFloor} decides them.`;
+      })(),
+      algoLine: 'tools/derive-sizing.py \u00b7 one algorithm, two mixes',
+      algoTip: `${M.SIZING.algorithm}. The same algorithm sizes the burst environment; only the mix and the load differ. Target utilisation is inside it at ${Math.round(M.SIZING.targetUtilisation * 100)}%, and either term of the max can win \u2014 here ${normal.services.filter((x) => x.drivenBy === 'load').length} of the sixteen are driven by load and the rest by the survivability floor of ${M.SIZING.normalFloor}, because a share of two or three per cent implies one replica and one replica is no redundancy. ${M.SIZING.unmeasured}`,
+      tip: tip ?? '', tipStyle,
+      onTipIn: (e) => {
+        const node = e.target.closest ? e.target.closest('[data-tip]') : null;
+        const text = node ? node.getAttribute('data-tip') : null;
+        if (!text || text === this.state.tip) return;
+        const r = node.getBoundingClientRect();
+        this.setState({ tip: text, tipRect: { left: r.left, bottom: r.bottom } });
+      },
+      onTipOut: (e) => {
+        const node = e.target.closest ? e.target.closest('[data-tip]') : null;
+        const to = e.relatedTarget && e.relatedTarget.closest ? e.relatedTarget.closest('[data-tip]') : null;
+        if (node && to === node) return;
+        if (this.state.tip) this.setState({ tip: null, tipRect: null });
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -96,7 +96,7 @@ exitStates:
   description: The journey ran end to end.
 - state: refused
   description: '**Stopped at a permission or a licence boundary**, with the reason named.'
-notes: '**ControlService was the second-thinnest service at 23% over 102 operations.** `ADM-008 Subscription
+notes: '**PlatformService was the second-thinnest service at 23% over 102 operations.** `ADM-008 Subscription
   & Plan Management` alone held 20 uncovered. **`setModuleEnablement` is the join declared on 24 August**
   — a tenant buys a module and 477 screens decide whether to appear, and nothing had walked it.'
 openQuestions: null

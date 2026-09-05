@@ -1,0 +1,23 @@
+digraph aiopt {
+  rankdir=TB; bgcolor="transparent";
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=10 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=9 color="#5A6577"];
+  q  [label="Question" fillcolor="#E2EFDA"];
+  gr [label="Guardrail short-circuit\na refusal a rule can decide\nnever reaches a model" fillcolor="#FFF6E0"];
+  ec [label="cache:answer — exact\nquestion + scope + locale" fillcolor="#DDEBF7"];
+  sc [label="Semantic cache\nembed, match at threshold\n'when do you shut' = 'what time do you close'" fillcolor="#DDEBF7"];
+  nc [label="Negative cache\n'no answer found'\nshorter TTL than a hit" fillcolor="#DDEBF7"];
+  sf [label="Single-flight\n200 people, one call" fillcolor="#DDEBF7"];
+  rt [label="Retrieval — hybrid\ndense + BM25 sparse\nQdrant shard = tenant" fillcolor="#FFF6E0"];
+  rr [label="Rerank\nwide recall, narrow result" fillcolor="#FFFFFF"];
+  sm [label="Small model" fillcolor="#FFFFFF"];
+  lg [label="Large model\nescalated below threshold" fillcolor="#FDECEC"];
+  out [label="Answer\nstreamed on chat capability" fillcolor="#E2EFDA"];
+  q -> gr; gr -> out [label="refused — no call" color="#1B7A3D"];
+  gr -> ec; ec -> out [label="hit — free" color="#1B7A3D"];
+  ec -> sc [label="miss"]; sc -> out [label="hit — one embedding" color="#1B7A3D"];
+  sc -> nc [label="miss"]; nc -> out [label="known miss" color="#1B7A3D"];
+  nc -> sf; sf -> rt -> rr -> sm;
+  sm -> out [label="confidence ok"];
+  sm -> lg [label="below cascade threshold" color="#B00020"]; lg -> out;
+}

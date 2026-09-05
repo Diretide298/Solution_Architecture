@@ -4005,7 +4005,7 @@
     "assets"
    ],
    "what": "No store for guest photos, avatars, IDs or signed documents.",
-   "why": "`assets` is the tenant media library \u2014 banners, product images, work-order evidence. **A guest ID scan, a signed waiver or a profile photo is personal data with a different retention posture, a different residency question under ADR-0009, and an erasure obligation** that `cross-cell.createDsarRequest` would have to reach. Putting them in the tenant library would make a DSAR delete a banner or miss a passport.",
+   "why": "`assets` is the tenant media library \u2014 banners, product images, work-order evidence. **A guest ID scan, a signed waiver or a profile photo is personal data with a different retention posture, a different residency question under ADR-0009, and an erasure obligation** that `cross-region.createDsarRequest` would have to reach. Putting them in the tenant library would make a DSAR delete a banner or miss a passport.",
    "fix": "A guest document store with retention and erasure, separate from the tenant media library.",
    "blockedOnSections": [],
    "blockedOnConflicts": [
@@ -4513,11 +4513,11 @@
    "lane": "deferred",
    "status": "done",
    "contracts": [
-    "cross-cell",
+    "cross-region",
     "marketing-crm"
    ],
    "candidateHomes": [
-    "cross-cell"
+    "cross-region"
    ],
    "what": "No subject-access export of one guest's data.",
    "why": "**DSAR is well built** \u2014 `createDsarRequest` with `pii.erase_subject` propagating and `ai.removeIndexEntry` as the vector-store path \u2014 and it covers erasure. **The access half is thinner**: 7.3.10 asks for a guest's data exported in PDF, Excel, CSV or JSON, which `reporting.exportReportResult` does not serve because a report is a population and a subject access request is one person across every contract.",

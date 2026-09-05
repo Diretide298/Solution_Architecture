@@ -28,7 +28,7 @@ A rule that lives only in prose is one a developer reads once and a test never c
 | `identity` | 8 |
 | `platform-ops` | 8 |
 | `retail` | 8 |
-| `cross-cell` | 7 |
+| `cross-region` | 7 |
 | `maintenance` | 7 |
 | `marketing-crm` | 7 |
 | `seating` | 7 |
@@ -91,16 +91,16 @@ Not the most numerous — the ones where the refusal is the control.
 | `catalogue` | `setProductAttributes` | 409 | Regeneration would exceed the configured variant ceiling for this product. |
 | `catalogue` | `transitionProductLifecycle` | 403 | Approval attempted by the principal who submitted it. Segregation applies here as it does to journals. |
 | `catalogue` | `transitionProductLifecycle` | 409 | Transition not valid from the current state, or archiving attempted while unexpired entitlements exist. |
-| `catalogue` | `updateEnvelope` | 409 | Capacity reduced below units already sold |
+| `catalogue` | `updateChannelCapacity` | 409 | Capacity reduced below units already sold |
 | `catalogue` | `updatePerformance` | 409 | Timing change attempted on a performance with sold tickets |
 | `catalogue` | `updatePriceList` | 409 | Currency or scale change attempted after prices exist |
-| `cross-cell` | `authoriseWalletSpend` | 409 | Guest link severed, or the wallet is suspended |
-| `cross-cell` | `captureWalletAuthorisation` | 409 | Hold expired, already captured, or capture exceeds the hold |
-| `cross-cell` | `consumeRedemptionRight` | 409 | Entries exhausted, or the right is revoked or outside its window |
-| `cross-cell` | `createGuestLink` | 403 | Consent absent or expired |
-| `cross-cell` | `createGuestLink` | 409 | The subject in the target cell is already linked to a different guest |
-| `cross-cell` | `propagateRedemptionRight` | 409 | Right already propagated. Idempotent — returns the existing right. |
-| `cross-cell` | `revokeRedemptionRight` | 409 | Already fully consumed. Revocation cannot undo a redemption that has happened — the guest was admitted. |
+| `cross-region` | `authoriseWalletSpend` | 409 | Guest link severed, or the wallet is suspended |
+| `cross-region` | `captureWalletAuthorisation` | 409 | Hold expired, already captured, or capture exceeds the hold |
+| `cross-region` | `consumeRedemptionRight` | 409 | Entries exhausted, or the right is revoked or outside its window |
+| `cross-region` | `createGuestLink` | 403 | Consent absent or expired |
+| `cross-region` | `createGuestLink` | 409 | The subject in the target cell is already linked to a different guest |
+| `cross-region` | `propagateRedemptionRight` | 409 | Right already propagated. Idempotent — returns the existing right. |
+| `cross-region` | `revokeRedemptionRight` | 409 | Already fully consumed. Revocation cannot undo a redemption that has happened — the guest was admitted. |
 | `finance` | `abandonPeriodClose` | 409 | Not in a state that permits this |
 | `finance` | `approveJournalEntry` | 403 | Approver is the poster, or lacks LEDGER_APPROVE |
 | `finance` | `beginPeriodClose` | 409 | Not in a state that permits this |

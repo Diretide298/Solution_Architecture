@@ -1,0 +1,140 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; background: #EEF1F6; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+a { color: #0D6EFD; text-decoration: none; }
+a:hover { color: #0A55C7; }
+</style>
+</helmet>
+
+<div style="font-family: Manrope, system-ui, sans-serif; color: #1F2937; background: #EEF1F6; padding: 44px 40px 56px">
+  <div style="max-width: 1160px; margin: 0 auto">
+
+    <div style="display: flex; align-items: flex-start; gap: 28px; flex-wrap: wrap; border-bottom: 1px solid #DCE3ED; padding-bottom: 26px">
+      <div style="flex: 1; min-width: 420px">
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: .14em; color: #0D6EFD; text-transform: uppercase">Audit &middot; 15 platforms &middot; screens/*.yaml</div>
+        <h1 style="font-size: 38px; font-weight: 800; letter-spacing: -.02em; margin: 8px 0 10px; line-height: 1.05">Recurring and redundant screens</h1>
+        <p style="font-size: 14.5px; line-height: 1.65; color: #4B5563; max-width: 74ch; margin: 0; text-wrap: pretty">The inventory holds 492 screens. Read by the operations they call rather than the names they carry, they resolve to 373 distinct behaviours &mdash; so <strong>105 screens do exactly what another screen already does</strong>, and 134 sit in pairs sharing four fifths of their operations. The duplication is not evenly spread: it clusters on eight workspaces that were re-drawn once per platform.</p>
+      </div>
+      <div style="display: flex; gap: 10px; flex-wrap: wrap; align-self: flex-start">
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 13px 17px; min-width: 104px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; color: #1F2937; font-variant-numeric: tabular-nums">492</div><div style="font-size: 10.5px; color: #6B7280; font-weight: 600; margin-top: 2px">screens defined</div></div>
+        <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 14px; padding: 13px 17px; min-width: 104px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; color: #0D6EFD; font-variant-numeric: tabular-nums">373</div><div style="font-size: 10.5px; color: #6B7280; font-weight: 600; margin-top: 2px">distinct behaviours</div></div>
+        <div style="background: #0C2340; border: 1px solid #0C2340; border-radius: 14px; padding: 13px 17px; min-width: 104px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 24px; font-weight: 600; color: #00D4C4; font-variant-numeric: tabular-nums">105</div><div style="font-size: 10.5px; color: #A9C2DC; font-weight: 600; margin-top: 2px">exact duplicates</div></div>
+      </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; padding: 20px 0 0">
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #C02626; border-radius: 12px; padding: 14px 17px">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #C02626; text-transform: uppercase">One product, drawn twice</div>
+        <p style="font-size: 12.5px; line-height: 1.6; color: #4B5563; margin: 7px 0 0; text-wrap: pretty">Guest Web and Guest App share 20 screen names and, on all twenty, the same operations. One guest product on two runtimes, inventoried as two.</p>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #96650A; border-radius: 12px; padding: 14px 17px">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #96650A; text-transform: uppercase">One workspace, seven names</div>
+        <p style="font-size: 12.5px; line-height: 1.6; color: #4B5563; margin: 7px 0 0; text-wrap: pretty">Seven screens on four platforms call the identical fourteen order operations. Held Orders, Ticket lookup, Order Detail and Group Bookings are one table under four headings.</p>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #6E7681; border-radius: 12px; padding: 14px 17px">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #6E7681; text-transform: uppercase">Navigation counted as screens</div>
+        <p style="font-size: 12.5px; line-height: 1.6; color: #4B5563; margin: 7px 0 0; text-wrap: pretty">BO-101 to BO-108 are back-office section landings whose only operation is <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11.5px">getVenueSettings</span>. They are a nav menu, each carrying a state contract nobody will write.</p>
+      </div>
+    </div>
+
+    <div style="margin-top: 26px; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 22px 26px 24px">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: .1em; color: #0D6EFD; text-transform: uppercase">The eight clusters</div>
+      <p style="font-size: 12.5px; line-height: 1.6; color: #6B7280; margin: 7px 0 18px; max-width: 82ch; text-wrap: pretty">Grouped by operation signature, not by name. <em>Collapsible</em> is what disappears if each cluster becomes one screen taking a scope or role parameter &mdash; a ceiling, not a target.</p>
+
+      <div style="display: grid; grid-template-columns: 30px minmax(0, 2.1fr) minmax(0, 1.4fr) 74px 88px; align-items: stretch; font-size: 12px">
+        <div style="padding: 0 0 9px"></div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase; padding: 0 10px 9px 0">Recurring workspace</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase; padding: 0 10px 9px 0">Platforms</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase; padding: 0 8px 9px 0; text-align: right">Screens</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #C02626; text-transform: uppercase; padding: 0 0 9px; text-align: right">Collapsible</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">01</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">Guest storefront &mdash; web and app</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P01 &middot; P02</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">40</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">20</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">02</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">Order workspace &mdash; find, modify, refund</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P04 &middot; P06 &middot; P08 &middot; P10</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">10</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">6</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">03</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">Scan, validate, override, sync</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P06 &middot; P07 &middot; P08</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">8</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">3</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">04</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">Reporting and analytics</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P04 &middot; P08 &middot; P09 &middot; P10 &middot; P12 &middot; P15 &middot; P16</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">25</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">10</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">05</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">Shift, cash and variance</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P04 &middot; P06 &middot; P08</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">7</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">4</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">06</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">Stock, count and replenishment</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P06 &middot; P08</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">25</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">7</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">07</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">Announcements and broadcast</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P06 &middot; P08</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">6</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">5</div>
+
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #6E7681">08</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; font-weight: 700">AI assistant and action centre</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 10px 10px 0; color: #6B7280; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px">P01 &middot; P02 &middot; P05 &middot; P06 &middot; P08 &middot; P09 &middot; P15 &middot; P16</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 8px 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums">15</div>
+        <div style="border-top: 1px solid #E5E7EB; padding: 10px 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 600; color: #C02626; font-variant-numeric: tabular-nums">6</div>
+
+        <div style="border-top: 2px solid #DCE3ED; padding: 12px 0 0"></div>
+        <div style="border-top: 2px solid #DCE3ED; padding: 12px 10px 0 0; font-weight: 800">Eight clusters</div>
+        <div style="border-top: 2px solid #DCE3ED; padding: 12px 10px 0 0"></div>
+        <div style="border-top: 2px solid #DCE3ED; padding: 12px 8px 0 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 700; font-variant-numeric: tabular-nums">136</div>
+        <div style="border-top: 2px solid #DCE3ED; padding: 12px 0 0; text-align: right; font-family: 'IBM Plex Mono', monospace; font-weight: 800; color: #C02626; font-variant-numeric: tabular-nums">61</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 22px; display: grid; grid-template-columns: minmax(0, 1.28fr) minmax(0, 1fr); gap: 14px">
+      <div style="background: #0C2340; border-radius: 16px; padding: 22px 26px 24px; color: #E8EFF7">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .1em; color: #00D4C4; text-transform: uppercase">How this was measured</div>
+        <p style="font-size: 12.5px; line-height: 1.65; color: #A9C2DC; margin: 9px 0 14px; text-wrap: pretty">Every screen was reduced to the set of contract operations it declares. Two screens with the same set are the same screen: they read the same data, offer the same actions, and will need the same states. Name and platform were ignored, so nothing here rests on two screens happening to be <em>called</em> the same thing.</p>
+        <div style="display: flex; gap: 10px; flex-wrap: wrap">
+          <div style="background: #14304F; border-radius: 10px; padding: 10px 14px; min-width: 122px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600; color: #FFFFFF; font-variant-numeric: tabular-nums">63</div><div style="font-size: 10px; color: #A9C2DC; font-weight: 600; margin-top: 2px">identical signatures</div></div>
+          <div style="background: #14304F; border-radius: 10px; padding: 10px 14px; min-width: 122px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600; color: #FFFFFF; font-variant-numeric: tabular-nums">168</div><div style="font-size: 10px; color: #A9C2DC; font-weight: 600; margin-top: 2px">screens inside them</div></div>
+          <div style="background: #14304F; border-radius: 10px; padding: 10px 14px; min-width: 122px"><div style="font-family: 'IBM Plex Mono', monospace; font-size: 19px; font-weight: 600; color: #FFFFFF; font-variant-numeric: tabular-nums">203</div><div style="font-size: 10px; color: #A9C2DC; font-weight: 600; margin-top: 2px">pairs above 80&#37;</div></div>
+        </div>
+      </div>
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 22px 24px 24px">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .1em; color: #96650A; text-transform: uppercase">What is not redundancy</div>
+        <p style="font-size: 12.5px; line-height: 1.65; color: #4B5563; margin: 9px 0 0; text-wrap: pretty">A screen repeated because the <strong>context genuinely differs</strong> stays. The scanner's offline journal is not the back office's scan activity: one is written with no network on a device held in one hand, the other is read at a desk. Same operations, different failure mode &mdash; and the failure mode is the design.</p>
+        <p style="font-size: 12.5px; line-height: 1.65; color: #4B5563; margin: 11px 0 0; text-wrap: pretty">The test applied throughout: <strong>would one screen with a parameter serve both people on both devices?</strong> Where the answer is no, the pair is marked intentional rather than collapsible.</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

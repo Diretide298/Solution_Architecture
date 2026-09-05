@@ -1,0 +1,801 @@
+# **Identical in everything but topology.** Same images, same Postgres flags, same Redis, same limits.
+# Only placement changes — that is the whole experiment, and anything else differing invalidates it.
+
+# **Agent 2 — every service per tenant.** 16 × 3 tenants = 48 containers. **Isolates on the
+# wrong axis**: a Saturday spike is one venue, and this scales eleven venues' worth of every
+# service because one is busy. Also contradicts ADR-0001 where a tenant spans jurisdictions.
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ticvai
+      POSTGRES_PASSWORD: ticvai
+      POSTGRES_DB: ticvai
+    command: postgres -c max_connections=400 -c shared_buffers=512MB
+    volumes:
+    - ./backend:/docker-entrypoint-initdb.d:ro
+    ports:
+    - 5432:5432
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 4G
+  redis:
+    image: redis:7-alpine
+    ports:
+    - 6379:6379
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 2G
+  identityservice-t1:
+    build: ./IdentityService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  identityservice-t2:
+    build: ./IdentityService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  identityservice-t3:
+    build: ./IdentityService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  tenancyservice-t1:
+    build: ./TenancyService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  tenancyservice-t2:
+    build: ./TenancyService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  tenancyservice-t3:
+    build: ./TenancyService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  catalogueservice-t1:
+    build: ./CatalogueService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  catalogueservice-t2:
+    build: ./CatalogueService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  catalogueservice-t3:
+    build: ./CatalogueService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  orderservice-t1:
+    build: ./OrderService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  orderservice-t2:
+    build: ./OrderService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  orderservice-t3:
+    build: ./OrderService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  accessservice-t1:
+    build: ./AccessService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  accessservice-t2:
+    build: ./AccessService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  accessservice-t3:
+    build: ./AccessService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  ledgerservice-t1:
+    build: ./LedgerService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  ledgerservice-t2:
+    build: ./LedgerService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  ledgerservice-t3:
+    build: ./LedgerService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  inventoryservice-t1:
+    build: ./InventoryService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  inventoryservice-t2:
+    build: ./InventoryService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  inventoryservice-t3:
+    build: ./InventoryService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  fnbservice-t1:
+    build: ./FnbService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  fnbservice-t2:
+    build: ./FnbService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  fnbservice-t3:
+    build: ./FnbService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  retailservice-t1:
+    build: ./RetailService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  retailservice-t2:
+    build: ./RetailService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  retailservice-t3:
+    build: ./RetailService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  marketingservice-t1:
+    build: ./MarketingService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  marketingservice-t2:
+    build: ./MarketingService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  marketingservice-t3:
+    build: ./MarketingService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  aiservice-t1:
+    build: ./AiService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  aiservice-t2:
+    build: ./AiService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  aiservice-t3:
+    build: ./AiService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  venueopsservice-t1:
+    build: ./VenueOpsService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  venueopsservice-t2:
+    build: ./VenueOpsService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  venueopsservice-t3:
+    build: ./VenueOpsService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  platformservice-t1:
+    build: ./PlatformService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  platformservice-t2:
+    build: ./PlatformService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  platformservice-t3:
+    build: ./PlatformService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  whitelabelservice-t1:
+    build: ./WhiteLabelService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  whitelabelservice-t2:
+    build: ./WhiteLabelService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  whitelabelservice-t3:
+    build: ./WhiteLabelService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  reportingservice-t1:
+    build: ./ReportingService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  reportingservice-t2:
+    build: ./ReportingService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  reportingservice-t3:
+    build: ./ReportingService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  crossregionservice-t1:
+    build: ./CrossRegionService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  crossregionservice-t2:
+    build: ./CrossRegionService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M
+  crossregionservice-t3:
+    build: ./CrossRegionService
+    environment:
+      PG_DSN: postgres://ticvai:ticvai@postgres:5432/ticvai
+      REDIS_URL: redis://redis:6379/0
+      PG_POOL_MIN: '2'
+      PG_POOL_MAX: '8'
+    depends_on:
+    - postgres
+    - redis
+    deploy:
+      replicas: 1
+      resources:
+        limits:
+          cpus: '1'
+          memory: 512M

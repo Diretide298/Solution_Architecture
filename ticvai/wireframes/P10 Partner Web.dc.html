@@ -114,7 +114,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
   <a class="home" href="TICVAI%20Wireframe%20Boards.dc.html">&larr; All boards</a>
   <div class="head">
     <div><span class="mark">TICVAI</span>
-      <h1>P10 · Partner Web — Reseller Portal <span style="font-weight:600;color:#6B7280">(21 screens)</span></h1></div>
+      <h1>P10 · Partner Web — Reseller Portal <span style="font-weight:600;color:#6B7280">(51 screens)</span></h1></div>
     <div class="meta">partner · web · partner-web</div>
   </div>
   <p class="lede"></p>
@@ -225,9 +225,9 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; none declared</div>
+          <div><b>OPERATIONS</b> &middot; listApiClients · createApiClient · rotateApiCredential · revokeApiCredential</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · error</span></div>
-          
+          <div><b>ARRIVES WITH</b> &middot; clientId&larr;navigation</div>
           <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
         </div>
       </div>
@@ -477,7 +477,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listPartnerAgreements · getCommissionStatement</div>
+          <div><b>OPERATIONS</b> &middot; listPartnerAgreements · getCommissionStatement · listPartnerQuotes · createPartnerQuote</div>
           <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoAccess · error</span></div>
           <div><b>ARRIVES WITH</b> &middot; agreementId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
@@ -706,9 +706,849 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>ARRIVES WITH</b> &middot; caseId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; PTR-001 · PTR-002 · PTR-003</div>
         </div>
+      </div></div><div class="grp">09 — Partners · 30 screens</div><div class="stack">
+      <div id="ptr-022" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-022</span>
+            <span class="ttl">Partner Management Command Center</span></div>
+          <div class="pur">Provide a centralized management dashboard for all B2B, reseller, OTA and distribution partners across the TICVAI ecosystem.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Management Command Center</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Total Partners</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Active Partners</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Pending Onboarding</span></div></div><div class="side"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Pending Approval</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Suspended Partners</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartner</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-023 · PTR-024 · PTR-025 · PTR-026</div>
+        </div>
+      </div>
+      <div id="ptr-023" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-023</span>
+            <span class="ttl">Partner Profile &amp; Organization Setup</span></div>
+          <div class="pur">Create the master business record for each external distribution partner.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Profile &amp; Organization Setup</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The configuration being edited</span></div><div class="panel"><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scope this applies at</span></div><div class="panel"><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Active</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; setPartnerProfileOrganization</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-024" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-024</span>
+            <span class="ttl">Partner Onboarding &amp; Application Workflow</span></div>
+          <div class="pur">Manage the complete journey from a new partner application through internal review and activation. 8 | Pag e</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Onboarding &amp; Application Workflo</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerOnboardingApplication</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-025" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-025</span>
+            <span class="ttl">Partner Contacts &amp; User Administration</span></div>
+          <div class="pur">Manage the individuals authorized to interact with TICVAI on behalf of each partner.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Contacts &amp; User Administration</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerContactUser</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-026" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-026</span>
+            <span class="ttl">Territory, Market &amp; Distribution Rights</span></div>
+          <div class="pur">Define where and through what business scope a partner is authorized to distribute TICVAI products.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Territory, Market &amp; Distribution Rights</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listTerritoryMarketDistribution</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-027" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-027</span>
+            <span class="ttl">Partner Brand, Venue &amp; Business Scope Assignment</span></div>
+          <div class="pur">Determine which TICVAI business entities the partner relationship covers. This is deliberately separate from product assignment, which is governed thr</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Brand, Venue &amp; Business Scope As</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; setPartnerBrandVenue</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-028" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-028</span>
+            <span class="ttl">Partner Documentation &amp; Compliance Repository</span></div>
+          <div class="pur">Maintain required partner documentation and ensure that commercial accounts remain compliant.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Documentation &amp; Compliance Repos</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerDocumentationCompliance</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-029" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-029</span>
+            <span class="ttl">Partner Access, Roles &amp; Permission Profile</span></div>
+          <div class="pur">Control what a partner organization is permitted to do, beyond individual-user permissions.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Access, Roles &amp; Permission Profi</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerAccessRole</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-030" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-030</span>
+            <span class="ttl">Partner Approval, Status &amp; Lifecycle Management</span></div>
+          <div class="pur">Govern the complete business lifecycle of a partner after onboarding.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Approval, Status &amp; Lifecycle Man</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; approvePartnerStatuLifecycle</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-031" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-031</span>
+            <span class="ttl">Partner 360° Profile, Readiness &amp; AI Review</span></div>
+          <div class="pur">Provide one consolidated Partner 360 screen before activation and throughout the relationship. 19 | Pag e This should become one of the most useful sc</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner 360° Profile, Readiness &amp; AI Rev</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerProfileReadiness</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-022</div>
+        </div>
+      </div>
+      <div id="ptr-032" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-032</span>
+            <span class="ttl">Commercial Agreement Command Center</span></div>
+          <div class="pur">Provide commercial and finance teams with a centralized view of all partner agreements and their current commercial health. 23 | Pag e</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Commercial Agreement Command Center</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Active Agreements</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Draft Agreements</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Pending Approval</span></div></div><div class="side"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Agreements Expiring Soon</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Expired Agreements</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCommercialAgreement</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-033 · PTR-034 · PTR-035 · PTR-036</div>
+        </div>
+      </div>
+      <div id="ptr-033" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-033</span>
+            <span class="ttl">Agreement &amp; Contract Terms Builder</span></div>
+          <div class="pur">Create the structured commercial agreement governing the partner relationship.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Agreement &amp; Contract Terms Builder</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The configuration being edited</span></div><div class="panel"><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scope this applies at</span></div><div class="panel"><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Active</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; setAgreementContractTerm</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-034" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-034</span>
+            <span class="ttl">Partner Rate &amp; Net Pricing Configuration</span></div>
+          <div class="pur">Define the commercial pricing basis available to a partner without recreating TICVAI&#x27;s Pricing Engine.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Rate &amp; Net Pricing Configuration</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The configuration being edited</span></div><div class="panel"><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scope this applies at</span></div><div class="panel"><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Active</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; setPartnerRateNet</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-035" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-035</span>
+            <span class="ttl">Commission, Margin &amp; Incentive Management</span></div>
+          <div class="pur">Configure how partner commissions and commercial incentives are calculated.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Commission, Margin &amp; Incentive Managemen</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCommissionMarginIncentive</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-036" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-036</span>
+            <span class="ttl">Credit Limit &amp; Exposure Management</span></div>
+          <div class="pur">Control the financial exposure TICVAI permits for partners buying on account. This should be one of the strongest finance-control screens in the B2B m</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Credit Limit &amp; Exposure Management</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCreditLimitExposure</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-037" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-037</span>
+            <span class="ttl">Deposit, Guarantee &amp; Financial Security Management</span></div>
+          <div class="pur">Manage financial security required to support partner credit or commercial access.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Deposit, Guarantee &amp; Financial Security </h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listDepositGuaranteeFinancial</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-038" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-038</span>
+            <span class="ttl">Payment Terms, Billing &amp; Account Configuration</span></div>
+          <div class="pur">Define how the partner pays TICVAI and how transactions are financially grouped.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Payment Terms, Billing &amp; Account Configu</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The configuration being edited</span></div><div class="panel"><span class="kind">selectField</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Scope this applies at</span></div><div class="panel"><span class="kind">toggle</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">Active</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; setPaymentTermBilling</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-039" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-039</span>
+            <span class="ttl">Commercial Allocation, Quota &amp; Commitment Management</span></div>
+          <div class="pur">Define the commercial commitment of inventory to a partner. This differs from Area 4&#x27;s operational channel allocation.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Commercial Allocation, Quota &amp; Commitmen</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCommercialAllocationQuota</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-040" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-040</span>
+            <span class="ttl">Booking Limits, Commercial Exceptions &amp; Approval</span></div>
+          <div class="pur">Control transaction limits and provide a governed mechanism for commercial exceptions.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Booking Limits, Commercial Exceptions &amp; </h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; approveBookingLimitCommercial</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-041" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-041</span>
+            <span class="ttl">Commercial Agreement 360°, Health &amp; AI Review</span></div>
+          <div class="pur">Give management a single consolidated view of the complete commercial relationship with a partner.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Commercial Agreement 360°, Health &amp; AI R</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCommercialAgreementHealth</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-032</div>
+        </div>
+      </div>
+      <div id="ptr-042" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-042</span>
+            <span class="ttl">Partner Operations Command Center</span></div>
+          <div class="pur">Provide commercial, operations and finance teams with one real-time view of active B2B, reseller and OTA business.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Operations Command Center</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Partner Sales Today</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Partner Sales MTD</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Active Partner Orders</span></div></div><div class="side"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Active Reservations/Holds</span></div><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Tickets Sold</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartner2</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-001 · PTR-043 · PTR-044 · PTR-045 · PTR-046</div>
+        </div>
+      </div>
+      <div id="ptr-043" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-043</span>
+            <span class="ttl">Partner Orders &amp; Booking Management</span></div>
+          <div class="pur">Provide a consolidated operational view of orders created by each partner.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Orders &amp; Booking Management</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerOrderBooking</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-044" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-044</span>
+            <span class="ttl">Reservations, Holds &amp; Release Management</span></div>
+          <div class="pur">Manage inventory temporarily reserved by B2B partners before final confirmation. This is particularly important for tour operators, corporate groups a</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Reservations, Holds &amp; Release Management</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listReservationHoldRelease</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-045" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-045</span>
+            <span class="ttl">Partner Cancellations, Refunds &amp; Amendments</span></div>
+          <div class="pur">Manage post-booking changes according to the partner&#x27;s commercial agreement and product policies.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Cancellations, Refunds &amp; Amendme</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerCancellationRefund</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-046" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-046</span>
+            <span class="ttl">Partner Statement &amp; Account Activity</span></div>
+          <div class="pur">Give finance and commercial teams a complete financial statement for each partner account.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Statement &amp; Account Activity</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerStatementAccount</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-047" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-047</span>
+            <span class="ttl">Partner Reconciliation &amp; Exception Management</span></div>
+          <div class="pur">Reconcile operational bookings against financial and channel records and identify discrepancies.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Reconciliation &amp; Exception Manag</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerReconciliationException</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-048" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-048</span>
+            <span class="ttl">Commission Calculation &amp; Settlement Management</span></div>
+          <div class="pur">Calculate, approve and settle commission or incentive amounts owed under partner commercial agreements.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Commission Calculation &amp; Settlement Mana</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listCommissionCalculationSettlement</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-049" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-049</span>
+            <span class="ttl">Partner Disputes, Cases &amp; Service Management</span></div>
+          <div class="pur">Provide a structured case-management environment for partner operational and commercial disputes.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Disputes, Cases &amp; Service Manage</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">searchField</span><div class="chip">Search</div><span class="why">Find a record</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">Every record with its status</span></div><div class="panel"><span class="kind">detailPanel</span><div class="rows"><div class="bar"><i style="width:64%"></i></div></div><span class="why">The selected record</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerDisputeCase</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-050" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-050</span>
+            <span class="ttl">Partner Performance Scorecard &amp; Risk Monitoring</span></div>
+          <div class="pur">Create a consistent scorecard for evaluating the quality and commercial value of every partner relationship.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner Performance Scorecard &amp; Risk Mon</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Headline figure</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The records behind the figures</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerPerformanceScorecard</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
+      </div>
+      <div id="ptr-051" class="scr">
+        <div>
+          <div class="hdr"><span class="code">PTR-051</span>
+            <span class="ttl">Partner AI Intelligence &amp; Relationship Optimization</span></div>
+          <div class="pur">Provide TICVAI&#x27;s AI decision-support layer across the complete partner lifecycle. This screen should combine information from Boards 1, 2 and 3.</div>
+        </div>
+        <div class="frame">
+          <aside class="rail"><div class="brand"><b>TICVAI Partner</b><span>Partners</span></div><nav class="nav"><i class="">Allocations</i><i class="on">Bookings</i><i class="">Statements</i><i class="">Support</i></nav></aside>
+          <div class="body">
+            <div class="top">
+              <div><h2>Partner AI Intelligence &amp; Relationship O</h2>
+                <small>Partner Web · wave 3 · compact</small></div>
+              <div class="acts"><div class="chip">This account</div><div class="chip cta">New booking</div></div>
+            </div>
+            
+            <div class="canvas">
+              <div class="kpis"><div class="kpi"><b>Allocation</b><span>2,400</span></div><div class="kpi"><b>Sold</b><span>1,860</span></div><div class="kpi"><b>Credit</b><span>AED 84k</span></div><div class="kpi"><b>Due</b><span>AED 12k</span></div></div>
+              <div class="two"><div class="grow"><div class="panel"><span class="kind">metricTile</span><div class="rows"><div class="bar"><i style="width:78%"></i></div><div class="bar"><i style="width:54%"></i></div><div class="bar"><i style="width:92%"></i></div><div class="bar"><i style="width:36%"></i></div><div class="bar"><i style="width:61%"></i></div></div><span class="why">Headline figure</span></div><div class="panel"><span class="kind">dataTable</span><div class="rows"><div class="row"><span>Name</span><span>Status</span><span>Value</span><span></span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div><div class="row"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div></div><span class="why">The records behind the figures</span></div></div></div>
+            </div>
+          </div>
+        </div>
+        <div class="foot">
+          <div><b>OPERATIONS</b> &middot; listPartnerRelationship</div>
+          <div><b>STATES</b> &middot; <span class="">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error</span></div>
+          
+          <div><b>GOES TO</b> &middot; PTR-042</div>
+        </div>
       </div></div>
   <div class="bottom">
     <span>Generated by tools/derive-wireframes.py from screens/P10-partner-reseller-portal.yaml — do not hand-edit</span>
-    <span>P10 · 21 screens · 8 groups</span>
+    <span>P10 · 51 screens · 9 groups</span>
   </div>
 </div></body></html>

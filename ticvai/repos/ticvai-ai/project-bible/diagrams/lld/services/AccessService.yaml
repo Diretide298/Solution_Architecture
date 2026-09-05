@@ -1,5 +1,5 @@
 id: LLD-AccessService
-title: AccessService — 31 operations, 8 tables
+title: AccessService — 177 operations, 8 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is h
   precisely because the gate cannot afford the arithmetic.
 ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
 coverage:
-  operations: 31
+  operations: 177
   inAFlow: 17
   percent: 57%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -22,7 +22,7 @@ schemas:
   largestTable: access.entitlement
 operationsByContract:
 - contract: access
-  count: 31
+  count: 177
   operations:
   - operation: addBlacklistEntry
     verb: POST
@@ -32,6 +32,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: approveManualOverrideSupervisor
+    verb: PUT
+    path: /manual-override-supervisor
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: approveMultiMediaPreview
+    verb: PUT
+    path: /multi-media-preview
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: createAccessPoint
     verb: POST
     path: /access-points
@@ -40,9 +56,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: createAdmissionProfile
+  - operation: createAdmissionRules
     verb: POST
-    path: /admission-profiles
+    path: /admission-rules
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -112,6 +128,46 @@ operationsByContract:
     offline: false
     reads: 9
     writes: 1
+  - operation: listAccess
+    verb: GET
+    path: /access
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessAttributeCatalog
+    verb: GET
+    path: /access-attribute-catalog
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessExecutiveInsight
+    verb: GET
+    path: /access-executive-insight
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessLocationGrouping
+    verb: GET
+    path: /access-location-grouping
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessMonitoring
+    verb: GET
+    path: /access-monitoring
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listAccessPoints
     verb: GET
     path: /access-points
@@ -120,13 +176,125 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: listAdmissionProfiles
+  - operation: listAccessReportScheduled
     verb: GET
-    path: /admission-profiles
+    path: /access-report-scheduled
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessRiskScoring
+    verb: GET
+    path: /access-risk-scoring
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessRule
+    verb: GET
+    path: /access-rule
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessSecurityFraud
+    verb: GET
+    path: /access-security-fraud
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAccessValidityTime
+    verb: GET
+    path: /access-validity-time
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAdmissionRules
+    verb: GET
+    path: /admission-rules
     scope: venue
     permission: SCOPE_VIEW
     offline: true
     reads: 1
+    writes: 0
+  - operation: listAntiPassbackJourney
+    verb: GET
+    path: /anti-passback-journey
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAttendanceAdmission
+    verb: GET
+    path: /attendance-admission
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listAuthorizationGovernanceTemporary
+    verb: GET
+    path: /authorization-governance-temporary
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBiometric
+    verb: GET
+    path: /biometric
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBiometricAccess
+    verb: GET
+    path: /biometric-access
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBiometricConsentGuardian
+    verb: GET
+    path: /biometric-consent-guardian
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBiometricIdentityIntegrity
+    verb: GET
+    path: /biometric-identity-integrity
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBiometricLifecycleRetention
+    verb: GET
+    path: /biometric-lifecycle-retention
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listBiometricValidationGate
+    verb: GET
+    path: /biometric-validation-gate
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listBlacklist
     verb: GET
@@ -136,6 +304,198 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: listBrandingLocalizationTemplate
+    verb: GET
+    path: /branding-localization-template
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listConnectivityFailureDegraded
+    verb: GET
+    path: /connectivity-failure-degraded
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredential
+    verb: GET
+    path: /credential
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialActivationDisplay
+    verb: GET
+    path: /credential-activation-display
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialDeliveryDistribution
+    verb: GET
+    path: /credential-delivery-distribution
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialDisableBlacklist
+    verb: GET
+    path: /credential-disable-blacklist
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialGenerationIssuance
+    verb: GET
+    path: /credential-generation-issuance
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialIdentityToken
+    verb: GET
+    path: /credential-identity-token
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialReplacementReissue
+    verb: GET
+    path: /credential-replacement-reissue
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialRevocationLifecycle
+    verb: GET
+    path: /credential-revocation-lifecycle
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialSecurity
+    verb: GET
+    path: /credential-security
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialSecurityOperational
+    verb: GET
+    path: /credential-security-operational
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialSharingConcurrent
+    verb: GET
+    path: /credential-sharing-concurrent
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialTransferRebinding
+    verb: GET
+    path: /credential-transfer-rebinding
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listCredentialUsageCross
+    verb: GET
+    path: /credential-usage-cross
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDeviceBindingSession
+    verb: GET
+    path: /device-binding-session
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDeviceGate
+    verb: GET
+    path: /device-gate
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDeviceTypeHardware
+    verb: GET
+    path: /device-type-hardware
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDigitalCredentialSecurity
+    verb: GET
+    path: /digital-credential-security
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listDynamicAccessPolicy
+    verb: GET
+    path: /dynamic-access-policy
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listEdgePackageData
+    verb: GET
+    path: /edge-package-data
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listEdgeSecurityDeployment
+    verb: GET
+    path: /edge-security-deployment
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listEntitlementConsumption
+    verb: GET
+    path: /entitlement-consumption
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listEntitlementCrossMedia
+    verb: GET
+    path: /entitlement-cross-media
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listEntitlements
     verb: GET
     path: /my/entitlements/all
@@ -143,6 +503,294 @@ operationsByContract:
     permission: null
     offline: false
     reads: 3
+    writes: 0
+  - operation: listEntryExitCrossover
+    verb: GET
+    path: /entry-exit-crossover
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listEntryExitRule
+    verb: GET
+    path: /entry-exit-rule
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listEntryTemporaryExit
+    verb: GET
+    path: /entry-temporary-exit
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listExternalPartnerCredential
+    verb: GET
+    path: /external-partner-credential
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFaceChangeEnrollment
+    verb: GET
+    path: /face-change-enrollment
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFaceMatchingVerification
+    verb: GET
+    path: /face-matching-verification
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFaceTagTemporary
+    verb: GET
+    path: /face-tag-temporary
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFailedGenerationDelivery
+    verb: GET
+    path: /failed-generation-delivery
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFamilyChildPod
+    verb: GET
+    path: /family-child-pod
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFastPassAttraction
+    verb: GET
+    path: /fast-pass-attraction
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listFraudDetectionRule
+    verb: GET
+    path: /fraud-detection-rule
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGateModeFree
+    verb: GET
+    path: /gate-mode-free
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGraphicalAccessMap
+    verb: GET
+    path: /graphical-access-map
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupAdmissionQuantity
+    verb: GET
+    path: /group-admission-quantity
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupAttendancePartial
+    verb: GET
+    path: /group-attendance-partial
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGroupLeaderFast
+    verb: GET
+    path: /group-leader-fast
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGuestCompanionEligibility
+    verb: GET
+    path: /guest-companion-eligibility
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGuestDwellTime
+    verb: GET
+    path: /guest-dwell-time
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listGuestJourney
+    verb: GET
+    path: /guest-journey
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listHardwareCompatibilityHealth
+    verb: GET
+    path: /hardware-compatibility-health
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listHotelWalletExternal
+    verb: GET
+    path: /hotel-wallet-external
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listIdentityMembershipAccreditation
+    verb: GET
+    path: /identity-membership-accreditation
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listLiveAccess
+    verb: GET
+    path: /live-access
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listLiveGateMode
+    verb: GET
+    path: /live-gate-mode
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listLiveVenueOccupancy
+    verb: GET
+    path: /live-venue-occupancy
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaActivationPriority
+    verb: GET
+    path: /media-activation-priority
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaCredential
+    verb: GET
+    path: /media-credential
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaDesign
+    verb: GET
+    path: /media-design
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaIssuanceEncoding
+    verb: GET
+    path: /media-issuance-encoding
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaReplacementRevocation
+    verb: GET
+    path: /media-replacement-revocation
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaSwapReplacement
+    verb: GET
+    path: /media-swap-replacement
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaTypeCredential
+    verb: GET
+    path: /media-type-credential
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMediaTypeTechnology
+    verb: GET
+    path: /media-type-technology
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMultiMediaBinding
+    verb: GET
+    path: /multi-media-binding
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMultiParkCrossover
+    verb: GET
+    path: /multi-park-crossover
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listMultiParkCrossover2
+    verb: GET
+    path: /multi-park-crossover
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: listMyEntitlements
     verb: GET
@@ -152,6 +800,46 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 0
+  - operation: listOfflineCredentialRevocation
+    verb: GET
+    path: /offline-credential-revocation
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOfflineCryptographicValidation
+    verb: GET
+    path: /offline-cryptographic-validation
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOfflineEdge
+    verb: GET
+    path: /offline-edge
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOfflineEntitlementUsage
+    verb: GET
+    path: /offline-entitlement-usage
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listOperatingCalendarSpecial
+    verb: GET
+    path: /operating-calendar-special
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listParkingFacilities
     verb: GET
     path: /parking-facilities
@@ -160,6 +848,62 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
+  - operation: listPhysicalDeviceRegistration
+    verb: GET
+    path: /physical-device-registration
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPodiumConsole
+    verb: GET
+    path: /podium-console
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPolicyEvaluationArchitecture
+    verb: GET
+    path: /policy-evaluation-architecture
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listPolicyScopeHierarchy
+    verb: GET
+    path: /policy-scope-hierarchy
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listQueueThroughputLane
+    verb: GET
+    path: /queue-throughput-lane
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listReconnectionSynchronizationConflict
+    verb: GET
+    path: /reconnection-synchronization-conflict
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listRelationshipCompanionFraud
+    verb: GET
+    path: /relationship-companion-fraud
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
   - operation: listScans
     verb: GET
     path: /access/scans
@@ -167,6 +911,126 @@ operationsByContract:
     permission: REPORT_VIEW_VENUE
     offline: false
     reads: 1
+    writes: 0
+  - operation: listSecurityDetectionGovernance
+    verb: GET
+    path: /security-detection-governance
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listShiftHandoverSummary
+    verb: GET
+    path: /shift-handover-summary
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listSpecialEventFree
+    verb: GET
+    path: /special-event-free
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listThroughputQueueValidation
+    verb: GET
+    path: /throughput-queue-validation
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTicketCredentialInvestigation
+    verb: GET
+    path: /ticket-credential-investigation
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listTicketMedia
+    verb: GET
+    path: /ticket-media
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listUnifiedIdentityCredential
+    verb: GET
+    path: /unified-identity-credential
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listValidationExceptionReason
+    verb: GET
+    path: /validation-exception-reason
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listValidationOutcomeRejection
+    verb: GET
+    path: /validation-outcome-rejection
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVenueParkAccess
+    verb: GET
+    path: /venue-park-access
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVerificationMethodSelection
+    verb: GET
+    path: /verification-method-selection
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVirtualCredentialMedia
+    verb: GET
+    path: /virtual-credential-media
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVirtualTicket
+    verb: GET
+    path: /virtual-ticket
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVirtualTicketArchitecture
+    verb: GET
+    path: /virtual-ticket-architecture
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: listVirtualTicketStatus
+    verb: GET
+    path: /virtual-ticket-statu
+    scope: venue
+    permission: SCOPE_VIEW
+    offline: false
+    reads: 0
     writes: 0
   - operation: lookupTicket
     verb: GET
@@ -184,6 +1048,30 @@ operationsByContract:
     offline: true
     reads: 4
     writes: 2
+  - operation: publishMediaCompatibilityTesting
+    verb: PUT
+    path: /media-compatibility-testing
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: publishRuleConflictCheck
+    verb: PUT
+    path: /rule-conflict-check
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: publishTopologyValidation
+    verb: PUT
+    path: /topology-validation
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: removeBlacklistEntry
     verb: DELETE
     path: /blacklist/{mediaCode}
@@ -200,6 +1088,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setAccessAreaZone
+    verb: PUT
+    path: /access-area-zone
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setAccessGraphicalMap
+    verb: PUT
+    path: /access-graphical-map
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setAccessPointGeofence
     verb: PUT
     path: /access-points/{accessPointId}/geofence
@@ -208,6 +1112,158 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setAppleWalletPass
+    verb: PUT
+    path: /apple-wallet-pass
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setAttractionAccess
+    verb: PUT
+    path: /attraction-access
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setBiometricVerificationProfile
+    verb: PUT
+    path: /biometric-verification-profile
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setBleBeaconGeofence
+    verb: PUT
+    path: /ble-beacon-geofence
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setContextTimeEvent
+    verb: PUT
+    path: /context-time-event
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setDeviceSoftwareContent
+    verb: PUT
+    path: /device-software-content
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setDigitalBarcodeTicket
+    verb: PUT
+    path: /digital-barcode-ticket
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setDigitalCardMembership
+    verb: PUT
+    path: /digital-card-membership
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setDynamicFieldData
+    verb: PUT
+    path: /dynamic-field-data
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setDynamicSecurityProfile
+    verb: PUT
+    path: /dynamic-security-profile
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setEdgeNodeLocal
+    verb: PUT
+    path: /edge-node-local
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setEmbeddedEntitlementPayload
+    verb: PUT
+    path: /embedded-entitlement-payload
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setFacePassEnrollment
+    verb: PUT
+    path: /face-pass-enrollment
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGateLane
+    verb: PUT
+    path: /gate-lane
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGoogleWalletPass
+    verb: PUT
+    path: /google-wallet-pass
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setGroupAdmissionProfile
+    verb: PUT
+    path: /group-admission-profile
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setHandheldMobileAccess
+    verb: PUT
+    path: /handheld-mobile-access
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setMediaBindingActivation
+    verb: PUT
+    path: /media-binding-activation
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setOperationalIncidentException
+    verb: PUT
+    path: /operational-incident-exception
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setParkingFacility
     verb: PUT
     path: /parking-facilities
@@ -216,6 +1272,62 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: setPdfPrintablePos
+    verb: PUT
+    path: /pdf-printable-pos
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setReaderScannerPeripheral
+    verb: PUT
+    path: /reader-scanner-peripheral
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setRealTimeSecurity
+    verb: PUT
+    path: /real-time-security
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setRfidNfc
+    verb: PUT
+    path: /rfid-nfc
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setRfidNfcCard
+    verb: PUT
+    path: /rfid-nfc-card
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setSecurityInvestigationEvidence
+    verb: PUT
+    path: /security-investigation-evidence
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setTurnstileLaneBehavior
+    verb: PUT
+    path: /turnstile-lane-behavior
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setTurnstileMode
     verb: PUT
     path: /access-points/{accessPointId}/mode
@@ -224,6 +1336,62 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 2
+  - operation: setValidationOutcomeGuest
+    verb: PUT
+    path: /validation-outcome-guest
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setVirtualTicketCredential
+    verb: PUT
+    path: /virtual-ticket-credential
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setVirtualTicketIdentity
+    verb: PUT
+    path: /virtual-ticket-identity
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setVisualAccessRule
+    verb: PUT
+    path: /visual-access-rule
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: setVisualDynamicPolicy
+    verb: PUT
+    path: /visual-dynamic-policy
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulateOfflineResilienceTesting
+    verb: PUT
+    path: /offline-resilience-testing
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: simulatePolicyConflictImpact
+    verb: PUT
+    path: /policy-conflict-impact
+    scope: venue
+    permission: ACCESS_POINT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: syncScans
     verb: POST
     path: /access/scans
@@ -240,9 +1408,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
-  - operation: updateAdmissionProfile
+  - operation: updateAdmissionRules
     verb: PUT
-    path: /admission-profiles/{profileId}
+    path: /admission-rules/{profileId}
     scope: venue
     permission: ACCESS_POINT_CONFIGURE
     offline: false
@@ -263,7 +1431,7 @@ operationsByContract:
     permission: ACCESS_VALIDATE
     offline: true
     reads: 6
-    writes: 2
+    writes: 3
   - operation: validateGroupAccess
     verb: POST
     path: /access/group-validate
@@ -273,6 +1441,20 @@ operationsByContract:
     reads: 4
     writes: 2
 tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: access.access_point
   columns: 12
   store: postgres
@@ -280,15 +1462,15 @@ tables:
   writtenBy:
   - access
   foreignWriters: null
-- table: access.admission_profile
-  columns: 9
+- table: access.admission_rules
+  columns: 10
   store: postgres
   parent: null
   writtenBy:
   - access
   foreignWriters: null
 - table: access.blacklist
-  columns: 5
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -347,7 +1529,7 @@ writesOutside:
 - service: IdentityService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
-- service: CrossCellService
+- service: CrossRegionService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: MarketingService
@@ -355,11 +1537,13 @@ writesOutside:
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-018 My Tickets
+- P01:WEB-041 Parking – Reserve & Pay
 - P02:GST-001 Home – Default
 - P02:GST-012 My Tickets
 - P02:GST-013 Ticket Details
 - P02:GST-027 Parking – Reserve & Pay
 - P02:GST-028 Parking – Reservation Confirmed
+- P02:GST-069 Face Pass
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-013 Mobile POS, Event Sales & Offline Operations
 - P06:EMP-010 Scan — ready
@@ -383,6 +1567,154 @@ screens:
 - P08:BO-037 Offline Package Status
 - P08:BO-060 Attendance & Footfall
 - P08:BO-064 Zones & Areas
+- P08:BO-103 Access & Venue
+- P08:BO-144 Access Control Command Center
+- P08:BO-145 Venue & Park Access Structure
+- P08:BO-146 Access Area & Zone Builder
+- P08:BO-147 Attraction Access Configuration
+- P08:BO-148 Access Point Directory
+- P08:BO-149 Gate & Lane Configuration
+- P08:BO-150 Access Control Graphical Map Designer
+- P08:BO-151 Access Location Grouping
+- P08:BO-152 Operating Calendar & Special Access Days
+- P08:BO-153 Topology Validation & Publication
+- P08:BO-154 Access Rule Command Center
+- P08:BO-155 Visual Access Rule Builder
+- P08:BO-156 Entry, Exit & Re-entry Rules
+- P08:BO-157 Anti-Passback & Journey Sequence
+- P08:BO-158 Access Validity & Time Rules
+- P08:BO-159 Entitlement Consumption Engine
+- P08:BO-160 Multi-Park & Crossover Rules
+- P08:BO-161 Guest, Companion & Eligibility Rules
+- P08:BO-162 Group Admission & Quantity Validation
+- P08:BO-163 Rule Simulation, Conflict Check & Publication
+- P08:BO-164 Digital Credential Security Command Center
+- P08:BO-165 Dynamic QR Security Profile Builder
+- P08:BO-166 Credential Activation & Display Rules
+- P08:BO-167 Device Binding & Session Security
+- P08:BO-168 BLE Beacon & Geofence Configuration
+- P08:BO-169 Credential Transfer & Rebinding
+- P08:BO-170 Credential Revocation & Lifecycle Events
+- P08:BO-171 Offline Cryptographic Validation Profile
+- P08:BO-172 Embedded Entitlement Payload Designer
+- P08:BO-173 Credential Security Simulation, Audit & Publication
+- P08:BO-174 Media & Credential Command Center
+- P08:BO-175 Media Type & Technology Library
+- P08:BO-176 Virtual Credential & Media Association
+- P08:BO-177 Verification Method Selection & Locking
+- P08:BO-178 Media Issuance & Encoding Profile
+- P08:BO-179 Media Swap & Replacement
+- P08:BO-180 RFID & NFC Configuration
+- P08:BO-181 External & Partner Credential Mapping
+- P08:BO-182 Hotel, Wallet & External Media Integration
+- P08:BO-183 Media Compatibility, Testing & Publication
+- P08:BO-184 Biometric Access Command Center
+- P08:BO-185 Biometric Verification Profile Builder
+- P08:BO-186 Face Pass Enrollment Configuration
+- P08:BO-187 Biometric Consent & Guardian Management
+- P08:BO-188 Face Tag Temporary Enrollment
+- P08:BO-189 Face Matching & Verification Thresholds
+- P08:BO-190 Face Change, Re-enrollment & Identity Protection
+- P08:BO-191 Biometric Validation at Gate
+- P08:BO-192 Biometric Lifecycle, Retention & Deletion
+- P08:BO-193 Biometric Simulation, Audit & Publication
+- P08:BO-194 Device & Gate Command Center
+- P08:BO-195 Device Type & Hardware Library
+- P08:BO-196 Physical Device Registration & Provisioning
+- P08:BO-197 Turnstile & Lane Behavior Configuration
+- P08:BO-198 Validation Outcome & Guest Feedback Designer
+- P08:BO-199 Reader, Scanner & Peripheral Configuration
+- P08:BO-200 Handheld & Mobile Access Device Configuration
+- P08:BO-201 Gate Modes, Free Spin & Emergency Controls
+- P08:BO-202 Device Software, Content & Remote Configuration
+- P08:BO-203 Hardware Compatibility, Health, Testing & Deployment
+- P08:BO-204 Offline & Edge Operations Command Center
+- P08:BO-205 Edge Node & Local Processing Configuration
+- P08:BO-207 Edge Package & Data Distribution
+- P08:BO-208 Offline Credential & Revocation Cache
+- P08:BO-209 Offline Entitlement & Usage Ledger
+- P08:BO-210 Connectivity Failure & Degraded Mode Policy
+- P08:BO-211 Reconnection, Synchronization & Conflict Resolution
+- P08:BO-212 Offline Simulation & Resilience Testing
+- P08:BO-213 Edge Security, Audit & Deployment
+- P08:BO-214 Guest Journey Command Center
+- P08:BO-215 Group & B2B Admission Profile Builder
+- P08:BO-216 Group Leader & Fast B2B Validation
+- P08:BO-217 Group Attendance & Partial Entry Manager
+- P08:BO-218 Family, Child, POD & Companion Journey
+- P08:BO-219 Re-entry & Temporary Exit Journey
+- P08:BO-220 Multi-Park & Crossover Journey Orchestrator
+- P08:BO-221 Fast Pass & Attraction Access Journey
+- P08:BO-222 Special Event, Free View & Alternative Admission
+- P08:BO-224 Live Access Operations Command Center
+- P08:BO-225 Podium Operations Console
+- P08:BO-226 Ticket & Credential Investigation Console
+- P08:BO-227 Validation Exception & Reason Code Manager
+- P08:BO-228 Manual Override & Supervisor Approval
+- P08:BO-229 Credential Disable, Blacklist & Whitelist Operations
+- P08:BO-230 Live Gate Mode & Lane Control
+- P08:BO-231 Queue, Throughput & Lane Optimization
+- P08:BO-232 Operational Incident & Exception Workspace
+- P08:BO-233 Operations Audit, Shift Handover & Control Summary
+- P08:BO-234 Dynamic Access Policy Command Center
+- P08:BO-235 Access Attribute Catalog
+- P08:BO-236 Visual Dynamic Policy Builder
+- P08:BO-237 Context, Time, Event & Capacity Policy Builder
+- P08:BO-238 Identity, Membership & Accreditation Policies
+- P08:BO-239 Policy Scope, Hierarchy & Inheritance
+- P08:BO-240 Authorization Governance & Temporary Access
+- P08:BO-241 Policy Evaluation Architecture & Offline Distribution
+- P08:BO-242 Policy Simulation, Conflict & Impact Analysis
+- P08:BO-244 Access Security & Fraud Command Center
+- P08:BO-245 Fraud Detection Rule & Signal Library
+- P08:BO-246 Credential Sharing & Concurrent Usage Detection
+- P08:BO-247 Unified Identity & Credential Lock Manager
+- P08:BO-248 Biometric & Identity Integrity Monitoring
+- P08:BO-249 Relationship & Companion Fraud Monitoring
+- P08:BO-250 Access Risk Scoring & Decision Engine
+- P08:BO-251 Real-Time Security Response & Playbook Builder
+- P08:BO-252 Security Investigation & Evidence Workspace
+- P08:BO-253 Security Analytics, AI Detection & Governance
+- P08:BO-254 Access Monitoring & Analytics Command Center
+- P08:BO-255 Live Venue Occupancy & People Counting
+- P08:BO-256 Graphical Access Map & Live Gate Performance
+- P08:BO-257 Attendance & Admission Analytics
+- P08:BO-258 Entry, Exit, Re-entry & Crossover Analytics
+- P08:BO-259 Throughput, Queue & Validation Performance Analytics
+- P08:BO-260 Validation Outcome & Rejection Analytics
+- P08:BO-261 Guest Dwell Time, Length of Stay & Attraction Flow
+- P08:BO-262 Access Reports, Scheduled Reporting & Data Export
+- P08:BO-263 AI Access Intelligence, Forecasting & Executive Insights
+- P08:BO-334 Virtual Ticket Command Center
+- P08:BO-335 Virtual Ticket Identity & Master Record Configuration
+- P08:BO-336 Virtual Ticket Status & Lifecycle Model
+- P08:BO-337 Media Type & Credential Technology Registry
+- P08:BO-338 Multi-Media Binding & Association Rules
+- P08:BO-339 Credential Identity, Token & Reference Mapping
+- P08:BO-340 Entitlement & Cross-Media Synchronization Rules
+- P08:BO-341 Media Activation, Priority & Fallback Rules
+- P08:BO-342 Media Replacement, Revocation & Rebinding Rules
+- P08:BO-343 Virtual Ticket Architecture Testing, Governance & Audit
+- P08:BO-344 Media Design Studio Command Center
+- P08:BO-345 Digital QR & Barcode Ticket Designer
+- P08:BO-346 PDF, Printable & POS Ticket Designer
+- P08:BO-347 Apple Wallet Pass Designer
+- P08:BO-348 Google Wallet Pass Designer
+- P08:BO-349 RFID, NFC, Card & Wristband Media Designer
+- P08:BO-350 Digital Card, Membership & Wearable Designer
+- P08:BO-351 Dynamic Fields, Data Mapping & Content Builder
+- P08:BO-352 Branding, Localization & Template Inheritance
+- P08:BO-353 Multi-Media Preview, Testing, Approval & Publication
+- P08:BO-354 Credential Operations Command Center
+- P08:BO-355 Virtual Ticket & Credential 360° Workspace
+- P08:BO-356 Credential Generation & Issuance Monitor
+- P08:BO-357 Credential Delivery & Distribution Operations
+- P08:BO-358 Media Binding, Activation & Assignment Operations
+- P08:BO-359 Credential Replacement, Reissue, Revocation & Recovery
+- P08:BO-360 Failed Generation, Delivery & Credential Exception Management
+- P08:BO-361 Credential Usage & Cross-Media Traceability
+- P08:BO-362 Credential Security, Audit & Operational Evidence
+- P08:BO-363 Ticket Media Analytics & AI Operations Intelligence
 flows:
 - F06 Guest enters the venue
 - F10 Partner books, uses and settles

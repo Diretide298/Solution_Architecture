@@ -10,7 +10,8 @@ operations:
   path: /game-cards/{cardCode}/adjust
   scope: venue
   permission: LEDGER_POST
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -23,7 +24,8 @@ operations:
   path: /games
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -36,7 +38,8 @@ operations:
   path: /prizes
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -49,7 +52,8 @@ operations:
   path: /game-cards/{cardCode}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: true
   reads:
   - games.card
@@ -60,7 +64,8 @@ operations:
   path: /game-cards
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -73,7 +78,8 @@ operations:
   path: /games
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - games.game
@@ -83,7 +89,8 @@ operations:
   path: /prizes
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - games.prize
@@ -93,7 +100,8 @@ operations:
   path: /game-cards/{cardCode}/load
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -106,7 +114,8 @@ operations:
   path: /game-plays
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -119,7 +128,8 @@ operations:
   path: /prize-redemptions
   scope: workstation
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -147,7 +157,8 @@ operations:
   path: /game-plays/sync
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - device
   offline: false
   reads:
   - games.card
@@ -161,7 +172,8 @@ operations:
   path: /game-cards/{cardCode}/transfer
   scope: venue
   permission: ORDER_MODIFY
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -174,7 +186,8 @@ operations:
   path: /games/{gameId}
   scope: venue
   permission: PRODUCT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

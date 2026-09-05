@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 29
+  "operationsWithNoScreen": 31
  },
  "waves": {
   "wave2": 10
@@ -150,6 +150,12 @@
     "summary": "Mark a table cleared and free"
    },
    {
+    "operation": "closeCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Close a signed finding"
+   },
+   {
     "operation": "createCombo",
     "contract": "fnb",
     "verb": "POST",
@@ -168,6 +174,12 @@
     "summary": "A table as a thing, not an inference"
    },
    {
+    "operation": "escalateCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Escalate a finding"
+   },
+   {
     "operation": "getTableVisit",
     "contract": "fnb",
     "verb": "GET",
@@ -178,6 +190,12 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Move work between stations mid-service"
+   },
+   {
+    "operation": "recordCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Record what was done about a finding"
    },
    {
     "operation": "requestBill",
@@ -226,12 +244,6 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Change what a table is"
-   },
-   {
-    "operation": "updateTableReservation",
-    "contract": "fnb",
-    "verb": "PATCH",
-    "summary": "Change or cancel a booking"
    },
    {
     "operation": "cancelReportExecution",

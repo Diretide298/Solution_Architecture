@@ -47,8 +47,8 @@ named in it carry the detail.
 > Each is described in the 20 August brief with the reason it exists:
 >
 >   - `schema-reference.json` now has a **`lineage`** block per table — `parent`, `schemaRoot`,
->     `anchors`. `platform.scope_node` is reached by 289 of 353 tables. **Make `anchors` a filter
->     on the ER view**: *everything anchored only on `scope_node`* is *everything purely
+>     `anchors`. `platform.org_unit` is reached by 289 of 353 tables. **Make `anchors` a filter
+>     on the ER view**: *everything anchored only on `org_unit`* is *everything purely
 >     tenancy-scoped*, and the diagram cannot answer that today.
 >   - **`entryState`** on 280 screens — what each arrives holding and where it came from. **A
 >     journey drawn as `A → B` where B needs an id A does not supply is a journey that cannot

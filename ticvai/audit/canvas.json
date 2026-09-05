@@ -1,0 +1,14 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "title": "Overview", "x": 0, "y": 0, "w": 1240, "h": 1350, "print": "flow" },
+    { "file": "Duplicates.dc.html", "title": "Hard duplicates", "x": 1360, "y": 0, "w": 1240, "h": 2100, "print": "flow" },
+    { "file": "Archetypes.dc.html", "title": "Recurring by construction", "x": 0, "y": 2240, "w": 1240, "h": 1850, "print": "flow" },
+    { "file": "GuestSplit.dc.html", "title": "Guest Web vs Guest App", "x": 1360, "y": 2240, "w": 1120, "h": 1480, "print": "flow" },
+    { "file": "Actions.dc.html", "title": "Six decisions", "x": 0, "y": 4210, "w": 1180, "h": 1650, "print": "flow" }
+  ],
+  "annotations": [
+    { "id": "start-here", "x": 0, "y": -130, "w": 420, "text": "Read left to right. Overview is the method and the numbers; the next three are the evidence; Six decisions is the only page that asks anything of anyone." },
+    { "id": "biggest-single", "x": 2620, "y": 2240, "w": 300, "text": "Largest single overlap: 20 screens, a third of the mobile app. Decision 01 on the last board." }
+  ],
+  "launch": { "view": "canvas" }
+}

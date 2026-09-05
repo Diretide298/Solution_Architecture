@@ -61,10 +61,15 @@ def load_operations() -> set[str]:
     if not CONTRACTS.exists():
         return ops
     for f in CONTRACTS.rglob("*.yaml"):
+        # **An unparseable contract used to be skipped in silence.** Its operations then looked
+        # as though they did not exist, so every screen calling one failed and the report pointed
+        # at the screens rather than at the one file that was broken. **A checker that misreports
+        # where a fault is costs more than one that stops.**
         try:
             doc = yaml.safe_load(f.read_text(encoding="utf-8"))
-        except Exception:
-            continue
+        except Exception as exc:  # noqa: BLE001
+            print(f"  FAIL  {f.name} does not parse: {exc}")
+            raise SystemExit(1)
         for item in (doc.get("paths") or {}).values():
             if isinstance(item, dict):
                 for verb, op in item.items():

@@ -46,14 +46,39 @@ MIG={'platform':'V0001 / V0003 / V0003a','identity':'V0002','pii':'V0001a','sync
 # No migrations are written as of 14 August — the workbook is the working artefact and DDL
 # resumes when the design settles. The Written column stays in the sheet so it means something
 # again the moment a migration lands.
+# Operation total, read rather than remembered — this line said 600 while the package held 1,032.
+_LIN = _P(__file__).resolve().parents[1] / 'handoff' / 'api-data-lineage.json'
+_NOPS = len(json.loads(_LIN.read_text(encoding='utf-8'))) if _LIN.exists() else 0
 written=set()
-for f in glob.glob('/home/claude/ticvai/ticvai-backend/src/Ticvai.Migrations/Scripts/V*.sql'):
-    s=open(f).read(); m=re.search(r"^-- =+\n-- ROLLBACK",s,re.M)
-    written.update(re.findall(r'CREATE TABLE (?:IF NOT EXISTS )?([\w.]+)', s[:m.start() if m else len(s)]))
-C='/home/claude/ticvai/ticvai-contracts/openapi'
+# **References that stopped being constraints when control became its own database.** Read
+# from the file derive-ddl writes for them, so the workbook and the DDL cannot disagree.
+_XDB=_P(__file__).resolve().parents[1] / 'backend' / '990-cross-database-references.sql'
+_N_XDB=(len(re.findall(r'^-- ALTER TABLE ', _XDB.read_text(encoding='utf-8'), re.M))
+        if _XDB.exists() else 0)
+# **These globs pointed at /home/claude on another machine** and so matched nothing, every run,
+# in silence — which is why the Written column read zero long after `backend/` was generated.
+# A path that cannot resolve should fail; one that resolves to nothing just looks like no data.
+# **Recursive since the split.** ADR-0039 put the control schema in its own database, so
+# derive-ddl writes backend/control/*.sql and backend/tenant/*.sql. A flat glob matched
+# neither, and read as 377 tables built one run and 0 the next with nothing having changed
+# in the contracts — the same silent-zero this comment block was written about.
+_BE = _P(__file__).resolve().parents[1] / 'backend'
+for f in sorted(glob.glob(str(_BE / '**' / '0*.sql'), recursive=True)):
+    s=open(f, encoding='utf-8').read(); m=re.search(r"^-- =+\n-- ROLLBACK",s,re.M)
+    # **A quoted identifier is still a table.** `[\w.]+` stops at the first double quote, so
+    # `CREATE TABLE fnb."table"` matched `fnb.` and four tables were never marked written:
+    # fnb.table, identity.session, marketing.case and retail.return — the four whose names are
+    # Postgres reserved words, which is exactly why derive-ddl quotes them.
+    #
+    # **They were the only four the viewer reported as built-but-not-claimed**, and the report was
+    # right: the DDL creates them and this sheet said it did not.
+    written.update(f'{a}.{b}' for a, b in re.findall(
+        r'CREATE TABLE (?:IF NOT EXISTS )?"?(\w+)"?\."?(\w+)"?',
+        s[:m.start() if m else len(s)]))
+C=str(_P(__file__).resolve().parents[1] / 'contracts')
 routing=defaultdict(lambda: defaultdict(int))
 for f in glob.glob(f'{C}/spine/*.yaml')+glob.glob(f'{C}/satellite/*.yaml'):
-    d=yaml.safe_load(open(f)); ctx=os.path.basename(f)[:-5]
+    d=yaml.safe_load(open(f, encoding='utf-8')); ctx=os.path.basename(f)[:-5]
     for p,i in (d.get('paths') or {}).items():
         for v,o in i.items():
             if not isinstance(o,dict) or v not in ('get','post','put','patch','delete'): continue
@@ -73,7 +98,26 @@ def hdr(ws,l,w,row=4):
         c.alignment=Alignment(vertical='center',wrap_text=True)
         ws.column_dimensions[get_column_letter(i)].width=b_
     ws.row_dimensions[row].height=28; ws.freeze_panes=ws.cell(row+1,1)
-tot=len(set(cols)|set(storage))   # union — two tables were in both maps and double-counted until 14 Aug
+# **The Postgres table count, which is what `derive-ddl` emits.** The union of `cols` and
+# `storage` reads 383 — it takes in the five cache: and qdrant: pseudo-stores and four entries
+# carrying no columns. Five numbers for one fact were in circulation on 3 September.
+tot=len({t for t in cols if '.' in t and ':' not in t})
+# **A table described by a contract is one with an origin.** The old line paired len(cols)
+# with len(storage) and called them contract-derived and storage-only — but almost every
+# table appears in both, so the two numbers summed to twice the total and neither was a share
+# of anything.
+_ALL_T={t for t in set(cols)|set(storage) if '.' in t and ':' not in t}
+_FROM_CONTRACT=len([x for x in _ALL_T if origin.get(x)])
+# **The same set `tot` counts, so the topology block and the headline cannot disagree.**
+# Computed off _ALL_T first, this read 335 tenant tables while the Tables sheet said 340 and
+# derive-ddl said 331 - three denominators for one number, which is the drift this package
+# keeps finding in its own counts.
+_TOT_T={x for x in cols if '.' in x and ':' not in x}
+_N_CONTROL=len([x for x in _TOT_T if x.split('.')[0]=='control'])
+_N_TENANT=len(_TOT_T)-_N_CONTROL
+# **Named, not counted.** A table registered with no columns is a modelling gap, and a gap
+# that only shows up as a number is a gap nobody goes and looks at.
+_EMPTY=[x for x in _ALL_T if not cols.get(x)]
 NEW={'platform.outlet','platform.tenant','marketing.guest_device','marketing.wishlist_item',
  'fnb.delivery_location','fnb.location_session','fnb.delivery_location_outlet','fnb.location_code',
  'retail.shop_and_drop','retail.shop_and_drop_line','assets.media_asset','assets.media_collection',
@@ -81,11 +125,46 @@ NEW={'platform.outlet','platform.tenant','marketing.guest_device','marketing.wis
  'pii.subject_document','pii.subject_biometric'}
 PII={t for t in set(cols)|set(storage) if t.startswith('pii.')}
 
+# **Which database a table is in** (ADR-0038, ADR-0039). A cell is a region and a Postgres
+# instance; a database is a tenant; the 25 schemas sit inside each tenant database; and
+# `control` is a database of its own because a cell registry that exists two hundred times is
+# two hundred registries that can disagree.
+#
+# **The sheet had no column for this and it is the first thing a build team needs**, because
+# it decides which connection string a table is reachable on.
+CONTROL_SCHEMA='control'
+def db_of(table):
+    # **A store is not a Postgres database and must not be counted as one.** Every real table
+    # is schema.table and every store is store:name - the colon is the package's own marker.
+    if ':' in table:
+        return 'not Postgres'
+    return 'control' if table.split('.')[0]==CONTROL_SCHEMA else 'tenant'
+TENANT_SCHEMAS=sorted({t.split('.')[0] for t in set(cols)|set(storage)
+                       if '.' in t and ':' not in t and db_of(t)=='tenant'})
+
 ws=wb.create_sheet('Read me'); ws.column_dimensions['A'].width=3; ws.column_dimensions['B'].width=102
 for i,(t_,f_) in enumerate([
  ('TICVAI — database schema reference',T),('',None),
- (f'{tot} tables. {len(cols)} from the API contracts, {len(storage)} storage-only.',BD),
- (f"{sum(len(v) for v in cols.values())} columns. 600 operations. {len(written)} tables written as DDL.",B),('',None),
+ (f'{tot} tables. {_FROM_CONTRACT} described by a contract, {tot - _FROM_CONTRACT} storage-only.',BD),
+ (f"{sum(len(v) for v in cols.values())} columns. {_NOPS} operations. {len(written)} tables written as DDL.",B),('',None),
+ ('Where the tables live',BD),
+ ('One Postgres instance per region. The instance is the cell (ADR-0038).',B),
+ ('',None),
+ (f'  instance = region = cell',M),
+ (f'    +-- database per tenant   {len(TENANT_SCHEMAS)} schemas -> {_N_TENANT} tables -> venue_id partitions',M),
+ (f'    +-- control database      1 schema -> {_N_CONTROL} tables, once per instance',M),
+ ('',None),
+ ('Services are common to all tenants, scaled on need and traffic, and routed per request',B),
+ ('to a tenant database by tenant id. So tenant_id is a column on a control table and a',B),
+ ('connection everywhere else: inside a tenant database it says what the connection',B),
+ ('already said (ADR-0038).',B),
+ ('',None),
+ (f'{_N_XDB} references cross the two databases and are no longer constraints. Postgres has',B),
+ ('no cross-database foreign key, so those are rules the caller keeps — listed in',B),
+ ('backend/990-cross-database-references.sql.',B),
+ ('',None),
+ (f'{len(_EMPTY)} tables are registered with no columns and are named here rather than left',B),
+ ('to be noticed: ' + (', '.join(sorted(_EMPTY)) or 'none') + '.',B),('',None),
  ('Personal data',BD),
  ('The pii schema was declared in V0001 and left empty. Four foreign keys pointed at',B),
  ('pii.subject, which no migration created — psql would have failed on the first one.',B),
@@ -128,7 +207,10 @@ hdr(ws,['Module','What it is','Why it is separate','Tables','Written','Cols','Co
        [13,52,66,7,8,7,18,6,10,7,6,7])
 r=5
 for m in MODROWS:
-    vals=[m['module'],m['purpose'],m['why'],m['tables'],m.get('written',0),m['columns'],
+    # **Counted from the DDL, not read from modules.json**, which has no `written` key — so
+    # this column was 0 for all 26 modules while the Read me on the first sheet said 377.
+    _w=sum(1 for x in written if x.split('.')[0]==m['module'])
+    vals=[m['module'],m['purpose'],m['why'],m['tables'],_w,m['columns'],
           m['contracts'],m['ops'],m['tier'],m['refs_out'],m['refs_in'],m['cross']]
     for i,v in enumerate(vals,1):
         c=ws.cell(r,i,v); c.font=M if i in (1,6) else B; c.border=BOX
@@ -168,7 +250,7 @@ for t_ in ['Out is how many foreign keys leave the module; In is how many point 
 # The join is one lookup: a table's schema is its prefix, and the decomposition maps every
 # schema to exactly one owner.
 try:
-    _D = json.load(open('/home/claude/ticvai-pkg/handoff/service-decomposition.json',
+    _D = json.load(open(_P(__file__).resolve().parents[1] / 'handoff' / 'service-decomposition.json',
                         encoding='utf-8'))['services']
 except Exception:
     _D = {}
@@ -203,8 +285,8 @@ ws.cell(2,1,'Blue is new on 14 August. Pink is personal data.').font=SUB
 #
 # **Same shape as the Modules sheet reading `module.written` before that column existed**: the
 # data was derived, the sheet read a different field, and nothing compared them.
-hdr(ws,['Module','Table','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
-    [12,32,74,17,9,8,6,6,20,26,30,26,20])
+hdr(ws,['Module','Table','Database','What it is','Service','Columns','Written','New','PII','Foreign writers','Parent','Anchors on','Derived from','Migration'],
+    [12,32,10,74,17,9,8,6,6,20,26,30,26,20])
 r=5
 for t in sorted(set(cols)|set(storage)):
     m=t.split('.')[0]; cs=cols.get(t,[])
@@ -220,24 +302,24 @@ for t in sorted(set(cols)|set(storage)):
     # is how a wide column becomes an ignored one.
     what=str(storage.get(t) or '').split('. **Hangs off**')[0].split('**Reaches**')[0].strip()
     if len(what)>300: what=what[:297]+'…'
-    for i,v in enumerate([m,t,what or '—',svc_of(t).replace('Service',''),len(cs) or '—',
+    for i,v in enumerate([m,t,db_of(t),what or '—',svc_of(t).replace('Service',''),len(cs) or '—',
                           'yes' if t in written else '',
                           'yes' if t in NEW else '','yes' if t in PII else '',
                           ', '.join(fw) or '',
                           (L.get('parent') or '—'), anchtxt or '—',
                           src,MIG.get(m,'unassigned')],1):
         c=ws.cell(r,i,v); c.font=M if i==2 else B; c.border=BOX
-        if i==3: c.alignment=Alignment(wrap_text=True,vertical='top')
-        if i in (5,6,7,8): c.alignment=Alignment(horizontal='center')
+        if i==4: c.alignment=Alignment(wrap_text=True,vertical='top')
+        if i in (3,6,7,8,9): c.alignment=Alignment(horizontal='center')
         # **Amber where a contract outside the owning service writes it.** Correct in all 22
         # cases and still the thing to look at first when a boundary is questioned.
-        if i==8 and fw: c.fill=AMBER
+        if i==9 and fw: c.fill=AMBER
         if t in PII: c.fill=PINK
         elif t in NEW: c.fill=BLUE
         elif t in written: c.fill=GREEN
         elif t in storage: c.fill=GREY
     r+=1
-ws.auto_filter.ref=f"A4:M{r-1}"
+ws.auto_filter.ref=f"A4:N{r-1}"
 
 ws=wb.create_sheet('Columns'); ws.cell(1,1,'Every column').font=T
 ws.cell(2,1,f"{sum(len(v) for v in cols.values())} columns. **References says where a column points; "
@@ -351,7 +433,7 @@ import json as _j
 LIN=_j.load(open(_pkg('api-data-lineage.json','lineage.json'), encoding='utf-8'))
 SERVICE={'tenancy':'TenancyService','identity':'IdentityService','catalogue':'CatalogueService',
  'orders':'OrderService','shift':'ShiftService','access':'AccessService','finance':'LedgerService',
- 'cross-cell':'CrossRegionService','fnb':'FnbService','retail':'RetailService','inventory':'InventoryService',
+ 'cross-region':'CrossRegionService','fnb':'FnbService','retail':'RetailService','inventory':'InventoryService',
  'seating':'SeatingService','promotions':'PromotionsService','marketing-crm':'MarketingService',
  'maintenance':'MaintenanceService','queue':'QueueService','white-label':'WhiteLabelService',
  'subscription':'SubscriptionService','platform-ops':'PlatformOpsService','reporting':'ReportingService',
@@ -401,5 +483,22 @@ for t_ in ['Blue rows are the eight stored procedures. Amber were hand-mapped be
     ws.cell(r,1,t_).font=B; r+=1
 
 
-wb.save('TICVAI_Schema_Reference.xlsx')
+# **Both tracked copies are written from this one build, to absolute paths.**
+#
+# This was `wb.save('TICVAI_Schema_Reference.xlsx')` — a bare filename, so it landed in whatever
+# directory the tool was invoked from. Two copies are tracked, the root one and
+# `handoff/`, and `derive-overview.py` documents the workbook as living in `handoff/`. Only the
+# root one was ever rewritten.
+#
+# **So `handoff/` held an older build, and `derive-mirrors.py` copied that older build into six
+# repos** — seven stale workbooks shipping from one stale source, and the freshest build in the
+# one place nothing pointed at. It read as 520 warnings that the DDL had invented columns the
+# workbook did not list; the DDL was right in every case.
+#
+# Writing both here is what keeps them from drifting: they cannot disagree if there is no moment
+# at which only one of them has been written.
+for _dest in (_ROOT / 'TICVAI_Schema_Reference.xlsx',
+              _H / 'TICVAI_Schema_Reference.xlsx'):
+    wb.save(_dest)
 print(f"{tot} tables | {len(written)} written | {len(PII)} PII | {len(NEW)} new")
+print("  written to TICVAI_Schema_Reference.xlsx and handoff/TICVAI_Schema_Reference.xlsx")

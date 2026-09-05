@@ -147,6 +147,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.goods_receipt
+  - platform.outbox
 - operation: createInventoryItem
   verb: POST
   path: /inventory-items
@@ -476,6 +477,7 @@ operations:
   writes:
   - cache:idempotency
   - inventory.count
+  - platform.outbox
 - operation: receiveStockTransfer
   verb: POST
   path: /stock-transfers/{transferId}/receive

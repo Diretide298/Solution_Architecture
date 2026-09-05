@@ -5,49 +5,14 @@
 | | |
 |---|---|
 | Screens | 46 |
-| Operations | 113 |
+| Operations | 115 |
 | Contracts | 14 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 28 |
+| Operations with no screen | 0 |
 | Waves | wave1 21 · wave2 21 · wave3 4 |
 
 ## Gaps
-
-### 28 operations with no screen here
-
-**In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
-
-| Operation | Contract | | |
-|---|---|---|---|
-| `enrolFacePass` | access | POST | Register a facial profile against an entitlement |
-| `getFacePassEnrolment` | access | GET | Whether a pass has a face registered, and when |
-| `revokeFacePass` | access | DELETE | Remove a facial profile |
-| `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
-| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
-| `updateTableReservation` | fnb | PATCH | Change or cancel a booking |
-| `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
-| `deleteGuestAccount` | identity | DELETE | Self-service account deletion |
-| `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `createReferral` | marketing-crm | POST | Issue a referral code |
-| `getMyChallenges` | marketing-crm | GET | Active challenges and how far along I am |
-| `getWaiverStatus` | marketing-crm | GET | Whether this guest may be issued a ticket that requires a waiver |
-| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
-| `respondToInvitation` | marketing-crm | POST | Accept or decline |
-| `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `updateGuestPreferences` | marketing-crm | PUT | The things a regular should not have to say twice |
-| `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
-| `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
-| `createCart` | orders | POST | Start a cart |
-| `createResaleListing` | orders | POST | List an entitlement for resale |
-| `getGroupBooking` | orders | GET |  |
-| `listPaymentTokens` | orders | GET | A guest's saved payment methods |
-| `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
-| `shareEntitlement` | orders | POST | Let somebody else use this, without giving it away |
-| `storePaymentToken` | orders | POST | Save a payment method for future use |
-| `transferWalletBalance` | retail | POST | Send balance to another guest |
-| `assignSeats` | seating | POST | Pick and hold the best available seats |
 
 ### 5 modules split across waves
 
@@ -107,7 +72,7 @@
 | `WEB-024` | Devices, Wishlist & Consent | Membership, Loyalty & Value | 3 | 7 | yes |
 | `WEB-025` | Help Centre / FAQ | Engagement & Support | 1 | 1 | yes |
 | `WEB-026` | Survey & Feedback | Engagement & Support | 3 | 1 | yes |
-| `WEB-027` | Newsletter Subscription | Engagement & Support | 2 | 7 | yes |
+| `WEB-027` | Newsletter Subscription | Engagement & Support | 2 | 9 | yes |
 | `WEB-028` | Contact & Venue Information | Engagement & Support | 1 | 1 | yes |
 | `WEB-029` | Error / Sold Out / Maintenance | System States | 1 | 1 | yes |
 | `WEB-030` | Ticket Transfer | Ticketing | 1 | 3 | yes |

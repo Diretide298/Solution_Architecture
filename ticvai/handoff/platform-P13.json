@@ -7,20 +7,28 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-01",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 20,
-  "operations": 77,
+  "screens": 60,
+  "operations": 122,
   "contracts": 8,
-  "modules": 1,
+  "modules": 2,
   "undrawn": 0,
-  "operationsWithNoScreen": 118
+  "operationsWithNoScreen": 112
  },
  "waves": {
-  "wave2": 20
+  "wave2": 20,
+  "wave3": 40
  },
  "modules": [
+  {
+   "module": "Policy",
+   "screens": 40,
+   "waves": [
+    3
+   ]
+  },
   {
    "module": "White Label",
    "screens": 20,
@@ -31,16 +39,16 @@
  ],
  "contracts": [
   {
-   "contract": "subscription",
-   "operations": 19
+   "contract": "marketing-crm",
+   "operations": 52
   },
   {
    "contract": "white-label",
-   "operations": 19
+   "operations": 23
   },
   {
-   "contract": "marketing-crm",
-   "operations": 11
+   "contract": "subscription",
+   "operations": 19
   },
   {
    "contract": "assets",
@@ -178,7 +186,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/seo-metadata",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   },
   {
@@ -214,7 +222,7 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/domain-certificate",
-   "operations": 0,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -241,6 +249,366 @@
    "module": "White Label",
    "wave": 2,
    "route": "/white-label/change-log",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-021",
+   "name": "Privacy & Consent Configuration Command Center",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/privacy-consent-configuration-command-center-cms-021",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-022",
+   "name": "Data Processing Purpose & Lawful Basis Registry",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/data-processing-purpose-lawful-basis-registry-cms-022",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-023",
+   "name": "Consent Purpose & Consent Type Builder",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/consent-purpose-consent-type-builder-cms-023",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-024",
+   "name": "Communication Preference & Marketing Permission Configuration",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/communication-preference-marketing-permission-configurat-cms-024",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-025",
+   "name": "Cookie, Tracking & Digital Technology Registry",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/cookie-tracking-digital-technology-registry-cms-025",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-026",
+   "name": "Cookie Banner & Preference Center Designer",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/cookie-banner-preference-center-designer-cms-026",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-027",
+   "name": "Consent Capture Point & Customer Journey Configuration",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/consent-capture-point-customer-journey-configuration-cms-027",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-028",
+   "name": "Privacy Notice, Policy & Terms Version Management",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/privacy-notice-policy-terms-version-management-cms-028",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-029",
+   "name": "Minor, Guardian & Age-Based Privacy Configuration",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/minor-guardian-age-based-privacy-configuration-cms-029",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-030",
+   "name": "Privacy Configuration Testing, Approval & Publication",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/privacy-configuration-testing-approval-publication-cms-030",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-031",
+   "name": "Privacy Operations Command Center",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/privacy-operations-command-center-cms-031",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-032",
+   "name": "Customer Privacy, Consent & Preference 360\u00b0",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/customer-privacy-consent-preference-360-cms-032",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-033",
+   "name": "Consent Evidence, History & Withdrawal Management",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/consent-evidence-history-withdrawal-management-cms-033",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-034",
+   "name": "Data Subject / Customer Privacy Request Management",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/data-subject-customer-privacy-request-management-cms-034",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-035",
+   "name": "Data Discovery, Access, Export & Correction Workspace",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/data-discovery-access-export-correction-workspace-cms-035",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-036",
+   "name": "Deletion, Anonymization & Restriction Operations",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/deletion-anonymization-restriction-operations-cms-036",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-037",
+   "name": "Data Retention, Expiry & Legal Hold Operations",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/data-retention-expiry-legal-hold-operations-cms-037",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-038",
+   "name": "Privacy Compliance, Exception & Investigation Workspace",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/privacy-compliance-exception-investigation-workspace-cms-038",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-039",
+   "name": "Privacy Audit, Evidence & Compliance Reporting",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/privacy-audit-evidence-compliance-reporting-cms-039",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-040",
+   "name": "Privacy Analytics & AI Compliance Intelligence",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/privacy-analytics-ai-compliance-intelligence-cms-040",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-041",
+   "name": "Waiver & Consent Command Center",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/waiver-consent-command-center-cms-041",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-042",
+   "name": "Waiver Template Library & Master Setup",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/waiver-template-library-master-setup-cms-042",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-043",
+   "name": "Digital Waiver & Form Builder",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/digital-waiver-form-builder-cms-043",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-044",
+   "name": "Dynamic Fields, Questions & Conditional Logic",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/dynamic-fields-questions-conditional-logic-cms-044",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-045",
+   "name": "Signatory, Signature & Guardian Rule Configuration",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/signatory-signature-guardian-rule-configuration-cms-045",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-046",
+   "name": "Product, Event & Experience Association",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/product-event-experience-association-cms-046",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-047",
+   "name": "Waiver Trigger, Eligibility & Completion Rules",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/waiver-trigger-eligibility-completion-rules-cms-047",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-048",
+   "name": "Versioning, Effective Dates & Legal Change Control",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/versioning-effective-dates-legal-change-control-cms-048",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-049",
+   "name": "Localization, Branding & Customer Experience Configuration",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/localization-branding-customer-experience-configuration-cms-049",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-050",
+   "name": "Waiver Approval, Testing & Publication Workspace",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/waiver-approval-testing-publication-workspace-cms-050",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-051",
+   "name": "Waiver Operations Command Center",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/waiver-operations-command-center-cms-051",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-052",
+   "name": "Participant Waiver Status & Tracking",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/participant-waiver-status-tracking-cms-052",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-053",
+   "name": "Digital Signing & Collection Operations",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/digital-signing-collection-operations-cms-053",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-054",
+   "name": "Minor, Guardian & Group Consent Management",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/minor-guardian-group-consent-management-cms-054",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-055",
+   "name": "Waiver Verification & Validation Workspace",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/waiver-verification-validation-workspace-cms-055",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-056",
+   "name": "Missing, Expired & Invalid Waiver Management",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/missing-expired-invalid-waiver-management-cms-056",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-057",
+   "name": "On-Site Waiver & Exception Handling",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/on-site-waiver-exception-handling-cms-057",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-058",
+   "name": "Compliance Evidence, Audit & Waiver Repository",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/compliance-evidence-audit-waiver-repository-cms-058",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-059",
+   "name": "Waiver Analytics, Compliance & Operational Insights",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/waiver-analytics-compliance-operational-insights-cms-059",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "CMS-060",
+   "name": "AI Waiver Compliance & Risk Intelligence Center",
+   "module": "Policy",
+   "wave": 3,
+   "route": "/policy/ai-waiver-compliance-risk-intelligence-center-cms-060",
    "operations": 1,
    "drawn": true
   }
@@ -356,18 +724,6 @@
     "summary": "Change what a table is"
    },
    {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
-   },
-   {
     "operation": "setPasswordPolicy",
     "contract": "identity",
     "verb": "PUT",
@@ -428,12 +784,6 @@
     "summary": "Create a loyalty programme"
    },
    {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
     "operation": "createUrlRedirect",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -452,22 +802,10 @@
     "summary": "Candidate matches, scored"
    },
    {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
    },
    {
     "operation": "listMessageTriggers",
@@ -530,22 +868,10 @@
     "summary": "Why the conversation ended, and any callback"
    },
    {
-    "operation": "setConsentPurposes",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Configure consent purposes"
-   },
-   {
     "operation": "setMessageTrigger",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Fire a message from a platform event"
-   },
-   {
-    "operation": "setSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Titles, descriptions, canonicals and hreflang"
    },
    {
     "operation": "startKioskAssist",
@@ -558,18 +884,6 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "captureStoredValue",
@@ -590,16 +904,16 @@
     "summary": "Turn a visit into a membership or season pass"
    },
    {
+    "operation": "createCart",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Start a cart"
+   },
+   {
     "operation": "createPaymentLink",
     "contract": "orders",
     "verb": "POST",
     "summary": "Send a guest a link to pay later"
-   },
-   {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
    },
    {
     "operation": "createReservation",
@@ -612,12 +926,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "issueInvitation",
@@ -654,12 +962,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Gateways configured for this scope"
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -716,22 +1018,10 @@
     "summary": "Configure a gateway and its routing"
    },
    {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
    },
    {
     "operation": "voidPayment",
@@ -758,10 +1048,22 @@
     "summary": "Add a user to a partner branch"
    },
    {
+    "operation": "decommissionBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Tear it down"
+   },
+   {
     "operation": "disputeInvoice",
     "contract": "subscription",
     "verb": "POST",
     "summary": "Raise a dispute"
+   },
+   {
+    "operation": "drainBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Stop taking orders, let in-flight ones finish"
    },
    {
     "operation": "executeTenantMigration",
@@ -780,6 +1082,12 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Launch an identical cluster"
+   },
+   {
+    "operation": "listBurstEnvironments",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "On-sale environments"
    },
    {
     "operation": "listCellClusters",
@@ -812,10 +1120,28 @@
     "summary": "Plan moving a tenant to another cell"
    },
    {
+    "operation": "reconcileBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Move the orders into the permanent platform"
+   },
+   {
     "operation": "recordInvoicePayment",
     "contract": "subscription",
     "verb": "POST",
     "summary": "Record payment against an invoice"
+   },
+   {
+    "operation": "registerPartner",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "A business applies to become a partner"
+   },
+   {
+    "operation": "requestBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Stand one up for a performance"
    },
    {
     "operation": "resolveInvoiceDispute",
@@ -834,6 +1160,12 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Turn metered AI interactions into a billable usage record"
+   },
+   {
+    "operation": "submitOnboardingApplication",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "A prospect signs themselves up"
    },
    {
     "operation": "createBanner",

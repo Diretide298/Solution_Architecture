@@ -1,5 +1,5 @@
 id: LLD-access
-title: access — 31 operations
+title: access — 177 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -19,6 +19,26 @@ operations:
   writes:
   - access.blacklist
   - cache:idempotency
+- operation: approveManualOverrideSupervisor
+  verb: PUT
+  path: /manual-override-supervisor
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveMultiMediaPreview
+  verb: PUT
+  path: /multi-media-preview
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createAccessPoint
   verb: POST
   path: /access-points
@@ -163,6 +183,56 @@ operations:
   - venuemap.point
   writes:
   - cache:resolution
+- operation: listAccess
+  verb: GET
+  path: /access
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessAttributeCatalog
+  verb: GET
+  path: /access-attribute-catalog
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessExecutiveInsight
+  verb: GET
+  path: /access-executive-insight
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessLocationGrouping
+  verb: GET
+  path: /access-location-grouping
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessMonitoring
+  verb: GET
+  path: /access-monitoring
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listAccessPoints
   verb: GET
   path: /access-points
@@ -173,6 +243,56 @@ operations:
   offline: true
   reads:
   - access.access_point
+  writes: []
+- operation: listAccessReportScheduled
+  verb: GET
+  path: /access-report-scheduled
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessRiskScoring
+  verb: GET
+  path: /access-risk-scoring
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessRule
+  verb: GET
+  path: /access-rule
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessSecurityFraud
+  verb: GET
+  path: /access-security-fraud
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAccessValidityTime
+  verb: GET
+  path: /access-validity-time
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listAdmissionRules
   verb: GET
@@ -185,6 +305,96 @@ operations:
   reads:
   - access.admission_rules
   writes: []
+- operation: listAntiPassbackJourney
+  verb: GET
+  path: /anti-passback-journey
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAttendanceAdmission
+  verb: GET
+  path: /attendance-admission
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAuthorizationGovernanceTemporary
+  verb: GET
+  path: /authorization-governance-temporary
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBiometric
+  verb: GET
+  path: /biometric
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBiometricAccess
+  verb: GET
+  path: /biometric-access
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBiometricConsentGuardian
+  verb: GET
+  path: /biometric-consent-guardian
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBiometricIdentityIntegrity
+  verb: GET
+  path: /biometric-identity-integrity
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBiometricLifecycleRetention
+  verb: GET
+  path: /biometric-lifecycle-retention
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBiometricValidationGate
+  verb: GET
+  path: /biometric-validation-gate
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listBlacklist
   verb: GET
   path: /blacklist
@@ -195,6 +405,246 @@ operations:
   offline: true
   reads:
   - access.blacklist
+  writes: []
+- operation: listBrandingLocalizationTemplate
+  verb: GET
+  path: /branding-localization-template
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listConnectivityFailureDegraded
+  verb: GET
+  path: /connectivity-failure-degraded
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredential
+  verb: GET
+  path: /credential
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialActivationDisplay
+  verb: GET
+  path: /credential-activation-display
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialDeliveryDistribution
+  verb: GET
+  path: /credential-delivery-distribution
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialDisableBlacklist
+  verb: GET
+  path: /credential-disable-blacklist
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialGenerationIssuance
+  verb: GET
+  path: /credential-generation-issuance
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialIdentityToken
+  verb: GET
+  path: /credential-identity-token
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialReplacementReissue
+  verb: GET
+  path: /credential-replacement-reissue
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialRevocationLifecycle
+  verb: GET
+  path: /credential-revocation-lifecycle
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialSecurity
+  verb: GET
+  path: /credential-security
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialSecurityOperational
+  verb: GET
+  path: /credential-security-operational
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialSharingConcurrent
+  verb: GET
+  path: /credential-sharing-concurrent
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialTransferRebinding
+  verb: GET
+  path: /credential-transfer-rebinding
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCredentialUsageCross
+  verb: GET
+  path: /credential-usage-cross
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDeviceBindingSession
+  verb: GET
+  path: /device-binding-session
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDeviceGate
+  verb: GET
+  path: /device-gate
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDeviceTypeHardware
+  verb: GET
+  path: /device-type-hardware
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDigitalCredentialSecurity
+  verb: GET
+  path: /digital-credential-security
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicAccessPolicy
+  verb: GET
+  path: /dynamic-access-policy
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEdgePackageData
+  verb: GET
+  path: /edge-package-data
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEdgeSecurityDeployment
+  verb: GET
+  path: /edge-security-deployment
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEntitlementConsumption
+  verb: GET
+  path: /entitlement-consumption
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEntitlementCrossMedia
+  verb: GET
+  path: /entitlement-cross-media
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listEntitlements
   verb: GET
@@ -208,6 +658,366 @@ operations:
   - access.admission_rules
   - access.entitlement
   - catalogue.product
+  writes: []
+- operation: listEntryExitCrossover
+  verb: GET
+  path: /entry-exit-crossover
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEntryExitRule
+  verb: GET
+  path: /entry-exit-rule
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEntryTemporaryExit
+  verb: GET
+  path: /entry-temporary-exit
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listExternalPartnerCredential
+  verb: GET
+  path: /external-partner-credential
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFaceChangeEnrollment
+  verb: GET
+  path: /face-change-enrollment
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFaceMatchingVerification
+  verb: GET
+  path: /face-matching-verification
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFaceTagTemporary
+  verb: GET
+  path: /face-tag-temporary
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFailedGenerationDelivery
+  verb: GET
+  path: /failed-generation-delivery
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFamilyChildPod
+  verb: GET
+  path: /family-child-pod
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFastPassAttraction
+  verb: GET
+  path: /fast-pass-attraction
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFraudDetectionRule
+  verb: GET
+  path: /fraud-detection-rule
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGateModeFree
+  verb: GET
+  path: /gate-mode-free
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGraphicalAccessMap
+  verb: GET
+  path: /graphical-access-map
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupAdmissionQuantity
+  verb: GET
+  path: /group-admission-quantity
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupAttendancePartial
+  verb: GET
+  path: /group-attendance-partial
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGroupLeaderFast
+  verb: GET
+  path: /group-leader-fast
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGuestCompanionEligibility
+  verb: GET
+  path: /guest-companion-eligibility
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGuestDwellTime
+  verb: GET
+  path: /guest-dwell-time
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGuestJourney
+  verb: GET
+  path: /guest-journey
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listHardwareCompatibilityHealth
+  verb: GET
+  path: /hardware-compatibility-health
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listHotelWalletExternal
+  verb: GET
+  path: /hotel-wallet-external
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listIdentityMembershipAccreditation
+  verb: GET
+  path: /identity-membership-accreditation
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listLiveAccess
+  verb: GET
+  path: /live-access
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listLiveGateMode
+  verb: GET
+  path: /live-gate-mode
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listLiveVenueOccupancy
+  verb: GET
+  path: /live-venue-occupancy
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaActivationPriority
+  verb: GET
+  path: /media-activation-priority
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaCredential
+  verb: GET
+  path: /media-credential
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaDesign
+  verb: GET
+  path: /media-design
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaIssuanceEncoding
+  verb: GET
+  path: /media-issuance-encoding
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaReplacementRevocation
+  verb: GET
+  path: /media-replacement-revocation
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaSwapReplacement
+  verb: GET
+  path: /media-swap-replacement
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaTypeCredential
+  verb: GET
+  path: /media-type-credential
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMediaTypeTechnology
+  verb: GET
+  path: /media-type-technology
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMultiMediaBinding
+  verb: GET
+  path: /multi-media-binding
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMultiParkCrossover
+  verb: GET
+  path: /multi-park-crossover
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMultiParkCrossover2
+  verb: GET
+  path: /multi-park-crossover
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listMyEntitlements
   verb: GET
@@ -224,6 +1034,56 @@ operations:
   - catalogue.product
   - identity.delegated_access
   writes: []
+- operation: listOfflineCredentialRevocation
+  verb: GET
+  path: /offline-credential-revocation
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOfflineCryptographicValidation
+  verb: GET
+  path: /offline-cryptographic-validation
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOfflineEdge
+  verb: GET
+  path: /offline-edge
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOfflineEntitlementUsage
+  verb: GET
+  path: /offline-entitlement-usage
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOperatingCalendarSpecial
+  verb: GET
+  path: /operating-calendar-special
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listParkingFacilities
   verb: GET
   path: /parking-facilities
@@ -236,6 +1096,76 @@ operations:
   reads:
   - access.parking_facility
   writes: []
+- operation: listPhysicalDeviceRegistration
+  verb: GET
+  path: /physical-device-registration
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPodiumConsole
+  verb: GET
+  path: /podium-console
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPolicyEvaluationArchitecture
+  verb: GET
+  path: /policy-evaluation-architecture
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPolicyScopeHierarchy
+  verb: GET
+  path: /policy-scope-hierarchy
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listQueueThroughputLane
+  verb: GET
+  path: /queue-throughput-lane
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listReconnectionSynchronizationConflict
+  verb: GET
+  path: /reconnection-synchronization-conflict
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRelationshipCompanionFraud
+  verb: GET
+  path: /relationship-companion-fraud
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listScans
   verb: GET
   path: /access/scans
@@ -246,6 +1176,156 @@ operations:
   offline: false
   reads:
   - access.scan_event
+  writes: []
+- operation: listSecurityDetectionGovernance
+  verb: GET
+  path: /security-detection-governance
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listShiftHandoverSummary
+  verb: GET
+  path: /shift-handover-summary
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSpecialEventFree
+  verb: GET
+  path: /special-event-free
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listThroughputQueueValidation
+  verb: GET
+  path: /throughput-queue-validation
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTicketCredentialInvestigation
+  verb: GET
+  path: /ticket-credential-investigation
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTicketMedia
+  verb: GET
+  path: /ticket-media
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUnifiedIdentityCredential
+  verb: GET
+  path: /unified-identity-credential
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listValidationExceptionReason
+  verb: GET
+  path: /validation-exception-reason
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listValidationOutcomeRejection
+  verb: GET
+  path: /validation-outcome-rejection
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVenueParkAccess
+  verb: GET
+  path: /venue-park-access
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVerificationMethodSelection
+  verb: GET
+  path: /verification-method-selection
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVirtualCredentialMedia
+  verb: GET
+  path: /virtual-credential-media
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVirtualTicket
+  verb: GET
+  path: /virtual-ticket
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVirtualTicketArchitecture
+  verb: GET
+  path: /virtual-ticket-architecture
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVirtualTicketStatus
+  verb: GET
+  path: /virtual-ticket-statu
+  scope: venue
+  permission: SCOPE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: lookupTicket
   verb: GET
@@ -277,6 +1357,36 @@ operations:
   writes:
   - access.scan_event
   - cache:idempotency
+- operation: publishMediaCompatibilityTesting
+  verb: PUT
+  path: /media-compatibility-testing
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: publishRuleConflictCheck
+  verb: PUT
+  path: /rule-conflict-check
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: publishTopologyValidation
+  verb: PUT
+  path: /topology-validation
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: removeBlacklistEntry
   verb: DELETE
   path: /blacklist/{mediaCode}
@@ -306,6 +1416,26 @@ operations:
   writes:
   - cache:idempotency
   - pii.subject_biometric
+- operation: setAccessAreaZone
+  verb: PUT
+  path: /access-area-zone
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setAccessGraphicalMap
+  verb: PUT
+  path: /access-graphical-map
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setAccessPointGeofence
   verb: PUT
   path: /access-points/{accessPointId}/geofence
@@ -320,6 +1450,196 @@ operations:
   writes:
   - access.access_point
   - cache:idempotency
+- operation: setAppleWalletPass
+  verb: PUT
+  path: /apple-wallet-pass
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setAttractionAccess
+  verb: PUT
+  path: /attraction-access
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setBiometricVerificationProfile
+  verb: PUT
+  path: /biometric-verification-profile
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setBleBeaconGeofence
+  verb: PUT
+  path: /ble-beacon-geofence
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setContextTimeEvent
+  verb: PUT
+  path: /context-time-event
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDeviceSoftwareContent
+  verb: PUT
+  path: /device-software-content
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDigitalBarcodeTicket
+  verb: PUT
+  path: /digital-barcode-ticket
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDigitalCardMembership
+  verb: PUT
+  path: /digital-card-membership
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDynamicFieldData
+  verb: PUT
+  path: /dynamic-field-data
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDynamicSecurityProfile
+  verb: PUT
+  path: /dynamic-security-profile
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setEdgeNodeLocal
+  verb: PUT
+  path: /edge-node-local
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setEmbeddedEntitlementPayload
+  verb: PUT
+  path: /embedded-entitlement-payload
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setFacePassEnrollment
+  verb: PUT
+  path: /face-pass-enrollment
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGateLane
+  verb: PUT
+  path: /gate-lane
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGoogleWalletPass
+  verb: PUT
+  path: /google-wallet-pass
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGroupAdmissionProfile
+  verb: PUT
+  path: /group-admission-profile
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setHandheldMobileAccess
+  verb: PUT
+  path: /handheld-mobile-access
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setMediaBindingActivation
+  verb: PUT
+  path: /media-binding-activation
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setOperationalIncidentException
+  verb: PUT
+  path: /operational-incident-exception
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setParkingFacility
   verb: PUT
   path: /parking-facilities
@@ -334,6 +1654,76 @@ operations:
   writes:
   - access.parking_facility
   - cache:idempotency
+- operation: setPdfPrintablePos
+  verb: PUT
+  path: /pdf-printable-pos
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setReaderScannerPeripheral
+  verb: PUT
+  path: /reader-scanner-peripheral
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setRealTimeSecurity
+  verb: PUT
+  path: /real-time-security
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setRfidNfc
+  verb: PUT
+  path: /rfid-nfc
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setRfidNfcCard
+  verb: PUT
+  path: /rfid-nfc-card
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setSecurityInvestigationEvidence
+  verb: PUT
+  path: /security-investigation-evidence
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setTurnstileLaneBehavior
+  verb: PUT
+  path: /turnstile-lane-behavior
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setTurnstileMode
   verb: PUT
   path: /access-points/{accessPointId}/mode
@@ -348,6 +1738,76 @@ operations:
   writes:
   - access.access_point
   - cache:idempotency
+- operation: setValidationOutcomeGuest
+  verb: PUT
+  path: /validation-outcome-guest
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setVirtualTicketCredential
+  verb: PUT
+  path: /virtual-ticket-credential
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setVirtualTicketIdentity
+  verb: PUT
+  path: /virtual-ticket-identity
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setVisualAccessRule
+  verb: PUT
+  path: /visual-access-rule
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setVisualDynamicPolicy
+  verb: PUT
+  path: /visual-dynamic-policy
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulateOfflineResilienceTesting
+  verb: PUT
+  path: /offline-resilience-testing
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulatePolicyConflictImpact
+  verb: PUT
+  path: /policy-conflict-impact
+  scope: venue
+  permission: ACCESS_POINT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: syncScans
   verb: POST
   path: /access/scans
@@ -421,6 +1881,7 @@ operations:
   writes:
   - access.scan_event
   - cache:idempotency
+  - platform.outbox
 - operation: validateGroupAccess
   verb: POST
   path: /access/group-validate

@@ -1,0 +1,20 @@
+digraph b {
+  rankdir=TB; bgcolor="transparent"; ranksep=0.5; nodesep=0.3;
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=11 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=9 color="#5A6577"];
+  subgraph cluster_cell { label="One cell per jurisdiction · shared · holds many tenants";
+    style="rounded,filled"; fillcolor="#F4F7FB"; fontname="Helvetica"; fontsize=12;
+    { rank=same;
+      s1 [label="Catalogue 4–20\nOrder 4–16\nautoscale on RPS" fillcolor="#E2EFDA"];
+      s3 [label="Identity 3–8\nAccess 2–6 + edge" fillcolor="#E2EFDA"]; }
+    { rank=same;
+      s5 [label="Tenancy · Platform\nMarketing · AI · Reporting\nWhiteLabel" fillcolor="#DDEBF7"];
+      s6 [label="Ledger · CrossRegion\nregion-scoped\ncurrency, fiscal, tax" fillcolor="#FFF6E0"];
+      v1 [label="F&B · Inventory\nRetail · VenueOps\none set per venue" fillcolor="#EDEDED"]; }
+    pb [label="pgbouncer · transaction mode\n400 client → 40 server connections" fillcolor="#FDECEC"];
+    { rank=same;
+      pg [label="Postgres 8 vCPU / 16 GB\nmax_connections 500" fillcolor="#FFFFFF"];
+      rd [label="Redis 8 GB\ncache:resolution\nstale-while-revalidate" fillcolor="#FFFFFF"]; }
+    s1 -> pb; s3 -> pb; s5 -> pb; s6 -> pb; v1 -> pb; pb -> pg;
+    s1 -> rd [style=dotted]; }
+}

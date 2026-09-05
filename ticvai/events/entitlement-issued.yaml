@@ -36,7 +36,7 @@ consumers:
   idempotencyKey: entitlementId
   onFailure: retryThenDeadLetter
   isCritical: true
-- context: cross-cell
+- context: cross-region
   purpose: Publish a redemption right where crossesCells
   idempotencyKey: entitlementId
   onFailure: retryThenDeadLetter

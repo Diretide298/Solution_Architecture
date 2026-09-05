@@ -300,7 +300,14 @@ else {
         -Arguments $viewerArgs -Colour 'Green' | Out-Null
 }
 
-if (-not (Wait-Until { Invoke-WebRequest -Uri "http://localhost:$Port/api/index" -UseBasicParsing -TimeoutSec 2 | Out-Null; $true })) {
+# **`/login.html` and not `/api/index`.** The viewer is behind a gate, so
+# `/api/index` answers 401 to a request carrying no session — which is the gate
+# working, and is exactly what deploy.sh asserts to prove it holds. But
+# Invoke-WebRequest throws on a 401, Wait-Until catches it, and the probe
+# retried sixty times and then declared a healthy server dead. The sign-in page
+# is the right thing to ask for: it is the one page a stranger is meant to get,
+# so a 200 from it means the viewer is up without meaning the door is open.
+if (-not (Wait-Until { Invoke-WebRequest -Uri "http://localhost:$Port/login.html" -UseBasicParsing -TimeoutSec 2 | Out-Null; $true })) {
     Write-Bad "The viewer did not come up on $Port."
     if (-not $Shared) { Write-Bad 'Its window is still open — the reason will be in it.' }
     if ($Shared) { Stop-Started }

@@ -37,6 +37,7 @@ contracts:
 - orders
 - platform-ops
 - promotions
+- public-api
 - queue
 - reporting
 - resources

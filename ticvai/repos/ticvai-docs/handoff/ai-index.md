@@ -10,11 +10,11 @@
 | **Schemas** | 22 |
 | **States** | 11 |
 | **Events** | 11 |
-| **Tables** | 51 |
-| **Screens** | 31 |
+| **Tables** | 50 |
+| **Screens** | 33 |
 | **Flows** | 11 |
-| **Documents** | 13 |
-| **Open conflicts** | 0 |
+| **Documents** | 17 |
+| **Open conflicts** | 1 |
 
 ## Reached outside the contract
 
@@ -42,7 +42,7 @@
 | **Every model call leaves an audit record** — 10 operations write an `ai.interaction` (8.3.55). | yes | tools/check-package.py — a model-calling operation with no interaction fails |
 | **Only governed operations outside the domain may write to it** — 2 operations in other contracts write an `ai.*` table: ['askReportingQuestion', 'saveNaturalLanguageQuery']. Each is a governance record, not a bypass. | yes | tools/check-package.py allowlist, stated in ADR-0020 |
 
-**Storage tiers** — `postgres` 41 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 4
+**Storage tiers** — `postgres` 40 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 4
 
 ## Operations
 
@@ -120,9 +120,9 @@
 
 ## Storage
 
-**`postgres`** — 41
+**`postgres`** — 40
 
-`ai.chunk_ref` · `ai.index_entry` · `ai.index_job` · `ai.index_source` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.layout_draft` · `ai.policy` · `ai.proposed_action` · `ai.provider` · `assets.media_asset` · `catalogue.attribute_axis` · `catalogue.entitlement_template` · `catalogue.envelope` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `control.content_block` · `fnb.menu_item` · `maintenance.inspection_template` · `marketing.case` · `marketing.conversation_message` · `marketing.loyalty_programme` · `platform.region_settings` · `platform.scope_node` · `promotions.promotion` · `reporting.report_definition` · `retail.merchandise` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.policy`
+`ai.chunk_ref` · `ai.index_entry` · `ai.index_job` · `ai.index_source` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.layout_draft` · `ai.policy` · `ai.proposed_action` · `ai.provider` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `maintenance.inspection_template` · `marketing.case` · `marketing.loyalty_programme` · `platform.org_unit` · `platform.region_settings` · `promotions.promotion` · `reporting.report_definition` · `retail.merchandise` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.policy`
 
 **`postgres-analytical`** — 5
 
@@ -136,20 +136,21 @@
 
 `cache:answer` · `cache:embedding` · `cache:idempotency` · `cache:resolution`
 
-**Keys pointing in from other domains.** Each is a place another part of the platform depends on this one.
-
-- `marketing.conversation_message.ai_interaction_id` → `ai.interaction`
-
 ## Screens
+
+**P01 Guest Web**
+
+- `WEB-044` AI Concierge – Home — wave 2, 3 operations
 
 **P02 Guest App**
 
-- `GST-031` AI Concierge – Home — wave 2, 1 operation
+- `GST-031` AI Concierge – Home — wave 2, 3 operations
 - `GST-032` AI Concierge – Chat — wave 2, 1 operation
 - `GST-033` AI Concierge – Contextual Help — wave 2, 1 operation
 - `GST-052` Suggested Itineraries — wave 3, 1 operation
 - `GST-054` AI Optimized Itinerary — wave 3, 2 operations
 - `GST-059` Plan My Day – In Progress — wave 3, 1 operation
+- `GST-068` Help & My Cases — wave 2, 1 operation
 
 **P04 Venue POS**
 
@@ -222,6 +223,8 @@
 | Document | Status | Mentions |
 |---|---|---|
 | [AI scope — for confirmation](../docs/active/ai-scope-for-confirmation.md) |  | 1 |
+| [Deep audit — ten invariants, run adversarially](../docs/active/deep-audit-24-august.md) |  | 4 |
+| [Deployment architecture — four configurations, costed on AWS and GCP](../docs/active/deployment-configs-costed.md) |  | 6 |
 | [Full-layer audit — 20 August](../docs/active/full-layer-audit-20aug.md) |  | 4 |
 | [TICVAI — Hierarchy, Data Segregation and Services](../docs/active/hierarchy-segregation-services.md) |  | 1 |
 | [Optimisation assessment — RAG, caching, backend, frontend](../docs/active/optimisation-assessment.md) |  | 4 |
@@ -231,12 +234,15 @@
 | [ADR-0020 — Where AI runs, and what it is isolated from](../docs/adr/0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 14 |
 | [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](../docs/adr/0021-qdrant-partitioning.md) | Proposed · 17 August 2026 | 4 |
 | [ADR-0023 — Personal data lives apart from the append-only ledger](../docs/adr/0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 3 |
-| [ADR-0028: Sixteen services, and the data boundary decides where they split](../docs/adr/0028-service-decomposition.md) | Accepted | 1 |
+| [ADR-0028: Sixteen services, and the data boundary decides where they split](../docs/adr/0028-service-decomposition.md) | Accepted — the data topology is reopened (CF-161, 24 August) | 1 |
+| [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](../docs/adr/0033-outbox-and-dead-letters.md) | Accepted | 2 |
+| [ADR-0034: The cheapest AI call is the one that never reaches a provider](../docs/adr/0034-ai-retrieval-and-cost.md) | Accepted | 7 |
 | [Architecture](../docs/architecture/README.md) |  | 1 |
 | [AI provider credentials — where the key lives and who can reach it](../docs/architecture/ai-credentials.md) |  | 4 |
 
 ## Conflicts
 
+**1 open** — **CF-166**
 
 33 closed — CF-160 · CF-41 · CF-57 · CF-139 · CF-61 · CF-74 · CF-123 · CF-120 · CF-141 · CF-144 · CF-17 · CF-119 · CF-118 · CF-113 · CF-109 · CF-107 · CF-106 · CF-105 · CF-14 · CF-96 · CF-94 · CF-92 · CF-93 · CF-90 · CF-89 · CF-88 · CF-59 · CF-80 · CF-78 · CF-76 · CF-73 · CF-20 · CF-43
 

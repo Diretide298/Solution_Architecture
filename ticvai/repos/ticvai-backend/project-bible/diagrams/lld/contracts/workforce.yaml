@@ -1,5 +1,5 @@
 id: LLD-workforce
-title: workforce — 12 operations
+title: workforce — 14 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -10,7 +10,8 @@ operations:
   path: /announcements/{announcementId}/acknowledge
   scope: venue
   permission: WORKFORCE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -23,7 +24,8 @@ operations:
   path: /attendance/{recordId}/amend
   scope: venue
   permission: WORKFORCE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -54,11 +56,12 @@ operations:
   path: /rota-assignments
   scope: venue
   permission: WORKFORCE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - platform.workstation
   writes:
@@ -69,7 +72,8 @@ operations:
   path: /announcements/{announcementId}/reach
   scope: venue
   permission: WORKFORCE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - identity.principal
@@ -81,7 +85,8 @@ operations:
   path: /announcements
   scope: venue
   permission: WORKFORCE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - workforce.announcement
@@ -92,7 +97,8 @@ operations:
   path: /attendance
   scope: venue
   permission: WORKFORCE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - workforce.attendance
@@ -103,23 +109,47 @@ operations:
   path: /rota-assignments
   scope: venue
   permission: WORKFORCE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - identity.principal
   - workforce.rota_assignment
+  writes: []
+- operation: listShiftSwapRequests
+  verb: GET
+  path: /shift-swaps
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.shift_swap
+  writes: []
+- operation: listTrainingRecords
+  verb: GET
+  path: /training-records
+  scope: venue
+  permission: WORKFORCE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - workforce.training_record
   writes: []
 - operation: publishAnnouncement
   verb: POST
   path: /announcements
   scope: venue
   permission: ANNOUNCEMENT_PUBLISH
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
   - identity.role
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - workforce.announcement
@@ -129,7 +159,8 @@ operations:
   path: /attendance/clock
   scope: venue
   permission: ATTENDANCE_RECORD
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - access.access_point
@@ -143,7 +174,8 @@ operations:
   path: /rota-assignments/{assignmentId}/swap
   scope: venue
   permission: WORKFORCE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -158,7 +190,8 @@ operations:
   path: /rota-assignments/{assignmentId}
   scope: venue
   permission: WORKFORCE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

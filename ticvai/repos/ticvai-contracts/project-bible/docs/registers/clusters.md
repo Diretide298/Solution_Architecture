@@ -304,7 +304,7 @@ edit `handoff/backlog-clusters.json`, never this file.
 
 ## CL-09 — Guest self-service and identity
 
-**4 entries · 32 row citations · cross-cell, identity, marketing-crm · —**
+**4 entries · 32 row citations · cross-region, identity, marketing-crm · —**
 
 **A guest cannot identify themselves by any token, correct their own record, recover a locked account, or export their data.**
 

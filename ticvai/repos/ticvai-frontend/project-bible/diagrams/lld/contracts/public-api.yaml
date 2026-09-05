@@ -3,7 +3,7 @@ title: public-api — 22 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
-service: ControlService
+service: PlatformService
 operations:
 - operation: certifyIntegration
   verb: POST
@@ -125,7 +125,6 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - public
   - partner
   offline: false
   reads:
@@ -137,7 +136,6 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - public
   - staff
   - partner
   offline: false
@@ -186,7 +184,7 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - public
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -299,7 +297,7 @@ operations:
   writes:
   - cache:idempotency
   - control.developer_account
-  - identity.grant
+  - identity.delegated_access
 - operation: submitIntegrationListing
   verb: POST
   path: /listings

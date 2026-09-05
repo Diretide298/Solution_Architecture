@@ -7,33 +7,25 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 143,
-  "operations": 441,
-  "contracts": 25,
+  "screens": 363,
+  "operations": 666,
+  "contracts": 27,
   "modules": 8,
   "undrawn": 0,
-  "operationsWithNoScreen": 222
+  "operationsWithNoScreen": 228
  },
  "waves": {
   "wave1": 60,
   "wave2": 79,
-  "wave3": 4
+  "wave3": 224
  },
  "modules": [
   {
-   "module": "Sell",
-   "screens": 35,
-   "waves": [
-    1,
-    2
-   ]
-  },
-  {
-   "module": "Orders & Money",
-   "screens": 29,
+   "module": "Access & Venue",
+   "screens": 175,
    "waves": [
     1,
     2,
@@ -41,8 +33,17 @@
    ]
   },
   {
-   "module": "Access & Venue",
-   "screens": 25,
+   "module": "Sell",
+   "screens": 75,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Orders & Money",
+   "screens": 59,
    "waves": [
     1,
     2,
@@ -93,6 +94,14 @@
  ],
  "contracts": [
   {
+   "contract": "access",
+   "operations": 167
+  },
+  {
+   "contract": "orders",
+   "operations": 78
+  },
+  {
    "contract": "inventory",
    "operations": 48
   },
@@ -109,10 +118,6 @@
    "operations": 43
   },
   {
-   "contract": "orders",
-   "operations": 29
-  },
-  {
    "contract": "tenancy",
    "operations": 25
   },
@@ -125,12 +130,12 @@
    "operations": 24
   },
   {
-   "contract": "access",
-   "operations": 21
+   "contract": "subscription",
+   "operations": 22
   },
   {
    "contract": "promotions",
-   "operations": 20
+   "operations": 21
   },
   {
    "contract": "reporting",
@@ -153,6 +158,10 @@
    "operations": 11
   },
   {
+   "contract": "retail",
+   "operations": 10
+  },
+  {
    "contract": "venue-map",
    "operations": 10
   },
@@ -161,16 +170,16 @@
    "operations": 9
   },
   {
-   "contract": "retail",
-   "operations": 8
-  },
-  {
    "contract": "ai",
-   "operations": 7
+   "operations": 8
   },
   {
    "contract": "identity",
    "operations": 7
+  },
+  {
+   "contract": "public-api",
+   "operations": 5
   },
   {
    "contract": "games",
@@ -181,12 +190,12 @@
    "operations": 2
   },
   {
-   "contract": "subscription",
+   "contract": "assets",
    "operations": 2
   },
   {
-   "contract": "assets",
-   "operations": 2
+   "contract": "white-label",
+   "operations": 1
   },
   {
    "contract": "platform-ops",
@@ -218,7 +227,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/queue-management/queue-integration-setup",
-   "operations": 21,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -362,7 +371,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/venue-operations/closures-blackouts",
-   "operations": 11,
+   "operations": 12,
    "drawn": true
   },
   {
@@ -398,7 +407,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/refunds-exchanges",
-   "operations": 14,
+   "operations": 15,
    "drawn": true
   },
   {
@@ -478,7 +487,7 @@
    "name": "Admission Profiles",
    "module": "Access & Venue",
    "wave": 1,
-   "route": "/venue-operations/admission-profiles",
+   "route": "/venue-operations/admission-rules",
    "operations": 3,
    "drawn": true
   },
@@ -776,7 +785,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/venue-operations/venue-configuration",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -794,7 +803,7 @@
    "module": "Venue Operations",
    "wave": 2,
    "route": "/venue-operations/integrations",
-   "operations": 0,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -1010,7 +1019,7 @@
    "module": "Guests & Marketing",
    "wave": 1,
    "route": "/ai/policy",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1100,7 +1109,7 @@
    "module": "Orders & Money",
    "wave": 1,
    "route": "/orders-money",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1109,7 +1118,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1118,7 +1127,7 @@
    "module": "Access & Venue",
    "wave": 1,
    "route": "/access-venue",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1127,7 +1136,7 @@
    "module": "Food & Beverage",
    "wave": 1,
    "route": "/food-beverage",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1136,7 +1145,7 @@
    "module": "Stock & Supply",
    "wave": 1,
    "route": "/stock-supply",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1145,7 +1154,7 @@
    "module": "People & Access Rights",
    "wave": 1,
    "route": "/people-access-rights",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -1154,7 +1163,7 @@
    "module": "Guests & Marketing",
    "wave": 1,
    "route": "/guests-marketing",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -1163,7 +1172,7 @@
    "module": "Venue Operations",
    "wave": 1,
    "route": "/venue-operations",
-   "operations": 1,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1469,7 +1478,7 @@
    "module": "Sell",
    "wave": 2,
    "route": "/sell/store-rules-controls-permissions",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -1480,28 +1489,1990 @@
    "route": "/sell/retail-global-settings-controls",
    "operations": 2,
    "drawn": true
+  },
+  {
+   "id": "BO-144",
+   "name": "Access Control Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-control-command-center-bo-144",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-145",
+   "name": "Venue & Park Access Structure",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/venue-park-access-structure-bo-145",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-146",
+   "name": "Access Area & Zone Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-area-zone-builder-bo-146",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-147",
+   "name": "Attraction Access Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/attraction-access-configuration-bo-147",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-148",
+   "name": "Access Point Directory",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-point-directory-bo-148",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-149",
+   "name": "Gate & Lane Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/gate-lane-configuration-bo-149",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-150",
+   "name": "Access Control Graphical Map Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-control-graphical-map-designer-bo-150",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-151",
+   "name": "Access Location Grouping",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-location-grouping-bo-151",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-152",
+   "name": "Operating Calendar & Special Access Days",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/operating-calendar-special-access-days-bo-152",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-153",
+   "name": "Topology Validation & Publication",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/topology-validation-publication-bo-153",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-154",
+   "name": "Access Rule Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-rule-command-center-bo-154",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-155",
+   "name": "Visual Access Rule Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/visual-access-rule-builder-bo-155",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-156",
+   "name": "Entry, Exit & Re-entry Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/entry-exit-re-entry-rules-bo-156",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-157",
+   "name": "Anti-Passback & Journey Sequence",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/anti-passback-journey-sequence-bo-157",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-158",
+   "name": "Access Validity & Time Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-validity-time-rules-bo-158",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-159",
+   "name": "Entitlement Consumption Engine",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/entitlement-consumption-engine-bo-159",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-160",
+   "name": "Multi-Park & Crossover Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/multi-park-crossover-rules-bo-160",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-161",
+   "name": "Guest, Companion & Eligibility Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/guest-companion-eligibility-rules-bo-161",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-162",
+   "name": "Group Admission & Quantity Validation",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/group-admission-quantity-validation-bo-162",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-163",
+   "name": "Rule Simulation, Conflict Check & Publication",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/rule-simulation-conflict-check-publication-bo-163",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-164",
+   "name": "Digital Credential Security Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/digital-credential-security-command-center-bo-164",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-165",
+   "name": "Dynamic QR Security Profile Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/dynamic-qr-security-profile-builder-bo-165",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-166",
+   "name": "Credential Activation & Display Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-activation-display-rules-bo-166",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-167",
+   "name": "Device Binding & Session Security",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/device-binding-session-security-bo-167",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-168",
+   "name": "BLE Beacon & Geofence Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/ble-beacon-geofence-configuration-bo-168",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-169",
+   "name": "Credential Transfer & Rebinding",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-transfer-rebinding-bo-169",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-170",
+   "name": "Credential Revocation & Lifecycle Events",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-revocation-lifecycle-events-bo-170",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-171",
+   "name": "Offline Cryptographic Validation Profile",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/offline-cryptographic-validation-profile-bo-171",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-172",
+   "name": "Embedded Entitlement Payload Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/embedded-entitlement-payload-designer-bo-172",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-173",
+   "name": "Credential Security Simulation, Audit & Publication",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-security-simulation-audit-publication-bo-173",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-174",
+   "name": "Media & Credential Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-credential-command-center-bo-174",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-175",
+   "name": "Media Type & Technology Library",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-type-technology-library-bo-175",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-176",
+   "name": "Virtual Credential & Media Association",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/virtual-credential-media-association-bo-176",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-177",
+   "name": "Verification Method Selection & Locking",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/verification-method-selection-locking-bo-177",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-178",
+   "name": "Media Issuance & Encoding Profile",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-issuance-encoding-profile-bo-178",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-179",
+   "name": "Media Swap & Replacement",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-swap-replacement-bo-179",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-180",
+   "name": "RFID & NFC Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/rfid-nfc-configuration-bo-180",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-181",
+   "name": "External & Partner Credential Mapping",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/external-partner-credential-mapping-bo-181",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-182",
+   "name": "Hotel, Wallet & External Media Integration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/hotel-wallet-external-media-integration-bo-182",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-183",
+   "name": "Media Compatibility, Testing & Publication",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-compatibility-testing-publication-bo-183",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-184",
+   "name": "Biometric Access Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/biometric-access-command-center-bo-184",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-185",
+   "name": "Biometric Verification Profile Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/biometric-verification-profile-builder-bo-185",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-186",
+   "name": "Face Pass Enrollment Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/face-pass-enrollment-configuration-bo-186",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-187",
+   "name": "Biometric Consent & Guardian Management",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/biometric-consent-guardian-management-bo-187",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-188",
+   "name": "Face Tag Temporary Enrollment",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/face-tag-temporary-enrollment-bo-188",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-189",
+   "name": "Face Matching & Verification Thresholds",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/face-matching-verification-thresholds-bo-189",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-190",
+   "name": "Face Change, Re-enrollment & Identity Protection",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/face-change-re-enrollment-identity-protection-bo-190",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-191",
+   "name": "Biometric Validation at Gate",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/biometric-validation-at-gate-bo-191",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-192",
+   "name": "Biometric Lifecycle, Retention & Deletion",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/biometric-lifecycle-retention-deletion-bo-192",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-193",
+   "name": "Biometric Simulation, Audit & Publication",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/biometric-simulation-audit-publication-bo-193",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-194",
+   "name": "Device & Gate Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/device-gate-command-center-bo-194",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-195",
+   "name": "Device Type & Hardware Library",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/device-type-hardware-library-bo-195",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-196",
+   "name": "Physical Device Registration & Provisioning",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/physical-device-registration-provisioning-bo-196",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-197",
+   "name": "Turnstile & Lane Behavior Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/turnstile-lane-behavior-configuration-bo-197",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-198",
+   "name": "Validation Outcome & Guest Feedback Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/validation-outcome-guest-feedback-designer-bo-198",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-199",
+   "name": "Reader, Scanner & Peripheral Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/reader-scanner-peripheral-configuration-bo-199",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-200",
+   "name": "Handheld & Mobile Access Device Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/handheld-mobile-access-device-configuration-bo-200",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-201",
+   "name": "Gate Modes, Free Spin & Emergency Controls",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/gate-modes-free-spin-emergency-controls-bo-201",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-202",
+   "name": "Device Software, Content & Remote Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/device-software-content-remote-configuration-bo-202",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-203",
+   "name": "Hardware Compatibility, Health, Testing & Deployment",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/hardware-compatibility-health-testing-deployment-bo-203",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-204",
+   "name": "Offline & Edge Operations Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/offline-edge-operations-command-center-bo-204",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-205",
+   "name": "Edge Node & Local Processing Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/edge-node-local-processing-configuration-bo-205",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-206",
+   "name": "Offline Validation Policy Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/offline-validation-policy-builder-bo-206",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-207",
+   "name": "Edge Package & Data Distribution",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/edge-package-data-distribution-bo-207",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-208",
+   "name": "Offline Credential & Revocation Cache",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/offline-credential-revocation-cache-bo-208",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-209",
+   "name": "Offline Entitlement & Usage Ledger",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/offline-entitlement-usage-ledger-bo-209",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-210",
+   "name": "Connectivity Failure & Degraded Mode Policy",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/connectivity-failure-degraded-mode-policy-bo-210",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-211",
+   "name": "Reconnection, Synchronization & Conflict Resolution",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/reconnection-synchronization-conflict-resolution-bo-211",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-212",
+   "name": "Offline Simulation & Resilience Testing",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/offline-simulation-resilience-testing-bo-212",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-213",
+   "name": "Edge Security, Audit & Deployment",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/edge-security-audit-deployment-bo-213",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-214",
+   "name": "Guest Journey Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/guest-journey-command-center-bo-214",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-215",
+   "name": "Group & B2B Admission Profile Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/group-b2b-admission-profile-builder-bo-215",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-216",
+   "name": "Group Leader & Fast B2B Validation",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/group-leader-fast-b2b-validation-bo-216",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-217",
+   "name": "Group Attendance & Partial Entry Manager",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/group-attendance-partial-entry-manager-bo-217",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-218",
+   "name": "Family, Child, POD & Companion Journey",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/family-child-pod-companion-journey-bo-218",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-219",
+   "name": "Re-entry & Temporary Exit Journey",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/re-entry-temporary-exit-journey-bo-219",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-220",
+   "name": "Multi-Park & Crossover Journey Orchestrator",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/multi-park-crossover-journey-orchestrator-bo-220",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-221",
+   "name": "Fast Pass & Attraction Access Journey",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/fast-pass-attraction-access-journey-bo-221",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-222",
+   "name": "Special Event, Free View & Alternative Admission",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/special-event-free-view-alternative-admission-bo-222",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-223",
+   "name": "Journey Simulation, Audit & Publication",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/journey-simulation-audit-publication-bo-223",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-224",
+   "name": "Live Access Operations Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/live-access-operations-command-center-bo-224",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-225",
+   "name": "Podium Operations Console",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/podium-operations-console-bo-225",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-226",
+   "name": "Ticket & Credential Investigation Console",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/ticket-credential-investigation-console-bo-226",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-227",
+   "name": "Validation Exception & Reason Code Manager",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/validation-exception-reason-code-manager-bo-227",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-228",
+   "name": "Manual Override & Supervisor Approval",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/manual-override-supervisor-approval-bo-228",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-229",
+   "name": "Credential Disable, Blacklist & Whitelist Operations",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-disable-blacklist-whitelist-operations-bo-229",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-230",
+   "name": "Live Gate Mode & Lane Control",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/live-gate-mode-lane-control-bo-230",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-231",
+   "name": "Queue, Throughput & Lane Optimization",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/queue-throughput-lane-optimization-bo-231",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-232",
+   "name": "Operational Incident & Exception Workspace",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/operational-incident-exception-workspace-bo-232",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-233",
+   "name": "Operations Audit, Shift Handover & Control Summary",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/operations-audit-shift-handover-control-summary-bo-233",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-234",
+   "name": "Dynamic Access Policy Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/dynamic-access-policy-command-center-bo-234",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-235",
+   "name": "Access Attribute Catalog",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-attribute-catalog-bo-235",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-236",
+   "name": "Visual Dynamic Policy Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/visual-dynamic-policy-builder-bo-236",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-237",
+   "name": "Context, Time, Event & Capacity Policy Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/context-time-event-capacity-policy-builder-bo-237",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-238",
+   "name": "Identity, Membership & Accreditation Policies",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/identity-membership-accreditation-policies-bo-238",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-239",
+   "name": "Policy Scope, Hierarchy & Inheritance",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/policy-scope-hierarchy-inheritance-bo-239",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-240",
+   "name": "Authorization Governance & Temporary Access",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/authorization-governance-temporary-access-bo-240",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-241",
+   "name": "Policy Evaluation Architecture & Offline Distribution",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/policy-evaluation-architecture-offline-distribution-bo-241",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-242",
+   "name": "Policy Simulation, Conflict & Impact Analysis",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/policy-simulation-conflict-impact-analysis-bo-242",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-243",
+   "name": "Policy Approval, Audit, Analytics & AI Optimization",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/policy-approval-audit-analytics-ai-optimization-bo-243",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-244",
+   "name": "Access Security & Fraud Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-security-fraud-command-center-bo-244",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-245",
+   "name": "Fraud Detection Rule & Signal Library",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/fraud-detection-rule-signal-library-bo-245",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-246",
+   "name": "Credential Sharing & Concurrent Usage Detection",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-sharing-concurrent-usage-detection-bo-246",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-247",
+   "name": "Unified Identity & Credential Lock Manager",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/unified-identity-credential-lock-manager-bo-247",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-248",
+   "name": "Biometric & Identity Integrity Monitoring",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/biometric-identity-integrity-monitoring-bo-248",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-249",
+   "name": "Relationship & Companion Fraud Monitoring",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/relationship-companion-fraud-monitoring-bo-249",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-250",
+   "name": "Access Risk Scoring & Decision Engine",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-risk-scoring-decision-engine-bo-250",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-251",
+   "name": "Real-Time Security Response & Playbook Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/real-time-security-response-playbook-builder-bo-251",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-252",
+   "name": "Security Investigation & Evidence Workspace",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/security-investigation-evidence-workspace-bo-252",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-253",
+   "name": "Security Analytics, AI Detection & Governance",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/security-analytics-ai-detection-governance-bo-253",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-254",
+   "name": "Access Monitoring & Analytics Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-monitoring-analytics-command-center-bo-254",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-255",
+   "name": "Live Venue Occupancy & People Counting",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/live-venue-occupancy-people-counting-bo-255",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-256",
+   "name": "Graphical Access Map & Live Gate Performance",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/graphical-access-map-live-gate-performance-bo-256",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-257",
+   "name": "Attendance & Admission Analytics",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/attendance-admission-analytics-bo-257",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-258",
+   "name": "Entry, Exit, Re-entry & Crossover Analytics",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/entry-exit-re-entry-crossover-analytics-bo-258",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-259",
+   "name": "Throughput, Queue & Validation Performance Analytics",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/throughput-queue-validation-performance-analytics-bo-259",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-260",
+   "name": "Validation Outcome & Rejection Analytics",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/validation-outcome-rejection-analytics-bo-260",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-261",
+   "name": "Guest Dwell Time, Length of Stay & Attraction Flow",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/guest-dwell-time-length-of-stay-attraction-flow-bo-261",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-262",
+   "name": "Access Reports, Scheduled Reporting & Data Export",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/access-reports-scheduled-reporting-data-export-bo-262",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-263",
+   "name": "AI Access Intelligence, Forecasting & Executive Insights",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/ai-access-intelligence-forecasting-executive-insights-bo-263",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-264",
+   "name": "Group Sales Command Center",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-sales-command-center-bo-264",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-265",
+   "name": "Group Enquiry & Opportunity Capture",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-enquiry-opportunity-capture-bo-265",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-266",
+   "name": "Group Customer & Organization Profile",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-customer-organization-profile-bo-266",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-267",
+   "name": "Group Requirements, Availability & Capacity Planner",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-requirements-availability-capacity-planner-bo-267",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-268",
+   "name": "Group Package & Experience Builder",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-package-experience-builder-bo-268",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-269",
+   "name": "Group Quotation Builder & Proposal Generation",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-quotation-builder-proposal-generation-bo-269",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-270",
+   "name": "Quote Revision, Negotiation & Version Management",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/quote-revision-negotiation-version-management-bo-270",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-271",
+   "name": "Group Discount, Exception & Approval Workflow",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-discount-exception-approval-workflow-bo-271",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-272",
+   "name": "Quote-to-Booking Conversion & Confirmation",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/quote-to-booking-conversion-confirmation-bo-272",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-273",
+   "name": "Group Booking 360\u00b0 & Handover Workspace",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-booking-360-handover-workspace-bo-273",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-274",
+   "name": "Group Booking Operations Command Center",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-booking-operations-command-center-bo-274",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-275",
+   "name": "Group Operational Planning & Task Workspace",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-operational-planning-task-workspace-bo-275",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-276",
+   "name": "Participants, Guest Lists & Group Structure",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/participants-guest-lists-group-structure-bo-276",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-277",
+   "name": "Group Payment, Deposit & Balance Management",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-payment-deposit-balance-management-bo-277",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-278",
+   "name": "Group Ticket, Seat & Entitlement Allocation",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-ticket-seat-entitlement-allocation-bo-278",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-279",
+   "name": "Group Ticket Fulfillment & Distribution",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-ticket-fulfillment-distribution-bo-279",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-280",
+   "name": "Group Arrival, Check-In & Admission Operations",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-arrival-check-in-admission-operations-bo-280",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-281",
+   "name": "Group Amendments, Cancellation & Refund Operations",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-amendments-cancellation-refund-operations-bo-281",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-282",
+   "name": "Group Booking Reconciliation, Closure & Performance",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-booking-reconciliation-closure-performance-bo-282",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-283",
+   "name": "Group Sales Analytics & AI Intelligence Center",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/group-sales-analytics-ai-intelligence-center-bo-283",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-284",
+   "name": "Membership & Annual Pass Command Center",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-annual-pass-command-center-bo-284",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-285",
+   "name": "Membership Product & Tier Builder",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-product-tier-builder-bo-285",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-286",
+   "name": "Membership Eligibility & Qualification Rule Builder",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-eligibility-qualification-rule-builder-bo-286",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-287",
+   "name": "Validity, Activation & Expiry Configuration",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/validity-activation-expiry-configuration-bo-287",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-288",
+   "name": "Membership Entitlement & Admission Benefit Builder",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-entitlement-admission-benefit-builder-bo-288",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-289",
+   "name": "Membership Usage, Visit & Consumption Rules",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-usage-visit-consumption-rules-bo-289",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-290",
+   "name": "Family, Household & Dependent Membership Configuration",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/family-household-dependent-membership-configuration-bo-290",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-291",
+   "name": "Membership Commercial, Pricing & Channel Association",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-commercial-pricing-channel-association-bo-291",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-292",
+   "name": "Renewal, Auto-Renewal & Membership Continuity Configuration",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/renewal-auto-renewal-membership-continuity-configuration-bo-292",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-293",
+   "name": "Membership Product Validation, Approval, Publication & Versioning",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-product-validation-approval-publication-versi-bo-293",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-294",
+   "name": "Member Operations Command Center",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/member-operations-command-center-bo-294",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-295",
+   "name": "Member 360\u00b0 Membership Account Workspace",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/member-360-membership-account-workspace-bo-295",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-296",
+   "name": "Membership Activation, Assignment & Credential Management",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-activation-assignment-credential-management-bo-296",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-297",
+   "name": "Visit, Admission & Entitlement Usage Monitor",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/visit-admission-entitlement-usage-monitor-bo-297",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-298",
+   "name": "Membership Freeze, Suspension & Reactivation Management",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-freeze-suspension-reactivation-management-bo-298",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-299",
+   "name": "Membership Upgrade, Downgrade & Product Migration Operations",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-upgrade-downgrade-product-migration-operation-bo-299",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-300",
+   "name": "Renewal Operations & Auto-Renewal Management",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/renewal-operations-auto-renewal-management-bo-300",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-301",
+   "name": "Member Exceptions, Overrides & Service Recovery",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/member-exceptions-overrides-service-recovery-bo-301",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-302",
+   "name": "Member Lifecycle History, Audit & Case Timeline",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/member-lifecycle-history-audit-case-timeline-bo-302",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-303",
+   "name": "Membership Analytics, Renewal Intelligence & AI Retention Center",
+   "module": "Sell",
+   "wave": 3,
+   "route": "/sell/membership-analytics-renewal-intelligence-ai-retention-c-bo-303",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-304",
+   "name": "Order & Reservation Command Center",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-reservation-command-center-bo-304",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-305",
+   "name": "Order Detail & Transaction Workspace",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-detail-transaction-workspace-bo-305",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-306",
+   "name": "Reservation & Hold Policy Configuration",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/reservation-hold-policy-configuration-bo-306",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-307",
+   "name": "Order & Reservation Status Lifecycle Configuration",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-reservation-status-lifecycle-configuration-bo-307",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-308",
+   "name": "Order Creation & Source/Channel Configuration",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-creation-source-channel-configuration-bo-308",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-309",
+   "name": "Customer, Guest & Account Assignment",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/customer-guest-account-assignment-bo-309",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-310",
+   "name": "Order Line, Product & Entitlement Composition",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-line-product-entitlement-composition-bo-310",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-311",
+   "name": "Capacity Reservation & Inventory Commitment",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/capacity-reservation-inventory-commitment-bo-311",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-312",
+   "name": "Reservation Confirmation, Expiry & Fulfillment Readiness",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/reservation-confirmation-expiry-fulfillment-readiness-bo-312",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-313",
+   "name": "Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-lifecycle-timeline-sla-exceptions-ai-operations-bo-313",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-314",
+   "name": "Amendment & After-Sales Command Center",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/amendment-after-sales-command-center-bo-314",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-315",
+   "name": "Order Amendment Workspace",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-amendment-workspace-bo-315",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-316",
+   "name": "Amendment Eligibility & Policy Rule Builder",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/amendment-eligibility-policy-rule-builder-bo-316",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-317",
+   "name": "Cancellation & Partial Cancellation Policy Configuration",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/cancellation-partial-cancellation-policy-configuration-bo-317",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-318",
+   "name": "Refund Policy & Refund Calculation Configuration",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/refund-policy-refund-calculation-configuration-bo-318",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-319",
+   "name": "Void, Reversal & Same-Day Correction Management",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/void-reversal-same-day-correction-management-bo-319",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-320",
+   "name": "Ticket Reissue & Fulfillment Regeneration",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/ticket-reissue-fulfillment-regeneration-bo-320",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-321",
+   "name": "After-Sales Financial Settlement & Adjustment Workspace",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/after-sales-financial-settlement-adjustment-workspace-bo-321",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-322",
+   "name": "Approval, Exception & Service Recovery Management",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/approval-exception-service-recovery-management-bo-322",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-323",
+   "name": "Amendment History, Audit & After-Sales Analytics",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/amendment-history-audit-after-sales-analytics-bo-323",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-324",
+   "name": "Payment & Order Financial Command Center",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/payment-order-financial-command-center-bo-324",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-325",
+   "name": "Order Payment Detail & Transaction Ledger",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-payment-detail-transaction-ledger-bo-325",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-326",
+   "name": "Multi-Payment, Split Tender & Payment Allocation Configuration",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/multi-payment-split-tender-payment-allocation-configurat-bo-326",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-327",
+   "name": "Deposit, Partial Payment & Outstanding Balance Management",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/deposit-partial-payment-outstanding-balance-management-bo-327",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-328",
+   "name": "Order Split, Merge & Transaction Relationship Management",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-split-merge-transaction-relationship-management-bo-328",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-329",
+   "name": "Related Order & Transaction Relationship Explorer",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/related-order-transaction-relationship-explorer-bo-329",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-330",
+   "name": "External Payment, Partner & Settlement Reference Mapping",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/external-payment-partner-settlement-reference-mapping-bo-330",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-331",
+   "name": "Payment Reconciliation & Exception Management",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/payment-reconciliation-exception-management-bo-331",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-332",
+   "name": "Financial Traceability, Control & Audit Explorer",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/financial-traceability-control-audit-explorer-bo-332",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-333",
+   "name": "Order Financial Analytics & AI Reconciliation Intelligence",
+   "module": "Orders & Money",
+   "wave": 3,
+   "route": "/orders-money/order-financial-analytics-ai-reconciliation-intelligence-bo-333",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-334",
+   "name": "Virtual Ticket Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/virtual-ticket-command-center-bo-334",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-335",
+   "name": "Virtual Ticket Identity & Master Record Configuration",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/virtual-ticket-identity-master-record-configuration-bo-335",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-336",
+   "name": "Virtual Ticket Status & Lifecycle Model",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/virtual-ticket-status-lifecycle-model-bo-336",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-337",
+   "name": "Media Type & Credential Technology Registry",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-type-credential-technology-registry-bo-337",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-338",
+   "name": "Multi-Media Binding & Association Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/multi-media-binding-association-rules-bo-338",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-339",
+   "name": "Credential Identity, Token & Reference Mapping",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-identity-token-reference-mapping-bo-339",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-340",
+   "name": "Entitlement & Cross-Media Synchronization Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/entitlement-cross-media-synchronization-rules-bo-340",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-341",
+   "name": "Media Activation, Priority & Fallback Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-activation-priority-fallback-rules-bo-341",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-342",
+   "name": "Media Replacement, Revocation & Rebinding Rules",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-replacement-revocation-rebinding-rules-bo-342",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-343",
+   "name": "Virtual Ticket Architecture Testing, Governance & Audit",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/virtual-ticket-architecture-testing-governance-audit-bo-343",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-344",
+   "name": "Media Design Studio Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-design-studio-command-center-bo-344",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-345",
+   "name": "Digital QR & Barcode Ticket Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/digital-qr-barcode-ticket-designer-bo-345",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-346",
+   "name": "PDF, Printable & POS Ticket Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/pdf-printable-pos-ticket-designer-bo-346",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-347",
+   "name": "Apple Wallet Pass Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/apple-wallet-pass-designer-bo-347",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-348",
+   "name": "Google Wallet Pass Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/google-wallet-pass-designer-bo-348",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-349",
+   "name": "RFID, NFC, Card & Wristband Media Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/rfid-nfc-card-wristband-media-designer-bo-349",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-350",
+   "name": "Digital Card, Membership & Wearable Designer",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/digital-card-membership-wearable-designer-bo-350",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-351",
+   "name": "Dynamic Fields, Data Mapping & Content Builder",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/dynamic-fields-data-mapping-content-builder-bo-351",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-352",
+   "name": "Branding, Localization & Template Inheritance",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/branding-localization-template-inheritance-bo-352",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-353",
+   "name": "Multi-Media Preview, Testing, Approval & Publication",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/multi-media-preview-testing-approval-publication-bo-353",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-354",
+   "name": "Credential Operations Command Center",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-operations-command-center-bo-354",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-355",
+   "name": "Virtual Ticket & Credential 360\u00b0 Workspace",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/virtual-ticket-credential-360-workspace-bo-355",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-356",
+   "name": "Credential Generation & Issuance Monitor",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-generation-issuance-monitor-bo-356",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-357",
+   "name": "Credential Delivery & Distribution Operations",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-delivery-distribution-operations-bo-357",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-358",
+   "name": "Media Binding, Activation & Assignment Operations",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/media-binding-activation-assignment-operations-bo-358",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-359",
+   "name": "Credential Replacement, Reissue, Revocation & Recovery",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-replacement-reissue-revocation-recovery-bo-359",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-360",
+   "name": "Failed Generation, Delivery & Credential Exception Management",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/failed-generation-delivery-credential-exception-manageme-bo-360",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-361",
+   "name": "Credential Usage & Cross-Media Traceability",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-usage-cross-media-traceability-bo-361",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-362",
+   "name": "Credential Security, Audit & Operational Evidence",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/credential-security-audit-operational-evidence-bo-362",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "BO-363",
+   "name": "Ticket Media Analytics & AI Operations Intelligence",
+   "module": "Access & Venue",
+   "wave": 3,
+   "route": "/access-venue/ticket-media-analytics-ai-operations-intelligence-bo-363",
+   "operations": 1,
+   "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
-   {
-    "operation": "enrolFacePass",
-    "contract": "access",
-    "verb": "POST",
-    "summary": "Register a facial profile against an entitlement"
-   },
-   {
-    "operation": "getFacePassEnrolment",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Whether a pass has a face registered, and when"
-   },
-   {
-    "operation": "revokeFacePass",
-    "contract": "access",
-    "verb": "DELETE",
-    "summary": "Remove a facial profile"
-   },
    {
     "operation": "createKnowledgeCollection",
     "contract": "ai",
@@ -1525,12 +3496,6 @@
     "contract": "ai",
     "verb": "GET",
     "summary": "What is indexed, and how current it is"
-   },
-   {
-    "operation": "listKnowledgeCollections",
-    "contract": "ai",
-    "verb": "GET",
-    "summary": "Collections available to this tenant"
    },
    {
     "operation": "proposeTranslations",
@@ -1569,6 +3534,12 @@
     "summary": ""
    },
    {
+    "operation": "issueAccreditationBadge",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Issue a badge"
+   },
+   {
     "operation": "assessProductChange",
     "contract": "catalogue",
     "verb": "POST",
@@ -1605,34 +3576,10 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
-   },
-   {
     "operation": "listDonationCampaigns",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Campaigns a guest can give to"
-   },
-   {
-    "operation": "listGuestMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listProductVersions",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "What this product used to be"
    },
    {
     "operation": "listWaitlistEntries",
@@ -1695,6 +3642,12 @@
     "summary": "Every money source against the ledger, in one view"
    },
    {
+    "operation": "ingestFxRates",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Pull rates from the configured provider"
+   },
+   {
     "operation": "listInterEntityObligations",
     "contract": "finance",
     "verb": "GET",
@@ -1731,6 +3684,12 @@
     "summary": "Revalue monetary balances at close"
    },
    {
+    "operation": "setFxProvider",
+    "contract": "finance",
+    "verb": "PUT",
+    "summary": "Which provider serves which purpose"
+   },
+   {
     "operation": "validateRecognitionSchedules",
     "contract": "finance",
     "verb": "POST",
@@ -1747,6 +3706,12 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Mark a table cleared and free"
+   },
+   {
+    "operation": "closeCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Close a signed finding"
    },
    {
     "operation": "createCombo",
@@ -1767,6 +3732,12 @@
     "summary": "A table as a thing, not an inference"
    },
    {
+    "operation": "escalateCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Escalate a finding"
+   },
+   {
     "operation": "getTableVisit",
     "contract": "fnb",
     "verb": "GET",
@@ -1777,6 +3748,12 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Move work between stations mid-service"
+   },
+   {
+    "operation": "recordCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Record what was done about a finding"
    },
    {
     "operation": "requestBill",
@@ -1827,12 +3804,6 @@
     "summary": "Change what a table is"
    },
    {
-    "operation": "updateTableReservation",
-    "contract": "fnb",
-    "verb": "PATCH",
-    "summary": "Change or cancel a booking"
-   },
-   {
     "operation": "adjustGameCard",
     "contract": "games",
     "verb": "POST",
@@ -1873,24 +3844,6 @@
     "contract": "games",
     "verb": "POST",
     "summary": "Move balances to another card"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "deleteGuestAccount",
-    "contract": "identity",
-    "verb": "DELETE",
-    "summary": "Self-service account deletion"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
    },
    {
     "operation": "setPasswordPolicy",
@@ -1959,12 +3912,6 @@
     "summary": "Create a loyalty programme"
    },
    {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
     "operation": "createUrlRedirect",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -1983,22 +3930,10 @@
     "summary": "Candidate matches, scored"
    },
    {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
    },
    {
     "operation": "listMessageTriggers",
@@ -2061,22 +3996,10 @@
     "summary": "Why the conversation ended, and any callback"
    },
    {
-    "operation": "setConsentPurposes",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Configure consent purposes"
-   },
-   {
     "operation": "setMessageTrigger",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Fire a message from a platform event"
-   },
-   {
-    "operation": "setSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Titles, descriptions, canonicals and hreflang"
    },
    {
     "operation": "startKioskAssist",
@@ -2089,18 +4012,6 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "captureStoredValue",
@@ -2133,12 +4044,6 @@
     "summary": "Send a guest a link to pay later"
    },
    {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -2149,12 +4054,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "issueInvitation",
@@ -2191,12 +4090,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Gateways configured for this scope"
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -2253,22 +4146,10 @@
     "summary": "Configure a gateway and its routing"
    },
    {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
    },
    {
     "operation": "voidPayment",
@@ -2319,12 +4200,6 @@
     "summary": "List bundles"
    },
    {
-    "operation": "listUpsellRules",
-    "contract": "promotions",
-    "verb": "GET",
-    "summary": "List upsell and cross-sell rules"
-   },
-   {
     "operation": "listVoucherBatches",
     "contract": "promotions",
     "verb": "GET",
@@ -2361,34 +4236,16 @@
     "summary": "Cancel a voucher"
    },
    {
-    "operation": "getSignageQueueBoard",
-    "contract": "queue",
-    "verb": "GET",
-    "summary": "Wait-time board for a display"
-   },
-   {
-    "operation": "getSignageQueueCalls",
-    "contract": "queue",
-    "verb": "GET",
-    "summary": "Currently called party numbers"
-   },
-   {
-    "operation": "overrideQueueEntry",
+    "operation": "overrideWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit against a failed redemption"
    },
    {
-    "operation": "redeemQueueEntry",
+    "operation": "redeemWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit a party at the ride"
-   },
-   {
-    "operation": "submitQueueReading",
-    "contract": "queue",
-    "verb": "POST",
-    "summary": "Inbound sensor reading"
    },
    {
     "operation": "cancelReportExecution",
@@ -2553,12 +4410,6 @@
     "summary": "Add value to a wallet"
    },
    {
-    "operation": "transferWalletBalance",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Send balance to another guest"
-   },
-   {
     "operation": "assignSeats",
     "contract": "seating",
     "verb": "POST",
@@ -2575,6 +4426,12 @@
     "contract": "seating",
     "verb": "POST",
     "summary": "Apply a parsed import"
+   },
+   {
+    "operation": "copySeatMapSection",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Copy one section into another map"
    },
    {
     "operation": "createSeatCategory",
@@ -2595,6 +4452,12 @@
     "summary": "Save a map as a reusable template"
    },
    {
+    "operation": "diffSeatMapVersions",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "Compare two versions of a layout"
+   },
+   {
     "operation": "getImportJob",
     "contract": "seating",
     "verb": "GET",
@@ -2605,6 +4468,12 @@
     "contract": "seating",
     "verb": "GET",
     "summary": "Read a seat map with its structure"
+   },
+   {
+    "operation": "getSeatMapImport",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "How the import went"
    },
    {
     "operation": "getSeatingRules",
@@ -2623,6 +4492,12 @@
     "contract": "seating",
     "verb": "POST",
     "summary": "Import the logical seat structure"
+   },
+   {
+    "operation": "importSeatMap",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Import a seat map from a plan or a manifest"
    },
    {
     "operation": "listSeatCategories",
@@ -2703,10 +4578,22 @@
     "summary": "Add a user to a partner branch"
    },
    {
+    "operation": "decommissionBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Tear it down"
+   },
+   {
     "operation": "disputeInvoice",
     "contract": "subscription",
     "verb": "POST",
     "summary": "Raise a dispute"
+   },
+   {
+    "operation": "drainBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Stop taking orders, let in-flight ones finish"
    },
    {
     "operation": "executeTenantMigration",
@@ -2725,6 +4612,12 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Launch an identical cluster"
+   },
+   {
+    "operation": "listBurstEnvironments",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "On-sale environments"
    },
    {
     "operation": "listCellClusters",
@@ -2757,22 +4650,28 @@
     "summary": "Plan moving a tenant to another cell"
    },
    {
+    "operation": "reconcileBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Move the orders into the permanent platform"
+   },
+   {
     "operation": "recordInvoicePayment",
     "contract": "subscription",
     "verb": "POST",
     "summary": "Record payment against an invoice"
    },
    {
-    "operation": "recordUsage",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Record metered usage"
-   },
-   {
     "operation": "registerPartner",
     "contract": "subscription",
     "verb": "POST",
     "summary": "A business applies to become a partner"
+   },
+   {
+    "operation": "requestBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Stand one up for a performance"
    },
    {
     "operation": "resolveInvoiceDispute",
@@ -2793,6 +4692,12 @@
     "summary": "Turn metered AI interactions into a billable usage record"
    },
    {
+    "operation": "submitOnboardingApplication",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "A prospect signs themselves up"
+   },
+   {
     "operation": "getRegionSettings",
     "contract": "tenancy",
     "verb": "GET",
@@ -2809,6 +4714,126 @@
     "contract": "venue-map",
     "verb": "POST",
     "summary": "Accept or reject proposed walkways"
+   },
+   {
+    "operation": "createBanner",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a banner"
+   },
+   {
+    "operation": "createContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Author a block of content"
+   },
+   {
+    "operation": "createContentPage",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a content page"
+   },
+   {
+    "operation": "createPromoBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Create a promotional block"
+   },
+   {
+    "operation": "deleteBanner",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a banner"
+   },
+   {
+    "operation": "deleteContentPage",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a content page"
+   },
+   {
+    "operation": "deletePromoBlock",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Delete a promotional block"
+   },
+   {
+    "operation": "getFeatureToggles",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read tenant feature toggles"
+   },
+   {
+    "operation": "getModuleEnablement",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read module enablement"
+   },
+   {
+    "operation": "getNavigation",
+    "contract": "white-label",
+    "verb": "GET",
+    "summary": "Read navigation"
+   },
+   {
+    "operation": "publishContentBlock",
+    "contract": "white-label",
+    "verb": "POST",
+    "summary": "Publish now, or schedule it"
+   },
+   {
+    "operation": "setFeatureToggles",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set feature toggles"
+   },
+   {
+    "operation": "setFooter",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Footer columns, legal links and social"
+   },
+   {
+    "operation": "setHeader",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Configure the header"
+   },
+   {
+    "operation": "setMaintenanceMode",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or clear maintenance mode"
+   },
+   {
+    "operation": "setModuleEnablement",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Enable or disable modules"
+   },
+   {
+    "operation": "setNavigation",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Set main and overflow navigation"
+   },
+   {
+    "operation": "updateBanner",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend or activate a banner"
+   },
+   {
+    "operation": "updateContentPage",
+    "contract": "white-label",
+    "verb": "PUT",
+    "summary": "Amend a content page"
+   },
+   {
+    "operation": "updatePromoBlock",
+    "contract": "white-label",
+    "verb": "PATCH",
+    "summary": "Amend a promotional block"
    },
    {
     "operation": "broadcastToGuests",
@@ -2860,7 +4885,8 @@
     "module": "Sell",
     "waves": [
      1,
-     2
+     2,
+     3
     ]
    },
    {

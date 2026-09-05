@@ -26,7 +26,7 @@ info:
     \ one bounded context: server code, client code and mock servers are generated from it, never the\
     \ other way round. If a field is not here, it does not exist.\n**Contracts are split into two tiers.**\n\
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,\n  catalogue, orders,\
-    \ shift, access, finance, cross-cell. Frozen first. A change here\n  requires a formal change request,\
+    \ shift, access, finance, cross-region. Frozen first. A change here\n  requires a formal change request,\
     \ because every satellite has pinned against it.\n- **Satellite** — a domain that builds on the spine\
     \ and can move independently.\n  Cheaper to change.\n\n**`paths` are operations.** Each one declares\
     \ four TICVAI extensions, and Redocly rejects any that does not:\n| Extension | Answers | |---|---|\
@@ -996,6 +996,18 @@ paths:
       - hold
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
+      x-ticvai-lock: rowExclusive
+      x-ticvai-lock-excludes:
+        - "cache:idempotency"
+      x-ticvai-lock-excludes-note: >
+        ADR-0037. **Resolved before the transaction opens, never inside the lock.** A Postgres row l
+        ock costs microseconds and this one measured six milliseconds — the difference was a Redis r
+        ound trip and a read the decision does not use. **A lock held across a hop is a lock held fo
+        r the latency of the slowest thing on the path.**
+      x-ticvai-lock-note: "ADR-0031. **Two callers want the same row and both cannot have it.** Optimistic\
+        \ retry under  contention is worse than a lock — at 5,000 RPS every retry is another read, and\
+        \ the retry st orm is the outage. **Plain FOR UPDATE because the caller chose this row** — they\
+        \ wait or are\n told no, and must not silently receive a different one.\n"
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1837,6 +1849,18 @@ components:
                   must be stated — it determines whether a guest finds their seat.
 
                   '
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `venue` scope.**'
     CreateSeatMapRequest:
       x-ticvai-persistence: none — request only
       type: object
@@ -2519,6 +2543,18 @@ components:
           type: string
           format: date-time
           nullable: true
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `venue` scope.**'
     SeatingRules:
       x-ticvai-persistence: seating.seating_rules
       type: object

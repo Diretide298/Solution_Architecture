@@ -57,7 +57,7 @@ transitions:
 - from: open
   to: actioned
   trigger: recordAction
-  operation: signCorrectiveAction
+  operation: recordCorrectiveAction
   guard: 'An action must be described. **A disposal of `none` is allowed and must be justified** — a
     reading that came back into range on its own is a real outcome, and forcing a disposal teaches a
     kitchen to discard stock it did not need to.
@@ -74,12 +74,12 @@ transitions:
 - from: open
   to: escalated
   trigger: escalate
-  operation: signCorrectiveAction
+  operation: escalateCorrectiveAction
   guard: Severity is critical, or the action has been open past the venue's threshold.
 - from: actioned
   to: escalated
   trigger: escalate
-  operation: signCorrectiveAction
+  operation: escalateCorrectiveAction
 - from: escalated
   to: signed
   trigger: signBySupervisor
@@ -88,17 +88,17 @@ transitions:
 - from: signed
   to: closed
   trigger: closeAfterReview
-  operation: null
+  operation: closeCorrectiveAction
   guard: '**A job, not a button.** Findings close on the venue''s review cycle so that a manager cannot
     close a bad week by clicking through it.
 
     '
 openQuestions: null
-notes: '**No transition deletes and none reverses.** A finding that was signed cannot be unsigned —
-  a correction to a signature is a new finding referencing the first, because **an audit trail that
-  can be edited is not an audit trail.**
-
-  **`actioned` is deliberately not terminal.** The obvious model closes at *action taken*, and that
-  is the model that produces a year of unsigned entries nobody notices until an inspection.
-
-  '
+notes: "**No transition deletes and none reverses.** A finding that was signed cannot be unsigned —\
+  \ a correction to a signature is a new finding referencing the first, because **an audit trail that\
+  \ can be edited is not an audit trail.**\n**`actioned` is deliberately not terminal.** The obvious\
+  \ model closes at *action taken*, and that is the model that produces a year of unsigned entries nobody\
+  \ notices until an inspection.\n\n  **Corrected 24 August.** Every transition named `signCorrectiveAction`\
+  \ and `signed -> closed` named nothing. **One operation cannot be the fix, the escalation and the\
+  \ attestation** — `recordCorrectiveAction`, `escalateCorrectiveAction` and `closeCorrectiveAction`\
+  \ were built, and a signed finding can now be closed by somebody other than whoever signed it."

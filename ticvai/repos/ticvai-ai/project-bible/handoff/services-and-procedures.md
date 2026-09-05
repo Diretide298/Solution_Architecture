@@ -25,7 +25,7 @@ a Saturday.
 | `AiService` | 22 |
 | `QueueService` | 21 |
 | `TenancyService` | 18 |
-| `CrossCellService` | 16 |
+| `CrossRegionService` | 16 |
 | `ShiftService` | 13 |
 | `GamesService` | 13 |
 | `ApprovalService` | 13 |

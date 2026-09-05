@@ -33,7 +33,7 @@ closePurchaseOrderShort, closeTableVisit, collectShopAndDrop, commitImportJob, c
 completeUpload, configureWorkstation, consumeRedemptionRight, convertReservation, copyPriceList, createAccessPoint
 createAccount, createAdmissionProfile, createAsset, createBanner, createBulkRefund, createBundle
 createCampaign, createCashMovement, createCollection, createContentPage, createCostCenter, createCouponCampaign
-createDashboard, createDsarRequest, createEntitlementTemplate, createEnvelope, createEvent, createFnbOrder
+createDashboard, createDsarRequest, createEntitlementTemplate, createChannelCapacity, createEvent, createFnbOrder
 createGame, createGoodsReceipt, createGuestLink, createInspectionTemplate, createInventoryItem, createJournalEntry
 createLegalEntity, createLoyaltyProgramme, createMaintenancePlan, createMenu, createMerchandise, createMessageTemplate
 createMfaChallenge, createModifierGroup, createOutlet, createPerformances, createPlan, createPlanVersion

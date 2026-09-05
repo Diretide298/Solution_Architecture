@@ -1,0 +1,728 @@
+<title>Screen Redundancy Findings</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ── tokens: light is the base, both dark paths redefine only these ───────── */
+:root {
+  --ground:   #EEF1F6;
+  --surface:  #FFFFFF;
+  --sunken:   #F7F9FC;
+  --deep:     #0C2340;
+  --deep-in:  #14304F;
+  --ink:      #1F2937;
+  --ink-2:    #4B5563;
+  --muted:    #6B7280;
+  --faint:    #6E7681;
+  --line:     #E5E7EB;
+  --line-2:   #DCE3ED;
+  --accent:   #0D6EFD;
+  --accent-q: #0D6EFD14;
+  --crit:     #C02626;
+  --crit-q:   #C0262612;
+  --warn:     #96650A;
+  --warn-q:   #96650A12;
+  --on-deep:  #E8EFF7;
+  --on-deep-2:#A9C2DC;
+  --teal:     #00D4C4;
+  --shadow:   0 1px 2px #0C234010;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ground:   #0E1620;
+    --surface:  #16202C;
+    --sunken:   #121B25;
+    --deep:     #0A131D;
+    --deep-in:  #1B2A3A;
+    --ink:      #E4ECF4;
+    --ink-2:    #BCCBDA;
+    --muted:    #8FA3B8;
+    --faint:    #7E93A8;
+    --line:     #243243;
+    --line-2:   #2C3B4D;
+    --accent:   #4D93FF;
+    --accent-q: #4D93FF1F;
+    --crit:     #FF7A70;
+    --crit-q:   #FF7A701A;
+    --warn:     #D9A441;
+    --warn-q:   #D9A4411A;
+    --on-deep:  #E4ECF4;
+    --on-deep-2:#9DB3C9;
+    --teal:     #2FE0D2;
+    --shadow:   0 1px 2px #00000040;
+  }
+}
+:root[data-theme="dark"] {
+  --ground:   #0E1620;
+  --surface:  #16202C;
+  --sunken:   #121B25;
+  --deep:     #0A131D;
+  --deep-in:  #1B2A3A;
+  --ink:      #E4ECF4;
+  --ink-2:    #BCCBDA;
+  --muted:    #8FA3B8;
+  --faint:    #7E93A8;
+  --line:     #243243;
+  --line-2:   #2C3B4D;
+  --accent:   #4D93FF;
+  --accent-q: #4D93FF1F;
+  --crit:     #FF7A70;
+  --crit-q:   #FF7A701A;
+  --warn:     #D9A441;
+  --warn-q:   #D9A4411A;
+  --on-deep:  #E4ECF4;
+  --on-deep-2:#9DB3C9;
+  --teal:     #2FE0D2;
+  --shadow:   0 1px 2px #00000040;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: Manrope, system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+a:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+.wrap { max-width: 1180px; margin: 0 auto; padding: 0 32px 96px; }
+.prose { max-width: 68ch; }
+
+/* ── type ─────────────────────────────────────────────────────────────────── */
+.eyebrow {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 11px; font-weight: 600; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--accent);
+}
+h1 { font-size: 40px; font-weight: 800; letter-spacing: -.022em; line-height: 1.04; margin: 10px 0 14px; text-wrap: balance; }
+h2 { font-size: 24px; font-weight: 800; letter-spacing: -.015em; line-height: 1.15; margin: 0 0 8px; text-wrap: balance; }
+h3 { font-size: 16px; font-weight: 800; letter-spacing: -.005em; margin: 0 0 6px; }
+p  { margin: 0 0 12px; color: var(--ink-2); text-wrap: pretty; }
+p.lede { font-size: 17px; line-height: 1.62; color: var(--ink-2); }
+strong { color: var(--ink); font-weight: 700; }
+.mono { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: .88em; }
+.id { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 11px; color: var(--faint); font-weight: 500; }
+.num { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+
+/* ── header ───────────────────────────────────────────────────────────────── */
+header.head { border-bottom: 1px solid var(--line-2); padding: 56px 0 30px; }
+.stats { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 22px; }
+.stat { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 13px 18px; min-width: 128px; box-shadow: var(--shadow); }
+.stat .v { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 26px; font-weight: 600; font-variant-numeric: tabular-nums; line-height: 1.1; }
+.stat .k { font-size: 11px; font-weight: 600; color: var(--muted); margin-top: 3px; }
+.stat.hi { background: var(--deep); border-color: var(--deep); }
+.stat.hi .v { color: var(--teal); }
+.stat.hi .k { color: var(--on-deep-2); }
+
+/* ── sections ─────────────────────────────────────────────────────────────── */
+section { padding-top: 46px; }
+.shead { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
+.shead .n { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 12px; font-weight: 600; color: var(--faint); }
+
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 24px; box-shadow: var(--shadow); }
+.grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+.grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+.stack { display: flex; flex-direction: column; gap: 14px; }
+
+/* severity stripe encodes tier, not decoration */
+.t1 { border-left: 3px solid var(--crit); }
+.t2 { border-left: 3px solid var(--warn); }
+.t3 { border-left: 3px solid var(--accent); }
+.tn { border-left: 3px solid var(--faint); }
+
+.chip {
+  display: inline-flex; gap: 7px; align-items: baseline;
+  border: 1px solid var(--line); border-radius: 999px;
+  padding: 4px 11px; background: var(--sunken); font-size: 12px; font-weight: 700;
+}
+.chip .id { font-size: 10px; }
+.chiprow { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+
+.tag {
+  display: inline-block; font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 10px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase;
+  padding: 3px 8px; border-radius: 5px;
+}
+.tag.crit { color: var(--crit); background: var(--crit-q); }
+.tag.warn { color: var(--warn); background: var(--warn-q); }
+.tag.info { color: var(--accent); background: var(--accent-q); }
+
+/* ── tables ───────────────────────────────────────────────────────────────── */
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 13px; }
+th {
+  font-family: 'IBM Plex Mono', ui-monospace, monospace;
+  font-size: 9.5px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase;
+  color: var(--faint); text-align: left; padding: 0 12px 9px 0; white-space: nowrap;
+}
+td { padding: 9px 12px 9px 0; border-top: 1px solid var(--line); vertical-align: top; color: var(--ink-2); }
+td.n, th.n { text-align: right; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; padding-right: 0; }
+td:first-child, th:first-child { padding-left: 0; }
+tr.total td { border-top: 2px solid var(--line-2); font-weight: 800; color: var(--ink); }
+.nm { color: var(--ink); font-weight: 700; }
+
+/* density bar in the platform table */
+.bar { display: block; height: 6px; border-radius: 999px; background: var(--line); overflow: hidden; min-width: 84px; margin-top: 6px; }
+.bar span { display: block; height: 100%; background: var(--crit); }
+
+/* ── deep panel ───────────────────────────────────────────────────────────── */
+.deep { background: var(--deep); border-radius: 14px; padding: 22px 26px; color: var(--on-deep); }
+.deep h3 { color: var(--on-deep); }
+.deep p { color: var(--on-deep-2); }
+.deep .eyebrow { color: var(--teal); }
+.deep strong { color: var(--on-deep); }
+.deep .mono { color: var(--on-deep); }
+
+/* ── decision rows ────────────────────────────────────────────────────────── */
+.dec { display: grid; grid-template-columns: 36px minmax(0,1fr) 92px; gap: 16px; padding: 16px 0; border-top: 1px solid var(--line); align-items: start; }
+.dec .rank { font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 600; color: var(--accent); padding-top: 2px; }
+.dec .cnt { text-align: right; font-family: 'IBM Plex Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; font-size: 19px; font-weight: 700; color: var(--crit); }
+.dec p { font-size: 13.5px; margin: 6px 0 0; }
+
+/* ── appendix ─────────────────────────────────────────────────────────────── */
+details { border-top: 1px solid var(--line); }
+summary { cursor: pointer; padding: 13px 0; font-weight: 700; font-size: 14px; list-style: none; display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+summary::-webkit-details-marker { display: none; }
+summary::after { content: '+'; font-family: 'IBM Plex Mono', ui-monospace, monospace; color: var(--muted); font-weight: 400; }
+details[open] summary::after { content: '\2212'; }
+details > div { padding-bottom: 16px; }
+
+hr.rule { border: 0; border-top: 1px solid var(--line-2); margin: 0; }
+
+@media (max-width: 640px) {
+  .wrap { padding: 0 20px 72px; }
+  h1 { font-size: 30px; }
+  h2 { font-size: 20px; }
+  .dec { grid-template-columns: 28px minmax(0,1fr); }
+  .dec .cnt { grid-column: 2; text-align: left; }
+}
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header class="head">
+  <div class="eyebrow">TICVAI &middot; 15 platforms &middot; ticvai/screens/*.yaml</div>
+  <h1>Where the screen inventory repeats itself</h1>
+  <p class="lede prose">Four hundred and ninety-two screens are defined. Read by the contract operations each one declares rather than by the name it carries, they resolve to <strong>373 distinct behaviours</strong>. The gap is not spread evenly across the platforms &mdash; it sits on eight workspaces that were drawn once per platform that touches them, and on one guest product that was inventoried twice.</p>
+  <div class="stats">
+    <div class="stat"><div class="v">492</div><div class="k">screens defined</div></div>
+    <div class="stat"><div class="v" style="color:var(--accent)">373</div><div class="k">distinct behaviours</div></div>
+    <div class="stat hi"><div class="v">105</div><div class="k">exact functional duplicates</div></div>
+    <div class="stat"><div class="v">168</div><div class="k">screens inside a duplicate cluster</div></div>
+    <div class="stat"><div class="v">14</div><div class="k">screens declaring no operations</div></div>
+  </div>
+</header>
+
+<!-- ── method ────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">01</span><h2>What was measured</h2></div>
+  <div class="grid2">
+    <div class="card">
+      <p>Every screen in the fifteen platform files was reduced to the <strong>set of contract operations it declares</strong> under <span class="mono">apis[].operationId</span>. Two screens with the same set are treated as the same screen: they read the same data, offer the same actions, and will need the same loading, empty, error and offline states.</p>
+      <p>Names, modules and platforms were ignored while clustering. Nothing in this report rests on two screens happening to be <em>called</em> the same thing &mdash; where a name collision is the finding, it is named as one.</p>
+      <p style="margin-bottom:0">Two thresholds are used throughout. <strong>Identical</strong> means the operation sets match exactly. <strong>Near-identical</strong> means they overlap by 80&#37; or more on the Jaccard measure, counted only for screens declaring at least three operations so a one-operation screen cannot match another by accident.</p>
+    </div>
+    <div class="card tn">
+      <div class="tag info">Limits</div>
+      <h3 style="margin-top:10px">What this method cannot see</h3>
+      <p>Operations are a good proxy for what a screen does and a poor one for <strong>who is standing in front of it</strong>. A gate device held in one hand and a desk in the back office can call the same endpoint and still be two screens; the failure mode, not the payload, is what separates them.</p>
+      <p><strong>Fourteen screens declare no operations at all</strong> &mdash; four of the eight accreditation screens among them &mdash; so they are invisible to the clustering entirely and are listed separately in the appendix.</p>
+      <p style="margin-bottom:0">Every judgement below about <em>context</em> rather than data is a reading of the one-line <span class="mono">purpose</span> field. That field is itself unreliable: <strong>28 screens share one of just four sentences</strong>. Where a finding here contradicts what the team knows about the user, the team is right &mdash; the value is that the question now has specific screen ids attached to it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── where it sits ─────────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">02</span><h2>Where the duplication sits</h2></div>
+  <p class="prose">Share of each platform's screens that sit inside a cluster of two or more screens with an identical operation set. The two guest platforms and the two staff-facing scanning surfaces carry most of it; the developer portal carries none.</p>
+  <div class="card scroll">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:52px">Code</th>
+          <th>Platform</th>
+          <th class="n">Screens</th>
+          <th class="n">In a cluster</th>
+          <th style="width:150px">Share</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td class="id">P01</td><td class="nm">Guest Web</td><td class="n">46</td><td class="n">30</td><td><span class="num">65&#37;</span><span class="bar"><span style="width:65%"></span></span></td></tr>
+        <tr><td class="id">P07</td><td class="nm">Venue Scanner</td><td class="n">11</td><td class="n">8</td><td><span class="num">73&#37;</span><span class="bar"><span style="width:73%"></span></span></td></tr>
+        <tr><td class="id">P10</td><td class="nm">Partner Portal</td><td class="n">21</td><td class="n">10</td><td><span class="num">48&#37;</span><span class="bar"><span style="width:48%"></span></span></td></tr>
+        <tr><td class="id">P02</td><td class="nm">Guest App</td><td class="n">63</td><td class="n">28</td><td><span class="num">44&#37;</span><span class="bar"><span style="width:44%"></span></span></td></tr>
+        <tr><td class="id">P09</td><td class="nm">Admin Console</td><td class="n">37</td><td class="n">15</td><td><span class="num">41&#37;</span><span class="bar"><span style="width:41%"></span></span></td></tr>
+        <tr><td class="id">P06</td><td class="nm">Staff App</td><td class="n">66</td><td class="n">26</td><td><span class="num">39&#37;</span><span class="bar"><span style="width:39%"></span></span></td></tr>
+        <tr><td class="id">P11</td><td class="nm">Accreditation</td><td class="n">8</td><td class="n">3</td><td><span class="num">38&#37;</span><span class="bar"><span style="width:38%"></span></span></td></tr>
+        <tr><td class="id">P05</td><td class="nm">Guest Kiosk</td><td class="n">17</td><td class="n">5</td><td><span class="num">29&#37;</span><span class="bar"><span style="width:29%"></span></span></td></tr>
+        <tr><td class="id">P08</td><td class="nm">Back Office</td><td class="n">143</td><td class="n">37</td><td><span class="num">26&#37;</span><span class="bar"><span style="width:26%"></span></span></td></tr>
+        <tr><td class="id">P15</td><td class="nm">Kitchen Display</td><td class="n">10</td><td class="n">2</td><td><span class="num">20&#37;</span><span class="bar"><span style="width:20%"></span></span></td></tr>
+        <tr><td class="id">P12</td><td class="nm">Support Console</td><td class="n">8</td><td class="n">1</td><td><span class="num">12&#37;</span><span class="bar"><span style="width:12%"></span></span></td></tr>
+        <tr><td class="id">P16</td><td class="nm">Venue Analytics</td><td class="n">10</td><td class="n">1</td><td><span class="num">10&#37;</span><span class="bar"><span style="width:10%"></span></span></td></tr>
+        <tr><td class="id">P13</td><td class="nm">White-Label CMS</td><td class="n">20</td><td class="n">1</td><td><span class="num">5&#37;</span><span class="bar"><span style="width:5%"></span></span></td></tr>
+        <tr><td class="id">P04</td><td class="nm">Staff POS</td><td class="n">24</td><td class="n">1</td><td><span class="num">4&#37;</span><span class="bar"><span style="width:4%"></span></span></td></tr>
+        <tr><td class="id">P14</td><td class="nm">Developer Portal</td><td class="n">8</td><td class="n">0</td><td><span class="num">0&#37;</span><span class="bar"><span style="width:0%"></span></span></td></tr>
+        <tr class="total"><td></td><td>All platforms</td><td class="n">492</td><td class="n">168</td><td><span class="num">34&#37;</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="prose" style="margin-top:14px"><strong>P16 and P04 read low for opposite reasons.</strong> The POS screens are genuinely distinct from each other, which is why only one of the twenty-four lands in a cluster. Venue Analytics scores low because its ten screens differ from each other by one or two operations apiece &mdash; they are not identical, they are ten configurations of the same report screen, which the clustering measure is the wrong instrument to catch. Section&nbsp;05 covers it.</p>
+</section>
+
+<!-- ── tier 1 ────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">03</span><h2>Hard duplicates</h2><span class="tag crit">Tier 1</span></div>
+  <p class="prose">Groups where a name, a module or an exact operation set is shared and nothing in the definitions explains why both screens exist. These need a decision before more wireframes are drawn against them.</p>
+
+  <div class="stack">
+
+    <div class="card t1">
+      <h3>Two name collisions inside one platform</h3>
+      <p>The back office carries two pairs of screens with the same name. Neither pair is explained by the module they sit in.</p>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <div class="chiprow" style="margin-top:0">
+            <span class="chip"><span class="id">BO-020</span>F&amp;B Order Management</span>
+            <span class="chip"><span class="id">BO-047</span>F&amp;B Order Management</span>
+          </div>
+          <p style="font-size:13px;margin-top:9px;margin-bottom:0">BO-020 sits in <em>Food &amp; Beverage</em> and declares eleven kitchen and F&amp;B order operations. BO-047 sits in <em>Orders &amp; Money</em> and declares the fourteen generic order operations &mdash; the same set as Order Detail, Held Orders and Group Bookings. <strong>BO-047 is not an F&amp;B screen</strong>; it is the order workspace wearing an F&amp;B name.</p>
+        </div>
+        <div>
+          <div class="chiprow" style="margin-top:0">
+            <span class="chip"><span class="id">BO-031</span>Asset Register</span>
+            <span class="chip"><span class="id">BO-069</span>Asset Register</span>
+          </div>
+          <p style="font-size:13px;margin-top:9px;margin-bottom:0">Same title, same module (<em>Access &amp; Venue</em>), no distinguishing purpose. This has the shape of an id that was never retired when the maintenance screens were folded into the section. BO-031 also shares its exact operation set with CMS-004 Logo &amp; Assets on the white-label platform.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card t1">
+      <h3>The order workspace &mdash; one table, seven headings</h3>
+      <p>Seven screens across four platforms declare an <strong>identical fourteen-operation set</strong>. Not similar: identical.</p>
+      <div class="chiprow">
+        <span class="chip"><span class="id">POS-006</span>Held Orders</span>
+        <span class="chip"><span class="id">EMP-014</span>Ticket lookup</span>
+        <span class="chip"><span class="id">BO-022</span>Order Detail</span>
+        <span class="chip"><span class="id">BO-026</span>Group Bookings</span>
+        <span class="chip"><span class="id">BO-047</span>F&amp;B Order Management</span>
+        <span class="chip"><span class="id">PTR-008</span>Booking Creation</span>
+        <span class="chip"><span class="id">PTR-015</span>Order History</span>
+      </div>
+      <p class="mono" style="font-size:11px;line-height:1.75;color:var(--faint);margin:12px 0 0">listOrders &middot; getOrder &middot; createOrder &middot; modifyOrder &middot; voidOrder &middot; holdOrder &middot; resumeOrder &middot; rescheduleOrder &middot; exchangeOrderLines &middot; createRefund &middot; listOrderRefunds &middot; applyManualDiscount &middot; reprintOrder &middot; getOrderStatement</p>
+      <p style="margin:14px 0 0">Four more screens sit one operation away and form a second identical cluster of their own: <span class="mono">BO-023 Refunds &amp; Exchanges</span> at thirteen of the fourteen, and <span class="mono">BO-051 Purchase Orders</span>, <span class="mono">BO-070 Work Orders</span> and <span class="mono">PTR-016 Voucher&nbsp;/&nbsp;Ticket Download</span> sharing a thirteen-operation set between them. <strong>Eleven screens in total over one object.</strong></p>
+      <p style="margin-bottom:0">The last three are a different question. A purchase order and a ticket order are not the same thing, and the fact that they were given the ticket-order operations is a <em>modelling</em> problem rather than a merge candidate &mdash; worth resolving before either screen is built on top of the wrong contract.</p>
+    </div>
+
+    <div class="card t1">
+      <h3>Eight navigation landings counted as screens</h3>
+      <p>BO-101 through BO-108 each take their name from the module they head, and each declares exactly one operation: <span class="mono">getVenueSettings</span>.</p>
+      <div class="chiprow">
+        <span class="chip"><span class="id">BO-101</span>Orders &amp; Money</span>
+        <span class="chip"><span class="id">BO-102</span>Sell</span>
+        <span class="chip"><span class="id">BO-103</span>Access &amp; Venue</span>
+        <span class="chip"><span class="id">BO-104</span>Food &amp; Beverage</span>
+        <span class="chip"><span class="id">BO-105</span>Stock &amp; Supply</span>
+        <span class="chip"><span class="id">BO-106</span>People &amp; Access Rights</span>
+        <span class="chip"><span class="id">BO-107</span>Guests &amp; Marketing</span>
+        <span class="chip"><span class="id">BO-108</span>Venue Operations</span>
+      </div>
+      <p style="margin:14px 0 0">These are the eight items of the back-office navigation, plus BO-100 Venue Home as its root. Counting them as screens inflates P08 and, under the four-states rule in <span class="mono">_schema.yaml</span>, commits the team to writing loading, empty-first-run, error and offline states for a menu. The same question applies to the four <em>Command Center</em> landings on P06, P15 and P16.</p>
+    </div>
+
+    <div class="card t1">
+      <h3>Shift and cash &mdash; five screens over one ledger</h3>
+      <p>An identical thirteen-operation set covering opening, closing, variance, cash movement and banking.</p>
+      <div class="chiprow">
+        <span class="chip"><span class="id">EMP-009</span>End shift</span>
+        <span class="chip"><span class="id">BO-039</span>Shift Directory</span>
+        <span class="chip"><span class="id">BO-040</span>Variance Approval</span>
+        <span class="chip"><span class="id">BO-041</span>Cash Movements</span>
+        <span class="chip"><span class="id">BO-042</span>Banking &amp; Safe</span>
+      </div>
+      <p style="margin:14px 0 0;margin-bottom:0">POS-001 Begin Shift and POS-007 Close Shift carry all thirteen inside a set of seventeen &mdash; supersets rather than copies, and defensible as the terminal's own view of the same ledger. Seven screens in the family altogether.</p>
+    </div>
+
+    <div class="card t1">
+      <h3>Announcements, notifications and the emergency path</h3>
+      <p>Six screens on an identical four-operation set: <span class="mono">listAnnouncements</span>, <span class="mono">publishAnnouncement</span>, <span class="mono">acknowledgeAnnouncement</span>, <span class="mono">getAnnouncementReach</span>.</p>
+      <div class="chiprow">
+        <span class="chip"><span class="id">EMP-007</span>Handover notes</span>
+        <span class="chip"><span class="id">EMP-037</span>Notifications</span>
+        <span class="chip"><span class="id">EMP-038</span>Broadcast to team</span>
+        <span class="chip"><span class="id">EMP-039</span>Announcements</span>
+        <span class="chip"><span class="id">EMP-047</span>Emergency mode</span>
+        <span class="chip"><span class="id">BO-066</span>Notification Settings</span>
+      </div>
+      <p style="margin:14px 0 0;margin-bottom:0"><strong>EMP-047 Emergency mode is the one to look at.</strong> If an emergency really is a broadcast list with the same four operations and the same states as handover notes, then the emergency path has not been designed &mdash; it has been filed. That is a correctness question, not a screen count.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── tier 2 ────────────────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">04</span><h2>One guest product, inventoried twice</h2><span class="tag crit">Tier 1</span></div>
+  <p class="prose">The largest single overlap in the inventory. Twenty screens carry the same name on Guest Web and Guest App, and on <strong>every one of the twenty the two screens declare exactly the same operations</strong>. P01 is 46 screens and P02 is 63, so the overlap is a third of the mobile app.</p>
+  <div class="card scroll">
+    <table>
+      <thead><tr><th style="width:70px">P01</th><th>Guest Web</th><th style="width:70px">P02</th><th>Guest App</th><th class="n" style="width:56px">Ops</th></tr></thead>
+      <tbody>
+        <tr><td class="id">WEB-002</td><td class="nm">Event &amp; Attraction Listing</td><td class="id">GST-003</td><td class="nm">Event &amp; Attraction Listing</td><td class="n">4</td></tr>
+        <tr><td class="id">WEB-004</td><td class="nm">Attraction Details</td><td class="id">GST-004</td><td class="nm">Attraction Details</td><td class="n">4</td></tr>
+        <tr><td class="id">WEB-007</td><td class="nm">Interactive Seat Selection</td><td class="id">GST-049</td><td class="nm">Interactive Seat Selection</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-013</td><td class="nm">Booking Confirmation</td><td class="id">GST-010</td><td class="nm">Booking Confirmation</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-015</td><td class="nm">Branded Queue / Waiting Room</td><td class="id">GST-046</td><td class="nm">Branded Queue / Waiting Room</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-018</td><td class="nm">My Tickets</td><td class="id">GST-012</td><td class="nm">My Tickets</td><td class="n">6</td></tr>
+        <tr><td class="id">WEB-019</td><td class="nm">Order History</td><td class="id">GST-019</td><td class="nm">Order History</td><td class="n">4</td></tr>
+        <tr><td class="id">WEB-030</td><td class="nm">Ticket Transfer</td><td class="id">GST-014</td><td class="nm">Ticket Transfer</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-031</td><td class="nm">My Reservations</td><td class="id">GST-016</td><td class="nm">My Reservations</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-032</td><td class="nm">Offers &amp; Promotions</td><td class="id">GST-037</td><td class="nm">Offers &amp; Promotions</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-034</td><td class="nm">Lost &amp; Found</td><td class="id">GST-034</td><td class="nm">Lost &amp; Found</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-035</td><td class="nm">Multi-Currency &amp; Pricing</td><td class="id">GST-044</td><td class="nm">Multi-Currency &amp; Pricing</td><td class="n">2</td></tr>
+        <tr><td class="id">WEB-036</td><td class="nm">F&amp;B &ndash; Browse &amp; Order</td><td class="id">GST-024</td><td class="nm">F&amp;B &ndash; Browse &amp; Order</td><td class="n">8</td></tr>
+        <tr><td class="id">WEB-037</td><td class="nm">Menu Item Detail</td><td class="id">GST-061</td><td class="nm">Menu Item Detail</td><td class="n">2</td></tr>
+        <tr><td class="id">WEB-038</td><td class="nm">F&amp;B &ndash; Order Tracking</td><td class="id">GST-025</td><td class="nm">F&amp;B &ndash; Order Tracking</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-040</td><td class="nm">Virtual Queue</td><td class="id">GST-023</td><td class="nm">Virtual Queue</td><td class="n">4</td></tr>
+        <tr><td class="id">WEB-041</td><td class="nm">Parking &ndash; Reserve &amp; Pay</td><td class="id">GST-027</td><td class="nm">Parking &ndash; Reserve &amp; Pay</td><td class="n">3</td></tr>
+        <tr><td class="id">WEB-043</td><td class="nm">Loyalty &amp; Rewards</td><td class="id">GST-036</td><td class="nm">Loyalty &amp; Rewards</td><td class="n">4</td></tr>
+        <tr><td class="id">WEB-044</td><td class="nm">AI Concierge &ndash; Home</td><td class="id">GST-031</td><td class="nm">AI Concierge &ndash; Home</td><td class="n">5</td></tr>
+        <tr><td class="id">WEB-046</td><td class="nm">In-Venue Notifications</td><td class="id">GST-030</td><td class="nm">In-Venue Notifications</td><td class="n">1</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="grid3" style="margin-top:14px">
+    <div class="card t3">
+      <h3>Three that are genuinely mobile</h3>
+      <p style="font-size:13px;margin-bottom:0">Only a handful of P02 screens need an installed app: <span class="mono">GST-055 Dynamic QR Ticket</span> (a rotating code the web cannot hold), <span class="mono">GST-059 Plan My Day &ndash; In Progress</span> (location through the day), and the push path behind GST-030. Those justify a native app. Twenty duplicated storefront screens do not.</p>
+    </div>
+    <div class="card t2">
+      <h3>Two that may not be screens</h3>
+      <p style="font-size:13px;margin-bottom:0"><strong>Multi-Currency &amp; Pricing</strong> is a property of every price on every screen, not a destination. <strong>Lost &amp; Found</strong> appears a third time as EMP-028 in the staff app, which is the only one of the three with a person on the other side of it.</p>
+    </div>
+    <div class="card tn">
+      <h3>The purposes do not match</h3>
+      <p style="font-size:13px;margin-bottom:0">Of the twenty pairs, only <span class="mono">WEB-018&nbsp;/&nbsp;GST-012</span> share a purpose sentence. The rest differ &mdash; but they differ as prose, not as behaviour. Nothing in either definition says what a guest can <em>do</em> on one that they cannot do on the other.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── tier 2: archetypes ────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">05</span><h2>Recurring by construction</h2><span class="tag warn">Tier 2</span></div>
+  <p class="prose">Not accidental collisions. Each of these is a capability that was given its own screens on every platform that touches it, so the same engine is specified three, four and five times over with slightly different operations and a different name each time.</p>
+
+  <div class="stack">
+
+    <div class="card t2">
+      <h3>One report engine, twenty-five surfaces</h3>
+      <p>Twenty-five screens across seven platforms call <span class="mono">runReport</span>, <span class="mono">getDashboard</span> or <span class="mono">getFinancialReport</span> &mdash; ten on P08, nine on P16, and one or two each on P04, P09, P10, P12 and P15.</p>
+      <div class="grid2" style="margin-top:12px">
+        <div>
+          <div class="tag warn">P16 Venue Analytics</div>
+          <p style="font-size:13px;margin-top:10px">Nine of its ten screens are in that set; seven call both <span class="mono">getDashboard</span> and <span class="mono">runReport</span>. Each differs from the next by one or two operations that fetch the figures &mdash; <span class="mono">getStockValuation</span> on the margin screen, <span class="mono">listSegments</span> on the guest one. <strong>The difference between these screens is the report they load.</strong></p>
+          <div class="chiprow">
+            <span class="chip"><span class="id">ANL-002</span>Sales, Revenue &amp; Channel</span>
+            <span class="chip"><span class="id">ANL-003</span>Operational Performance</span>
+            <span class="chip"><span class="id">ANL-004</span>Product Performance</span>
+            <span class="chip"><span class="id">ANL-005</span>Cost, Margin &amp; Profitability</span>
+            <span class="chip"><span class="id">ANL-006</span>Inventory &amp; Waste Intelligence</span>
+            <span class="chip"><span class="id">ANL-007</span>Guest &amp; Conversion Intelligence</span>
+          </div>
+        </div>
+        <div>
+          <div class="tag crit">Identical, four ways</div>
+          <p style="font-size:13px;margin-top:10px">Four screens on two platforms share an <strong>identical nine-operation reporting signature</strong> &mdash; including the natural-language query and the report CRUD. They are one report screen scoped four ways.</p>
+          <div class="chiprow">
+            <span class="chip"><span class="id">BO-029</span>Report Builder</span>
+            <span class="chip"><span class="id">BO-059</span>Sales Reports</span>
+            <span class="chip"><span class="id">BO-061</span>Scheduled Reports</span>
+            <span class="chip"><span class="id">PTR-018</span>Reports &amp; Sales Performance</span>
+          </div>
+          <p style="font-size:13px;margin-top:12px;margin-bottom:0">BO-058 Reporting Home, POS-008 Reports and SUP-008 Agent Performance &amp; SLA View sit just outside it on the same operations.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card t2">
+      <h3>The stock ledger, drawn for the floor and for the desk</h3>
+      <p>P06's <em>Stock on the Floor</em> module is ten screens using 27 operations. <strong>Nineteen of those &mdash; 70&#37; &mdash; are already used by P08's Stock &amp; Supply</strong> (fifteen screens, 60 operations). The two modules walk the same lifecycle in the same order under different titles.</p>
+      <div class="scroll" style="margin-top:12px">
+        <table>
+          <thead><tr><th>P06 Staff App</th><th style="width:110px">Relationship</th><th>P08 Back Office</th></tr></thead>
+          <tbody>
+            <tr><td><span class="id">EMP-065</span> <span class="nm">Receiving &amp; Store Put-Away</span></td><td>3 shared ops</td><td><span class="id">BO-052</span> <span class="nm">Goods Receipt</span></td></tr>
+            <tr><td><span class="id">EMP-066</span> <span class="nm">Stock Count &amp; Cycle Count Management</span></td><td><strong style="color:var(--warn)">all five count ops</strong></td><td><span class="id">BO-079</span> <span class="nm">Stock Count</span></td></tr>
+            <tr><td><span class="id">EMP-063</span> <span class="nm">Requisition &amp; Smart Store Replenishment</span></td><td>2 shared ops</td><td><span class="id">BO-078</span> <span class="nm">Requisitions</span></td></tr>
+            <tr><td><span class="id">EMP-064</span> <span class="nm">Store-to-Store &amp; Warehouse Transfers</span></td><td>1 shared op</td><td><span class="id">BO-080</span> <span class="nm">Stock Transfers</span></td></tr>
+            <tr><td><span class="id">EMP-069</span> <span class="nm">Barcode, RFID, Serialized Stock &amp; Traceability</span></td><td><strong style="color:var(--crit)">identical</strong></td><td><span class="id">BO-114</span> <span class="nm">Variants, Attributes, Barcode &amp; RFID Management</span></td></tr>
+            <tr><td><span class="id">EMP-070</span> <span class="nm">Inventory Exceptions, AI Replenishment &amp; Action Center</span></td><td><strong style="color:var(--crit)">identical</strong></td><td><span class="id">BO-141</span> <span class="nm">Operational Alerts, AI Replenishment &amp; Action Center</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:14px;margin-bottom:0">The eight operations P06 has that P08 does not are the ones that argue for keeping a floor surface at all: <span class="mono">logTemperature</span>, <span class="mono">logColdChain</span>, <span class="mono">getHaccpStatus</span>, <span class="mono">signCorrectiveAction</span>, <span class="mono">setDailyCount</span>. <strong>That is a food-safety round done standing up with a device &mdash; two or three screens, not ten.</strong></p>
+    </div>
+
+    <div class="grid2">
+      <div class="card t2">
+        <h3>The kitchen queue, in three places</h3>
+        <p style="font-size:13.5px">P15 is a ten-screen platform for the kitchen using 24 operations, and <strong>seventeen of them already appear on other platforms</strong> &mdash; nine in P08's F&amp;B section, seven at the point of sale.</p>
+        <div class="chiprow">
+          <span class="chip"><span class="id">KIT-002</span>Kitchen Display System</span>
+          <span class="chip"><span class="id">BO-046</span>Kitchen Display</span>
+          <span class="chip"><span class="id">POS-022</span>Send to Kitchen</span>
+        </div>
+        <p style="font-size:13.5px;margin-top:12px;margin-bottom:0">KIT-005 and BO-134 share an <strong>identical</strong> two-operation set: the kitchen configures its stations from the kitchen, and the back office configures them again. KIT-010 is identical to ANL-008 Demand Forecasting on the analytics platform.</p>
+      </div>
+      <div class="card t2">
+        <h3>One people directory, three owners</h3>
+        <p style="font-size:13.5px">Three screens on three platforms declare exactly <span class="mono">listPrincipals</span>, <span class="mono">getPrincipal</span>, <span class="mono">createPrincipal</span>, <span class="mono">updatePrincipal</span> over the same records.</p>
+        <div class="chiprow">
+          <span class="chip"><span class="id">BO-053</span>Staff Directory</span>
+          <span class="chip"><span class="id">ADM-020</span>Platform User Directory</span>
+          <span class="chip"><span class="id">PTR-003</span>Profile &amp; Company Details</span>
+        </div>
+        <p style="font-size:13.5px;margin-top:12px;margin-bottom:0">The scope differs &mdash; a venue's staff, the platform's users, a partner's own people &mdash; which is exactly the shape of one screen with a scope parameter, rather than three screens with three sets of empty and permission states. BO-054 Role Assignment and ADM-021 Platform Role Management are a second, identical pair alongside them.</p>
+      </div>
+    </div>
+
+    <div class="card t2">
+      <h3>Six admin screens on one infrastructure signature</h3>
+      <p>Entirely inside P09: six screens declaring the same seven cell-management operations, from a performance monitor to a WAF policy view to a backup status page.</p>
+      <div class="chiprow">
+        <span class="chip"><span class="id">ADM-013</span>Tenant Performance Monitor</span>
+        <span class="chip"><span class="id">ADM-014</span>Auto-Scaling Configuration</span>
+        <span class="chip"><span class="id">ADM-030</span>Infrastructure Sizing &amp; Scaling Policy</span>
+        <span class="chip"><span class="id">ADM-032</span>WAF &amp; Security Policy View</span>
+        <span class="chip"><span class="id">ADM-033</span>Backup &amp; DR Status</span>
+        <span class="chip"><span class="id">ADM-034</span>Archival Job Monitor</span>
+      </div>
+      <p style="margin:14px 0 0;margin-bottom:0">A WAF policy and an archival job have almost nothing in common operationally. This cluster is most likely the signature of an operation list applied to a whole section at once rather than screen by screen &mdash; which makes it a data-quality finding about the definitions as much as a redundancy finding about the product. A second P09 cluster of four does the same with two support-notice operations.</p>
+    </div>
+
+  </div>
+</section>
+
+<!-- ── weak signals ──────────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">06</span><h2>Weaker signals worth reading</h2><span class="tag info">Tier 3</span></div>
+  <p class="prose">Neither of the following proves duplication on its own. Both are reliable indicators of a screen that was created because a section needed a heading rather than because a person needed a page.</p>
+  <div class="grid2">
+    <div class="card t3">
+      <h3>Naming formulas</h3>
+      <p style="font-size:13.5px">Counts are screens whose name <em>contains</em> the phrase, across all fifteen platforms.</p>
+      <div class="scroll" style="margin-top:6px">
+        <table>
+          <thead><tr><th>Formula</th><th class="n">Screens</th><th>Note</th></tr></thead>
+          <tbody>
+            <tr><td class="nm">&hellip; Management</td><td class="n">33</td><td>Eight platforms. Almost always a list plus a form.</td></tr>
+            <tr><td class="nm">&hellip; Configuration</td><td class="n">12</td><td>Settings split by section, not by who may change them.</td></tr>
+            <tr><td class="nm">&hellip; Dashboard</td><td class="n">8</td><td>Ten screens share one purpose sentence with these.</td></tr>
+            <tr><td class="nm">&hellip; Monitor</td><td class="n">7</td><td>EMP-031 &ldquo;Queue monitor&rdquo; and BO-005 &ldquo;Queue Monitor&rdquo;.</td></tr>
+            <tr><td class="nm">&hellip; Directory</td><td class="n">6</td><td>Queue, Product, Shift, Staff, Tenant, Platform User.</td></tr>
+            <tr><td class="nm">&hellip; Command Center</td><td class="n">4</td><td>EMP-051, EMP-061, KIT-001, ANL-001 &mdash; all landings.</td></tr>
+            <tr><td class="nm">&hellip; Action Center</td><td class="n">3</td><td>EMP-070, BO-141, ANL-009. Two are identical.</td></tr>
+            <tr><td class="nm">AI surfaces</td><td class="n">15</td><td>Eight platforms, no shared component between them.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card t3">
+      <h3>Copy-pasted purposes</h3>
+      <p style="font-size:13.5px">The <span class="mono">purpose</span> field is meant to be one sentence saying what the user came to do. <strong>Four sentences are doing duty for 28 screens</strong>, which means those 28 were never asked the question.</p>
+      <div class="scroll" style="margin-top:6px">
+        <table>
+          <thead><tr><th class="n" style="width:44px">Uses</th><th>Sentence and the screens carrying it</th></tr></thead>
+          <tbody>
+            <tr><td class="n" style="color:var(--warn);font-weight:600">10</td><td><em>&ldquo;The screen this app sits on. Everything else is entered from here and returns to it.&rdquo;</em><div class="id" style="margin-top:4px">WEB-017 GST-001 GST-011 GST-031 ADM-002 ADM-003 ADM-031 PTR-002 ACC-001 SUP-002</div></td></tr>
+            <tr><td class="n" style="color:var(--warn);font-weight:600">8</td><td><em>&ldquo;Find the right one quickly, and act on it without opening it.&rdquo;</em><div class="id" style="margin-top:4px">WEB-009 GST-003 GST-020 GST-023 ADM-005 ADM-020 ACC-006 SUP-004</div></td></tr>
+            <tr><td class="n" style="color:var(--warn);font-weight:600">6</td><td><em>&ldquo;Answer a question without needing a person.&rdquo;</em><div class="id" style="margin-top:4px">WEB-025 GST-033 GST-040 ADM-026 ADM-035 PTR-021</div></td></tr>
+            <tr><td class="n" style="color:var(--warn);font-weight:600">4</td><td><em>&ldquo;Take the money, and be unambiguous about whether it worked.&rdquo;</em><div class="id" style="margin-top:4px">GST-027 GST-041 PTR-012 PTR-014</div></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── counter-example ───────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">07</span><h2>What is not redundant</h2></div>
+  <div class="deep">
+    <div class="eyebrow">The check on the method</div>
+    <p style="margin-top:10px">P06's <em>Floor Service</em> module looks like exactly the same kind of duplicate as the stock module beside it &mdash; ten screens over restaurant tables, sitting next to P08's F&amp;B section. <strong>It is not.</strong> The two share two operations out of twenty-nine each. Table service is genuinely a different job from F&amp;B configuration, and the module survives this audit unchanged.</p>
+    <p>The same test rescues the scanning cluster from its own numbers. Eight screens across P06, P07 and P08 share an identical seven-operation set, but a gate admission, an offline package status and a back-office scan log are not one screen. That signature is an operation list applied to a whole platform at once. The real finding there is narrower and sharper: <span class="mono">EMP-010&nbsp;&equiv;&nbsp;SCN-007</span>, <span class="mono">EMP-015&nbsp;&equiv;&nbsp;SCN-008</span>, <span class="mono">EMP-017&nbsp;&equiv;&nbsp;SCN-014</span> &mdash; the staff app and the scanner restating each other, three pairs deep.</p>
+    <p style="margin-bottom:0">The test applied throughout this report: <strong>would one screen with a parameter serve both people, on both devices, in both failure modes?</strong> Where the answer is no, the pair is left alone and said to be intentional.</p>
+  </div>
+</section>
+
+<!-- ── decisions ─────────────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">08</span><h2>Six decisions, in this order</h2></div>
+  <p class="prose">Each row is a question with an owner, not a refactor. Answering them is what removes the screens &mdash; nobody has to merge a YAML file to find out whether two screens are the same. Ordered by how much each one unblocks: the first two decide what a third of the remaining wireframes even look like.</p>
+  <div class="card" style="padding-top:6px">
+    <div class="dec" style="border-top:0">
+      <div class="rank">01</div>
+      <div>
+        <h3>Is the guest app a second product, or a wrapper?</h3>
+        <p>Twenty screens are duplicated between P01 and P02, each pair declaring exactly the same operations. If the app is a shell over the same storefront, <strong>P02 keeps only the three screens that need the device</strong> and everything else becomes one definition with two breakpoints. If it is genuinely a second product, each of the twenty needs a sentence saying what is different on a phone.</p>
+      </div>
+      <div class="cnt">20</div>
+    </div>
+    <div class="dec">
+      <div class="rank">02</div>
+      <div>
+        <h3>Is there one order workspace, or one per platform?</h3>
+        <p>Seven screens across the POS, the staff app, the back office and the partner portal declare the identical fourteen order operations. <strong>One screen taking an order id and a role</strong> replaces all seven; what differs between them is which actions the permission allows, which <span class="mono">_schema.yaml</span> already models on the component. Decide it before BO-051 and BO-070 inherit the same fourteen for a different object.</p>
+      </div>
+      <div class="cnt">6</div>
+    </div>
+    <div class="dec">
+      <div class="rank">03</div>
+      <div>
+        <h3>Is Venue Analytics a platform, or a report library?</h3>
+        <p>Nine of its ten screens call a reporting operation and seven call both <span class="mono">getDashboard</span> and <span class="mono">runReport</span>; BO-029 Report Builder already builds them. <strong>If a saved report is a configuration rather than a screen</strong>, P16 becomes two screens &mdash; a library and a viewer &mdash; and BO-058/059/061, POS-008, PTR-018 and SUP-008 become entries in it.</p>
+      </div>
+      <div class="cnt">10</div>
+    </div>
+    <div class="dec">
+      <div class="rank">04</div>
+      <div>
+        <h3>Which app owns scanning &mdash; the staff app or the scanner?</h3>
+        <p>EMP-010, EMP-015 and EMP-017 restate SCN-007, SCN-008 and SCN-014 operation for operation. Both platforms are offline-capable, and <strong>two apps queueing admissions offline against the same gate is a reconciliation problem, not a duplication problem</strong>. This one carries a correctness cost, not only a cost in screens: pick the owner, and have the other app deep-link into it.</p>
+      </div>
+      <div class="cnt">3</div>
+    </div>
+    <div class="dec">
+      <div class="rank">05</div>
+      <div>
+        <h3>Does the floor need its own stock app, or a food-safety round?</h3>
+        <p>Seventy per cent of P06's stock vocabulary is already in P08, and two of its screens carry signatures identical to back-office ones. What P06 has that P08 does not is the HACCP set. <strong>That is two or three screens done standing up, not ten.</strong></p>
+      </div>
+      <div class="cnt">7</div>
+    </div>
+    <div class="dec">
+      <div class="rank">06</div>
+      <div>
+        <h3>Are navigation landings screens?</h3>
+        <p>BO-101 to BO-108 are the back-office section menu and BO-100 is its root. Under the four-states rule each owes a loading, empty-first-run, error and offline state. <strong>Either they are navigation and leave the inventory, or the rule does not apply to them</strong> &mdash; they cannot stay as screens nobody will ever specify. The same question covers the four Command Center landings.</p>
+      </div>
+      <div class="cnt">8</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-top:16px">
+    <div class="deep">
+      <div class="eyebrow">If all six go the consolidating way</div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin:16px 0 6px;flex-wrap:wrap">
+        <div><div class="num" style="font-size:36px;font-weight:600;line-height:1;color:var(--on-deep)">492</div><div style="font-size:11px;color:var(--on-deep-2);font-weight:600;margin-top:4px">defined today</div></div>
+        <div class="num" style="font-size:22px;color:var(--teal);padding-bottom:16px">&rarr;</div>
+        <div><div class="num" style="font-size:36px;font-weight:600;line-height:1;color:var(--teal)">438</div><div style="font-size:11px;color:var(--on-deep-2);font-weight:600;margin-top:4px">after these six</div></div>
+      </div>
+      <div style="height:8px;border-radius:999px;background:var(--deep-in);overflow:hidden;display:flex;margin:16px 0 12px">
+        <div style="width:89%;background:var(--teal)"></div><div style="width:11%;background:var(--crit)"></div>
+      </div>
+      <p style="margin-bottom:0">Fifty-four fewer screens &mdash; the six rows above, added up. But the count is not the point. <strong>Fifty-four removed is fifty-four sets of loading, empty, error and offline states nobody has to write, and fifty-four fewer wireframes to draw and review.</strong></p>
+    </div>
+    <div class="card t2">
+      <h3>Two schema fields would stop it recurring</h3>
+      <div style="margin-top:14px">
+        <div class="mono" style="font-size:12.5px;font-weight:600;color:var(--ink)">sameAs: &lt;screen id&gt;</div>
+        <p style="font-size:13px;margin-top:5px">Declares that this screen is another screen at a different scope or on a different device, and names what differs. A screen with <span class="mono">sameAs</span> inherits states rather than re-declaring them; one without it that duplicates a signature fails the check &mdash; the way <span class="mono">check-screens.py</span> already fails an unknown operation id.</p>
+      </div>
+      <hr class="rule" style="margin:14px 0">
+      <div>
+        <div class="mono" style="font-size:12.5px;font-weight:600;color:var(--ink)">kind: screen | landing</div>
+        <p style="font-size:13px;margin-top:5px;margin-bottom:0">A landing is navigation. It keeps an id and a route so links resolve, and it is exempt from the four-states rule &mdash; which is honest about what BO-101 to BO-108 are, instead of leaving nine permanent TODOs in the specified count.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── appendix ──────────────────────────────────────────────────────────── -->
+<section>
+  <div class="shead"><span class="n">09</span><h2>Appendix</h2></div>
+  <div class="card" style="padding-top:2px">
+
+    <details>
+      <summary><span>All 63 identical-signature clusters</span><span class="id">168 screens</span></summary>
+      <div class="scroll">
+        <table>
+          <thead><tr><th class="n" style="width:36px">#</th><th class="n" style="width:44px">Scr</th><th class="n" style="width:44px">Ops</th><th>Screens</th></tr></thead>
+          <tbody>
+            <tr><td class="n">1</td><td class="n">8</td><td class="n">7</td><td><span class="nm">Scanning &amp; access</span> <span class="id">EMP-010, EMP-015, SCN-007, SCN-008, SCN-009, SCN-013, SCN-015, BO-034</span></td></tr>
+            <tr><td class="n">2</td><td class="n">8</td><td class="n">1</td><td><span class="nm">Back-office section landings</span> <span class="id">BO-101 &hellip; BO-108</span></td></tr>
+            <tr><td class="n">3</td><td class="n">7</td><td class="n">14</td><td><span class="nm">Order workspace</span> <span class="id">POS-006, EMP-014, BO-022, BO-026, BO-047, PTR-008, PTR-015</span></td></tr>
+            <tr><td class="n">4</td><td class="n">6</td><td class="n">4</td><td><span class="nm">Announcements</span> <span class="id">EMP-007, EMP-037, EMP-038, EMP-039, EMP-047, BO-066</span></td></tr>
+            <tr><td class="n">5</td><td class="n">6</td><td class="n">7</td><td><span class="nm">Platform infrastructure</span> <span class="id">ADM-013, ADM-014, ADM-030, ADM-032, ADM-033, ADM-034</span></td></tr>
+            <tr><td class="n">6</td><td class="n">5</td><td class="n">1</td><td><span class="nm">Ticket delivery</span> <span class="id">GST-008, GST-045, GST-055, KSK-010, KSK-012</span></td></tr>
+            <tr><td class="n">7</td><td class="n">5</td><td class="n">13</td><td><span class="nm">Shift &amp; cash</span> <span class="id">EMP-009, BO-039, BO-040, BO-041, BO-042</span></td></tr>
+            <tr><td class="n">8</td><td class="n">4</td><td class="n">1</td><td><span class="nm">Help &amp; system status</span> <span class="id">WEB-025, WEB-028, WEB-029, GST-047</span></td></tr>
+            <tr><td class="n">9</td><td class="n">4</td><td class="n">9</td><td><span class="nm">Reporting</span> <span class="id">BO-029, BO-059, BO-061, PTR-018</span></td></tr>
+            <tr><td class="n">10</td><td class="n">4</td><td class="n">2</td><td><span class="nm">Platform notices</span> <span class="id">ADM-024, ADM-026, ADM-035, ADM-036</span></td></tr>
+            <tr><td class="n">11</td><td class="n">3</td><td class="n">7</td><td><span class="nm">Guest account</span> <span class="id">WEB-017, WEB-024, WEB-027</span></td></tr>
+            <tr><td class="n">12</td><td class="n">3</td><td class="n">2</td><td><span class="nm">Rota</span> <span class="id">EMP-021, EMP-022, EMP-023</span></td></tr>
+            <tr><td class="n">13</td><td class="n">3</td><td class="n">11</td><td><span class="nm">Sessions</span> <span class="id">BO-015, BO-016, BO-019</span></td></tr>
+            <tr><td class="n">14</td><td class="n">3</td><td class="n">13</td><td><span class="nm">Order-shaped objects</span> <span class="id">BO-051, BO-070, PTR-016</span></td></tr>
+            <tr><td class="n">15</td><td class="n">3</td><td class="n">4</td><td><span class="nm">People directory</span> <span class="id">BO-053, ADM-020, PTR-003</span></td></tr>
+            <tr><td class="n">16&ndash;39</td><td class="n">2</td><td class="n">1&ndash;8</td><td><span class="nm">Guest Web / Guest App pairs and kiosk siblings</span> <span class="id">the 20 P01/P02 pairs listed in section 04, plus WEB-006&nbsp;/&nbsp;KSK-005, WEB-008&nbsp;/&nbsp;GST-048, WEB-009&nbsp;/&nbsp;GST-020, WEB-033&nbsp;/&nbsp;KSK-017, GST-002&nbsp;/&nbsp;KSK-003, GST-022&nbsp;/&nbsp;ACC-006</span></td></tr>
+            <tr><td class="n">40&ndash;52</td><td class="n">2</td><td class="n">1&ndash;15</td><td><span class="nm">Staff-side pairs</span> <span class="id">EMP-017/SCN-014, EMP-004/EMP-005, EMP-019/EMP-020, EMP-033/BO-017, EMP-035/PTR-012, EMP-024/BO-056, EMP-026/BO-072, EMP-028/PTR-021, EMP-040/EMP-041, EMP-069/BO-114, EMP-070/BO-141, SCN-002/SCN-016</span></td></tr>
+            <tr><td class="n">53&ndash;63</td><td class="n">2</td><td class="n">1&ndash;8</td><td><span class="nm">Back office, admin, partner and kitchen pairs</span> <span class="id">BO-025/PTR-014, BO-031/CMS-004, BO-054/ADM-021, BO-062/BO-065, BO-134/KIT-005, ADM-001/SUP-001, ADM-022/ADM-023, PTR-011/PTR-017, ACC-002/ACC-005, KIT-010/ANL-008</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </details>
+
+    <details>
+      <summary><span>Near-duplicates: 80&#37; or more shared, not identical</span><span class="id">62 pairs &middot; 47 screens</span></summary>
+      <div>
+        <p style="font-size:13.5px">Almost all of them are one family. <strong>BO-023 Refunds &amp; Exchanges shares thirteen of fourteen operations with every member of the order workspace cluster</strong>, and the three order-shaped objects (BO-051, BO-070, PTR-016) sit at the same distance from it. Together with the seven identical screens that is eleven screens over one object, and it accounts for the large majority of the 62 pairs.</p>
+        <p style="font-size:13.5px;margin-bottom:0">The rest are genuine near-misses worth a look individually: <span class="mono">WEB-016 Login&nbsp;/&nbsp;Register</span> and <span class="mono">GST-042 Simple Registration &amp; OTP</span> at 95&#37;, and the P06 task trio <span class="mono">EMP-004&nbsp;/&nbsp;EMP-005&nbsp;/&nbsp;EMP-006</span> at 94&#37;, where a list, a detail and a create form share almost every operation.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary><span>Screens declaring no operations</span><span class="id">14 screens</span></summary>
+      <div class="scroll">
+        <table>
+          <thead><tr><th style="width:70px">Id</th><th>Screen</th><th>Platform</th></tr></thead>
+          <tbody>
+            <tr><td class="id">GST-043</td><td class="nm">Arabic / RTL Experience</td><td>Guest App</td></tr>
+            <tr><td class="id">KSK-001</td><td class="nm">Attract Loop</td><td>Guest Kiosk</td></tr>
+            <tr><td class="id">KSK-014</td><td class="nm">Out of service</td><td>Guest Kiosk</td></tr>
+            <tr><td class="id">EMP-044</td><td class="nm">Accessibility</td><td>Staff App</td></tr>
+            <tr><td class="id">EMP-045</td><td class="nm">Arabic / RTL</td><td>Staff App</td></tr>
+            <tr><td class="id">BO-067</td><td class="nm">Integrations</td><td>Back Office</td></tr>
+            <tr><td class="id">PTR-019</td><td class="nm">API Credentials &amp; Integration</td><td>Partner Portal</td></tr>
+            <tr><td class="id">ACC-001</td><td class="nm">Landing / Programme Overview</td><td>Accreditation</td></tr>
+            <tr><td class="id">ACC-003</td><td class="nm">Application Review &amp; Submit</td><td>Accreditation</td></tr>
+            <tr><td class="id">ACC-004</td><td class="nm">Application Status Tracking</td><td>Accreditation</td></tr>
+            <tr><td class="id">ACC-008</td><td class="nm">Credential Register</td><td>Accreditation</td></tr>
+            <tr><td class="id">SUP-006</td><td class="nm">Knowledge Base Search</td><td>Support Console</td></tr>
+            <tr><td class="id">CMS-013</td><td class="nm">SEO &amp; Metadata</td><td>White-Label CMS</td></tr>
+            <tr><td class="id">CMS-017</td><td class="nm">Domain &amp; Certificate</td><td>White-Label CMS</td></tr>
+          </tbody>
+        </table>
+        <p style="font-size:13px;margin-top:12px;margin-bottom:0">Some of these are correct &mdash; an attract loop and an out-of-service screen genuinely call nothing. <strong>Four of the eight accreditation screens are here, which is the one that stands out:</strong> ACC-003 Application Review &amp; Submit and ACC-004 Application Status Tracking must read and write something. Those two are missing definitions, not screens without behaviour.</p>
+      </div>
+    </details>
+
+    <details>
+      <summary><span>A note on the screens README</span><span class="id">stale</span></summary>
+      <div>
+        <p style="font-size:13.5px"><span class="mono">ticvai/screens/README.md</span> describes <strong>364 screens across twelve platforms</strong> with a table totalling 347, and reports 27 screens as fully specified. The YAML now holds <strong>492 across fifteen platforms</strong>, all of which carry non-stub states and a layout, and 478 of which carry operations.</p>
+        <p style="font-size:13.5px;margin-bottom:0">The related claims it depends on are stale too &mdash; it says P07 has 11 screens with sixteen venue-scanner screens carrying TODO offline states; P07 has 11 screens and no TODO states remain. Worth regenerating before the numbers in it are quoted anywhere else.</p>
+      </div>
+    </details>
+
+  </div>
+</section>
+
+</div>

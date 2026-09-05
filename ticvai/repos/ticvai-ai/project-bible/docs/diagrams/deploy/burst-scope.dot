@@ -1,0 +1,15 @@
+digraph bs {
+  rankdir=LR; bgcolor="transparent"; ranksep=0.55; nodesep=0.25;
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=11 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=9 color="#5A6577"];
+  subgraph cluster_on { label="Deployed — 3 of 16 services"; style="rounded,filled"; fillcolor="#E2EFDA"; fontname="Helvetica"; fontsize=12;
+    c [label="Catalogue · 64%\n4–20 replicas\nbrowse, availability, hold" fillcolor="#FFFFFF"];
+    o [label="Order · 22%\n4–16 replicas\ncart, order, payment" fillcolor="#FFFFFF"];
+    i [label="Identity · 2%\n3–6 replicas\nsmall, not optional" fillcolor="#FFFFFF"]; }
+  subgraph cluster_off { label="Not deployed — no part of a ticket sale"; style="rounded,filled,dashed"; fillcolor="#F4F7FB"; fontsize=12;
+    x [label="Marketing · Reporting · Inventory\nF&B · Maintenance · WhiteLabel\nVenueOps · Retail · AI\nLedger · CrossRegion · Platform · Tenancy · Access" fillcolor="#EDEDED"]; }
+  hold [label="catalogue.inventory_hold\nFOR UPDATE SKIP LOCKED\nwhere a flash sale fails" fillcolor="#FDECEC"];
+  db [label="42 tables of 372\n34 operations of 1,032" fillcolor="#FFF6E0"];
+  c -> hold [label="3 calls per buyer" color="#B00020"];
+  c -> db; o -> db; i -> db;
+}

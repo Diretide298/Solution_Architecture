@@ -1,0 +1,17 @@
+digraph sa {
+  rankdir=LR; bgcolor="transparent"; ranksep=0.4;
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=12 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=10 color="#5A6577"];
+  subgraph cluster_a { label="Customer A — their own setup"; style="rounded,filled"; fillcolor="#F4F7FB"; fontname="Helvetica"; fontsize=13;
+    a1 [label="Everything the platform does" fillcolor="#E2EFDA"];
+    a2 [label="Their database" fillcolor="#FFFFFF"]; a1 -> a2; }
+  subgraph cluster_b { label="Customer B — their own setup"; style="rounded,filled"; fillcolor="#F4F7FB"; fontsize=13;
+    b1 [label="Everything the platform does" fillcolor="#E2EFDA"];
+    b2 [label="Their database" fillcolor="#FFFFFF"]; b1 -> b2; }
+  subgraph cluster_c { label="Customer B again — Saudi Arabia"; style="rounded,filled"; fillcolor="#FDECEC"; fontsize=13;
+    c1 [label="Everything the platform does" fillcolor="#E2EFDA"];
+    c2 [label="Their database" fillcolor="#FFFFFF"]; c1 -> c2; }
+  note [label="A customer operating in two countries\nneeds two setups. Data cannot cross\nthe border." shape=note fillcolor="#FFF6E0" fontsize=11];
+  b1 -> c1 [label="no personal data crosses" style=dotted color="#8A6D00" constraint=false];
+  c1 -> note [style=invis];
+}

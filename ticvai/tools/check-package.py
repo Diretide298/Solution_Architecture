@@ -102,6 +102,9 @@ def _scope_levels() -> list:
         return []
 
 
+import collections as _collections
+
+
 def main() -> int:
     C = ROOT / "contracts"
     if not C.exists():
@@ -137,7 +140,7 @@ def main() -> int:
         ERRORS.append(f"contract operation '{x}' is missing from the lineage")
 
     # 10. every contract names the requirement domain it serves, or a documented reason not to
-    CROSS_CUTTING = {"identity", "tenancy", "cross-cell", "platform-ops"}
+    CROSS_CUTTING = {"identity", "tenancy", "cross-region", "platform-ops"}
     for tier in ("spine", "satellite"):
         for f in (C / tier).glob("*.yaml"):
             if f.name in shared:
@@ -778,6 +781,117 @@ def main() -> int:
                 f"{_t}: no description — the name is the only thing saying what it is. Add it to "
                 "WHAT in tools/derive-table-notes.py")
 
+    # 39. **A table whose operations declare a scope must carry a column for it.** 49 tables were
+    # written at `venue` or `tenant` scope and held no scope column at all — `marketing.suppression`
+    # among them, which is *who must not be contacted, whatever a campaign says*. **A suppression
+    # list with no tenant scope is one tenant's opt-out silencing another's.**
+    #
+    # **A child inherits through its parent** and is exempt: `orders.order_line` reaches scope
+    # through `sales_order`, and duplicating it would create two answers.
+    #
+    # **Three tables are genuinely global** and named rather than inferred, because "no scope" and
+    # "not scoped yet" look identical from here.
+    GLOBAL_TABLES = {
+        "control.subscription_plan",   # the plan catalogue the platform sells
+        "control.api_version",         # the API the platform publishes
+        "platform.org_unit",           # the root of the tree — it *is* the scope
+        # **`pii.subject` is deliberately unscoped and it is the most important exemption here.**
+        # A guest is not a venue's guest — they buy at one venue and are admitted at another, and
+        # ADR-0023 keeps the subject isolated so a data-subject request has one place to answer
+        # from. **Scoping it to a venue would create one subject row per venue**, which is exactly
+        # the duplication a DSAR cannot survive.
+        "pii.subject",
+        # `orders.invitation` reaches scope through the order it invites to. It carries no
+        # same-schema reference the child rule can see, so it is named here instead.
+        "orders.invitation",
+    }
+    SCOPE_COLS = {"scope_path", "venue_id", "tenant_id", "outlet_id", "location_id", "region_id",
+                  "cell_name", "org_unit_id", "department_id", "workstation_id", "subject_id",
+                  "principal_id", "partner_id"}
+    if _schema.exists():
+        _s = json.loads(_schema.read_text(encoding="utf-8"))
+        _written = {t for v in lin.values() for t in v["writes"]}
+        for _t in sorted(_s.get("cols") or {}):
+            if "." not in _t or ":" in _t or _t in GLOBAL_TABLES or _t not in _written:
+                continue
+            _cols = {c["column"] for c in _s["cols"][_t]}
+            if _cols & SCOPE_COLS:
+                continue
+            if any(c.get("references", "").split(".")[0] == _t.split(".")[0]
+                   for c in _s["cols"][_t] if c.get("references")):
+                continue
+            _sc = sorted({lin[o].get("scope") for o, v in lin.items()
+                          if _t in v["writes"] and lin[o].get("scope")})
+            WARNINGS.append(
+                f"{_t}: written at {'/'.join(_sc) or 'unstated'} scope and carries no scope column "
+                "— a row written at one scope is readable by anything that reaches the table")
+
+    # 40. **One generation of DDL, or a consumer silently gets the older one.** A parser reading
+    # `backend/*.sql` in sorted order applies a later `CREATE TABLE` over an earlier one for the
+    # same name, and **digits sort before letters** — so `V0002__identity.sql` beside
+    # `010-identity.sql` wins.
+    #
+    # **Found 31 August in a consumer's tree**, which held this generation and an August
+    # `V0001`–`V0003b` series. Thirty-three tables existed in both, the August definition won every
+    # time, and **65 foreign keys were discarded** because `900-foreign-keys.sql` attaches them
+    # before the V-series re-creates their tables.
+    #
+    # **Nothing reported a dangling reference** — both generations' tables existed, so a key on
+    # `identity.principal` pointing at `platform.scope_node` resolved to a table this generation
+    # renamed six days earlier. **The graph wired itself to the dead half and said nothing.**
+    _backend = ROOT / "backend"
+    if _backend.exists():
+        _sql = sorted(f.name for f in _backend.glob("*.sql"))
+        _ours = {n for n in _sql if re.match(r"^\d{3}-", n)}
+        _other = [n for n in _sql if n not in _ours]
+        if _other:
+            ERRORS.append(
+                f"backend/ holds {len(_other)} SQL file(s) this package did not generate "
+                f"({', '.join(_other[:3])}{'...' if len(_other) > 3 else ''}) — a parser sorting "
+                "them after the numeric series will apply them last and discard the foreign keys "
+                "attached to the tables they redefine")
+        # **A table defined twice inside our own generation would be the same defect from a
+        # different direction**, so it is checked rather than assumed impossible.
+        _seen: dict = {}
+        for _n in sorted(_ours):
+            for _m in re.finditer(r"CREATE TABLE IF NOT EXISTS ([\w\".]+)\.([\w\"]+)",
+                                  (_backend / _n).read_text(encoding="utf-8")):
+                _t = f"{_m.group(1)}.{_m.group(2)}".replace('"', "")
+                if _t in _seen:
+                    ERRORS.append(f"{_t} is created in both {_seen[_t]} and {_n}")
+                _seen[_t] = _n
+
+    # 41. **ADR-0037: a lock holds one statement, not a transaction.** An operation declaring
+    # `x-ticvai-lock` must say what it resolves *before* the transaction opens, because the default
+    # is that everything in `reads` happens inside it — and that default is what made
+    # `acquireInventoryHold` a six-millisecond lease when a row lock costs microseconds.
+    #
+    # **Two things are always outside**: a cache read, because it is a network hop to another
+    # process, and any table the locked decision does not use. **`platform.workstation` is who is
+    # holding, not whether capacity exists** — it was inside the lock and it never needed to be.
+    for _f in sorted(C.glob("*/*.yaml")):
+        _d = yaml.safe_load(_f.read_text(encoding="utf-8")) or {}
+        for _p, _item in (_d.get("paths") or {}).items():
+            for _v, _op in _item.items():
+                if not isinstance(_op, dict) or not _op.get("x-ticvai-lock"):
+                    continue
+                _oid = _op.get("operationId")
+                _ex = _op.get("x-ticvai-lock-excludes")
+                if _ex is None:
+                    ERRORS.append(
+                        f"{_oid}: declares a lock and not what sits outside it — ADR-0037 requires "
+                        "x-ticvai-lock-excludes, because the default is that every read happens "
+                        "inside the lock")
+                    continue
+                _reads = set((lin.get(_oid) or {}).get("reads") or [])
+                _cache = {r for r in _reads if r.startswith("cache:")}
+                _missed = sorted(_cache - set(_ex))
+                if _missed:
+                    ERRORS.append(
+                        f"{_oid}: reads {', '.join(_missed)} and does not exclude it from the lock "
+                        "— a cache read is a network hop, and a lock held across one is held for "
+                        "the latency of the slowest thing on the path")
+
     # 13. The x-ticvai-* vocabularies are closed sets. `lastWriteWins` and `lastWriterWins` were
     # both in use on 17 August — one policy, two spellings, ten operations split between them, and
     # every checker passed because each value was individually plausible.
@@ -910,6 +1024,30 @@ def main() -> int:
                 if ln.startswith("**Status:**") and ("uperseded" in ln or "mended" in ln):
                     superseded[f.name[:4]] = f.name
                     break
+        # **Prose wraps, and the acknowledgement lands on the next line.** This read the single
+        # line naming the ADR, so a citation that said what it needed to say one line later
+        # failed anyway. On 3 September five deploy files carried
+        #
+        #     ... which is exactly ADR-0032's
+        #     amendment: 20 connections across 25 concurrent tenants ...
+        #
+        # and were reported as not saying so. The label was there; the reading was one line
+        # short. **This is the same failure the rule exists to catch, committed by the rule** —
+        # ADR-0021's original defect was a supersession that was labelled and not read.
+        #
+        # A window of one line either way is what a wrap needs, and no more. Widening further
+        # would start matching an unrelated sentence in the next paragraph, which is how a
+        # control stops meaning anything.
+        def acknowledged(text: str, num: str) -> bool:
+            lines = text.split("\n")
+            for i, ln in enumerate(lines):
+                if f"ADR-{num}" not in ln:
+                    continue
+                window = " ".join(lines[max(0, i - 1):i + 2])
+                if "upersed" in window or "amend" in window or "no longer" in window:
+                    return True
+            return False
+
         for f in adr_dir.glob("0*.md"):
             text = f.read_text(encoding="utf-8")
             for num in sorted(superseded):
@@ -917,10 +1055,30 @@ def main() -> int:
                     continue
                 if f"ADR-{num}" not in text:
                     continue
-                near = [ln for ln in text.split("\n") if f"ADR-{num}" in ln]
-                if not any("upersed" in ln or "amend" in ln or "no longer" in ln for ln in near):
+                if not acknowledged(text, num):
                     ERRORS.append(f"{f.name} cites ADR-{num}, which is superseded or amended, "
-                                  "without saying so on any line that mentions it")
+                                  "without saying so on or beside any line that mentions it")
+
+        # 15b. **The same rule, applied to the files that get deployed.** Rule 15
+        # covers ADRs citing ADRs and stopped there, and a compose file citing a
+        # superseded ADR passed every check in the package. On 3 September
+        # ADR-0036 was superseded and four configurations still carried its
+        # reasoning in their headers — one instance, a database per service —
+        # with the arrangement it argued for in the YAML underneath.
+        #
+        # A deployment configuration is the one artefact a person hands to a
+        # machine, so a stale decision in its header is worse there than in an
+        # ADR, not better.
+        for d in ("deploy", "deploy/variants"):
+            for f in sorted((ROOT / d).glob("*.y*ml")):
+                text = f.read_text(encoding="utf-8")
+                for num in sorted(superseded):
+                    if f"ADR-{num}" not in text:
+                        continue
+                    if not acknowledged(text, num):
+                        ERRORS.append(f"{d}/{f.name} reasons from ADR-{num}, which is superseded "
+                                      "or amended, without saying so on or beside any line that "
+                                      "mentions it")
 
     # 11. no document names a platform code that no longer exists
     import re as _re
@@ -1036,6 +1194,101 @@ def main() -> int:
                if f.name != "_schema.yaml"}
     for e in sorted(emitted - defined):
         ERRORS.append(f"a state model emits '{e}' with no event definition")
+
+
+    # 42. **One contract per operationId.** On 3 September `contracts/spine/cross-cell.yaml` had
+    # been renamed to `cross-region.yaml` and the original was never deleted, so sixteen operations
+    # were declared twice. Every loader here keys by `operationId` and a dict keeps the last, so
+    # **every count in the package still read 1,032** and nothing looked wrong.
+    #
+    # **Two tools in this pipeline then resolved the same operation to different files.**
+    # `api-data-lineage.json` took `authoriseWalletSpend` from `cross-region`; rule 41 above walks
+    # files in order and took it from `cross-cell`, which is the copy the ADR-0037 fix never
+    # reached. A duplicate is not a tidiness problem — it is two answers to one question.
+    _where = _collections.defaultdict(list)
+    for _f in sorted(C.glob("*/*.yaml")):
+        if _f.name in shared:
+            continue
+        for _item in (yaml.safe_load(_f.read_text(encoding="utf-8")) or {}).get("paths", {}).values():
+            if not isinstance(_item, dict):
+                continue
+            for _v, _op in _item.items():
+                if _v in ("get", "post", "put", "patch", "delete") and isinstance(_op, dict):
+                    if _oid := _op.get("operationId"):
+                        _where[_oid].append(_f.name)
+    for _oid, _files in sorted(_where.items()):
+        if len(_files) > 1:
+            ERRORS.append(f"{_oid} is declared in {' and '.join(_files)} — one operation, two "
+                          "contracts, and which one a tool sees depends on the order it globs")
+
+    # 43 + 44. **The emitted DDL, checked against Postgres's own rules rather than against the
+    # schema reference it came from.** Rule 30 asks whether a table has a column that *could* be a
+    # key; it never opens the SQL to see whether one was written. On 3 September that gap held
+    # **84 tables with no `PRIMARY KEY`, 37 foreign keys between `uuid` and `text`, and 16 pointing
+    # at a column carrying no unique constraint** — 52 statements Postgres rejects outright.
+    #
+    # **None of it would have surfaced before the first `psql -f`**, which this package has never
+    # run. A generated artefact nothing parses back is a generated artefact nobody has read.
+    _backend = ROOT / "backend"
+    if _backend.exists():
+        _sql = "".join(f.read_text(encoding="utf-8") + "\n"
+                       for f in sorted(_backend.glob("010-*.sql")))
+        _cols: dict = {}
+        for _m in _re.finditer(
+                r'CREATE TABLE IF NOT EXISTS ([\w.]+|\w+\."\w+") \(\n(.*?)\n\);', _sql, _re.S):
+            _t = _m.group(1).replace('"', "")
+            _cols[_t] = {}
+            for _line in _m.group(2).split("\n"):
+                _mm = _re.match(r"^(\w+)\s+(.+)$", _line.strip().rstrip(","))
+                if _mm:
+                    _cols[_t][_mm.group(1)] = _mm.group(2)
+        _nokey = sorted(t for t, v in _cols.items()
+                        if not any("PRIMARY KEY" in d for d in v.values()))
+        for _t in _nokey:
+            ERRORS.append(f"{_t}: no PRIMARY KEY in the DDL — a row nothing can address, and a "
+                          "table nothing may reference")
+        _uniq = {t: {c for c, d in v.items() if "PRIMARY KEY" in d or "UNIQUE" in d}
+                 for t, v in _cols.items()}
+        _fkf = _backend / "900-foreign-keys.sql"
+        if _fkf.exists():
+            _pat = _re.compile(
+                r'ALTER TABLE ([\w.]+|\w+\."\w+") ADD CONSTRAINT (\w+) FOREIGN KEY '
+                r'\((\w+)\) REFERENCES ([\w.]+|\w+\."\w+")\((\w+)\);')
+            for _m in _pat.finditer(_fkf.read_text(encoding="utf-8")):
+                _src, _cn, _sc, _tgt, _tc = [g.replace('"', "") for g in _m.groups()]
+                if _src not in _cols or _tgt not in _cols:
+                    continue
+                if _tc not in _uniq[_tgt]:
+                    ERRORS.append(f"{_cn}: references {_tgt}.{_tc}, which is neither a primary key "
+                                  "nor unique — Postgres refuses the constraint")
+                elif (_cols[_src][_sc].split()[0].lower()
+                      != _cols[_tgt][_tc].split()[0].lower()):
+                    ERRORS.append(
+                        f"{_cn}: {_src}.{_sc} is {_cols[_src][_sc].split()[0]} and "
+                        f"{_tgt}.{_tc} is {_cols[_tgt][_tc].split()[0]} — a foreign key cannot "
+                        "span two types")
+        # **Synthesised keys are counted, not passed off.** 81 tables carry a surrogate `id` no
+        # contract asserts, because they were derived from response shapes. They are a worklist.
+        _ref = H / "schema-reference.json"
+        if _ref.exists():
+            _sr = json.loads(_ref.read_text(encoding="utf-8"))
+            _syn = sum(1 for v in (_sr.get("cols") or {}).values()
+                       for c in v if c.get("synthesised"))
+            if _syn:
+                WARNINGS.append(f"{_syn} table(s) are keyed by a synthesised surrogate — no "
+                                "contract asserts an identity for them")
+
+    # 45. **A link in prose resolves, or it is not a link.** `audit-links.py` covers nine
+    # directions of cross-layer integrity and prose is not among them, so ADR-0034 shipped on
+    # 31 August pointing at `0020-ai-proposes-a-person-accepts.md` and
+    # `0021-qdrant-collections-and-shards.md` — **two ADRs that had been renamed**, in the Related
+    # line a reader follows first.
+    for _f in sorted((ROOT / "docs").rglob("*.md")):
+        if "repos" in str(_f):
+            continue
+        for _m in _re.finditer(r"\]\(([^)#:]+\.md)(?:#[^)]*)?\)", _f.read_text(encoding="utf-8")):
+            if not (_f.parent / _m.group(1)).exists():
+                ERRORS.append(f"{_f.name}: links to {_m.group(1)}, which does not exist")
 
     print(f"{len(ops)} operations · {len(tables)} tables · {len(sids)} screens · "
           f"{len(apps)} apps · {len(plats)} platforms\n")

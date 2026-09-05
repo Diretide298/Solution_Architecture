@@ -39,7 +39,7 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 45
+  operationCalls: 47
 - service: CatalogueService
   operationCalls: 31
 - service: OrderService
@@ -829,12 +829,14 @@ screens:
   density: compact
   operations:
   - addToWishlist
+  - getMarketingSubscription
   - getWishlist
   - listGuestDevices
   - recordConsent
   - registerGuestDevice
   - removeFromWishlist
   - revokeGuestDevice
+  - setMarketingSubscription
   states:
   - emptyFirstRun
   - emptyNoResults

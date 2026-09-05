@@ -30,7 +30,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -446,6 +446,7 @@ paths:
         - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"
+        - "P06 EMP-022 My rota"
         - "P07 SCN-001 Sign in"
         - "P08 BO-039 Shift Directory"
         - "P08 BO-040 Variance Approval"

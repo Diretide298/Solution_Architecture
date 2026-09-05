@@ -1,0 +1,19 @@
+digraph sb {
+  rankdir=TB; bgcolor="transparent"; ranksep=0.5; nodesep=0.35;
+  node [shape=box style="filled,rounded" fontname="Helvetica" fontsize=12 color="#D8DEE8"];
+  edge [fontname="Helvetica" fontsize=10 color="#5A6577"];
+  subgraph cluster_s { label="One shared setup per country"; style="rounded,filled"; fillcolor="#F4F7FB"; fontname="Helvetica"; fontsize=13;
+    t1 [label="Ticket sales
+grows and shrinks
+with demand" fillcolor="#E2EFDA"];
+    t2 [label="Everything else
+steady" fillcolor="#DDEBF7"];
+    { rank=same;
+      v1 [label="Venue 1\nfood, shops, stock" fillcolor="#EDEDED"];
+      v2 [label="Venue 2" fillcolor="#EDEDED"];
+      v3 [label="Venue 3" fillcolor="#EDEDED"]; }
+    db [label="One database
+every customer's data
+kept separate inside it" fillcolor="#FFFFFF"];
+    t1 -> db; t2 -> db; v1 -> db; v2 -> db; v3 -> db; }
+}

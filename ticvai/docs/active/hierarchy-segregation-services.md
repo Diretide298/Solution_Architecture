@@ -110,14 +110,14 @@ about, and it makes the service boundary impossible to enforce.
 | `marketing` | 37 | Marketing | postgres | access, fnb, identity, marketing-crm, orders, public-api, workforce |
 | `orders` | 34 | Order | postgres | fnb, identity, marketing-crm, orders, resources, shift |
 | `pii` | 4 | Identity | postgres | access, identity, marketing-crm |
-| `platform` | 24 | Tenancy | postgres | cross-cell, identity, inventory, tenancy |
+| `platform` | 24 | Tenancy | postgres | cross-region, identity, inventory, tenancy |
 | `promotions` | 11 | Catalogue | postgres | promotions |
 | `queue` | 4 | VenueOps | postgres | queue |
 | `reporting` | 13 | Reporting | derived, postgres | reporting |
 | `resources` | 4 | VenueOps | postgres | resources |
 | `retail` | 14 | Retail | postgres | orders, retail |
 | `seating` | 11 | Catalogue | postgres | seating |
-| `sync` | 1 | CrossCell | postgres | access, games |
+| `sync` | 1 | CrossRegion | postgres | access, games |
 | `venuemap` | 4 | VenueOps | postgres | venue-map |
 | `whitelabel` | 13 | WhiteLabel | postgres | white-label |
 | `workforce` | 5 | Tenancy | postgres | workforce |
@@ -199,7 +199,7 @@ from 23 to 2.
 | **Control** | Plat | 102 | 41 | 42 | 10 | 39% | `control` |
 | **White label** | Plat | 50 | 13 | 25 | 6 | 44% | `whitelabel` |
 | **Reporting** | Plat | 29 | 13 | 31 | 10 | 62% | `reporting` |
-| **CrossCell** | Plat | 16 | 1 | 4 | 1 | 31% | `sync` |
+| **CrossRegion** | Plat | 16 | 1 | 4 | 1 | 31% | `sync` |
 
 **Flows %** is flow coverage — how much of each service a journey has traced end to end. **Not
 tests, not build.** Every flow written in this project has found a defect, so **a service under 40%
@@ -242,7 +242,7 @@ Splitting them would give three services writing one schema, which is the arrang
 
 *Scale.* Low volume, high consequence. Tenant provisioning and licensing. *If it is down.* Down blocks provisioning and the developer API. **Trading is unaffected.**
 
-**CrossCell** — **The only service that reaches another region** (ADR-0010, ADR-0014). Separate because it is the one place where data crosses a jurisdiction, and **a boundary that matters legally should be a boundary that exists physically.**
+**CrossRegion** — **The only service that reaches another region** (ADR-0010, ADR-0014). Separate because it is the one place where data crosses a jurisdiction, and **a boundary that matters legally should be a boundary that exists physically.**
 
 It moves a pseudonymous guest link rather than a guest, which is the whole design.
 
@@ -263,7 +263,7 @@ It moves a pseudonymous guest link rather than a guest, which is the whole desig
 **Deploy order is the tier order.** Foundation first and alone — twelve contracts read Identity, and
 289 tables anchor on `platform.org_unit`.
 
-**Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossCell. **A
+**Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossRegion. **A
 deliberate property that should be tested rather than assumed.**
 
 **Order autoscales and nothing else needs to.** A Saturday evening is ten times a Tuesday morning.
@@ -274,7 +274,7 @@ deliberate property that should be tested rather than assumed.**
 
 ## 6. Merges considered
 
-**CrossCell into Tenancy is the closest call.** 16 operations, one table, and 11 of its writes go
+**CrossRegion into Tenancy is the closest call.** 16 operations, one table, and 11 of its writes go
 into `platform.*`. **Kept separate** because it is the only service reaching another jurisdiction,
 and putting that code inside the service everything depends on widens the blast radius of a mistake.
 

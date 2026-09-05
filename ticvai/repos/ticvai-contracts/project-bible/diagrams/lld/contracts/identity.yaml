@@ -10,7 +10,8 @@ operations:
   path: /auth/sso/{providerId}/callback
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
   offline: false
   reads:
   - cache:idempotency
@@ -19,26 +20,31 @@ operations:
   writes:
   - cache:idempotency
   - identity.session
-- operation: createGrant
+- operation: createDelegatedAccess
   verb: POST
-  path: /grants
+  path: /delegated-access
   scope: venue
   permission: PERMISSION_GRANT
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   writes:
   - cache:idempotency
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
 - operation: createMfaChallenge
   verb: POST
   path: /auth/mfa/challenge
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -51,7 +57,9 @@ operations:
   path: /principals
   scope: venue
   permission: USER_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -64,7 +72,8 @@ operations:
   path: /roles
   scope: venue
   permission: ROLE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -73,26 +82,29 @@ operations:
   - cache:idempotency
   - cache:resolution
   - identity.role
-- operation: deleteGrant
+- operation: deleteDelegatedAccess
   verb: DELETE
-  path: /grants/{grantId}
+  path: /delegated-access/{delegatedAccessId}
   scope: venue
   permission: PERMISSION_GRANT
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   writes:
   - cache:idempotency
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
 - operation: deleteGuestAccount
   verb: DELETE
   path: /auth/guest/account
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -106,7 +118,10 @@ operations:
   path: /auth/mfa/methods
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -141,7 +156,9 @@ operations:
   path: /auth/sessions/{sessionId}/force-logout
   scope: venue
   permission: SESSION_FORCE_LOGOUT
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -154,11 +171,13 @@ operations:
   path: /auth/session
   scope: workstation
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: true
   reads:
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - identity.role
   - identity.session
@@ -169,7 +188,9 @@ operations:
   path: /auth/guest/session
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
+  - partner
   offline: true
   reads:
   - identity.guest_session
@@ -180,7 +201,9 @@ operations:
   path: /principals/{principalId}
   scope: venue
   permission: USER_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - identity.principal
@@ -190,7 +213,8 @@ operations:
   path: /tenants/sso-config
   scope: tenant
   permission: USER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - identity.sso_group_mapping
@@ -207,17 +231,18 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - pii.subject
   writes:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
 - operation: guestLogout
   verb: DELETE
   path: /auth/guest/session
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - identity.guest_session
@@ -228,7 +253,8 @@ operations:
   path: /auth/guest/social
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
   offline: false
   reads:
   - cache:idempotency
@@ -242,7 +268,8 @@ operations:
   path: /auth/guest/uae-pass
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
   offline: false
   reads:
   - cache:idempotency
@@ -257,7 +284,8 @@ operations:
   path: /auth/guest/link-checkout
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -272,11 +300,25 @@ operations:
   path: /auth/sessions
   scope: venue
   permission: SESSION_FORCE_LOGOUT
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - identity.principal
   - identity.session
+  writes: []
+- operation: listDelegatedAccess
+  verb: GET
+  path: /delegated-access
+  scope: venue
+  permission: PERMISSION_VIEW
+  audience:
+  - staff
+  - partner
+  offline: false
+  reads:
+  - identity.delegated_access
   writes: []
 - operation: listDelegations
   verb: GET
@@ -288,26 +330,19 @@ operations:
   - guest
   offline: false
   reads:
-  - identity.grant
+  - identity.delegated_access
   - marketing.guest_profile
   - pii.subject
-  writes: []
-- operation: listGrants
-  verb: GET
-  path: /grants
-  scope: venue
-  permission: PERMISSION_VIEW
-  audience: null
-  offline: false
-  reads:
-  - identity.grant
   writes: []
 - operation: listMfaMethods
   verb: GET
   path: /auth/mfa/methods
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
+  - guest
   offline: false
   reads:
   - identity.mfa_method
@@ -317,7 +352,9 @@ operations:
   path: /principals
   scope: venue
   permission: USER_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - identity.principal
@@ -327,8 +364,9 @@ operations:
   path: /roles
   scope: venue
   permission: ROLE_MANAGE
-  audience: null
-  offline: false
+  audience:
+  - staff
+  offline: true
   reads:
   - identity.role
   writes: []
@@ -337,7 +375,9 @@ operations:
   path: /auth/sso/providers
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
+  - partner
   offline: false
   reads:
   - identity.sso_provider
@@ -347,11 +387,13 @@ operations:
   path: /auth/login
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
+  - partner
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - identity.principal_credential
   - identity.role
@@ -363,7 +405,8 @@ operations:
   path: /auth/logout
   scope: workstation
   permission: null
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -376,7 +419,10 @@ operations:
   path: /auth/refresh
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -389,7 +435,8 @@ operations:
   path: /auth/guest/register
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
   offline: false
   reads:
   - cache:idempotency
@@ -404,7 +451,10 @@ operations:
   path: /auth/mfa/methods/{methodId}
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -417,7 +467,8 @@ operations:
   path: /auth/guest/otp
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
   offline: false
   reads:
   - cache:idempotency
@@ -430,16 +481,17 @@ operations:
   path: /permissions/resolve
   scope: venue
   permission: PERMISSION_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
   - cache:resolution
-  - identity.grant
+  - identity.delegated_access
   - identity.principal
   - identity.role
   - identity.role_permission
-  - platform.scope_node
+  - platform.org_unit
   writes:
   - cache:idempotency
   - cache:resolution
@@ -448,7 +500,9 @@ operations:
   path: /auth/sessions/revoke-all
   scope: venue
   permission: SESSION_FORCE_LOGOUT
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -461,11 +515,12 @@ operations:
   path: /auth/select-role
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.role
   - identity.session
   writes:
@@ -495,7 +550,7 @@ operations:
   offline: false
   reads:
   - cache:idempotency
-  - identity.grant
+  - identity.delegated_access
   - identity.segregation_rule
   writes:
   - cache:idempotency
@@ -505,7 +560,8 @@ operations:
   path: /tenants/sso-config
   scope: tenant
   permission: USER_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -520,7 +576,8 @@ operations:
   path: /auth/sso/{providerId}/authorize
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
   offline: false
   reads:
   - identity.sso_provider
@@ -530,7 +587,9 @@ operations:
   path: /principals/{principalId}
   scope: venue
   permission: USER_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -561,7 +620,8 @@ operations:
   path: /auth/guest/otp/verify
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - anonymous
   offline: false
   reads:
   - cache:idempotency
@@ -576,7 +636,10 @@ operations:
   path: /auth/mfa/challenge/{challengeId}/verify
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -592,7 +655,10 @@ operations:
   path: /auth/mfa/methods/{methodId}
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - staff
+  - partner
+  - guest
   offline: false
   reads:
   - cache:idempotency

@@ -1,0 +1,6854 @@
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 1
+TICVAI
+Resource Management
+Configuration
+Backend Structure Module
+PROFESSIONALLY FORMATTED EDITION
+Comprehensive functional specification covering resource configuration, availability, workforce, 
+rostering, operations, assets, events, AI optimization, mobile operations, governance, and 
+analytics.
+Document type
+Functional & Backend Configuration Reference
+Module
+Resource Management
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 2
+Table of Contents
+Board 1 — Resource Master Data & Configuration 3
+Board 2 — Resource Calendar, Availability & Scheduling 19
+Board 3 — Staff Resource & Workforce Management 33
+Board 4 — Workforce Rostering, Attendance & Operations 48
+Board 5 — Experience, Ticket & Dynamic Resource Assignment 64
+Board 6 — Equipment, Assets, Rental & Maintenance 81
+Board 7 — Event Resource Planning & Allocation 98
+Board 8 — AI Resource Optimization & Forecasting 116
+Board 9 — Mobile Resource Operations & Employee App 135
+Board 10 — Analytics, Governance & Resource Control Tower 153
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 3
+TICVAI Resource Management
+Board 1 — Resource Master Data & Configuration
+Board Objective
+Provide administrators with a centralized, intelligent backend workspace to create, classify, configure, 
+organize, govern, and maintain every resource that can be used anywhere within the TICVAI platform.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 4
+A resource may represent:
+ Staff or personnel
+ Venue
+ Hall
+ Room
+ Stage
+ Area
+ Attraction space
+ Equipment
+ Asset
+ Rental item
+ Vehicle
+ Locker
+ Cabana
+ Meeting room
+ Stroller
+ Towel
+ AV equipment
+ Sound or lighting equipment
+ Any customer-defined resource type
+The board must support resource reuse across ticketing, experiences, events, rentals, workforce scheduling, 
+POS, mobile applications, and APIs.
+Primary matrix coverage: 1.2.1, 1.2.2, 1.2.23–1.2.26, 1.2.44, 1.2.46, 1.2.72, 1.2.75, 1.2.77, 1.2.78.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 5
+Screen 01 — Resource Management Command Center
+Purpose
+Provide administrators and operational managers with the main entry point for Resource Management and 
+an instant overview of the organization's complete resource inventory.
+Backend Configuration
+The screen shall display configurable KPI widgets including:
+ Total active resources
+ Resources by type
+ Resources by venue
+ Available resources
+ Assigned resources
+ Reserved resources
+ Resources under maintenance
+ Suspended resources
+ Retired resources
+ Resources with expiring certifications
+ Resources with unresolved configuration issues
+ Recently created resources
+ Recently modified resources
+Administrators shall be able to filter the command center by:
+ Tenant
+ Business unit
+ Country
+ Venue
+ Resource type
+ Category
+ Status
+ Owner
+ Department
+ Tags
+ Availability status
+ Effective date
+The screen shall provide quick actions for:
+ Create resource
+ Create resource type
+ Create category
+ Import resources
+ Duplicate resource
+ Assign resource to venue
+ Create package
+ Review configuration warnings
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 6
+An AI summary panel should highlight conditions such as:
+ Unused resources
+ Duplicate resources
+ Missing attributes
+ Resources approaching retirement
+ Resources without venue assignments
+ Unresolved resource dependencies
+Business Rules
+Dashboard information must respect the logged-in user's tenant, venue, department, and permission scope.
+Users must only see resources they are authorized to manage.
+Acceptance Condition
+Authorized users can view the complete permitted resource estate, filter and search resources, identify 
+configuration issues, and launch governed resource-management actions directly from the command center.
+Screen 02 — Resource Type Configuration
+Purpose
+Allow administrators to define the different classes of resources supported by the organization without 
+requiring software development.
+Backend Configuration
+Administrators shall be able to create configurable resource types such as:
+ Staff
+ Instructor
+ Security personnel
+ Venue
+ Room
+ Hall
+ Area
+ Cabana
+ Equipment
+ Asset
+ Rental item
+ Vehicle
+ Locker
+Each resource type shall support:
+ Resource type code
+ Resource type name
+ Description
+ Icon
+ Display color
+ Resource nature
+ Physical / human / virtual classification
+ Reservable yes/no
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 7
+ Rentable yes/no
+ Capacity-controlled yes/no
+ Schedule-controlled yes/no
+ Inventory-controlled yes/no
+ Staff qualification required yes/no
+ Maintenance-controlled yes/no
+ Check-in/check-out supported yes/no
+ Deposit applicable yes/no
+ Customer selectable yes/no
+ API visible yes/no
+Administrators shall determine which configuration sections are applicable to each resource type.
+Example:
+A Staff resource may require skills, certifications, shifts, breaks, and attendance.
+A Cabana resource may require capacity, location, opening hours, price linkage, and availability.
+A Towel resource may require inventory, checkout, deposit, return, and condition tracking.
+Governance
+Changes to resource-type definitions may require approval depending on tenant policy.
+Existing resources must be evaluated when their resource type is changed.
+Acceptance Condition
+Administrators can create reusable resource types and define which operational capabilities and attributes 
+apply to each type without code changes.
+Screen 03 — Resource Category Management
+Purpose
+Provide a flexible classification structure beneath resource types so resources can be organized, searched, 
+reported, and governed consistently.
+Backend Configuration
+Administrators shall create categories and subcategories such as:
+ Equipment
+ AV
+ Lighting
+ Sound
+ Furniture
+ Staff
+ Instructor
+ Operations
+ Security
+ Technical Crew
+ Rental
+ Towels
+ Strollers
+ Lockers
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 8
+ Cabanas
+The screen shall support:
+ Category code
+ Category name
+ Description
+ Parent category
+ Applicable resource types
+ Display order
+ Tags
+ Reporting group
+ Cost center
+ Default attributes
+ Default availability policies
+ Default approval workflow
+ Active/inactive status
+Categories may inherit configuration from parent categories.
+Administrators should be warned when changing a category used by active resources.
+Acceptance Condition
+Resources can be grouped into configurable hierarchical categories and subcategories that can subsequently
+be used throughout search, scheduling, reporting, automation, and integrations.
+Screen 04 — Resource Creation & Profile
+Purpose
+Provide the principal workspace for creating and maintaining an individual resource.
+Backend Configuration
+The resource profile shall contain configurable sections including:
+Identity
+ Resource ID
+ Resource code
+ Resource name
+ Short name
+ Resource type
+ Category
+ Description
+ Image
+ Barcode / QR identifier
+ External reference ID
+Organization
+ Tenant
+ Business unit
+ Venue
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 9
+ Department
+ Owner
+ Responsible manager
+ Cost center
+Operational Configuration
+ Active status
+ Reservable status
+ Rentable status
+ Capacity
+ Unit of measure
+ Customer selectable
+ Priority
+ Availability mode
+ Scheduling mode
+ Default duration
+ Minimum booking duration
+ Maximum booking duration
+Location
+ Venue
+ Building
+ Floor
+ Zone
+ Area
+ GPS/location metadata where applicable
+Commercial & Financial
+ Internal cost
+ Hourly cost
+ Daily cost
+ Replacement value
+ Deposit requirement
+ Tax treatment
+ Accounting reference
+Integration
+ External system ID
+ API identifier
+ Integration source
+ Last synchronization status
+The resource profile shall support:
+ Save as draft
+ Submit for approval
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 10
+ Activate
+ Suspend
+ Clone
+ Archive
+ Retire
+AI Assistance
+AI should be able to suggest:
+ Resource category
+ Required attributes
+ Tags
+ Similar existing resources
+ Potential duplicates
+Acceptance Condition
+Authorized users can create and maintain a complete resource profile, save it as draft, validate its 
+configuration, submit it through governance, and activate it for downstream use.
+Screen 05 — Configurable Attribute Builder
+Purpose
+Allow customers to extend resource records with their own attributes without changing the core application.
+Backend Configuration
+Administrators shall create configurable attributes such as:
+ Skill level
+ Height
+ Weight
+ Seating capacity
+ Equipment model
+ Serial number
+ Size
+ Manufacturer
+ Color
+ Power requirement
+ Warranty expiry
+ Maximum occupancy
+ Language
+ Certification level
+ Rental condition
+Supported data types shall include:
+ Text
+ Number
+ Decimal
+ Currency
+ Date
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 11
+ Date/time
+ Boolean
+ Single select
+ Multi-select
+ Lookup
+ Attachment
+ URL
+ Measurement
+ Formula/calculated field
+For each attribute, administrators shall configure:
+ Attribute code
+ Attribute label
+ Applicable resource type
+ Applicable category
+ Mandatory/optional
+ Default value
+ Allowed values
+ Minimum/maximum
+ Validation expression
+ Searchable yes/no
+ Reportable yes/no
+ API exposed yes/no
+ Customer visible yes/no
+ Effective date
+ Display sequence
+Conditional attributes shall be supported.
+Example:
+If Resource Type = Vehicle, display vehicle registration and passenger capacity.
+If Resource Type = Instructor, display skill level, languages, and qualifications.
+Acceptance Condition
+Administrators can extend resource records with reusable, validated, type-specific attributes without 
+requiring application development.
+Screen 06 — Resource Hierarchy & Parent–Child Relationships
+Purpose
+Represent physical and operational relationships between resources.
+Backend Configuration
+Administrators shall be able to create parent-child relationships such as:
+Venue
+→ Building
+→ Floor
+→ Hall
+→ Room
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 12
+or:
+AV System
+→ Projector
+→ Screen
+→ Speakers
+→ Microphones
+The screen shall provide:
+ Tree view
+ Expand/collapse hierarchy
+ Drag-and-drop organization
+ Parent selection
+ Child-resource assignment
+ Relationship type
+ Effective date
+ Relationship priority
+ Dependency indication
+Supported relationship examples:
+ Contains
+ Belongs to
+ Located in
+ Operated by
+ Supported by
+ Part of
+ Dedicated to
+The system shall prevent:
+ Circular hierarchies
+ Invalid parent relationships
+ Cross-tenant relationships without authorization
+Operational Impact
+Hierarchy may influence:
+ Availability
+ Capacity
+ Maintenance
+ Reporting
+ Reservations
+ Event allocation
+Example:
+If an entire hall is closed for maintenance, resources configured as dependent children may also become 
+unavailable.
+Acceptance Condition
+Administrators can create and manage multi-level resource hierarchies, and the platform validates those 
+relationships before they are used operationally.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 13
+Screen 07 — Resource Dependency Rules
+Purpose
+Define operational relationships where one resource requires, depends upon, conflicts with, or influences 
+another resource.
+Backend Configuration
+Administrators shall be able to configure dependencies such as:
+ Requires
+ Requires one of
+ Requires all
+ Conflicts with
+ Cannot operate simultaneously
+ Preferred with
+ Substitute for
+ Backup for
+ Shares capacity with
+Example:
+Stage A
+requires:
+ Sound System A
+ Lighting Rig A
+Private Ski Lesson
+requires:
+ One instructor
+ One training zone
+Dependency rules shall support:
+ Minimum quantity
+ Maximum quantity
+ Mandatory/optional
+ Priority
+ Effective dates
+ Venue limitation
+ Time overlap rules
+ Availability dependency
+ Capacity dependency
+The system must evaluate dependencies before confirming assignments or reservations.
+Conflict Detection
+The system shall display:
+ Missing dependencies
+ Resource conflicts
+ Circular dependency warnings
+ Unavailable dependent resources
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 14
+Acceptance Condition
+Administrators can define reusable dependency rules, and the system validates those dependencies before 
+affected resources can be reserved or assigned.
+Screen 08 — Resource Package & Bundle Configuration
+Purpose
+Allow commonly used combinations of resources to be predefined and assigned as a single operational 
+package.
+Backend Configuration
+Examples may include:
+ Conference Package
+ Meeting Room A
+ Projector
+ Screen
+ Microphone
+ Technician
+ VIP Cabana Package
+ Cabana
+ Towels
+ Locker
+ Service attendant
+ Event Stage Package
+ Stage
+ Sound equipment
+ Lighting
+ Technician
+ Security
+Administrators shall configure:
+ Package code
+ Package name
+ Description
+ Applicable venues
+ Included resources
+ Included resource types
+ Required quantities
+ Mandatory/optional components
+ Substitute resources
+ Allocation priority
+ Effective dates
+ Minimum/maximum duration
+ Approval requirement
+ Internal package cost
+Packages should support:
+ Fixed resources
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 15
+ Dynamic resources
+ Skill-based staff resources
+ Resource-type placeholders
+Example:
+Instead of assigning John Smith, the package may request:
+1 × Technician with AV Level 2 certification.
+The allocation engine can then select the most suitable available technician.
+Acceptance Condition
+Administrators can create reusable resource packages containing fixed or dynamically selected resources 
+and use those packages later during experience, event, reservation, and operational allocation.
+Screen 09 — Multi-Venue Resource Assignment
+Purpose
+Control where resources may operate and whether they can be shared across venues.
+Backend Configuration
+The screen shall support:
+ Primary venue
+ Secondary venues
+ Shared resource pool
+ Venue availability
+ Department ownership
+ Effective dates
+ Travel/setup buffer
+ Cross-venue booking permission
+ Resource transfer requirement
+ Transfer time
+ Venue-specific restrictions
+ Venue-specific cost
+Example:
+A portable projector may belong to Venue A but be shared with Venue B.
+An instructor may work across several attractions or venues.
+Administrators shall determine whether the resource is:
+ Venue-exclusive
+ Venue-shared
+ Tenant-wide
+ Temporary transfer
+ Centrally pooled
+Validation
+The platform shall check for:
+ Overlapping assignments
+ Travel/setup time
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 16
+ Venue authorization
+ Venue-specific qualification requirements
+Acceptance Condition
+Resources can be assigned to one or multiple venues under controlled rules, with conflicts and transfer 
+constraints validated before operational allocation.
+Screen 10 — Resource Lifecycle, Governance & Audit
+Purpose
+Manage the entire operational lifecycle of a resource from creation through retirement while maintaining full
+traceability.
+Lifecycle States
+The platform shall support configurable states such as:
+ Draft
+ Pending Approval
+ Approved
+ Active
+ Temporarily Unavailable
+ Under Maintenance
+ Suspended
+ Retired
+ Archived
+Administrators shall configure:
+ Allowed status transitions
+ Approval requirements
+ Effective dates
+ Retirement reason
+ Suspension reason
+ Replacement resource
+ Disposal information
+ Depreciation reference
+ Asset-retirement information
+Governance
+Actions may require:
+ Maker-checker approval
+ Manager approval
+ Finance approval
+ Operations approval
+Permission controls shall determine who may:
+ Create
+ Edit
+ Approve
+ Activate
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 17
+ Suspend
+ Retire
+ Archive
+Audit History
+The immutable audit timeline shall record:
+ User
+ Timestamp
+ Action
+ Previous value
+ New value
+ Approval
+ Reason
+ Source channel
+ API/system origin
+ Correlation/reference ID
+Users shall be able to compare versions of a resource configuration.
+Acceptance Condition
+The complete lifecycle of every resource is governed by permissions and configurable workflows, while every 
+material configuration change remains permanently traceable through immutable audit history.
+Board 1 Shared Rules
+All ten screens shall support, where applicable:
+ Multi-tenant architecture
+ Multi-venue configuration
+ Role-based and policy-based access control
+ Arabic and English localization
+ Configurable approval workflows
+ Effective dating
+ Version history
+ API accessibility
+ Event-driven integration
+ Search and filtering
+ Import/export controls
+ Audit history
+ AI-assisted configuration
+ Responsive administration interface
+No resource shall become operationally available until all mandatory configuration and validation 
+requirements have been satisfied.
+Board 1 End-to-End Outcome
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 18
+After completing Board 1 configuration, TICVAI shall have a standardized Resource Digital Twin for every 
+resource in the organization.
+Each resource will have:
+Identity Type Category Attributes Hierarchy Dependencies Package Membership Venue → → → → → → →
+Assignment Lifecycle Audit → →
+This resource master then becomes the foundation used by:
+ Calendar & availability
+ Staff scheduling
+ Rostering
+ Experience assignment
+ Ticketing
+ Rentals
+ Events
+ AI allocation
+ Mobile workforce
+ Analytics
+ APIs
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 19
+TICVAI Resource Management
+Board 2 — Resource Calendar, Availability & 
+Reservations
+Board Objective
+Provide TICVAI with a centralized, real-time Resource Scheduling & Availability Engine where 
+authorized users can visually see when resources are available, reserved, assigned, unavailable, 
+under maintenance, or in conflict and can allocate or reassign them directly from the calendar.
+The calendar must operate as an interactive operational workspace, not simply a calendar display.
+Users should be able to:
+ View resources across time
+ Search and filter resources
+ See real-time availability
+ Understand utilization visually
+ Select an available resource directly from the calendar
+ Create reservations
+ Make advance reservations
+ Configure recurring reservations
+ Detect scheduling conflicts
+ Block operational/setup/maintenance periods
+ Manage simultaneous events
+ Drag and drop assignments
+ Automatically find replacement resources
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 20
+ Receive AI recommendations
+Primary matrix coverage: 1.2.6–1.2.7, 1.2.13, 1.2.18–1.2.22, 1.2.27–1.2.31.
+Related coverage: 1.2.12, 1.2.19, 1.2.29, 1.2.52–1.2.57, 1.2.72–1.2.73, 1.2.77.
+Screen 01 — Resource Calendar Command Center
+Purpose
+Provide the main operational calendar from which users can see and manage resource availability, 
+reservations, assignments and operational blocks.
+Calendar Views
+The interface shall support:
+ Timeline
+ Day
+ Week
+ Month
+ Agenda
+ Resource view
+Resources may appear as rows or columns depending on the selected calendar mode.
+Users shall be able to switch between:
+ All Resources
+ Staff
+ Rooms
+ Areas
+ Venues
+ Equipment
+ Assets
+ Rental Resources
+ Vehicles
+ Custom Resource Types
+Visual Resource Status
+Calendar entries shall visually distinguish:
+ Available
+ Reserved
+ Assigned
+ Partially utilized
+ Fully utilized
+ Unavailable
+ On break
+ On leave
+ Under maintenance
+ Operationally blocked
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 21
+ Pending approval
+ Conflict detected
+Utilization indicators should make it possible to immediately understand how busy a resource is.
+Example:
+Green: Low utilization
+Yellow: Moderate utilization
+Orange: High utilization
+Red: Fully utilized / unavailable
+Smart Actions
+Selecting a free calendar slot should allow the user to:
+ Assign resource
+ Create reservation
+ Create block
+ View availability
+ View resource profile
+Selecting an existing assignment should allow:
+ View
+ Edit
+ Reassign
+ Extend
+ Shorten
+ Cancel
+ Check in/out where applicable
+Acceptance Condition
+Authorized users can view the real-time operational status of permitted resources and initiate 
+resource-management actions directly from the calendar.
+Screen 02 — Calendar Filters, Search & Smart Discovery
+Purpose
+Allow users to quickly locate the correct resource instead of manually searching through hundreds or
+thousands of resources.
+Search
+Universal search shall support:
+ Resource name
+ Resource code
+ Staff name
+ Skill
+ Certification
+ Venue
+ Room
+ Category
+ Equipment
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 22
+ Asset
+ Tag
+ Event
+ Experience
+ Filters
+Users shall filter by:
+ Date range
+ Time range
+ Resource type
+ Resource category
+ Resource name
+ Venue
+ Department
+ Availability
+ Capacity
+ Skill
+ Certification
+ Status
+ Assignment status
+Filters shall support combinations.
+Example:
+Ski Instructor + Level 3 + English + Available Tomorrow 10:00–14:00
+Saved Views
+Users shall be able to create saved calendar views such as:
+ Ski School
+ VIP Operations
+ Event Resources
+ Weekend Staffing
+ Waterpark Rentals
+ AV Equipment
+ AI Smart Search
+Conversational search should support queries such as:
+ “Show available instructors tomorrow between 2 PM and 6 PM.”
+ “Find a meeting room for 20 people with a projector.”
+ “Show resources available for Friday's corporate event.”
+Acceptance Condition
+Users can identify suitable resources through structured filters or conversational AI without manually
+reviewing the entire resource inventory.
+Screen 03 — Resource Availability Schedule Configuration
+Purpose
+Define the baseline schedule controlling when each resource can be used.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 23
+Configuration
+Administrators shall configure:
+ Available days
+ Opening time
+ Closing time
+ Effective date
+ Expiry date
+ Time zone
+ Seasonal availability
+ Venue operating hours
+ Resource-specific operating hours
+Availability may be configured using:
+ Standard weekly schedules
+ Specific dates
+ Seasonal schedules
+ Exception dates
+ Imported schedules
+ External workforce schedules
+ Availability Exceptions
+Administrators shall configure:
+ Public holidays
+ Venue closures
+ Maintenance periods
+ Staff leave
+ Training
+ Private blocks
+ Operational shutdowns
+ Special events
+ Inheritance
+A resource may inherit availability from:
+Tenant Venue Department Resource Type Individual Resource → → → →
+Individual-resource overrides shall be supported.
+Acceptance Condition
+Every resource has an effective availability calendar derived from configured schedules, inherited 
+operating rules and approved exceptions.
+Screen 04 — Resource Time-Slot Configuration
+Purpose
+Control how available resource time is converted into reservable or assignable time slots.
+Configuration
+Administrators shall configure:
+ Slot duration
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 24
+ Slot interval
+ Start time
+ End time
+ Minimum duration
+ Maximum duration
+ Booking increments
+ Buffer before
+ Buffer after
+ Capacity per slot
+ Concurrent reservations
+ Minimum notice
+ Maximum advance booking period
+Example:
+ Private Instructor
+Slot Duration: 60 minutes
+Buffer: 15 minutes
+Capacity: 1
+ Meeting Room
+Slot Duration: 30 minutes
+Minimum Reservation: 1 hour
+Maximum Reservation: 8 hours
+ Dynamic Slots
+Where enabled, TICVAI shall dynamically generate slots according to:
+ Resource availability
+ Experience duration
+ Existing bookings
+ Operating hours
+ Capacity
+ Setup requirements
+Acceptance Condition
+Administrators can determine precisely how resource availability is converted into customer-facing 
+or operational booking slots.
+Screen 05 — Advance Reservation Management
+Purpose
+Allow resources to be reserved before final operational assignment or ticket transaction.
+Reservation Workspace
+Users shall configure:
+ Reservation reference
+ Resource
+ Resource type
+ Date
+ Start time
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 25
+ End time
+ Customer/event/experience
+ Quantity
+ Capacity
+ Priority
+ Reservation status
+ Expiry
+ Notes
+ Owner
+ Reservation States
+Configurable statuses may include:
+ Draft
+ Tentative
+ Pending Approval
+ Confirmed
+ Checked-In
+ Completed
+ Cancelled
+ Expired
+ No-Show
+ Reservation Holds
+TICVAI shall support temporary resource holds.
+Administrators shall configure:
+ Hold duration
+ Automatic expiry
+ Extension permissions
+ Release rules
+ Smart Availability
+Before confirming a reservation, TICVAI shall automatically validate:
+ Availability
+ Capacity
+ Existing bookings
+ Dependencies
+ Venue restrictions
+ Resource status
+ Operational blocks
+Acceptance Condition
+Authorized users can reserve resources in advance while TICVAI prevents invalid or conflicting 
+reservations.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 26
+Screen 06 — Recurring Reservation Configuration
+Purpose
+Allow resources to be reserved repeatedly without creating each reservation individually.
+Recurrence Patterns
+Support:
+ Daily
+ Weekly
+ Monthly
+ Selected weekdays
+ Selected dates
+ Custom recurrence
+Example:
+ Meeting Room A
+Every Monday and Wednesday
+09:00–11:00
+1 September–31 December
+ Recurrence Controls
+Users shall configure:
+ Start date
+ End date
+ Frequency
+ Days
+ Times
+ Number of occurrences
+ Resource
+ Venue
+ Exceptions
+ Conflict Handling
+Before saving a recurring reservation, TICVAI shall analyze the entire series.
+The system shall identify:
+ Conflict-free occurrences
+ Conflicting occurrences
+ Unavailable dates
+ Maintenance conflicts
+ Venue closure conflicts
+Users may:
+ Keep resource where available
+ Skip conflicting occurrences
+ Select alternative resource
+ Request AI optimization
+Acceptance Condition
+Users can create and manage recurring resource reservations while TICVAI validates every 
+occurrence and clearly identifies exceptions.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 27
+Screen 07 — Conflict Detection & Resolution Center
+Purpose
+Provide a centralized workspace for detecting and resolving resource scheduling conflicts before they
+affect operations.
+Conflict Types
+The system shall identify:
+ Double booking
+ Capacity conflict
+ Availability conflict
+ Staff leave conflict
+ Certification conflict
+ Venue conflict
+ Maintenance conflict
+ Resource dependency conflict
+ Setup-time conflict
+ Travel-time conflict
+ Parent-resource conflict
+ Multi-event conflict
+Conflict Severity
+Conflicts may be classified:
+ Informational
+ Warning
+ High
+ Critical
+Resolution Actions
+Users shall be able to:
+ Change time
+ Change resource
+ Change venue
+ Reduce capacity
+ Cancel assignment
+ Request override
+ Send for approval
+AI Conflict Resolution
+AI shall recommend suitable alternatives based on:
+ Availability
+ Resource type
+ Skills
+ Capacity
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 28
+ Location
+ Cost
+ Priority
+ Existing workload
+Example:
+Conflict detected: Alex is unavailable at 14:00.
+Recommended: Maria — same certification, available 13:30–17:00, same venue.
+Acceptance Condition
+Scheduling conflicts are automatically identified, classified and presented with governed resolution 
+options before operational confirmation.
+Screen 08 — Operational Time & Resource Blocking
+Purpose
+Protect non-customer-facing time required for preparation, movement, maintenance and operational
+activities.
+Block Types
+Users shall configure:
+ Setup
+ Teardown
+ Cleaning
+ Maintenance
+ Inspection
+ Travel
+ Break
+ Training
+ Private use
+ Venue closure
+ Operational hold
+ Custom block
+Configuration
+Each block shall support:
+ Resource
+ Block type
+ Start
+ End
+ Recurrence
+ Reason
+ Owner
+ Priority
+ Override permission
+ Approval requirement
+Example:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 29
+ Event Hall A
+Setup: 14:00–16:00
+Event: 16:00–20:00
+Teardown: 20:00–22:00
+The resource must therefore remain unavailable from 14:00–22:00, not merely during the customerfacing event.
+Acceptance Condition
+Operational time blocks automatically affect resource availability and prevent reservations that 
+would interfere with required operational activities.
+Screen 09 — Multi-Event Resource Planning
+Purpose
+Allow operations teams to manage shared resources across multiple simultaneous events, 
+experiences and operational activities.
+Planning Workspace
+The screen shall display:
+ Events
+ Experiences
+ Resources
+ Venues
+ Time periods
+ Assignments
+ Conflicts
+ Capacity
+ Resource gaps
+Users shall be able to compare multiple events side-by-side.
+Example:
+Event A
+requires 10 security staff.
+Event B
+requires 8 security staff.
+Only 14 qualified staff are available.
+TICVAI shall immediately identify the 4-person staffing gap.
+Priority Management
+Events may be assigned:
+ Critical
+ High
+ Standard
+ Low
+Resource allocation can consider:
+ Event priority
+ Customer priority
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 30
+ Revenue
+ SLA
+ Resource suitability
+ Operational requirements
+AI Optimization
+AI should recommend how shared resources can be distributed across simultaneous activities.
+Acceptance Condition
+Operations teams can understand resource demand across parallel events and identify shortages or 
+allocation conflicts before operations begin.
+Screen 10 — Smart Assignment & Drag-and-Drop Reallocation
+Purpose
+Provide the fast, visual assignment experience that operational users and cashiers can use when 
+assigning or changing resources.
+This should become one of the signature TICVAI Resource Management experiences.
+Drag-and-Drop Assignment
+Users shall be able to drag:
+ Reservation
+ Booking
+ Experience
+ Staff assignment
+ Resource requirement
+onto an available resource and time.
+The system shall immediately validate the move.
+Live Validation
+Before accepting the drop, TICVAI shall check:
+ Availability
+ Capacity
+ Qualification
+ Certification
+ Dependencies
+ Existing reservations
+ Venue
+ Travel/setup buffer
+ Resource status
+ Operational rules
+Valid destinations should visually highlight.
+Invalid destinations should visually indicate the reason.
+Smart Reassignment
+If an assigned resource becomes unavailable, TICVAI shall:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 31
+1. Detect the issue.
+2. Identify eligible alternatives.
+3. Rank alternatives.
+4. Recommend the best replacement.
+5. Allow authorized automatic reassignment.
+Example:
+Instructor Alex — Sick / Unavailable
+TICVAI recommends:
+1. Maria — 96% match
+ Available
+ Same certification
+ Same venue
+ No overtime
+2. David — 88% match
+ Available
+ Qualified
+ Requires venue transfer
+AI Smart Assign
+Users may select:
+ Smart Assign
+TICVAI shall automatically evaluate suitable resources and recommend the best option.
+The recommendation should explain why the resource was selected.
+Customer/Cashier Flow
+When a ticket or experience requires a resource, the cashier should see:
+Date Time Available Resources Recommended Resource Confirm → → → →
+Rather than searching manually.
+The interface may show resource cards containing:
+ Photo/icon
+ Name
+ Skill/type
+ Availability
+ Capacity
+ Utilization
+ Rating or suitability
+ Location
+ AI recommendation indicator
+Acceptance Condition
+Authorized users can assign or reassign resources visually through drag-and-drop or AI Smart 
+Assign, with real-time validation preventing invalid allocations and all changes recorded in audit 
+history.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 32
+Board 2 Shared Rules
+All screens shall operate from a common real-time availability engine.
+Changes made from one channel must immediately affect all authorized channels, including:
+ Backend administration
+ POS
+ B2C
+ B2B
+ Employee App
+ Event Management
+ Ticketing
+ API integrations
+Resource availability must therefore never be maintained independently by each channel.
+The platform shall support:
+ Multi-tenant operation
+ Multi-venue scheduling
+ Time-zone awareness
+ RBAC/PBAC
+ Effective dating
+ Approval workflows
+ Real-time conflict detection
+ API access
+ Event-driven updates
+ Immutable audit history
+ AI recommendations
+Board 2 End-to-End Outcome
+Board 2 turns the resource master created in Board 1 into a live operational scheduling engine.
+The end-to-end flow becomes:
+Resource Availability Time Slot Search Reservation Conflict Validation Operational → → → → → →
+Block Assignment Smart Reassignment Real-Time Calendar → → →
+The most important design principle is that users should not have to think:
+“Which resource should I assign?”
+TICVAI should understand the requirement, availability, qualifications, dependencies and operational 
+rules and present:
+“These are the best resources available. This one is recommended.”
+That is the experience that makes Resource Management feel like an AI-first operational platform 
+rather than a traditional scheduling calendar.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 33
+TICVAI Resource Management
+Board 3 — Staff Resource & Workforce 
+Configuration
+Board Objective
+Provide TICVAI with a centralized backend configuration environment for treating employees, 
+instructors, contractors, technicians, security personnel, event staff, and other personnel as 
+intelligent operational resources.
+The board shall establish:
+Staff Profile Skills Certifications Qualifications Availability Shifts Breaks/Leave → → → → → → →
+Overtime External Workforce Integration →
+The objective is not to replace the later operational rostering board. Board 3 defines who the 
+employee is, what they are qualified to do, and when they are allowed or available to work.
+Operational roster construction, attendance monitoring, shift swaps, staffing gaps, and labor-cost 
+management will remain in Board 4 to avoid duplication.
+Primary matrix coverage: 1.2.3, 1.2.5, 1.2.17, 1.2.32–1.2.38.
+Supporting coverage: 1.2.4, 1.2.11–1.2.12, 1.2.34–1.2.39, 1.2.54, 1.2.60–1.2.66, 1.2.80–1.2.84.
+Screen 01 — Staff Resource Directory
+Purpose
+Provide the centralized master directory for all personnel who may be assigned as operational 
+resources within TICVAI.
+Staff Types
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 34
+The system shall support personnel such as:
+ Instructors
+ Event managers
+ Ushers
+ Security personnel
+ Technical crew
+ Hosts
+ Performers
+ Mascots
+ Lifeguards
+ Operators
+ Customer service staff
+ Cashiers
+ Supervisors
+ Contractors
+ Temporary staff
+ Customer-defined personnel types
+ Directory Information
+The directory shall display configurable columns including:
+ Employee/resource ID
+ Name
+ Photograph
+ Staff type
+ Role
+ Department
+ Primary venue
+ Skill level
+ Availability
+ Current status
+ Certification status
+ Shift status
+ Employment type
+Smart Indicators
+TICVAI shall visually identify:
+ Available
+ Assigned
+ Off shift
+ On leave
+ Certification expiring
+ Qualification issue
+ Suspended
+ Unavailable
+Search & Filters
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 35
+Users shall filter by:
+ Venue
+ Department
+ Role
+ Staff type
+ Skill
+ Certification
+ Qualification
+ Availability
+ Employment type
+ Status
+AI Search
+Users should be able to request:
+“Show all Level 3 ski instructors available this weekend.”
+or:
+“Find Arabic-speaking instructors qualified for private lessons.”
+Acceptance Condition
+Authorized users can locate and manage staff resources from one centralized directory using 
+structured filters or conversational AI.
+Screen 02 — Staff Resource Profile
+Purpose
+Maintain the operational resource profile for an individual employee or contractor.
+This profile shall complement the organization's HR employee record rather than unnecessarily 
+duplicate an HR system.
+Identity
+The screen shall support:
+ Employee/resource ID
+ Employee number
+ Name
+ Photograph
+ Staff type
+ Job title
+ Department
+ Employment type
+ Primary venue
+ Secondary venues
+ Manager
+ Operational status
+ Operational Information
+Configure:
+ Resource priority
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 36
+ Customer selectable yes/no
+ Individual selection allowed yes/no
+ Bookable yes/no
+ Scheduling enabled yes/no
+ Maximum concurrent assignment
+ Default assignment duration
+ Preferred operating area
+ Languages
+ Tags
+ Employment Classification
+Support:
+ Full-time
+ Part-time
+ Contractor
+ Temporary
+ Seasonal
+ External agency
+ System Links
+Where an HR/workforce system exists, TICVAI shall retain:
+ External employee ID
+ Source system
+ Synchronization status
+ Last synchronization
+ Record ownership
+Operational Summary
+The profile should provide a digital summary of:
+Availability | Skills | Certifications | Upcoming Assignments | Venue Access | Current Status
+Acceptance Condition
+Each staff resource has a complete operational profile that can be safely referenced by scheduling, 
+resource allocation, event management, mobile operations, and AI services.
+Screen 03 — Skills & Competency Management
+Purpose
+Define what each staff resource is capable of performing.
+Skill Library
+Administrators shall create reusable skills such as:
+ Ski instruction
+ Snowboarding
+ First aid
+ Lifeguarding
+ AV operation
+ Lighting operation
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 37
+ Crowd management
+ Customer service
+ Equipment operation
+ Language skills
+Skill Configuration
+Each skill shall support:
+ Skill code
+ Skill name
+ Skill category
+ Description
+ Level structure
+ Applicable roles
+ Applicable venues
+ Applicable experiences
+ Effective dates
+ Active/inactive
+ Proficiency Levels
+Configurable levels may include:
+ Beginner
+ Intermediate
+ Advanced
+ Expert
+or numerical structures such as:
+Level 1 Level 2 Level 3 Level 4 → → →
+ Employee Skill Assignment
+For each employee:
+ Skill
+ Proficiency level
+ Effective date
+ Expiry/review date
+ Assessor
+ Evidence
+ Notes
+ Verified status
+ AI Skill Matching
+The allocation engine shall use skill profiles when ranking staff for assignments.
+Example:
+Private Advanced Ski Lesson
+Required:
+ Ski Instruction: Level 3+
+ English
+ Private Lesson Qualified
+TICVAI shall exclude personnel who fail mandatory requirements.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 38
+Acceptance Condition
+Administrators can maintain reusable staff competencies and proficiency levels that are available to 
+the assignment and AI recommendation engines.
+Screen 04 — Certification & Expiry Management
+Purpose
+Manage certifications, licenses and credentials required for staff assignments.
+Certification Library
+Administrators shall configure:
+ Certification code
+ Certification name
+ Issuing authority
+ Applicable roles
+ Applicable resource types
+ Applicable venues
+ Validity period
+ Renewal requirements
+ Mandatory/optional
+ Warning period
+Examples:
+ First Aid
+ Lifeguard Certification
+ Instructor License
+ Security License
+ Equipment Operator License
+ Child Safeguarding
+ Health & Safety
+ Employee Certification Record
+For each employee:
+ Certification
+ Certificate number
+ Issue date
+ Expiry date
+ Issuing authority
+ Attachment
+ Verification status
+ Verified by
+ Verification date
+ Expiry Management
+Configurable alerts:
+ 90 days
+ 60 days
+ 30 days
+ 14 days
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 39
+ 7 days
+ Expired
+Operational Impact
+Administrators shall configure whether expiration:
+ Warns only
+ Prevents new assignments
+ Cancels future assignments
+ Requires manager override
+Acceptance Condition
+TICVAI maintains current certification records, proactively identifies expiry risks and prevents 
+unqualified staff from being assigned where mandatory certification rules apply.
+Screen 05 — Qualification & Assignment Rule Engine
+Purpose
+Convert skills, certifications and operational policies into machine-enforceable assignment rules.
+Rule Builder
+Administrators shall define requirements based on:
+ Role
+ Skill
+ Skill level
+ Certification
+ Language
+ Age/experience where permitted
+ Venue
+ Department
+ Experience
+ Attraction
+ Event type
+ Resource type
+ Working status
+Rule Logic
+Support:
+ AND
+ OR
+ NOT
+ Minimum requirement
+ Preferred requirement
+ Mandatory requirement
+Example:
+ Advanced Private Ski Lesson
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 40
+Staff must have:
+ Ski Instructor = Yes
+ AND
+ Ski Level 3 ≥
+ AND
+ Instructor Certification = Valid
+ AND
+ First Aid = Valid
+Preferred:
+ Customer language match
+ Qualification Result
+TICVAI shall return:
+ Qualified
+ Qualified with warning
+ Preferred
+ Not qualified
+with explanation.
+Rule Simulation
+Administrators shall be able to test a rule before activation.
+Example:
+Test this rule against all instructors.
+Result:
+38 Qualified
+7 Qualified with Warning
+12 Not Qualified
+Acceptance Condition
+Staff assignment requirements are machine-readable, testable and automatically enforced before 
+assignment confirmation.
+Screen 06 — Staff Availability & Working Pattern
+Purpose
+Define when an individual staff resource is normally available to work.
+Working Pattern
+Configure:
+ Working days
+ Start time
+ End time
+ Time zone
+ Effective period
+ Weekly hours
+ Availability type
+ Seasonal pattern
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 41
+ Availability Types
+Support:
+ Regular
+ Flexible
+ Seasonal
+ On-call
+ Temporary
+ External schedule
+ Multiple Working Patterns
+Example:
+ Peak Season
+Monday–Friday
+08:00–18:00
+ Off Season
+Monday–Thursday
+09:00–16:00
+ Availability Overrides
+Users shall configure:
+ Additional availability
+ Temporary unavailability
+ Special working day
+ Venue reassignment
+ Restricted hours
+ Calendar Preview
+The screen should provide a live calendar preview showing:
+ Available
+ Working
+ Unavailable
+ Leave
+ Break
+ Existing assignment
+Acceptance Condition
+Each staff resource has a reliable working-availability pattern that feeds the centralized Resource 
+Calendar and assignment engine.
+Screen 07 — Shift Template & Assignment Configuration
+Purpose
+Configure reusable workforce shift structures that can later be used by the operational roster engine.
+Shift Templates
+Examples:
+Morning Shift
+08:00–16:00
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 42
+Evening Shift
+16:00–00:00
+Event Shift
+14:00–23:00
+Split Shift
+08:00–12:00 / 16:00–20:00
+Shift Configuration
+Each template shall support:
+ Shift code
+ Shift name
+ Start/end time
+ Duration
+ Venue
+ Department
+ Applicable roles
+ Break policy
+ Overtime eligibility
+ Minimum rest period
+ Effective dates
+ Assignment Controls
+Administrators shall define:
+ Maximum shifts per day
+ Maximum consecutive days
+ Minimum rest between shifts
+ Allowed roles
+ Venue restrictions
+ Skill requirements
+Shift Preview
+The screen shall show how the shift template will appear within the Resource Calendar and roster.
+Board Boundary
+This screen configures shift templates and assignment rules.
+Actual roster construction and operational staffing will be managed in Board 4.
+Acceptance Condition
+Administrators can create reusable governed shift structures that can subsequently be consumed by 
+rostering and workforce scheduling.
+Screen 08 — Break, Leave & Absence Configuration
+Purpose
+Ensure employee availability reflects breaks, approved leave, absences and other workforce 
+exceptions.
+Break Policies
+Configure:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 43
+ Break type
+ Minimum shift duration
+ Break duration
+ Paid/unpaid
+ Mandatory/optional
+ Earliest break
+ Latest break
+ Number of breaks
+ Leave Types
+Examples:
+ Annual leave
+ Sick leave
+ Emergency leave
+ Unpaid leave
+ Training
+ Personal leave
+ Other configurable types
+ Leave Integration
+TICVAI shall support:
+ Manual leave entry
+ Approved leave imported from HR
+ Workforce management integration
+ Scheduling Impact
+Approved leave shall automatically make affected staff unavailable for assignment.
+ Absence Handling
+Support:
+ Planned absence
+ Unplanned absence
+ Sick
+ No-show
+ Training
+ Administrative block
+Where an absence impacts future assignments, TICVAI should generate a resource conflict.
+Smart Replacement Trigger
+When appropriate, the system shall trigger the later Smart Assignment engine:
+“3 assignments affected by Maria's absence.”
+“Suitable replacements available.”
+Acceptance Condition
+Breaks, leave and absences are automatically reflected in staff availability and cannot be ignored by 
+downstream scheduling without authorized override.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 44
+Screen 09 — Overtime & Working-Hour Rules
+Purpose
+Configure workforce rules controlling employee working hours and overtime eligibility before 
+operational rostering occurs.
+Working-Hour Rules
+Administrators shall configure:
+ Standard daily hours
+ Standard weekly hours
+ Maximum daily hours
+ Maximum weekly hours
+ Minimum rest period
+ Maximum consecutive working days
+ Overtime threshold
+Overtime Configuration
+Support:
+ Overtime allowed
+ Overtime prohibited
+ Approval required
+ Maximum overtime
+ Venue-specific rules
+ Role-specific rules
+ Employee-group rules
+ Scheduling Warnings
+TICVAI shall detect:
+ Approaching overtime
+ Overtime generated
+ Maximum hours exceeded
+ Rest-period violation
+ Consecutive-day violation
+AI Consideration
+AI Smart Assignment shall consider overtime when ranking candidates.
+Example:
+Maria
+Available
+Qualified
+Would create 2 hours overtime
+David
+Available
+Qualified
+No overtime
+Recommendation:
+David
+Board Boundary
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 45
+Detailed labor-cost calculations and workforce compliance monitoring remain part of Board 4.
+Acceptance Condition
+Working-hour and overtime rules are configurable and automatically considered before staff 
+assignments are confirmed.
+Screen 10 — Workforce Integration & Synchronization Center
+Purpose
+Connect TICVAI Resource Management with external HR, workforce management, payroll, identity, 
+and employee systems where applicable.
+Integration Sources
+The architecture shall support integration with systems such as:
+ HRMS
+ Workforce Management
+ Payroll
+ Time & Attendance
+ Identity Management
+ External staffing agencies
+ Data Mapping
+Administrators shall map external fields to TICVAI including:
+ Employee ID
+ Name
+ Department
+ Role
+ Venue
+ Employment status
+ Working hours
+ Leave
+ Shift
+ Skills
+ Certifications
+Ownership Rules
+For every field, administrators shall determine:
+TICVAI Master
+or
+External System Master
+This prevents conflicting updates.
+Synchronization
+Support:
+ API
+ Webhooks/event-driven integration
+ Scheduled synchronization
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 46
+ Manual synchronization
+ File import where required
+ Integration Monitoring
+Display:
+ Connected systems
+ Last synchronization
+ Successful records
+ Failed records
+ Warnings
+ Mapping errors
+ Authentication status
+ Conflict Handling
+Examples:
+Employee exists in HR but not TICVAI.
+Employee venue changed externally.
+Certification expired.
+Employee terminated externally but has future TICVAI assignments.
+The system shall flag affected downstream assignments.
+Acceptance Condition
+TICVAI can safely consume and synchronize workforce data from external systems while maintaining 
+clear field ownership, traceability and operational consistency.
+Board 3 Shared Intelligence Rules
+Staff selection throughout TICVAI shall use a common Staff Eligibility Engine.
+When evaluating an employee for an assignment, the engine should evaluate:
+Availability + Shift + Skills + Certifications + Qualification + Leave + Breaks + Venue + Working 
+Hours + Overtime + Assignment Conflicts
+The result shall be explainable.
+For example:
+Maria Garcia — 97% Match
+✓ Available
+✓ Level 3 Instructor
+✓ Certification valid
+✓ Correct venue
+✓ No overtime
+✓ Language match
+David Lee — 82% Match
+✓ Available
+✓ Qualified
+✓ Certification valid
+⚠ Different venue
+⚠ 30-minute transfer required
+Alex Johnson — Not Eligible
+✕ On approved leave
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 47
+AI must never bypass mandatory qualification, certification, safety, or workforce rules merely 
+because a candidate has a high recommendation score.
+Board 3 Shared Governance
+All ten screens shall support, where applicable:
+ Multi-tenant configuration
+ Multi-venue workforce management
+ RBAC/PBAC
+ Maker-checker approval
+ Effective dating
+ Version control
+ Audit history
+ Arabic/English localization
+ API accessibility
+ Event-driven synchronization
+ Mobile integration
+ AI-assisted configuration
+Sensitive staff information must be permission-controlled and separated from general operational 
+resource data.
+Board 3 End-to-End Outcome
+After Board 3, TICVAI understands much more than simply:
+“Maria is a staff resource.”
+The platform understands:
+Who Maria is Where she can work When she can work What she can do What she is → → → →
+certified to do Which assignments she qualifies for Whether she is on leave Whether the → → →
+assignment creates overtime
+This prepares the data required for Board 4 — Workforce Rostering, Attendance & Staffing 
+Control, where TICVAI will convert these rules and staff profiles into actual operational rosters, 
+attendance monitoring, shift changes, staffing-gap detection and workforce control.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 48
+TICVAI Resource Management
+Board 4 — Workforce Rostering, Attendance & 
+Staffing Control
+Board Objective
+Provide TICVAI with a centralized, intelligent Workforce Operations & Rostering Engine that 
+converts staff profiles, availability, skills, certifications, working-hour rules, and demand forecasts 
+into executable operational rosters.
+Board 4 shall enable managers to:
+ Build operational rosters
+ Assign employees to attractions, venues, events, and activities
+ Define minimum staffing requirements
+ Validate role and skill coverage
+ Identify staffing shortages
+ Manage shift swaps, transfers, pickups, and releases
+ Monitor planned versus actual attendance
+ Capture check-in/check-out and attendance exceptions
+ Validate workforce compliance before assignments
+ Calculate and forecast labor costs
+ Use AI to optimize staffing
+Board 3 answers:
+“Who can work?”
+Board 4 answers:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 49
+“Who should work, where should they work, when should they work, did they actually work, 
+and what does that staffing plan cost?”
+Primary matrix coverage: 1.2.11, 1.2.32–1.2.33, 1.2.37–1.2.39, 1.2.80–1.2.84.
+Supporting coverage: 1.2.3–1.2.5, 1.2.12–1.2.13, 1.2.17, 1.2.36, 1.2.52–1.2.57, 1.2.60–1.2.66, 1.2.69, 
+1.2.75–1.2.76.
+Screen 01 — Workforce Roster Command Center
+Purpose
+Provide managers with the primary operational workspace for viewing and managing workforce 
+deployment across venues, attractions, events, departments, and shifts.
+Dashboard
+The command center shall display:
+ Total scheduled staff
+ Staff currently on shift
+ Staff checked in
+ Staff absent
+ Late arrivals
+ Open shifts
+ Unfilled positions
+ Understaffed operations
+ Overtime risk
+ Compliance warnings
+ Staffing cost today
+ AI staffing recommendations
+ Roster Views
+Users shall switch between:
+ Day
+ Week
+ Month
+ Venue
+ Attraction
+ Event
+ Department
+ Employee
+ Role
+Visual Timeline
+The roster shall visually display:
+Employee Shift Venue Assignment Break Status → → → → →
+Example:
+ Maria Garcia
+08:00–10:00 | Group Ski Lesson
+10:00–10:30 | Break
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 50
+10:30–12:30 | Private Lesson
+12:30–14:00 | Available
+14:00–16:00 | Group Lesson
+Smart Status
+Employees shall display statuses such as:
+ Scheduled
+ Checked In
+ Working
+ On Break
+ Available
+ Late
+ Absent
+ No-Show
+ Overtime
+ Checked Out
+ Quick Actions
+Managers shall be able to:
+ Assign employee
+ Move assignment
+ Add shift
+ Replace employee
+ Open shift
+ Publish roster
+ Notify employee
+ Run AI optimization
+Acceptance Condition
+Managers can understand the complete workforce position for their permitted operations and 
+manage staffing directly from one operational roster workspace.
+Screen 02 — Attraction & Operational Staffing Roster
+Purpose
+Create detailed staffing plans for individual attractions, experiences, venues, departments, and 
+events.
+Roster Structure
+Managers shall select:
+ Date
+ Venue
+ Attraction
+ Event
+ Department
+ Operating period
+The system shall display required operational roles.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 51
+Example:
+Ski School — 25 August
+Required
+ 1 Supervisor
+ 6 Ski Instructors
+ 2 Snowboard Instructors
+ 1 Customer Service Agent
+Scheduled
+ 1 Supervisor ✓
+ 5 Ski Instructors ⚠
+ 2 Snowboard Instructors ✓
+ 1 Customer Service Agent ✓
+Gap: 1 Ski Instructor
+Assignment
+Managers may assign employees through:
+ Manual selection
+ Drag and drop
+ Smart Assign
+ AI Auto-Roster
+Employee Cards
+Each candidate shall show:
+ Name
+ Photograph
+ Role
+ Skill level
+ Certifications
+ Availability
+ Current hours
+ Venue
+ Overtime impact
+ AI suitability score
+Ticket/Experience Visibility
+Where relevant, the roster shall show the tickets or experiences driving workforce requirements.
+Example:
+14:00 Group Lesson
+18 tickets sold
+Required instructors: 3
+Assigned instructors: 2
+Gap: 1
+Acceptance Condition
+Managers can construct operational staffing rosters against actual attraction, event, experience, and 
+ticketing demand.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 52
+Screen 03 — Minimum Staffing & Coverage Rule Configuration
+Purpose
+Define the minimum personnel required to operate safely and effectively.
+Rule Builder
+Administrators shall configure staffing rules based on:
+ Venue
+ Attraction
+ Experience
+ Event
+ Department
+ Resource type
+ Role
+ Time
+ Day
+ Demand
+ Capacity
+ Tickets sold
+ Attendance forecast
+Fixed Rules
+Example:
+Waterpark Zone A
+Minimum:
+ 1 Supervisor
+ 4 Lifeguards
+ 1 First Aid Qualified Employee
+Demand-Based Rules
+Example:
+Ski School
+1 instructor per 8 participants.
+If:
+40 participants booked
+TICVAI calculates:
+5 instructors required
+Coverage Requirements
+Rules may require:
+ Specific role
+ Skill level
+ Certification
+ Language
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 53
+ Supervisor presence
+ First aid coverage
+ Security coverage
+Thresholds
+Configure:
+ Minimum
+ Target
+ Recommended
+ Maximum
+ Enforcement
+A rule may:
+ Warn
+ Require approval
+ Prevent roster publication
+ Trigger escalation
+Acceptance Condition
+Administrators can define fixed and demand-driven staffing requirements that TICVAI automatically 
+evaluates against planned rosters.
+Screen 04 — Staffing Gap & Coverage Control Center
+Purpose
+Identify workforce shortages before they create operational problems.
+Gap Detection
+TICVAI shall continuously compare:
+Required Staffing vs Scheduled Staffing vs Actual Attendance
+The system shall detect:
+ Missing staff
+ Missing role
+ Missing skill
+ Missing certification
+ Understaffing
+ Overstaffing
+ Absence-created gap
+ Demand-created gap
+ Venue coverage gap
+Example
+Adventure Park — 14:00
+Required: 12 Staff
+Scheduled: 11
+Checked In: 9
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 54
+Result:
+Planned Gap: 1
+Live Operational Gap: 3
+Severity
+Gaps may be:
+ Informational
+ Warning
+ High
+ Critical
+AI Recommendations
+TICVAI shall recommend:
+1. Available qualified employee
+2. Employee from nearby department
+3. Employee from another venue
+4. Shift extension
+5. Approved overtime
+6. External/temporary resource where configured
+Smart Resolution
+Example:
+Critical Coverage Gap
+Waterpark Zone B requires one additional certified lifeguard from 15:00–18:00.
+Recommended: Ahmed Hassan — 96% Match
+Acceptance Condition
+Managers can identify planned and live staffing gaps and receive actionable recommendations for 
+resolving them.
+Screen 05 — Shift Marketplace & Workforce Requests
+Purpose
+Allow employees and managers to manage shift changes through controlled workflows rather than 
+informal manual communication.
+Supported Requests
+Employees shall be able to request:
+ Shift swap
+ Shift transfer
+ Shift pickup
+ Shift release
+Shift Swap
+Example:
+Maria
+requests to exchange:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 55
+Tuesday 08:00–16:00
+with:
+David
+Wednesday 08:00–16:00
+Before allowing the swap, TICVAI shall validate:
+ Role
+ Skills
+ Certification
+ Availability
+ Working-hour limits
+ Rest periods
+ Overtime
+ Minimum staffing
+ Venue permission
+Open Shift Marketplace
+Managers may publish unfilled shifts.
+Eligible employees may:
+ View shift
+ Request pickup
+ Accept shift where allowed
+TICVAI shall only display shifts for which the employee meets configured eligibility rules.
+Approval Workflow
+Requests may require:
+ Employee acceptance
+ Supervisor approval
+ Department approval
+ Workforce manager approval
+Mobile Integration
+The same workflow shall be accessible from the TICVAI Employee App.
+Acceptance Condition
+Employees can request governed shift changes while TICVAI automatically validates qualifications, 
+workforce rules, and operational coverage before approval.
+Screen 06 — Attendance & Live Workforce Command Center
+Purpose
+Provide real-time visibility into whether scheduled employees actually reported and are available for 
+operation.
+Dashboard
+Display:
+ Scheduled today
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 56
+ Checked in
+ Not yet arrived
+ Late
+ Absent
+ No-show
+ On break
+ Checked out
+ Overtime
+ Attendance exceptions
+ Planned vs Actual
+For each employee:
+Employee Planned Actual In Actual Out Status
+Maria 08:00 07:56 — Working
+David 08:00 08:14 — Late
+Alex 08:00 — — No-Show
+ Live Alerts
+Managers shall receive alerts such as:
+David Lee arrived 14 minutes late.
+Alex Johnson has not checked in.
+Ski School staffing has fallen below minimum coverage.
+ Operational Link
+Attendance status shall immediately update:
+ Resource availability
+ Staffing coverage
+ Assignment eligibility
+ AI replacement recommendations
+Acceptance Condition
+Managers can monitor planned versus actual workforce attendance in real time and immediately 
+understand operational impact.
+Screen 07 — Staff Check-In, Check-Out & Attendance Exceptions
+Purpose
+Record actual employee working activity and manage exceptions to scheduled attendance.
+Check-In Methods
+TICVAI architecture shall support configurable methods such as:
+ Employee App
+ Manager check-in
+ Staff terminal
+ QR
+ NFC
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 57
+ Integrated time-and-attendance system
+ Attendance Record
+The system shall capture:
+ Planned check-in
+ Actual check-in
+ Planned check-out
+ Actual check-out
+ Attendance status
+ Lateness
+ Early departure
+ Overtime
+ No-show
+ Exception
+ Source/device
+ Exception Types
+Examples:
+ Late arrival
+ Early departure
+ Missed check-in
+ Missed check-out
+ Approved absence
+ Sick
+ Emergency
+ System error
+ Manager adjustment
+ Corrections
+Authorized managers may correct records.
+Every correction shall capture:
+ Original value
+ New value
+ User
+ Timestamp
+ Reason
+ Approval where required
+ Mobile Assignment Check-In
+Where configured, employees may also check into a specific assigned resource or operational 
+activity.
+Example:
+Checked In
+Employee: Maria Garcia
+Assignment: Private Ski Lesson
+Location: Ski School Zone A
+Time: 13:57
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 58
+Acceptance Condition
+TICVAI records actual workforce attendance and assignment activity with controlled exception 
+handling and complete auditability.
+Screen 08 — Workforce Compliance Validation Center
+Purpose
+Validate planned workforce schedules against legal, safety, certification, and organizational rules 
+before roster publication or assignment.
+Validation Rules
+The engine shall support:
+ Maximum working hours
+ Mandatory breaks
+ Minimum rest periods
+ Overtime limits
+ Consecutive working days
+ Certification requirements
+ Qualification requirements
+ Venue rules
+ Organizational workforce policies
+ Applicable labor regulations
+ Union rules where applicable
+ Validation Results
+Each issue shall display:
+ Employee
+ Rule violated
+ Severity
+ Affected shift
+ Operational impact
+ Recommended action
+Example:
+ Critical
+ Maria Garcia
+ Minimum rest required: 11 hours
+ Scheduled rest: 8 hours
+Next shift cannot be confirmed without authorized resolution.
+ Pre-Publish Validation
+Before publishing a roster, TICVAI shall run:
+ Availability Check
+ Qualification Check
+ Certification Check
+ Coverage Check
+ Working-Hour Check
+ Rest Check
+ Overtime Check
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 59
+ Conflict Check
+ Overrides
+Where policy permits an override, TICVAI shall require:
+ Authorized permission
+ Reason
+ Approval
+ Audit record
+Certain critical rules may be configured as non-overridable.
+Acceptance Condition
+No workforce roster is published without passing configured compliance validation or following an 
+explicitly authorized exception workflow.
+Screen 09 — Labor Cost & Staffing Budget Control
+Purpose
+Give managers visibility into the financial impact of staffing decisions before and after roster 
+publication.
+Cost Calculation
+TICVAI shall support calculation of:
+ Scheduled labor cost
+ Actual labor cost
+ Standard hours
+ Overtime cost
+ Event staffing cost
+ Venue staffing cost
+ Attraction staffing cost
+ Department staffing cost
+ Employee-group cost
+Budget Comparison
+Display:
+ Budget
+ Scheduled
+ Forecast
+ Actual
+ Variance
+Example:
+ Event A
+ Budget: AED 18,000
+ Scheduled Labor: AED 16,750
+ Forecast: AED 17,400
+ Variance to Budget: AED 600 favorable
+ Cost Drivers
+Managers shall understand:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 60
+ Base labor
+ Overtime
+ Additional staffing
+ Temporary staff
+ Cross-venue allocation
+ Premium shifts
+AI Cost Optimization
+AI may recommend:
+Replace an overtime assignment with an equally qualified available employee.
+Example:
+Current: Maria — AED 480 including overtime
+Alternative: David — AED 320
+Potential saving: AED 160
+Mandatory qualification and safety rules shall always take priority over cost optimization.
+Acceptance Condition
+Managers can understand staffing cost and budget impact before approving workforce plans and 
+can analyze actual labor expenditure after operations.
+Screen 10 — AI Workforce Planner & Roster Optimization
+Purpose
+Provide TICVAI's intelligent workforce-planning experience by automatically generating or optimizing
+operational rosters.
+AI Inputs
+The engine shall consider:
+ Operating schedule
+ Events
+ Experiences
+ Ticket sales
+ Forecast attendance
+ Required roles
+ Minimum staffing
+ Skills
+ Certifications
+ Employee availability
+ Leave
+ Shift patterns
+ Working-hour rules
+ Rest periods
+ Overtime
+ Venue
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 61
+ Staff preferences where permitted
+ Labor costs
+ Historical demand
+Generate Roster
+Managers may select:
+ Generate Roster with AI
+TICVAI shall generate a recommended staffing plan.
+Optimization Objectives
+Administrators may configure optimization priorities such as:
+ Best operational coverage
+ Minimize overtime
+ Minimize labor cost
+ Balance employee hours
+ Minimize cross-venue movement
+ Maximize skill match
+ Prioritize employee continuity
+Safety, compliance, and mandatory qualification rules shall remain hard constraints.
+ AI Explanation
+TICVAI shall explain recommendations.
+Example:
+Maria Garcia — Assigned
+Private Ski Lesson 14:00
+Why?
+✓ Available
+✓ Level 3 Instructor
+✓ Certification valid
+✓ Customer language match
+✓ Already at venue
+✓ No overtime
+Scenario Comparison
+Managers shall compare:
+Current Roster
+vs.
+AI Optimized Roster
+Example:
+Coverage: 94% → 100%
+Overtime: 22 hrs → 8 hrs
+Staffing gaps: 4 → 0
+Cross-venue transfers: 7 → 3
+Projected labor cost: AED 48,200 → AED 45,900
+Projected Saving: AED 2,300
+Human Approval
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 62
+AI shall recommend or generate plans but shall not bypass configured management approval 
+requirements.
+Managers may:
+ Accept all
+ Accept selected recommendations
+ Modify
+ Reject
+ Regenerate with different priorities
+Acceptance Condition
+TICVAI can generate and optimize workforce rosters using operational demand, employee eligibility, 
+compliance rules, availability, and cost while retaining human governance over final publication.
+Board 4 Shared Operational Logic
+Board 4 shall operate from a common real-time workforce state.
+A change such as:
+ Employee reports sick
+must immediately propagate through:
+Attendance Availability Existing Assignments Staffing Coverage Resource Calendar → → → → →
+AI Replacement Manager Alert Employee Notification → →
+Similarly:
+Ticket demand increases
+may trigger:
+Demand Forecast Staffing Requirement Staffing Gap AI Recommendation Roster → → → →
+Adjustment
+This event-driven behavior is essential to make Resource Management operationally intelligent 
+rather than static.
+Board 4 Shared Governance
+All ten screens shall support, where applicable:
+ Multi-tenant operation
+ Multi-venue workforce control
+ RBAC/PBAC
+ Approval workflows
+ Effective dating
+ Immutable audit history
+ API integration
+ Event-driven integration
+ Employee App integration
+ Notifications
+ Arabic and English
+ AI explainability
+ Human approval controls
+All workforce decisions must remain traceable.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 63
+Board 4 End-to-End Outcome
+After Board 4, TICVAI moves from knowing employee capabilities to actively managing the workforce.
+The complete flow becomes:
+Demand Staffing Requirement Roster Staff Assignment Coverage Validation → → → → →
+Employee Request Attendance Compliance Labor Cost AI Optimization → → → →
+TICVAI should therefore be able to tell an operations manager:
+“Tomorrow you require 126 staff across three venues. You currently have 121 eligible 
+employees scheduled. Five coverage gaps exist. I found qualified replacements for four of them
+and one requires management action.”
+And after optimization:
+“All mandatory positions are covered. The proposed roster reduces overtime by 14 hours and 
+projected labor cost by AED 2,100 while maintaining all qualification and compliance 
+requirements.”
+That is the intended intelligence level of the TICVAI Workforce Operations Engine.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 64
+TICVAI Resource Management
+Board 5 — Experience, Ticket & Dynamic Resource 
+Assignment
+Board Objective
+Provide TICVAI with a centralized Resource Requirement & Assignment Engine that connects ticket 
+products, attraction experiences, sessions, and time slots with the operational resources required to 
+deliver them.
+Board 5 shall allow administrators to configure:
+ Which resources an experience requires
+ How many resources are required
+ Which resource combinations are valid
+ Which skills and qualifications are mandatory
+ How resource requirements change with ticket quantity or capacity
+ Whether customers may select a specific resource
+ Whether customers may select a resource skill/type rather than a specific person
+ Whether TICVAI should automatically allocate resources
+ How resource priority is calculated
+ What happens when the assigned resource becomes unavailable
+ How assignments are exposed through POS, B2C, B2B, mobile, and APIs
+The core principle is:
+A ticket should not be considered available merely because a time slot exists. It should only be 
+sellable when all required operational resources can also be satisfied.
+Example:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 65
+A Private Ski Lesson at 14:00 may require:
+ 1 qualified ski instructor
+ Level 3+ certification
+ Training Area A
+ Maximum 4 participants
+ 15-minute preparation buffer
+If the time slot exists but no qualified instructor is available, TICVAI shall understand that the 
+experience cannot be sold unless an authorized alternative can be found.
+Primary matrix coverage: 1.2.2, 1.2.4–1.2.7, 1.2.11–1.2.13, 1.2.36, 1.2.52.
+Supporting coverage: 1.2.19, 1.2.28–1.2.30, 1.2.34–1.2.35, 1.2.53–1.2.57, 1.2.73–1.2.77.
+Screen 01 — Experience Resource Requirement Builder
+Purpose
+Define which operational resources are required for each attraction, experience, ticket product, 
+session, or service.
+Experience Selection
+Administrators shall select:
+ Tenant
+ Venue
+ Attraction
+ Experience
+ Ticket product
+ Variant
+ Session type
+ Effective period
+Resource Requirements
+For each experience, administrators shall define one or more resource requirements.
+Example:
+Private Ski Lesson
+Required Resources
+1 × Ski Instructor
+1 × Training Area
+Group Ski Lesson
+2 × Ski Instructors
+1 × Training Area
+1 × Equipment Set per participant
+VIP Cabana Experience
+1 × Cabana
+1 × Service Attendant
+4 × Towels
+1 × Locker
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 66
+Requirement Types
+Each requirement may reference:
+ Specific resource
+ Resource type
+ Resource category
+ Resource package
+ Staff role
+ Skill
+ Certification
+ Venue/space
+ Equipment
+ Asset
+ Rental resource
+Requirement Properties
+Configure:
+ Mandatory/optional
+ Minimum quantity
+ Maximum quantity
+ Fixed/dynamic quantity
+ Customer visible
+ Customer selectable
+ Auto-assign
+ Allocation timing
+ Priority
+ Effective dates
+ Visual Requirement Map
+The screen should visually display:
+ Experience
+ ↓
+ Required Staff
+ Required Space
+ Required Equipment
+ Optional Resources
+This allows administrators to understand the complete operational dependency of the experience.
+Acceptance Condition
+Administrators can define all operational resource requirements for an experience and TICVAI can 
+use those requirements during availability, sale, reservation, and assignment.
+Screen 02 — Staff-to-Experience Qualification Mapping
+Purpose
+Define which types of employees are permitted to deliver a specific experience.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 67
+Staff Requirement Configuration
+Administrators shall configure:
+ Required role
+ Required skill
+ Minimum skill level
+ Required certification
+ Required language
+ Required venue authorization
+ Experience-specific qualification
+ Preferred attributes
+Example:
+ Advanced Private Ski Lesson
+Mandatory:
+ Role = Ski Instructor
+ Ski Instruction Level 3 ≥
+ Instructor Certification = Valid
+ First Aid = Valid
+Preferred:
+ Same language as customer
+ Previous private-lesson experience
+ Eligibility Preview
+The screen shall immediately show:
+Eligible Staff: 38
+Eligible with Warning: 7
+Not Eligible: 12
+Administrators shall be able to inspect why an employee does or does not qualify.
+Qualification Source
+The engine shall consume the skill, certification, and qualification rules established in Board 3 rather 
+than recreate them.
+Acceptance Condition
+Every staff-based experience can be linked to machine-readable staff eligibility requirements that 
+TICVAI automatically enforces during assignment.
+Screen 03 — Resource Combination Builder
+Purpose
+Allow experiences to require multiple resources in valid combinations.
+Combination Logic
+Support:
+ AND
+ OR
+ One of
+ At least X
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 68
+ Exactly X
+ Optional
+ Conditional
+Example:
+ Corporate Event Package
+Requires:
+ 1 × Meeting Room
+ AND
+ 1 × AV Package
+ AND
+ 1 × Technician
+ OR
+ 2 × AV Operators
+ Alternative Combinations
+Administrators may define multiple valid delivery models.
+Example:
+Group Lesson
+Option A
+2 × Level 2 Instructors
+OR
+Option B
+1 × Level 3 Instructor
++
+1 × Level 1 Instructor
+Conditional Combinations
+Resource combinations may change based on:
+ Participant count
+ Ticket type
+ Customer type
+ Venue
+ Day
+ Time
+ Experience variant
+ Accessibility requirement
+Validation
+TICVAI shall test combinations for:
+ Resource availability
+ Dependency rules
+ Circular requirements
+ Qualification
+ Capacity
+ Venue restrictions
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 69
+Acceptance Condition
+Administrators can configure flexible multi-resource combinations and TICVAI can determine 
+whether at least one valid combination exists before confirming availability.
+Screen 04 — Ticket Demand & Resource Capacity Mapping
+Purpose
+Connect ticket sales and participant quantity directly to resource requirements.
+Capacity Models
+Support:
+ Fixed
+One resource regardless of participant count.
+Example:
+1 Cabana per reservation.
+ Ratio-Based
+One resource per X participants.
+Example:
+1 Instructor per 8 participants.
+ Tiered
+1–8 participants 1 Instructor →
+9–16 2 Instructors →
+17–24 3 Instructors →
+ Capacity-Based
+Resource capacity determines maximum saleable inventory.
+Example:
+Training Area capacity = 30.
+ Real-Time Calculation
+TICVAI shall calculate:
+Ticket Demand Participant Count Resource Demand Available Resource Capacity → → → →
+Saleable Capacity
+Example:
+Session capacity: 40
+Instructor ratio: 1:8
+Available qualified instructors: 4
+Maximum operational capacity:
+32 participants
+Even if the venue capacity is 40.
+Capacity Protection
+The system shall prevent ticket inventory from exceeding the capacity that can actually be supported 
+by required resources unless an authorized oversell policy exists.
+Acceptance Condition
+Ticket availability dynamically reflects the actual operational resource capacity required to deliver the 
+experience.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 70
+Screen 05 — Customer Resource Selection Configuration
+Purpose
+Control whether customers or cashiers may choose a specific staff member or resource during 
+purchase.
+Selection Modes
+Administrators shall configure:
+ No Selection
+TICVAI automatically assigns the resource.
+Resource Type Selection
+Customer selects:
+Instructor Level 3
+but not a specific instructor.
+Specific Resource Selection
+Customer selects:
+Maria Garcia
+Preference Only
+Customer requests Maria, but TICVAI may assign another eligible instructor.
+Channel Configuration
+Selection behavior may differ by:
+ POS
+ B2C
+ B2B
+ Mobile App
+ Call Center
+ API
+Example:
+ B2C
+Customer may choose instructor.
+ POS
+Cashier may override instructor.
+ B2B
+Auto-assignment only.
+ Resource Cards
+Selectable resources should display configurable information such as:
+ Photo
+ Name
+ Role
+ Skill
+ Language
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 71
+ Availability
+ Next available time
+ Venue
+ Suitability
+ Customer-facing description
+Sensitive internal workforce data must never be exposed to customers.
+Acceptance Condition
+Administrators can determine precisely how resource selection works for each experience and sales 
+channel.
+Screen 06 — Skill-Based & Smart Resource Selection
+Purpose
+Allow users to request the type or capability of resource they require without manually choosing an 
+individual resource.
+Smart Search
+Cashiers or customers may select criteria such as:
+ Instructor level
+ Language
+ Skill
+ Accessibility capability
+ Equipment type
+ Room capacity
+ Resource feature
+Example:
+Ski Instructor
+Level 3+
+Arabic speaking
+Tomorrow
+14:00
+TICVAI shall return only eligible resources.
+Matching Score
+Resources may be ranked by:
+ Qualification
+ Skill
+ Availability
+ Language
+ Venue
+ Workload
+ Customer preference
+ Cost
+ Priority
+Example:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 72
+Maria Garcia — 98% Match
+✓ Level 3
+✓ Arabic
+✓ Available
+✓ Same venue
+✓ No overtime
+David Lee — 87% Match
+✓ Level 3
+✕ Arabic
+✓ Available
+✓ Same venue
+Acceptance Condition
+Users can find suitable resources by operational characteristics rather than requiring knowledge of 
+specific resource names.
+Screen 07 — Customer / Cashier Resource Assignment Experience
+Purpose
+Provide the fast, visual assignment interface shown during ticket or experience purchase.
+This screen shall be optimized for speed and simplicity.
+User Flow
+The cashier/customer experience should follow:
+Experience
+→
+Date
+→
+Time
+→
+Available Resource
+→
+Confirm
+Calendar Experience
+After selecting a date, TICVAI shall display:
+ Available times
+ Limited availability
+ Fully booked times
+ Resource-dependent availability
+After selecting a time, available resources shall appear as visual cards.
+Example:
+14:00 — Available Instructors
+Maria Garcia
+Level 3
+Arabic / English
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 73
+Available
+ Recommended
+David Lee
+Level 3
+English
+Available
+Sophie Martin
+Level 2
+English / French
+Available
+AI Recommended Option
+TICVAI should highlight:
+ Best Match
+with an explanation where appropriate.
+One-Click Assignment
+The cashier should be able to assign the recommended resource without opening the administrative 
+backend.
+No Resource Available
+If no resource is available, TICVAI shall offer:
+ Another time
+ Another date
+ Alternative resource
+ Waiting list where configured
+ Manager override where permitted
+Acceptance Condition
+Cashiers and authorized customer channels can assign resources through a simple visual workflow 
+without understanding backend scheduling complexity.
+Screen 08 — Dynamic Resource Allocation Engine
+Purpose
+Configure how TICVAI automatically chooses a resource when a customer or cashier does not make a
+specific selection.
+Allocation Modes
+Administrators shall configure:
+ Manual
+ Automatic
+ AI recommended + user confirmation
+ Fully automatic
+ Allocation Timing
+Resources may be allocated:
+ During availability search
+ At reservation
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 74
+ At payment
+ At ticket issuance
+ X hours before experience
+ At operational roster publication
+ At customer check-in
+ Allocation Criteria
+The engine shall evaluate:
+ Availability
+ Qualification
+ Skill
+ Certification
+ Capacity
+ Venue
+ Priority
+ Workload
+ Customer preference
+ Cost
+ Overtime
+ Resource dependencies
+ Operational continuity
+Allocation Lock
+Administrators shall define when an automatically assigned resource becomes locked from 
+automatic reassignment.
+Example:
+Assignment locked 2 hours before experience.
+API Behavior
+The same allocation engine shall be available through APIs and online channels as required by the 
+resource-management matrix.
+Acceptance Condition
+TICVAI can automatically allocate suitable resources consistently across backend, POS, online, 
+mobile, and API channels.
+Screen 09 — Priority, Scoring & Allocation Policy
+Purpose
+Configure how TICVAI ranks eligible resources when several resources could satisfy the same 
+requirement.
+Scoring Factors
+Administrators may assign configurable weight to:
+ Skill match
+ Certification
+ Customer preference
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 75
+ Venue proximity
+ Current workload
+ Equal workload distribution
+ Labor cost
+ Overtime
+ Resource priority
+ Historical assignment
+ Customer continuity
+ Utilization
+Example:
+Skill Match — 30%
+Availability — Mandatory
+Customer Language — 20%
+Same Venue — 15%
+Workload Balance — 15%
+Customer Preference — 10%
+Cost — 10%
+Hard vs Soft Rules
+Hard Rules
+Cannot be violated.
+Examples:
+ Mandatory certification
+ Availability
+ Safety qualification
+Soft Rules
+Influence ranking.
+Examples:
+ Language preference
+ Customer preference
+ Lower cost
+ Same instructor as previous visit
+Simulation
+Administrators shall test allocation policies using sample bookings.
+Example:
+Booking Test
+Private Ski Lesson
+14:00
+Arabic-speaking customer
+Results:
+1. Maria — 97%
+2. Ahmed — 92%
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 76
+3. David — 78%
+The system shall explain the scoring.
+Acceptance Condition
+Resource allocation priorities are configurable, transparent, testable, and explainable.
+Screen 10 — Automatic Replacement & Assignment Recovery
+Purpose
+Automatically detect when an assigned resource becomes unavailable and protect the customer's 
+booking by finding a suitable replacement.
+Trigger Events
+Recovery may be triggered by:
+ Staff absence
+ Sick leave
+ Resource breakdown
+ Maintenance
+ Certification expiry
+ Venue closure
+ Schedule change
+ Double-booking resolution
+ Operational emergency
+ Impact Analysis
+When a resource becomes unavailable, TICVAI shall identify:
+ Affected bookings
+ Affected customers
+ Affected experiences
+ Affected time slots
+ Affected venues
+Example:
+Instructor Alex — Unavailable
+7 future bookings affected
+Replacement Search
+TICVAI shall identify eligible alternatives and rank them.
+Example:
+Recommended Replacements
+1. Maria Garcia — 96%
+✓ Qualified
+✓ Available
+✓ Same venue
+✓ Same language
+✓ No overtime
+2. David Lee — 88%
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 77
+✓ Qualified
+✓ Available
+⚠ Different venue
+Recovery Modes
+Administrators shall configure:
+ Automatic
+Replace without manual intervention when all rules are satisfied.
+ Approval Required
+AI recommends replacement and manager approves.
+ Manual
+Manager chooses replacement.
+ Customer Impact
+Where the replacement affects customer-facing information, TICVAI may trigger:
+ Customer notification
+ Updated ticket/booking
+ Employee notification
+ Operational notification
+Audit
+The system shall record:
+Original Resource Trigger Alternatives Evaluated Replacement User/System Decision → → → →
+→ Timestamp
+Acceptance Condition
+When an assigned resource becomes unavailable, TICVAI detects affected bookings and either 
+automatically replaces the resource or presents governed replacement recommendations without 
+losing the underlying customer reservation.
+Board 5 Shared Resource Availability Logic
+Resource-dependent products shall use a common availability calculation:
+Experience Schedule
+
+Ticket Capacity
+
+Required Resource Availability
+
+Resource Qualification
+
+Resource Capacity
+
+Dependencies
+
+Operational Blocks
+=
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 78
+True Saleable Availability
+A time slot shall therefore not be shown as available merely because the attraction calendar is open.
+Example:
+Private Ski Lesson — 14:00
+Experience schedule: ✓
+Training area: ✓
+Ticket capacity: ✓
+Qualified instructor: ✕
+Result
+Not Available
+or TICVAI may recommend another time where all requirements can be fulfilled.
+Board 5 Shared AI Assignment Logic
+TICVAI shall maintain a common Resource Suitability Score for eligible candidates.
+Example:
+Maria Garcia — 97%
+✓ Available
+✓ Correct skill
+✓ Certification valid
+✓ Same venue
+✓ Customer language match
+✓ No overtime
+✓ Balanced workload
+David Lee — 84%
+✓ Available
+✓ Qualified
+✓ Certification valid
+⚠ Different venue
+⚠ Higher workload
+Alex Johnson — Not Eligible
+✕ On leave
+AI recommendations must remain explainable.
+Mandatory operational, safety, certification, capacity, and qualification requirements cannot be 
+overridden by an AI recommendation score.
+Board 5 Cross-Channel Architecture
+The same Resource Assignment Engine shall be consumed by:
+ Backend administration
+ POS
+ B2C website
+ B2C mobile application
+ B2B/reseller
+ Call center
+ Employee App
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 79
+ Event Management
+ Ticketing
+ External APIs
+This is critical.
+TICVAI must not create separate assignment logic for POS, B2C, and API.
+All channels shall request availability and assignment from the same centralized Resource 
+Management service.
+Board 5 Shared Governance
+All screens shall support, where applicable:
+ Multi-tenant architecture
+ Multi-venue operation
+ RBAC/PBAC
+ Approval workflows
+ Effective dating
+ Versioning
+ Immutable audit history
+ API accessibility
+ Event-driven integrations
+ Arabic and English
+ AI explainability
+ Customer-data privacy
+ Manual override controls
+ Exception reason capture
+Board 5 End-to-End Outcome
+After Board 5, TICVAI understands the complete relationship between a commercial booking and 
+the resources required to deliver it.
+The flow becomes:
+Ticket / Experience
+→ Resource Requirement
+→ Qualification
+→ Resource Combination
+→ Demand & Capacity
+→ Customer Preference
+→ Eligible Resources
+→ AI Ranking
+→ Assignment
+→ Automatic Recovery
+For the cashier, however, all this complexity should disappear.
+The cashier should experience something as simple as:
+Private Ski Lesson
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 80
+1. Select Date
+25 August
+2. Select Time
+14:00
+3. TICVAI checks everything automatically
+✓ Experience available
+✓ Training area available
+✓ Qualified instructors available
+✓ Capacity available
+4. Recommended Instructor
+Maria Garcia — Best Match
+5. Confirm
+That is the objective of Board 5: complex intelligence in the backend, extremely simple 
+interaction in the frontend.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 81
+TICVAI Resource Management
+Board 6 — Equipment, Assets, Rental & 
+Maintenance Management
+Board Objective
+Provide TICVAI with a centralized Physical Resource & Rental Operations Engine for managing 
+equipment, operational assets, and customer-rental resources throughout their complete lifecycle.
+Board 6 shall manage resources such as:
+ Towels
+ Strollers
+ Wheelchairs
+ Lockers
+ Cabanas
+ Helmets
+ Sports equipment
+ Cameras
+ Projectors
+ AV equipment
+ Lighting equipment
+ Sound systems
+ Furniture
+ Booths
+ Vehicles
+ Operational equipment
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 82
+ Customer-defined physical assets
+The board shall support:
+Asset Registration Inventory Availability Reservation Checkout Guest Assignment → → → → → →
+Deposit Return Inspection Maintenance Depreciation Retirement → → → → →
+The core objective is to give TICVAI complete visibility over:
+What physical resources exist, where they are, who currently has them, what condition they 
+are in, when they are due back, whether a deposit is held, and whether they are operationally 
+available.
+Primary matrix coverage: 1.2.8–1.2.10, 1.2.16, 1.2.40–1.2.46.
+Supporting coverage: 1.2.1–1.2.2, 1.2.19, 1.2.23–1.2.30, 1.2.41–1.2.44, 1.2.67–1.2.75.
+Screen 01 — Equipment & Asset Command Center
+Purpose
+Provide operations teams with a real-time overview of all physical resources across the organization.
+Dashboard KPIs
+Display:
+ Total assets
+ Available
+ Reserved
+ Checked out
+ In use
+ Due for return
+ Overdue
+ Under maintenance
+ Inspection due
+ Damaged
+ Lost
+ Retired
+ Asset Value Indicators
+Where financial permissions allow:
+ Total asset value
+ Replacement value
+ Depreciated value
+ Maintenance cost
+ Lost/damaged value
+Resource Breakdown
+Users shall view resources by:
+ Resource type
+ Category
+ Venue
+ Location
+ Operational status
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 83
+ Condition
+ Ownership
+ Rental status
+Smart Alerts
+Examples:
+18 rental items overdue
+7 assets require inspection this week
+Projector P-17 has repeated maintenance incidents
+Towel inventory at Waterpark Zone B is below threshold
+Quick Actions
+Users may initiate:
+ Add asset
+ Checkout
+ Return
+ Transfer
+ Block for maintenance
+ Record inspection
+ Report damage
+ Retire asset
+Acceptance Condition
+Authorized users can understand the real-time operational state of all physical resources and 
+immediately identify assets requiring operational action.
+Screen 02 — Rental Resource Configuration
+Purpose
+Define how a physical resource behaves when offered as a customer-rental resource.
+Rental Configuration
+Administrators shall configure:
+ Rental enabled
+ Rental item/resource type
+ Rental duration
+ Minimum duration
+ Maximum duration
+ Rental increments
+ Same-day return required
+ Overnight rental permitted
+ Extension permitted
+ Maximum extension
+ Advance reservation permitted
+ Walk-in rental permitted
+ Customer eligibility
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 84
+ Venue availability
+ Quantity Model
+Support:
+ Individually Tracked
+Example:
+ Stroller ST-00123
+ Pooled Inventory
+Example:
+ 500 standard towels
+ Capacity-Based
+Example:
+ 50 lockers within Locker Zone A
+ Return Rules
+Configure:
+ Expected return time
+ Grace period
+ Late-return policy
+ Automatic overdue status
+ Return venue
+ Cross-venue return allowed
+ Inspection required
+ Channel Rules
+Rental availability may be exposed through:
+ POS
+ B2C
+ Mobile App
+ Kiosk
+ Employee App
+ API
+Acceptance Condition
+Administrators can define how each physical resource or resource category behaves throughout the 
+rental process.
+Screen 03 — Rental Inventory & Availability Control
+Purpose
+Provide real-time inventory visibility for rental and operational resources.
+Inventory Status
+For each resource/category, TICVAI shall track:
+ Total Quantity
+ Available
+ Reserved
+ Checked Out
+ Under Inspection
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 85
+ Cleaning
+ Maintenance
+ Damaged
+ Lost
+Example
+Waterpark Towels
+Total: 1,000
+Available: 582
+Reserved: 75
+Checked Out: 278
+Cleaning: 42
+Damaged: 13
+Maintenance/Other: 10
+Location Tracking
+Inventory shall be visible by:
+ Venue
+ Warehouse
+ Store
+ Rental station
+ Attraction
+ Zone
+ Operational location
+ Inventory Thresholds
+Administrators shall configure:
+ Minimum available quantity
+ Reorder/transfer threshold
+ Critical threshold
+ Maximum quantity
+ Smart Alerts
+Example:
+Towel Station B has only 58 towels available. Expected demand for the next 2 hours is 140.
+Recommended:
+Transfer 100 towels from Station A.
+Acceptance Condition
+TICVAI maintains a real-time operational inventory of rental resources and identifies shortages 
+before they impact customer operations.
+Screen 04 — Resource Checkout Workspace
+Purpose
+Provide frontline employees with a fast digital interface for issuing physical resources to guests.
+Checkout Methods
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 86
+The employee shall be able to identify the resource using:
+ Search
+ Barcode
+ QR code
+ RFID/NFC where supported
+ Asset ID
+ Inventory selection
+Guest Identification
+The resource may be linked to:
+ Guest profile
+ Ticket
+ Booking
+ Membership
+ Order
+ Wristband
+ Mobile account
+Checkout Information
+Capture:
+ Resource
+ Guest
+ Checkout time
+ Expected return
+ Rental duration
+ Venue
+ Rental station
+ Employee
+ Condition at checkout
+ Deposit
+ Notes
+ Fast Checkout
+Example:
+ Scan Guest Wristband
+→ Guest identified
+ Scan Stroller QR
+→ Resource identified
+ Deposit: AED 100
+→ Collected
+ Confirm
+→ Checked Out
+The entire process should require only a few seconds.
+Availability Update
+Once checkout is confirmed:
+Available Checked Out →
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 87
+The resource shall immediately disappear from available inventory across all channels.
+Acceptance Condition
+Frontline employees can issue a resource to a guest through a fast scan-driven workflow, and 
+resource availability updates immediately.
+Screen 05 — Guest & Resource Assignment
+Purpose
+Maintain a live relationship between every checked-out physical resource and the guest responsible 
+for it.
+Assignment View
+Display:
+ Guest
+ Photograph where available
+ Ticket/booking
+ Membership
+ Resource
+ Resource ID
+ Checkout time
+ Expected return
+ Current status
+ Deposit
+ Venue
+ Responsible employee
+ Guest Resource Timeline
+Example:
+ Guest — John Smith
+ 10:03 — Entered Waterpark
+ 10:08 — Towel T-142 issued
+ 10:10 — Locker L-382 assigned
+ 10:14 — Stroller S-084 issued
+Expected returns:
+Towel — Before venue closing
+Locker — 18:00
+Stroller — 17:30
+ Multiple Resources
+One guest may hold multiple resources simultaneously where permitted.
+ Restrictions
+Administrators may configure:
+ Maximum resources per guest
+ Resource-type limits
+ Eligibility requirements
+ Membership benefits
+ Deposit requirements
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 88
+ Operational Search
+Staff shall be able to search:
+ “Who has stroller S-084?”
+or:
+ “What resources does John Smith currently hold?”
+Acceptance Condition
+Every checked-out tracked resource can be traced to the responsible guest, booking, transaction, and
+issuing employee.
+Screen 06 — Rental Duration, Extension & Return Management
+Purpose
+Control rental periods and manage extensions, overdue items, and returns.
+Active Rental View
+Display:
+ Resource
+ Guest
+ Checkout
+ Due time
+ Remaining time
+ Status
+ Deposit
+ Extension eligibility
+ Status Indicators
+ Active
+ Due Soon
+ Overdue
+ Extended
+ Return Pending
+ Returned
+ Extension
+Where permitted:
+Extend Rental
+TICVAI shall validate:
+ Future reservation
+ Operating hours
+ Maximum rental duration
+ Resource availability
+ Additional fee
+ Deposit requirement
+Return Workflow
+On return:
+1. Identify resource.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 89
+2. Identify active rental.
+3. Record return time.
+4. Inspect condition.
+5. Calculate additional charges.
+6. Process deposit.
+7. Determine next status.
+Possible next status:
+ Available
+ Cleaning
+ Inspection
+ Maintenance
+ Damaged
+Overdue Management
+TICVAI shall identify overdue resources and may trigger:
+ Employee alert
+ Customer notification
+ Late fee
+ Deposit retention workflow
+Acceptance Condition
+TICVAI controls the complete rental period from checkout through extension, overdue monitoring, 
+and final return.
+Screen 07 — Deposit & Rental Financial Control
+Purpose
+Configure and manage deposits associated with rental resources.
+Deposit Configuration
+Administrators shall define:
+ Deposit required yes/no
+ Fixed deposit
+ Percentage deposit
+ Deposit by resource type
+ Deposit by customer type
+ Deposit by membership tier
+ Deposit currency
+ Waiver rules
+Example:
+Stroller
+Rental: AED 50
+Deposit: AED 100
+Premium Camera
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 90
+Rental: AED 200
+Deposit: AED 1,000
+Collection Methods
+The architecture shall support applicable payment methods such as:
+ Cash
+ Card
+ Wallet
+ Preauthorization
+ Account balance
+ Deposit Status
+Track:
+ Required
+ Collected
+ Authorized
+ Held
+ Partially retained
+ Returned
+ Forfeited
+ Return Decision
+Upon resource return:
+ Good Condition
+Deposit → Full Return
+ Damaged
+Deposit → Partial/Full Retention
+ Lost
+Deposit → Retention according to policy
+Governance
+Deposit adjustments or manual release may require manager approval.
+Finance Integration
+All deposit movements shall be traceable to:
+ Transaction
+ Guest
+ Resource
+ Employee
+ Payment reference
+ Finance/ledger reference
+Acceptance Condition
+Deposits are collected, held, adjusted, and returned according to configurable rental policies with 
+complete financial traceability.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 91
+Screen 08 — Maintenance & Resource Blocking
+Purpose
+Prevent unavailable or unsafe resources from being assigned, rented, or reserved.
+Maintenance Types
+Support:
+ Preventive
+ Corrective
+ Emergency
+ Scheduled
+ Inspection-triggered
+ Manufacturer service
+ Maintenance Record
+Capture:
+ Resource
+ Maintenance type
+ Issue
+ Severity
+ Start date/time
+ Expected completion
+ Actual completion
+ Technician/vendor
+ Cost
+ Attachments
+ Notes
+ Automatic Blocking
+When maintenance begins:
+Available Under Maintenance →
+TICVAI shall immediately prevent:
+ New reservations
+ Checkout
+ Assignment
+ Event allocation
+Future Booking Impact
+If future reservations exist, TICVAI shall identify them.
+Example:
+Projector P-01 blocked for maintenance.
+3 future assignments affected.
+The system should trigger the replacement engine established in Board 5.
+Maintenance Calendar
+Users shall see maintenance periods alongside operational availability.
+Acceptance Condition
+Resources under maintenance are automatically removed from operational availability and affected 
+future assignments are identified immediately.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 92
+Screen 09 — Inspection, Condition & Compliance Management
+Purpose
+Ensure physical resources remain safe, compliant, and operationally fit for use.
+Inspection Templates
+Administrators shall configure checklists by resource type.
+Example:
+Stroller Return Inspection
+ Frame condition
+ Wheels
+ Safety belt
+ Brakes
+ Cleanliness
+AV Equipment Inspection
+ Power test
+ Cable condition
+ Input/output test
+ Physical damage
+ Firmware/status
+Inspection Result
+Support:
+ Passed
+ Passed with Observation
+ Cleaning Required
+ Maintenance Required
+ Failed
+ Unsafe
+ Evidence
+Users may attach:
+ Photos
+ Documents
+ Notes
+ Signature
+Compliance Scheduling
+Track:
+ Last inspection
+ Next inspection
+ Inspection frequency
+ Responsible person
+ Compliance status
+ Automatic Status
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 93
+Example:
+If:
+ Inspection Result = Failed
+then:
+Resource Status Blocked →
+and optionally:
+ Create Maintenance Request
+AI Assistance
+Where enabled, AI may identify repeated failure patterns.
+Example:
+Projector P-17 has failed three power-related inspections in 60 days. Consider replacement 
+assessment.
+Acceptance Condition
+TICVAI records inspection and condition history and automatically prevents failed or unsafe 
+resources from operational use.
+Screen 10 — Asset Lifecycle, Depreciation & Retirement
+Purpose
+Manage the physical resource from acquisition through operational use to final retirement.
+Lifecycle
+Support:
+ Ordered
+→ Received
+→ Active
+→ In Use
+→ Maintenance
+→ Suspended
+→ End of Life
+→ Retired
+→ Disposed
+ Asset Information
+Track:
+ Acquisition date
+ Purchase cost
+ Supplier
+ Warranty
+ Expected useful life
+ Replacement value
+ Current book/reference value
+ Depreciation method
+ Depreciation period
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 94
+ Maintenance history
+ Utilization
+ Condition
+ Depreciation
+Where required, support reference tracking for:
+ Straight-line depreciation
+ Configurable financial method
+ Accumulated depreciation
+ Current value
+Detailed accounting postings may remain owned by the Finance/ERP integration while Resource 
+Management maintains operational asset references.
+Retirement Assessment
+TICVAI shall provide:
+ Age
+ Condition
+ Utilization
+ Maintenance cost
+ Failure frequency
+ Current value
+ Replacement recommendation
+AI Lifecycle Recommendation
+Example:
+Projector P-17
+Age: 6.2 years
+Maintenance Cost YTD: AED 4,800
+Downtime: 14 days
+Utilization: 71%
+AI recommendation:
+Consider replacement. Maintenance cost has exceeded configured lifecycle threshold.
+Retirement Workflow
+Retirement may require:
+ Operations approval
+ Finance approval
+ Asset manager approval
+Capture:
+ Retirement reason
+ Retirement date
+ Disposal method
+ Disposal value
+ Replacement resource
+Once retired, the resource must no longer appear as operationally available.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 95
+Acceptance Condition
+TICVAI maintains complete lifecycle visibility for physical resources from acquisition through 
+retirement, including operational history, maintenance, condition, value references, and governance.
+Board 6 Shared Digital Resource Journey
+A physical resource should have a complete digital operational history.
+Example:
+Stroller S-084
+08:00 — Available at Rental Station A
+10:14 — Checked out to Guest #48291
+10:14 — AED 100 deposit collected
+14:00 — Rental extended
+17:22 — Returned
+17:23 — Inspection: Cleaning Required
+17:24 — Status changed to Cleaning
+17:48 — Cleaning completed
+17:49 — Available again
+TICVAI therefore always knows the exact operational state of the resource.
+Board 6 Shared Resource State Engine
+Physical resources shall use controlled lifecycle states.
+Typical operational states include:
+ Available
+ Reserved
+ Checked Out
+ In Use
+ Due Soon
+ Overdue
+ Returned
+ Cleaning
+ Inspection
+ Maintenance
+ Damaged
+ Lost
+ Suspended
+ Retired
+Status transitions shall trigger downstream events.
+Example:
+Available Checked Out →
+causes:
+ Inventory availability reduction
+ Guest-resource association
+ Rental timer start
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 96
+ Deposit state activation
+ Audit event
+Example:
+Inspection Failed Maintenance →
+causes:
+ Resource blocking
+ Future booking impact analysis
+ Replacement search
+ Maintenance workflow
+Board 6 Shared AI Intelligence
+AI shall support operational decisions without overriding safety or governance.
+Examples:
+ Inventory Prediction
+“Based on tomorrow's expected attendance, Waterpark Station B may run out of towels between 
+13:00 and 15:00.”
+Transfer Recommendation
+“Move 120 towels from Station A to Station B before 12:30.”
+Maintenance Prediction
+“Projector P-17 shows an abnormal maintenance frequency.”
+Replacement Recommendation
+“Replace Projector P-17 with P-24 for tomorrow's corporate event.”
+Lifecycle Recommendation
+“Asset maintenance cost has exceeded the configured replacement threshold.”
+Board 6 Integration Requirements
+Board 6 shall integrate with:
+ Resource Master
+ Resource Calendar
+ Ticketing
+ Experience Management
+ POS
+ B2C
+ Employee App
+ Event Management
+ Inventory & Procurement
+ Finance
+ Payment services
+ CRM/Guest Profile
+ APIs
+A resource must have one authoritative operational state across the TICVAI platform.
+If a stroller is checked out at POS, it cannot simultaneously appear available on B2C or another POS.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 97
+Board 6 Shared Governance
+All screens shall support, where applicable:
+ Multi-tenant architecture
+ Multi-venue operation
+ RBAC/PBAC
+ Approval workflows
+ Effective dating
+ Immutable audit history
+ API access
+ Event-driven integrations
+ Barcode/QR/RFID identifiers
+ Arabic and English
+ AI explainability
+ Financial traceability
+ Customer-data privacy
+ Mobile operation
+Board 6 End-to-End Outcome
+After Board 6, TICVAI can answer in real time:
+What assets do we own?
+Where are they?
+Which ones are available?
+Which guest currently has this item?
+When is it due back?
+Was a deposit collected?
+What condition was it returned in?
+Is it under maintenance?
+Does it have future bookings?
+What is its operational and financial lifecycle?
+The complete flow becomes:
+Resource Inventory Availability Reservation Checkout Guest Assignment Deposit → → → → → →
+→ → → → → → → Usage Return Inspection Maintenance Available Again Lifecycle Retirement
+The frontline experience should remain extremely simple:
+Scan Guest Scan Resource Deposit Confirm → → →
+and on return:
+Scan Resource Inspect Deposit Resolution Complete → → →
+Everything else should happen intelligently in the TICVAI backend.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 98
+TICVAI Resource Management
+Board 7 — Event Resource Planning & Allocation
+Board Objective
+Provide TICVAI with a centralized Event Resource Planning Engine that allows event managers and 
+operations teams to define everything required to deliver an event and convert those requirements 
+into actual resource reservations and assignments.
+The board shall manage event requirements across:
+ Venues
+ Auditoriums
+ Halls
+ Rooms
+ Stages
+ Breakout areas
+ Outdoor areas
+ AV systems
+ Lighting
+ Sound systems
+ Projectors
+ Screens
+ Chairs
+ Tables
+ Booths
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 99
+ Operational equipment
+ Event managers
+ Ushers
+ Security
+ Technical crew
+ Hosts
+ Performers
+ Mascots
+ Temporary staff
+ Other configurable resources
+The event-resource lifecycle shall be:
+Event Requirements Template Demand Forecast Availability Allocation Conflict → → → → → →
+Check Cost Approval Operational Plan → → →
+The objective is to ensure that an event is not considered operationally ready merely because the 
+venue and event schedule have been created.
+TICVAI must understand:
+Do we actually have all the people, spaces, equipment and operational resources required to 
+deliver this event?
+Primary matrix coverage: 1.2.14–1.2.22, 1.2.40, 1.2.47–1.2.52.
+Supporting coverage: 1.2.19, 1.2.29–1.2.31, 1.2.39, 1.2.41–1.2.43, 1.2.53–1.2.58, 1.2.67–1.2.76.
+Screen 01 — Event Resource Planning Command Center
+Purpose
+Provide event and operations managers with a single workspace for understanding the resource 
+readiness of upcoming events.
+Dashboard KPIs
+Display:
+ Upcoming events
+ Events fully resourced
+ Events partially resourced
+ Events with critical gaps
+ Pending resource requests
+ Pending approvals
+ Resource conflicts
+ Staff shortages
+ Equipment shortages
+ Venue/space conflicts
+ Forecast resource cost
+ Event Readiness
+Each event shall receive a visual readiness indicator.
+Example:
+Corporate Gala
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 100
+Resource Readiness: 94%
+✓ Venue confirmed
+✓ AV confirmed
+✓ Catering resources confirmed
+✓ Technical crew confirmed
+⚠ 2 security positions unfilled
+Concert A
+Resource Readiness: 71%
+✓ Venue confirmed
+⚠ Lighting incomplete
+✕ Sound engineer unavailable
+✕ 8 ushers unassigned
+Filters
+Users shall filter by:
+ Event
+ Date
+ Venue
+ Event type
+ Resource status
+ Readiness
+ Event manager
+ Approval status
+ Risk level
+ AI Event Summary
+Example:
+5 events are scheduled this weekend.
+3 are fully resourced.
+2 have unresolved staffing or equipment gaps.
+Acceptance Condition
+Managers can immediately understand resource readiness across upcoming events and identify 
+events requiring operational attention.
+Screen 02 — Event Resource Requirement Builder
+Purpose
+Define every resource required to deliver a specific event.
+Event Selection
+The screen shall consume the event master from TICVAI Event Management.
+Display:
+ Event
+ Event type
+ Venue
+ Event date
+ Start/end
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 101
+ Expected attendance
+ Capacity
+ Event manager
+ Resource Requirement Sections
+ Spaces
+Configure:
+ Hall
+ Auditorium
+ Stage
+ Breakout room
+ Backstage
+ VIP area
+ Registration area
+ Equipment
+Configure:
+ Sound
+ Lighting
+ Screens
+ Projectors
+ Microphones
+ Furniture
+ Barriers
+ Booths
+ Staff
+Configure:
+ Event managers
+ Ushers
+ Security
+ Technical crew
+ Hosts
+ Performers
+ Operational personnel
+ Requirement Properties
+For each requirement:
+ Resource type
+ Category
+ Quantity
+ Mandatory/optional
+ Start
+ End
+ Setup requirement
+ Teardown requirement
+ Skill requirement
+ Certification
+ Priority
+ Substitute allowed
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 102
+ Approval required
+ Dynamic Requirements
+Requirements may change according to:
+ Expected attendance
+ Tickets sold
+ Event type
+ Venue
+ Duration
+ VIP attendance
+ Event risk classification
+Acceptance Condition
+Event managers can define a complete structured resource requirement plan for each event.
+Screen 03 — Venue & Space Allocation
+Purpose
+Assign suitable physical spaces to an event and its operational components.
+Space Selection
+The interface shall display available:
+ Venues
+ Halls
+ Rooms
+ Stages
+ Breakout areas
+ Outdoor spaces
+ VIP areas
+ Backstage areas
+Availability Timeline
+Users shall see:
+Setup Event Teardown → →
+Example:
+Grand Hall
+Setup
+12:00–16:00
+Event
+16:00–22:00
+Teardown
+22:00–00:00
+The hall shall therefore remain operationally unavailable from:
+12:00–00:00
+Space Information
+Display:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 103
+ Capacity
+ Layout
+ Location
+ Availability
+ Existing bookings
+ Setup time
+ Teardown time
+ Accessibility
+ Associated resources
+ Operational restrictions
+Conflict Detection
+TICVAI shall prevent:
+ Double booking
+ Overlapping setup
+ Overlapping teardown
+ Maintenance conflict
+ Capacity violation
+Alternative Recommendation
+If the requested space is unavailable:
+Grand Hall unavailable.
+Recommended:
+Conference Hall B — 94% match
+✓ Capacity suitable
+✓ Available
+✓ Same venue
+⚠ 10-minute additional setup
+Acceptance Condition
+Users can assign suitable venues and spaces while TICVAI validates the entire operational occupancy 
+period rather than only the event start/end time.
+Screen 04 — Equipment & Asset Allocation
+Purpose
+Allocate physical equipment and operational assets required for events.
+Equipment Requirements
+Users shall assign:
+ AV systems
+ Sound systems
+ Lighting
+ Projectors
+ Screens
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 104
+ Microphones
+ Cameras
+ Furniture
+ Booths
+ Barriers
+ Operational equipment
+Allocation View
+For each requirement, show:
+Required
+Allocated
+Available
+Gap
+Example:
+Resource Required Allocated Ga
+p
+Projectors 4 4 0
+Wireless Mics 12 10 2
+LED Screens 3 3 0
+Lighting Rigs 4 3 1
+Asset Validation
+Before allocation TICVAI shall check:
+ Availability
+ Maintenance
+ Inspection status
+ Location
+ Existing reservation
+ Setup requirements
+ Dependencies
+Specific vs Dynamic Assignment
+Event managers may request:
+Specific Asset
+Projector P-01
+or:
+Resource Type
+1 × 4K Projector
+TICVAI may then choose the most appropriate available unit.
+Acceptance Condition
+Event equipment requirements can be translated into actual physical-asset allocations without 
+creating resource conflicts.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 105
+Screen 05 — Event Staff & Personnel Allocation
+Purpose
+Assign qualified staff resources to event roles.
+Event Roles
+Support:
+ Event manager
+ Supervisor
+ Ushers
+ Security
+ Technical crew
+ AV operators
+ Hosts
+ Performers
+ Mascots
+ Registration staff
+ Customer service
+ Custom roles
+Requirement Configuration
+For each role:
+ Required quantity
+ Minimum skill
+ Certification
+ Shift
+ Start/end
+ Break requirement
+ Venue
+ Priority
+Candidate Selection
+TICVAI shall consume Board 3 and Board 4 workforce intelligence.
+Each candidate may display:
+ Name
+ Role
+ Skill
+ Certification
+ Availability
+ Existing workload
+ Venue
+ Overtime impact
+ AI match
+AI Smart Assign
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 106
+Example:
+AV Technician Required
+Maria — 97%
+✓ AV Level 3
+✓ Available
+✓ Same venue
+✓ No overtime
+David — 86%
+✓ AV Level 3
+✓ Available
+⚠ Different venue
+Acceptance Condition
+Event managers can assign qualified staff while TICVAI automatically validates workforce eligibility 
+and availability.
+Screen 06 — Event Resource Template Library
+Purpose
+Allow frequently used event-resource configurations to be saved as reusable templates.
+Example Templates
+Corporate Conference — 500 Guests
+ 1 Main Hall
+ 3 Breakout Rooms
+ 1 Stage
+ 2 LED Screens
+ 8 Wireless Microphones
+ 1 Sound System
+ 1 Lighting Package
+ 1 Event Manager
+ 8 Ushers
+ 6 Security
+ 4 Technical Crew
+Concert — Medium
+ Main Stage
+ Backstage
+ Lighting Package
+ Sound Package
+ 12 Security
+ 15 Ushers
+ 8 Technical Crew
+Template Configuration
+Administrators shall configure:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 107
+ Template code
+ Template name
+ Event type
+ Attendance range
+ Applicable venues
+ Required resources
+ Quantities
+ Staff roles
+ Setup duration
+ Teardown duration
+ Dependencies
+ Effective dates
+ Template Application
+When creating an event:
+Apply Resource Template
+TICVAI shall populate the resource plan automatically.
+Users may then modify the event-specific requirements.
+Template Versioning
+Changes shall not silently modify already-approved event plans.
+Acceptance Condition
+Reusable event-resource templates significantly reduce manual event setup while maintaining 
+controlled versioning.
+Screen 07 — AI Event Resource Forecasting
+Purpose
+Predict the resources required for an event before final allocation.
+Forecast Inputs
+AI shall consider:
+ Event type
+ Expected attendance
+ Tickets sold
+ Venue
+ Event duration
+ Historical events
+ Setup complexity
+ VIP requirements
+ Security classification
+ Operational standards
+ Season
+ Day/time
+Forecast Output
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 108
+Example:
+Corporate Gala — 1,200 Guests
+AI Recommended:
+ Security: 18
+ Ushers: 24
+ Event Managers: 2
+ Technical Crew: 8
+ Registration Staff: 6
+ Wireless Microphones: 10
+ LED Screens: 4
+ Barriers: 20
+Comparison
+Display:
+ Configured
+vs.
+ AI Recommended
+Example:
+Security:
+ Configured: 12
+ AI Recommended: 18
+ Difference: +6
+Reason:
+Historical events of similar size required additional security during entrance and exit periods.
+ Human Control
+AI recommendations may be:
+ Accepted
+ Partially accepted
+ Rejected
+ Modified
+Acceptance Condition
+TICVAI can forecast event-resource demand and explain differences between manually configured 
+and predicted requirements.
+Screen 08 — Event Resource Cost Estimator
+Purpose
+Calculate the expected resource cost of delivering an event.
+Cost Components
+Support:
+ Venue cost
+ Room/space cost
+ Equipment cost
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 109
+ Rental cost
+ Staff cost
+ Overtime
+ External resource cost
+ Setup cost
+ Teardown cost
+ Transportation/transfer cost
+ Cost Summary
+Display:
+ Budget
+ Estimated
+ Committed
+ Actual
+ Variance
+Example:
+ Corporate Gala
+ Budget: AED 120,000
+ Estimated Resource Cost: AED 108,500
+ Committed: AED 91,200
+ Forecast Actual: AED 112,000
+Budget Variance:
+ AED 8,000 favorable
+ Cost Breakdown
+Users shall analyze by:
+ Resource type
+ Department
+ Venue
+ Event phase
+ Internal/external
+ Staff/equipment
+ AI Optimization
+AI may recommend:
+Replace 3 cross-venue technicians with equally qualified local staff.
+Estimated saving:
+ AED 1,850
+Acceptance Condition
+Event managers can understand expected resource cost before approving the operational event 
+plan.
+Screen 09 — Multi-Event Allocation & Conflict Optimizer
+Purpose
+Manage scarce resources across simultaneous or overlapping events.
+Planning View
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 110
+Display multiple events across a shared timeline.
+Example:
+Friday
+Corporate Gala
+Concert A
+Conference B
+VIP Dinner
+The screen shall compare resource demand across all events.
+Shared Resource Analysis
+Example:
+Security Level 2+
+Required:
+Corporate Gala — 18
+Concert A — 24
+Conference B — 8
+Total Required: 50
+Available: 43
+Gap: 7
+Equipment Conflict
+Example:
+LED Screens Required: 9
+Available: 7
+Gap: 2
+Priority Rules
+Allocation may consider:
+ Event priority
+ SLA
+ Customer tier
+ Revenue
+ Contractual commitment
+ Resource suitability
+ Operational risk
+AI Optimization
+AI shall propose:
+ Resource redistribution
+ Alternative resources
+ Schedule adjustments
+ Cross-venue transfers
+ External resource requirement
+Example:
+Move 4 security staff from Conference B after 18:00 to Concert A.
+Replace LED Screen requirement at VIP Dinner with compatible projector package.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 111
+Scenario Comparison
+Managers shall compare:
+Current Allocation
+vs.
+AI Optimized Allocation
+including:
+ Gaps
+ Conflicts
+ Costs
+ Transfers
+ Utilization
+Acceptance Condition
+Managers can resolve shared-resource conflicts across multiple simultaneous events using visual 
+planning and AI-supported optimization.
+Screen 10 — Event Resource Approval & Readiness Gate
+Purpose
+Provide the final governance checkpoint before an event resource plan becomes operational.
+Readiness Checklist
+TICVAI shall validate:
+Venue & Space
+✓ Confirmed
+Equipment
+✓ Allocated
+Staff
+⚠ 1 position pending
+Qualifications
+✓ Valid
+Maintenance
+✓ Clear
+Resource Conflicts
+✓ None
+Budget
+✓ Within tolerance
+Approvals
+⚠ Security approval pending
+Readiness Status
+Events may be classified:
+ Draft
+ Planning
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 112
+ Partially Resourced
+ Resource Ready
+ Pending Approval
+ Approved
+ Operationally Ready
+ Blocked
+Approval Workflow
+Depending on event size/risk, approval may require:
+ Event Manager
+ Operations
+ Security
+ Technical
+ Finance
+ Venue Manager
+ Senior Management
+Readiness Gate
+TICVAI shall prevent an event from reaching Operationally Ready where mandatory resource 
+requirements remain unresolved.
+Critical requirements shall be non-overridable where configured.
+Publication
+Once approved:
+ Resource reservations are locked as configured.
+ Staff assignments are published.
+ Employee notifications are triggered.
+ Event calendar is updated.
+ Equipment allocations are confirmed.
+ Operational teams receive the resource plan.
+Audit
+Record:
+ Resource-plan version
+ Submitted by
+ Approvers
+ Approval dates
+ Exceptions
+ Overrides
+ Final allocation
+ Publication status
+Acceptance Condition
+An event cannot be marked operationally ready until mandatory resource requirements, conflicts, 
+qualifications, costs, and approvals have passed configured readiness controls.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 113
+Board 7 Shared Event Readiness Engine
+TICVAI shall calculate an event's resource readiness using a common model:
+Space Readiness
+
+Equipment Readiness
+
+Staff Readiness
+
+Qualification Readiness
+
+Availability
+
+Conflict Status
+
+Operational Timing
+
+Approval Status
+=
+Event Resource Readiness
+Example:
+Corporate Gala
+Venue: 100%
+Equipment: 100%
+Staff: 92%
+Qualifications: 100%
+Conflicts: Clear
+Approvals: 80%
+Overall
+94% Resource Ready
+TICVAI shall clearly explain what prevents the event from reaching 100%.
+Board 7 Shared AI Event Copilot
+Managers should be able to interact with the event-resource plan conversationally.
+Examples:
+“Prepare the resources for a 1,500-person concert next Friday.”
+TICVAI may respond with a proposed requirement plan based on templates, venue configuration, 
+operational policies, and forecasts.
+Or:
+“Why isn't Corporate Gala resource-ready?”
+TICVAI:
+“Two Level 2 security positions remain unfilled and Security approval is pending.”
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 114
+Or:
+“Can we operate all four events Friday without external resources?”
+TICVAI should simulate the scenario and identify shortages.
+AI-generated plans must remain subject to mandatory operational and approval rules.
+Board 7 Integration Requirements
+Board 7 shall consume and coordinate information from:
+ Event Management
+ Resource Master
+ Resource Calendar
+ Workforce Management
+ Equipment & Asset Management
+ Ticketing
+ Experience Management
+ Finance
+ Employee App
+ Notifications
+ APIs
+Resource definitions must remain owned by Resource Management.
+Event definitions must remain owned by Event Management.
+Board 7 creates the operational relationship between them rather than duplicating either master.
+Board 7 Shared Governance
+All screens shall support, where applicable:
+ Multi-tenant architecture
+ Multi-venue operation
+ RBAC/PBAC
+ Configurable approvals
+ Effective dating
+ Versioning
+ Immutable audit history
+ Event-driven integration
+ API accessibility
+ Arabic and English
+ AI explainability
+ Cost permissions
+ Override governance
+ Notifications
+Board 7 End-to-End Outcome
+After Board 7, TICVAI should be able to take an event such as:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 115
+ Corporate Gala
+ 1,200 Guests — Grand Hall — Friday 18:00
+and automatically understand:
+ Which spaces are required
+→ Which equipment is required
+→ Which staff roles are required
+→ How many resources are needed
+→ Which resources are actually available
+→ Which resources are qualified
+→ What conflicts exist
+→ What the resources will cost
+→ What approvals remain
+→ Whether the event is operationally ready
+The event manager should ultimately see a simple status:
+94% RESOURCE READY
+2 actions remaining
+⚠ Assign 2 Security Staff
+⚠ Obtain Security Approval
+ TICVAI has identified qualified replacements for both open positions.
+That is the intended Board 7 experience: the event manager should not need to manually check five 
+different systems to determine whether an event can actually operate.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 116
+TICVAI Resource Management
+Board 8 — AI Resource Optimization & 
+Forecasting
+Board Objective
+Provide TICVAI with a centralized AI Resource Intelligence Engine capable of forecasting demand, 
+identifying resource shortages, recommending optimal staff and physical resources, resolving 
+conflicts, optimizing schedules, simulating operational scenarios, and allowing managers to interact 
+with Resource Management through natural language.
+Board 8 shall consume information from the previous Resource Management boards rather than 
+recreate their configuration.
+The AI engine shall analyze:
+ Resource master data
+ Resource availability
+ Calendars
+ Reservations
+ Ticket sales
+ Experience bookings
+ Event schedules
+ Staff skills
+ Certifications
+ Workforce availability
+ Rosters
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 117
+ Attendance
+ Labor costs
+ Equipment availability
+ Maintenance
+ Resource utilization
+ Historical demand
+ Venue operations
+ Resource conflicts
+ Customer preferences
+ Operational priorities
+The intelligence flow shall be:
+Demand Forecast Required Resources Available Resources Eligibility Optimization → → → → → →
+Recommendation Simulation Approval Execution → → →
+The core objective is for TICVAI to move beyond:
+“Here are your resources.”
+and instead tell the operator:
+“Here is what you will need, where you will have shortages, and the best action to take.”
+Primary matrix coverage: 1.2.39, 1.2.48, 1.2.53–1.2.59.
+Supporting coverage: 1.2.11–1.2.13, 1.2.18–1.2.22, 1.2.29–1.2.31, 1.2.36, 1.2.47–1.2.52, 1.2.67–1.2.76.
+Screen 01 — AI Resource Intelligence Command Center
+Purpose
+Provide management with a centralized AI-generated overview of current and future resource 
+conditions across the organization.
+Intelligence KPIs
+Display:
+ Resource readiness
+ Today's utilization
+ Forecast utilization
+ Predicted shortages
+ Predicted excess capacity
+ Staffing gaps
+ Equipment gaps
+ Resource conflicts
+ Overtime risk
+ Maintenance risk
+ AI recommendations awaiting action
+ Estimated optimization opportunity
+ Time Horizons
+Users shall switch between:
+ Live
+ Today
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 118
+ Tomorrow
+ 7 Days
+ 30 Days
+ Custom period
+Resource Intelligence
+The dashboard shall identify:
+Underutilized
+Resources with significant available capacity.
+Overutilized
+Resources operating close to or above configured thresholds.
+Shortage Risk
+Resources where forecast demand exceeds available supply.
+Operational Risk
+Resources affected by:
+ Maintenance
+ Staff absence
+ Certification expiry
+ Scheduling conflicts
+ Venue restrictions
+ AI Daily Brief
+Example:
+ TICVAI AI Brief — Tomorrow
+ Expected Attendance: 8,420
+ Resource Readiness: 94%
+ 5 staffing gaps predicted
+ 2 equipment shortages predicted
+ 18 overtime hours at risk
+ AED 4,200 potential labor optimization
+Top Recommendation:
+Reallocate four instructors from Ski Zone B to Ski Zone A between 14:00 and 17:00.
+Acceptance Condition
+Authorized managers can immediately understand current and forecast resource conditions and see 
+prioritized AI-generated actions from one command center.
+Screen 02 — Optimal Resource Recommendation Engine
+Purpose
+Recommend the best available resource for any operational requirement.
+Request Inputs
+The engine shall accept requirements such as:
+ Resource type
+ Date/time
+ Venue
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 119
+ Capacity
+ Skill
+ Certification
+ Equipment specification
+ Duration
+ Customer preference
+ Operational priority
+ Candidate Evaluation
+TICVAI shall evaluate eligible candidates against:
+ Availability
+ Resource type
+ Skills
+ Qualifications
+ Certifications
+ Capacity
+ Venue
+ Distance/transfer time
+ Utilization
+ Current assignments
+ Cost
+ Maintenance status
+ Dependencies
+ Customer preference
+Recommendation
+Example:
+Requirement
+Private Ski Instructor
+25 August
+14:00–15:00
+Arabic-speaking
+Level 3+
+AI Recommendation
+Maria Garcia — 97% Match
+✓ Available
+✓ Level 3
+✓ Arabic
+✓ Same venue
+✓ Certification valid
+✓ No overtime
+Alternatives
+Ahmed Hassan — 91%
+David Lee — 82%
+Explainability
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 120
+Users shall be able to select:
+Why this resource?
+TICVAI shall explain the scoring factors.
+Acceptance Condition
+The AI engine can rank suitable resources for a defined operational requirement and clearly explain 
+why each resource was recommended.
+Screen 03 — AI Staff Recommendation & Workforce Matching
+Purpose
+Provide advanced AI-assisted selection specifically for human resources.
+This screen consumes the staff rules established in Boards 3 and 4.
+AI Evaluation
+Staff recommendations shall consider:
+ Role
+ Skills
+ Skill level
+ Certifications
+ Experience
+ Language
+ Availability
+ Shift
+ Leave
+ Existing assignments
+ Working hours
+ Rest periods
+ Overtime
+ Venue
+ Customer preference
+ Workload balance
+ Historical performance where permitted
+Smart Candidate Ranking
+Example:
+Requirement
+2 × AV Technicians
+Event: Corporate Gala
+18:00–23:00
+Recommended:
+1. Ahmed — 98%
+2. Sarah — 95%
+Alternatives:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 121
+3. David — 87%
+Team Recommendation
+AI shall also be able to recommend a complete team rather than individual employees.
+Example:
+Build the best available technical crew for Corporate Gala.
+TICVAI may recommend:
+ 1 Technical Supervisor
+ 2 AV Technicians
+ 2 Lighting Technicians
+ 1 Sound Engineer
+Fairness & Governance
+Where workforce recommendations use performance, preferences, or historical information, 
+administrators shall control which factors are permitted.
+Mandatory qualifications and workforce rules shall always remain hard constraints.
+Acceptance Condition
+TICVAI can recommend individual staff members or complete qualified teams while respecting 
+availability, compliance, skills, and workforce governance.
+Screen 04 — Resource Demand Forecasting
+Purpose
+Predict future demand for resources before shortages occur.
+Forecast Inputs
+The engine shall consider available data such as:
+ Historical attendance
+ Ticket sales
+ Advance bookings
+ Event schedule
+ Experience reservations
+ Season
+ Day of week
+ Time
+ Venue
+ Holidays
+ Campaigns
+ Historical utilization
+ Current booking pace
+External forecast data may be incorporated through approved integrations where configured.
+ Forecast Levels
+Forecast demand by:
+ Tenant
+ Venue
+ Attraction
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 122
+ Event
+ Resource type
+ Resource category
+ Time slot
+Example
+Saturday — Ski School
+Expected Visitors:
+2,850
+Expected Lesson Participants:
+620
+Forecast Instructor Requirement:
+48
+Available:
+42
+Predicted Gap
+6 instructors
+Confidence
+Forecasts should display confidence indicators where technically supported.
+Example:
+Forecast Confidence: 91%
+Comparison
+Display:
+ Historical
+vs.
+ Forecast
+vs.
+ Actual
+to improve forecasting evaluation.
+Acceptance Condition
+TICVAI can forecast future resource demand at useful operational levels and identify likely shortages 
+or excess capacity before the operating date.
+Screen 05 — AI Staffing Requirement Forecast
+Purpose
+Translate forecast operational demand into specific workforce requirements.
+Demand Conversion
+TICVAI shall use:
+ Minimum staffing rules
+ Participant ratios
+ Venue requirements
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 123
+ Experience rules
+ Event requirements
+ Safety requirements
+ Expected attendance
+Example:
+Waterpark
+Forecast Attendance:
+5,200
+Configured rule:
+1 Lifeguard / 250 guests
+Minimum operational base:
+14 Lifeguards
+Calculated requirement:
+21 Lifeguards
+Available scheduled:
+18
+Gap
+3 Lifeguards
+Time-Based Forecast
+Requirements shall be forecast by operational interval.
+Example:
+09:00 14 Lifeguards →
+11:00 17 →
+13:00 21 →
+15:00 22 →
+17:00 18 →
+This prevents overstaffing the entire day based only on peak demand.
+AI Recommendation
+TICVAI may recommend:
+Start three additional lifeguards at 12:00 rather than 09:00.
+Estimated labor saving:
+AED 1,080
+Acceptance Condition
+Forecast demand is automatically translated into role, skill, certification, quantity, and time-specific 
+workforce requirements.
+Screen 06 — AI Conflict Resolution Assistant
+Purpose
+Automatically analyze resource conflicts and recommend the most operationally appropriate 
+resolution.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 124
+Conflict Inputs
+Consume conflicts from:
+ Resource Calendar
+ Workforce Roster
+ Events
+ Equipment
+ Reservations
+ Experience assignments
+Conflict Types
+Support:
+ Double booking
+ Staff absence
+ Qualification failure
+ Certification expiry
+ Equipment maintenance
+ Venue conflict
+ Capacity conflict
+ Dependency conflict
+ Travel-time conflict
+ Setup conflict
+ Multi-event resource shortage
+ Resolution Recommendations
+For each conflict, AI shall evaluate alternatives such as:
+ Replace resource
+ Move assignment
+ Change time
+ Change venue
+ Redistribute workload
+ Use substitute resource
+ Transfer resource
+ Request external resource
+ Request controlled override where allowed
+Example
+Conflict
+Maria Garcia
+Assigned:
+Private Lesson — 14:00
+Corporate Event — 14:30
+AI Recommendation
+Move Private Lesson to Ahmed Hassan
+Match: 94%
+Impact:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 125
+✓ Customer language retained
+✓ No overtime
+✓ No downstream conflict
+Bulk Resolution
+Managers shall be able to select:
+Resolve All Recommended Conflicts
+subject to approval policies.
+Acceptance Condition
+AI can analyze operational conflicts, identify viable alternatives, rank resolutions, and explain the 
+expected operational impact before execution.
+Screen 07 — Automatic Schedule Optimization
+Purpose
+Optimize resource schedules across multiple assignments while respecting operational constraints.
+Optimization Scope
+Users shall select:
+ Venue
+ Department
+ Event
+ Attraction
+ Resource category
+ Date range
+Optimization Objectives
+Administrators may prioritize:
+ Maximize coverage
+ Minimize conflicts
+ Minimize overtime
+ Minimize cost
+ Balance workload
+ Maximize utilization
+ Minimize idle time
+ Minimize cross-venue movement
+ Maximize customer preference match
+Hard Constraints
+Optimization shall never violate configured mandatory rules such as:
+ Certification
+ Qualification
+ Safety
+ Capacity
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 126
+ Availability
+ Required rest
+ Resource dependency
+Before vs Optimized
+Example:
+Current Schedule
+Coverage: 93%
+Conflicts: 7
+Overtime: 31 hrs
+Transfers: 14
+Labor Cost: AED 52,600
+AI Optimized
+Coverage: 100%
+Conflicts: 0
+Overtime: 12 hrs
+Transfers: 6
+Labor Cost: AED 49,300
+Improvement
+AED 3,300 projected saving
+Human Control
+Users may:
+ Preview
+ Accept all
+ Accept selected
+ Reject
+ Lock assignments
+ Re-run optimization
+Acceptance Condition
+TICVAI can generate an improved resource schedule while respecting mandatory operational rules 
+and maintaining human approval over execution.
+Screen 08 — Alternative & Replacement Resource 
+Recommendation
+Purpose
+Provide intelligent alternatives when the preferred resource cannot be used.
+Trigger Conditions
+Recommendations may be generated when:
+ Resource unavailable
+ Staff absent
+ Equipment failed
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 127
+ Resource under maintenance
+ Capacity exhausted
+ Certification expired
+ Customer-selected resource unavailable
+ Venue unavailable
+Similarity Matching
+For physical resources, TICVAI shall compare:
+ Resource type
+ Specifications
+ Capacity
+ Features
+ Location
+ Dependencies
+ Availability
+For staff, TICVAI shall compare:
+ Role
+ Skill
+ Certification
+ Language
+ Experience
+ Availability
+ Venue
+Example
+Requested
+Projector P-17
+Status:
+Under Maintenance
+Alternatives
+P-24 — 98% Match
+✓ Same specification
+✓ Same venue
+✓ Available
+P-31 — 92% Match
+✓ Compatible
+⚠ Different venue
+⚠ 30-minute transfer
+Customer Impact
+Where replacement affects a customer booking, TICVAI shall identify whether:
+ No notification required
+ Customer notification recommended
+ Customer approval required
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 128
+Acceptance Condition
+When a preferred resource is unavailable, TICVAI can automatically identify operationally compatible 
+alternatives and rank them by suitability and impact.
+Screen 09 — Operational Scenario Simulator & Digital Twin
+Purpose
+Allow managers to test operational scenarios before changing the live resource plan.
+This should be one of Board 8's signature AI capabilities.
+Scenario Creation
+Users may create simulations such as:
+ Scenario A
+Attendance increases by 20%.
+ Scenario B
+10 instructors become unavailable.
+ Scenario C
+Main Hall closes unexpectedly.
+ Scenario D
+Add another 2,000-person event on Friday.
+ Scenario E
+Reduce labor cost by 10%.
+ Simulation Engine
+TICVAI shall calculate the impact on:
+ Staffing
+ Equipment
+ Venues
+ Capacity
+ Availability
+ Conflicts
+ Overtime
+ Costs
+ Utilization
+ Event readiness
+ Customer bookings
+Example
+Scenario
+Attendance +20% Saturday
+Impact:
+Additional Staff Required: +14
+Additional Equipment: +22
+Overtime: +38 hrs
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 129
+Resource Conflicts: 7
+Estimated Additional Cost:
+AED 11,400
+AI Recommendation
+Add six temporary staff and redistribute eight existing employees between 12:00 and 18:00.
+Projected revised cost:
+AED 8,900
+Compare Scenarios
+Users shall compare:
+Current Plan
+Scenario A
+Scenario B
+AI Optimized Scenario
+Apply Scenario
+An approved simulation may be converted into proposed operational changes.
+It must not automatically alter live operations without configured approval.
+Acceptance Condition
+Managers can safely simulate operational changes and understand resource, workforce, capacity, 
+and financial consequences before modifying live schedules.
+Screen 10 — Conversational AI Resource Copilot
+Purpose
+Allow managers to interact with the complete Resource Management module using naturallanguage questions and commands.
+Example Queries
+Users may ask:
+“Which resources are underutilized this week?”
+“Show me all staffing gaps tomorrow.”
+“Who is the best instructor for the 2 PM private lesson?”
+“Why is Corporate Gala only 92% resource-ready?”
+“Which equipment is likely to cause operational issues this weekend?”
+“Can we run another 1,000-person event Friday?”
+“How can I reduce overtime tomorrow without affecting operations?”
+Context Awareness
+The AI Copilot shall understand:
+ Current user
+ Permission scope
+ Selected tenant
+ Venue
+ Date
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 130
+ Event
+ Resource
+ Screen context
+Response Types
+The Copilot may return:
+ Direct answer
+ Resource list
+ Chart
+ Calendar view
+ Forecast
+ Conflict explanation
+ Recommendation
+ Scenario
+ Suggested action
+Actionable AI
+Where permitted, users may request:
+“Find replacements for all absent staff tomorrow.”
+TICVAI shall prepare recommendations.
+Before applying changes, the system shall display:
+ Proposed Changes
+ 8 assignments affected
+ 7 automatic replacements found
+ 1 requires manager action
+ [Review Changes]
+ [Submit for Approval]
+ Permission Awareness
+AI shall never allow a user to perform an action outside their normal permissions.
+The AI layer must use the same RBAC/PBAC and approval controls as the rest of TICVAI.
+Explainability
+Users shall be able to ask:
+“Why?”
+Example:
+“Why did you recommend Maria?”
+TICVAI:
+Maria meets all mandatory qualifications, is already located at the venue, speaks the customer's 
+preferred language, has no conflicting assignments, and does not create overtime.
+Acceptance Condition
+Authorized users can query, analyze, simulate, and initiate governed resource-management actions 
+conversationally without bypassing normal platform permissions or approval controls.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 131
+Board 8 — AI Decision Architecture
+TICVAI should not create ten independent AI models for these screens.
+Board 8 should operate through a common Resource Intelligence Layer consuming trusted 
+operational data from the Resource Management domain.
+The conceptual architecture is:
+Operational Data
+↓
+Resource Digital Twin
+↓
+Availability & Eligibility Engine
+↓
+Demand Forecasting
+↓
+Optimization Engine
+↓
+AI Reasoning & Recommendation Layer
+↓
+Human Approval / Automation Policy
+↓
+Operational Execution
+This allows the same intelligence to serve the backend, POS, Employee App, Event Management, and 
+other authorized channels.
+Board 8 — AI Confidence & Explainability
+Every material AI recommendation should expose, where applicable:
+ Recommendation
+ Confidence
+ Factors considered
+ Mandatory constraints
+ Alternatives
+ Operational impact
+ Financial impact
+ Risks
+ Data freshness
+Example:
+AI Recommendation — 96% Confidence
+Transfer 4 instructors from Zone B to Zone A from 14:00–17:00.
+Why:
+✓ Zone A demand forecast +28%
+✓ Zone B has forecast spare capacity
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 132
+✓ All four instructors are qualified
+✓ No existing booking conflicts
+✓ No overtime generated
+Expected impact:
+Zone A Coverage: 87% 100% →
+Zone B Coverage: 118% 103% →
+Board 8 — Human-in-the-Loop Governance
+AI autonomy shall be configurable by action type.
+Recommendation Only
+AI proposes an action but cannot execute it.
+User Confirmation
+AI proposes and an authorized user confirms.
+Approval Required
+AI proposes, user submits, authorized approver approves.
+Auto-Execute
+Allowed only for explicitly approved low-risk scenarios.
+Examples might include:
+ Recommending resources — automatic
+ Low-risk resource rebalancing — configurable
+ Employee shift changes — approval
+ Safety-critical staffing changes — mandatory approval
+ Financially significant changes — approval
+AI must never bypass:
+ Safety rules
+ Qualification requirements
+ Certification requirements
+ Capacity rules
+ Legal/workforce rules
+ Approval policies
+ User permissions
+Board 8 — Learning & Feedback
+Where approved, TICVAI shall capture outcomes such as:
+Recommendation Accepted / Rejected Actual Result → →
+This may be used to evaluate and improve future recommendation quality.
+Examples:
+ Forecast accuracy
+ Replacement success
+ Staffing forecast accuracy
+ Optimization savings achieved
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 133
+ Conflict-resolution success
+AI performance itself should therefore become measurable.
+Board 8 — Shared Governance
+All ten screens shall support, where applicable:
+ Multi-tenant architecture
+ Multi-venue intelligence
+ RBAC/PBAC
+ Approval workflows
+ Immutable audit history
+ AI decision logging
+ Explainability
+ Confidence indicators
+ Data lineage
+ Model/version traceability where applicable
+ Arabic and English
+ API accessibility
+ Event-driven architecture
+ Human override
+ Sensitive-data controls
+Every executed AI-generated action must be distinguishable in the audit history from a manually 
+initiated action.
+Board 8 — End-to-End Outcome
+After Board 8, TICVAI Resource Management changes from a system that records operational 
+information into a system that actively helps operate the business.
+Instead of the manager discovering tomorrow morning:
+“We don't have enough instructors.”
+TICVAI should identify the issue beforehand:
+ Tomorrow's Resource Forecast
+Expected Attendance
+8,420
+Resource Readiness
+94%
+Predicted Issues
+⚠ 5 staffing gaps
+⚠ 2 equipment shortages
+⚠ 18 overtime hours
+TICVAI Optimization Available
+✓ Qualified replacements identified for 4 staffing gaps
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 134
+✓ Equipment can be transferred from Venue B
+✓ Overtime can be reduced by 11 hours
+Estimated saving: AED 3,450
+Recommended Action
+Review AI Optimized Plan
+The full Board 8 intelligence journey therefore becomes:
+Observe Predict Detect Recommend Simulate Optimize Explain Approve → → → → → → → →
+Execute Learn →
+That is what should make TICVAI Resource Management feel fundamentally different from a 
+conventional scheduling or resource-booking platform.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 135
+TICVAI Resource Management
+Board 9 — Mobile Resource Operations & 
+Employee Self-Service
+Board Objective
+Provide TICVAI employees and operational managers with a mobile-first Resource Operations 
+Workspace where they can see their schedules and assignments, receive operational instructions, 
+check in and out, manage resource handovers, submit workforce requests, approve operational 
+actions, and receive real-time notifications.
+Board 9 shall expose the appropriate functions through the TICVAI Employee App rather than 
+creating a separate Resource Management mobile application.
+The mobile experience shall consume the same centralized services used by the TICVAI backend:
+Resource Master Calendar Workforce Assignment Attendance Assets Events AI → → → → → → →
+→ Mobile
+Therefore, an assignment changed in the backend must immediately appear in the employee's 
+application, subject to synchronization and connectivity.
+The experience must be designed for frontline operations:
+ Minimal typing
+ Large touch targets
+ Scan-first workflows
+ Clear status
+ Fast confirmation
+ Mobile notifications
+ Offline support where required
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 136
+ Role-specific interfaces
+ Real-time synchronization
+ Arabic and English
+Primary matrix coverage: 1.2.60–1.2.66.
+Supporting coverage: 1.2.11, 1.2.17, 1.2.30–1.2.38, 1.2.52, 1.2.60–1.2.66, 1.2.80–1.2.81.
+Screen 01 — My Resource Operations Home
+Purpose
+Provide each employee with a personalized operational landing screen showing what requires their 
+attention now and next.
+Home Dashboard
+The screen shall display:
+ Current shift
+ Current assignment
+ Next assignment
+ Today's schedule
+ Assigned venue
+ Check-in status
+ Break status
+ Pending tasks
+ Resource handovers
+ Employee requests
+ Notifications
+ Manager messages
+ Smart Operational Card
+The primary card should always answer:
+“What am I supposed to do now?”
+Example:
+NOW
+Private Ski Lesson
+14:00–15:00
+Ski School — Zone A
+Customer: Booking #BK-28491
+Participants: 3
+Status:
+Starts in 12 min
+Actions:
+[View Assignment]
+[Check In]
+Next Assignment
+NEXT
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 137
+Group Ski Lesson
+15:30–16:30
+Zone B
+Participants: 8
+Alerts
+Examples:
+⚠ Your 15:30 assignment has moved to Zone C.
+✓ Equipment package is ready for collection.
+⚠ Your certification expires in 14 days.
+AI Assistant
+The employee may ask:
+“What is my next assignment?”
+or:
+“Where do I need to go after this?”
+Acceptance Condition
+Employees can immediately understand their current operational status and next required action 
+without navigating through multiple screens.
+Screen 02 — My Schedule & Assignment Calendar
+Purpose
+Provide employees with a mobile view of their working schedule and operational assignments.
+Calendar Views
+Support:
+ Today
+ Tomorrow
+ Week
+ Agenda
+ Schedule Timeline
+Example:
+ Tuesday — 25 August
+ 08:00–10:00
+ Group Ski Lesson
+ Zone A
+ 10:00–10:30
+ Break
+ 10:30–12:00
+ Private Lesson
+ Zone B
+ 12:00–13:00
+ Lunch
+ 13:00–15:00
+ Available
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 138
+ 15:00–17:00
+ Corporate Event Support
+ Grand Hall
+ Assignment Status
+Display:
+ Upcoming
+ Confirmed
+ In Progress
+ Completed
+ Changed
+ Cancelled
+ Requires Attention
+ Live Updates
+When a manager changes an assignment:
+Old Assignment
+Zone A
+→
+New Assignment
+Zone C
+The employee shall receive an immediate update and notification.
+Acceptance Condition
+Employees can view their complete operational schedule and receive synchronized updates 
+whenever assignments change.
+Screen 03 — Assignment Detail & Operational Brief
+Purpose
+Give the employee all information required to execute a specific assignment.
+Assignment Header
+Display:
+ Assignment
+ Date
+ Start/end
+ Venue
+ Zone/location
+ Role
+ Status
+ Priority
+ Operational Information
+Depending on assignment type:
+ Event
+ Experience
+ Customer booking
+ Participant count
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 139
+ Required resource
+ Equipment
+ Instructions
+ Checklist
+ Contact person
+ Supervisor
+Location
+Where appropriate, provide:
+ Venue map
+ Zone
+ Meeting point
+ Navigation link within configured venue mapping
+Required Resources
+Example:
+Equipment Required
+✓ Instructor Radio
+✓ Helmet Set
+✓ Training Cones
+⚠ Training Tablet — Collection Required
+Customer Information
+Only operationally necessary customer information shall be shown.
+Sensitive customer data must remain permission controlled.
+Quick Actions
+ Start assignment
+ Check in
+ Contact supervisor
+ Report issue
+ Request replacement
+ View checklist
+ Complete assignment
+Acceptance Condition
+Employees can access all permitted operational information needed to execute an assignment from 
+one mobile screen.
+Screen 04 — Mobile Staff Check-In & Check-Out
+Purpose
+Allow employees to record attendance and assignment presence from the Employee App.
+Check-In
+The system shall support configured verification methods such as:
+ Mobile confirmation
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 140
+ QR
+ NFC
+ Venue QR
+ Resource QR
+ Manager validation
+ Integrated attendance system
+ Check-In Screen
+Display:
+ Shift
+ 08:00–16:00
+ Venue
+ Ski School
+ Current Time
+ 07:56
+ Status
+ Ready to Check In
+ [CHECK IN]
+Validation
+Where configured, TICVAI may validate:
+ Correct date/time
+ Venue
+ Scheduled shift
+ Assignment
+ Device/session
+ Allowed check-in window
+Assignment Check-In
+Separate assignment-level check-in may be supported.
+Example:
+Check into Private Ski Lesson — Zone A
+Check-Out
+On checkout, display:
+ Actual working time
+ Breaks
+ Overtime
+ Exceptions
+ Outstanding assignments
+ Offline Mode
+Where required, check-in/out may be captured offline with:
+ Device timestamp
+ Offline indicator
+ Later synchronization
+Conflict-resolution rules shall apply when synchronization occurs.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 141
+Acceptance Condition
+Employees can record shift and assignment attendance from the mobile application with 
+configurable validation and full audit history.
+Screen 05 — Resource Collection, Handover & Return
+Purpose
+Digitally manage physical resources transferred between employees, departments, or operational 
+locations.
+Example
+An event technician receives:
+ Radio R-184
+ Tablet T-044
+ AV Toolkit K-12
+Collection
+Employee scans:
+Resource QR
+TICVAI displays:
+Radio R-184
+Status: Available
+Assigned to:
+Corporate Gala
+Employee:
+Ahmed Khan
+Actions:
+[Accept Resource]
+Handover
+For employee-to-employee transfer:
+Ahmed
+→ → Radio R-184 
+Sarah
+Both parties may be required to confirm.
+Condition
+Capture:
+ Good
+ Minor damage
+ Damaged
+ Missing component
+Photo evidence may be added where configured.
+ Return
+On return:
+ Scan resource
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 142
+ Confirm condition
+ Confirm location
+ Submit
+Resource status shall update immediately.
+ Chain of Custody
+The resource timeline shall record:
+Storage Employee A Employee B Event Returned → → → →
+Acceptance Condition
+Physical-resource custody can be digitally tracked through scan-driven collection, handover, and 
+return workflows.
+Screen 06 — Employee Requests & Resource Support
+Purpose
+Allow frontline employees to submit operational resource-related requests directly from the 
+Employee App.
+Request Types
+Support configurable requests such as:
+ Replacement resource
+ Additional equipment
+ Resource issue
+ Maintenance request
+ Assignment change
+ Assistance required
+ Venue change request
+ Schedule clarification
+ Custom operational request
+Example
+Resource Issue
+Resource:
+Projector P-17
+Issue:
+No Power
+Severity:
+High
+Photo:
+Attached
+Action:
+[Submit Issue]
+Immediate Operational Impact
+If the issue makes the resource unusable, authorized workflows may:
+1. Mark resource unavailable.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 143
+2. Create maintenance request.
+3. Identify affected assignments.
+4. Trigger AI replacement search.
+5. Alert manager.
+ Request Tracking
+Employees shall see:
+ Submitted
+ Under Review
+ Approved
+ Rejected
+ Resolved
+Acceptance Condition
+Employees can report operational resource issues and requests digitally, and those requests can 
+trigger the appropriate backend workflow.
+Screen 07 — Shift Change, Swap, Pickup & Release
+Purpose
+Expose the Board 4 Shift Marketplace capabilities through the Employee App.
+This screen does not recreate shift rules; it consumes the workforce rules already configured in 
+Board 4.
+My Shift Actions
+Employees may request:
+ Swap
+ Transfer
+ Release
+Open Shifts
+Eligible employees may view available shifts.
+Example:
+Open Shift
+Saturday
+14:00–22:00
+Waterpark
+Role:
+Customer Service
+You are eligible
+Estimated hours:
+8h
+[Request Shift]
+Eligibility
+Before displaying or allowing a shift request, TICVAI shall evaluate:
+ Role
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 144
+ Skill
+ Certification
+ Availability
+ Working hours
+ Rest
+ Overtime
+ Venue permission
+Shift Swap
+Employee selects:
+My Shift
+Friday 08:00–16:00
+and:
+Requested Employee / Open Exchange
+TICVAI validates both sides before submission.
+Approval
+Display request status:
+Awaiting Employee
+→ Awaiting Manager
+→ Approved
+Acceptance Condition
+Employees can manage permitted shift changes through mobile self-service while all qualification, 
+compliance, and approval rules remain enforced centrally.
+Screen 08 — Manager Mobile Approval Center
+Purpose
+Allow authorized supervisors and managers to approve operational requests without requiring 
+access to the desktop backend.
+Approval Inbox
+Display requests such as:
+ Shift swap
+ Shift pickup
+ Overtime
+ Resource replacement
+ Assignment change
+ Resource transfer
+ Maintenance block
+ Attendance correction
+ Operational exception
+ Approval Card
+Example:
+ Shift Swap Request
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 145
+ Maria Garcia
+ Friday 08:00–16:00
+ ↔
+ David Lee
+ Saturday 08:00–16:00
+TICVAI Validation
+✓ Both qualified
+✓ Certifications valid
+✓ Minimum staffing maintained
+✓ Rest rules satisfied
+⚠ David: +2 overtime hours
+Actions
+[Approve]
+[Reject]
+[Request Changes]
+AI Summary
+For complex requests:
+TICVAI Recommendation: Approve
+All mandatory rules pass. The change creates two overtime hours but maintains full operational 
+coverage.
+Governance
+Approval authority shall use the same RBAC/PBAC rules configured in the backend.
+Acceptance Condition
+Authorized managers can review and action operational approvals from mobile with sufficient 
+validation context to make an informed decision.
+Screen 09 — Operational Notifications & Live Alerts
+Purpose
+Provide employees and managers with timely, prioritized operational notifications.
+Notification Categories
+Support:
+ Assignment
+ Schedule
+ Shift
+ Resource
+ Maintenance
+ Event
+ Attendance
+ Approval
+ Emergency/critical operations
+ AI recommendation
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 146
+ Priority
+Notifications may be:
+ Critical
+Immediate operational action.
+ High
+Requires timely response.
+ Standard
+Operational information.
+ Informational
+No action required.
+Examples
+Critical
+Assignment Changed
+Corporate Gala AV assignment moved to Main Hall. Start time unchanged.
+High
+Resource Replacement
+Projector P-17 is unavailable. P-24 has been assigned.
+Standard
+Shift Approved
+Your Saturday shift pickup has been approved.
+Notification Actions
+Users may:
+ Open
+ Acknowledge
+ Accept
+ Decline where permitted
+ Navigate to affected assignment
+ Escalation
+Critical alerts may require acknowledgement.
+If not acknowledged within a configured period, TICVAI may escalate to:
+ Supervisor
+ Operations manager
+ Other configured recipient
+Acceptance Condition
+Operational changes and critical resource events are communicated to the correct users with 
+configurable priority, acknowledgement, and escalation behavior.
+Screen 10 — Mobile Operations Control & Offline Sync
+Purpose
+Configure and monitor how Resource Management operates on mobile devices, particularly where 
+connectivity is unreliable.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 147
+Mobile Configuration
+Administrators shall control:
+ Offline capability
+ Offline assignment cache
+ Offline schedule cache
+ Check-in offline
+ Resource scanning offline
+ Handover offline
+ Checklist offline
+ Maximum offline period
+ Synchronization frequency
+ Data-retention policy
+Offline Workspace
+When disconnected:
+OFFLINE MODE
+Last synchronized:
+14:32
+Cached:
+✓ Today's assignments
+✓ Resource details
+✓ Operational checklist
+✓ Venue information
+Pending synchronization:
+4 actions
+Pending Actions
+Example:
+1. Staff check-in
+2. Resource handover
+3. Assignment completion
+4. Resource issue report
+Reconnection
+On reconnection:
+Synchronizing 4 actions...
+TICVAI shall validate each transaction against current server state.
+Conflict Resolution
+Example:
+A resource was assigned offline but became unavailable centrally.
+TICVAI shall not silently overwrite the conflict.
+It shall:
+1. Flag synchronization conflict.
+2. Preserve original offline transaction.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 148
+3. Determine operational impact.
+4. Request resolution or apply configured conflict policy.
+Device & Sync Monitoring
+Administrators shall be able to see:
+ Active mobile sessions
+ Last sync
+ Offline devices
+ Pending transactions
+ Sync failures
+ Version status
+Acceptance Condition
+The Employee App can support configured resource operations during temporary connectivity loss 
+and safely synchronize transactions when connectivity returns without compromising the 
+authoritative resource state.
+Board 9 — Role-Based Mobile Experience
+Board 9 should not show every employee the same application.
+The mobile interface shall adapt based on role.
+Instructor
+My Schedule Lessons Check-In Equipment Requests → → → →
+Event Technician
+Event Assignments Equipment Collection Checklist Handover Issues → → → →
+Frontline Rental Employee
+Resource Checkout Return Inspection Issue Reporting → → →
+Supervisor
+Team Status Staffing Gaps Approvals Alerts Reassignments → → → →
+Operations Manager
+Resource Readiness Critical Alerts Approvals AI Recommendations → → →
+This should be driven by permission and operational context rather than separate applications.
+Board 9 — Smart Mobile Home Principle
+The Employee App should prioritize contextual actions, not menus.
+If the employee has an assignment starting in ten minutes, the application should immediately 
+surface:
+NEXT ACTION
+Private Ski Lesson — 14:00
+Zone A
+Equipment Ready ✓
+Customer Checked In ✓
+[Start Assignment]
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 149
+If instead the employee has an unreturned resource:
+ACTION REQUIRED
+Radio R-184
+Return due at 18:00
+[Return Resource]
+The employee should not have to search the application to determine what needs attention.
+Board 9 — Mobile AI Copilot
+The Resource AI layer from Board 8 should be available in a controlled form through the Employee 
+App.
+Employees may ask:
+“Where is my next assignment?”
+“Which equipment do I need?”
+“Can I swap my Friday shift?”
+“Who should I hand this radio to?”
+Managers may ask:
+“Who hasn't checked in?”
+“Show me today's staffing gaps.”
+“Find a replacement for Ahmed.”
+The Copilot shall only return information and actions the logged-in user is permitted to access.
+Board 9 — Offline-First Architecture
+Because TICVAI may operate in attractions, stadiums, theme parks, event venues, and temporary 
+event environments, selected Employee App capabilities should be designed to tolerate unstable 
+connectivity.
+The architecture should therefore support, where required:
+Server State
+↓
+Encrypted Local Operational Cache
+↓
+Offline Action Queue
+↓
+Connectivity Restored
+↓
+Validation & Conflict Detection
+↓
+Server Synchronization
+Offline support must never create uncontrolled duplicate assignments or conflicting resource states.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 150
+Board 9 — Shared Security & Governance
+All mobile screens shall support, where applicable:
+ RBAC/PBAC
+ Tenant isolation
+ Venue restrictions
+ Device/session security
+ SSO
+ MFA where required
+ Encrypted local storage
+ API security
+ Customer-data minimization
+ Immutable audit history
+ Mobile action traceability
+ Offline transaction traceability
+ Arabic and English
+ Accessibility
+ Approval workflows
+ Push notifications
+Sensitive information must be limited to what the employee requires to perform the assignment.
+Board 9 — Cross-Platform Synchronization
+Board 9 shall use the same underlying Resource Management services as:
+ Backend Administration
+ POS
+ B2C
+ B2B
+ Event Management
+ Workforce Management
+ Equipment & Asset Management
+ AI Resource Intelligence
+ APIs
+For example:
+Manager changes Maria's assignment in Backend
+→ Resource Calendar updates
+→ Workforce Roster updates
+→ Maria's Employee App updates
+→ Push notification generated
+→ Old resource availability released
+→ New resource availability reserved
+→ Audit event recorded
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 151
+No separate mobile resource database shall become an independent source of truth.
+Board 9 — End-to-End Outcome
+After Board 9, TICVAI Resource Management no longer stops at the manager's desktop.
+The operational loop becomes:
+Manager Plans
+→ TICVAI Assigns
+→ Employee Receives
+→ Employee Checks In
+→ Employee Executes
+→ Resource Is Collected / Handed Over
+→ Employee Reports Exceptions
+→ Manager Approves / AI Recommends
+→ Assignment Updates
+→ Employee Completes
+→ Backend Updates in Real Time
+The employee experience should ultimately be extremely simple:
+GOOD MORNING, MARIA
+Your Shift
+08:00–16:00
+Next Assignment
+Private Ski Lesson
+14:00 — Zone A
+Starts in 12 minutes
+✓ Customer checked in
+✓ Training area ready
+✓ Equipment ready
+[START ASSIGNMENT]
+Everything complex—availability, certification, resource dependency, workforce compliance, 
+customer booking, equipment status, and scheduling—has already been validated behind that single
+button.
+That is the objective of Board 9: enterprise-grade Resource Management intelligence delivered 
+to frontline employees through an extremely simple digital experience.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 152
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 153
+Board 10 — Analytics, Governance & Resource Control 
+Center
+Board Objective
+Provide TICVAI with the executive and administrative control layer for the entire Resource Management 
+ecosystem.
+Board 10 shall consolidate information from all previous boards to answer four fundamental questions:
+1. Are our resources being used efficiently?
+2. Are they generating the expected operational and financial value?
+3. Are resource decisions compliant, controlled, and auditable?
+4. What should management change to improve future performance?
+Board 10 shall therefore cover:
+Analytics Utilization Cost & Performance Forecast Accuracy SLA/KPI Governance → → → → → →
+Approvals Audit Integration Health Executive Intelligence → → →
+The board should not recreate operational functions from Boards 1–9. It should provide the management, 
+governance, analytics, and control plane above them.
+Screen 01 — Resource Analytics Command Center
+Purpose
+Provide executives and operational managers with a single enterprise dashboard showing the overall health 
+and performance of Resource Management.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 154
+Executive KPIs
+Display:
+ Total active resources
+ Available resources
+ Currently assigned
+ Utilization %
+ Resource readiness %
+ Staff utilization
+ Physical asset utilization
+ Resource conflicts
+ Unfulfilled resource demand
+ Overtime
+ Maintenance downtime
+ Resource-related operational cost
+ Forecast vs actual demand
+ AI recommendations implemented
+ Resource Breakdown
+Allow analysis by:
+ Tenant
+ Region
+ Venue
+ Attraction
+ Event
+ Department
+ Resource category
+ Resource type
+ Staff
+ Equipment
+ Space
+ Date range
+ Executive Health Indicators
+Example:
+ Resource Readiness — 96%
+ Workforce Coverage — 98%
+ Asset Availability — 94%
+ Conflict Resolution — 91%
+ Forecast Accuracy — 93%
+ AI Executive Summary
+TICVAI shall generate a concise operational brief such as:
+Resource utilization increased 7% this week. Ski School is operating near optimal capacity, while Event 
+Operations has 18% underutilized equipment. Three recurring staffing gaps are predicted for the coming 
+weekend.
+Acceptance Condition
+Authorized management users can understand overall Resource Management performance and identify 
+areas requiring attention from a single dashboard.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 155
+Screen 02 — Resource Utilization & Capacity Analytics
+Purpose
+Measure how effectively resources are being utilized and identify overused or underused capacity.
+Utilization Metrics
+For each resource calculate, where applicable:
+Available Time
+Reserved Time
+Assigned Time
+Actual Usage
+Idle Time
+Blocked Time
+Maintenance Time
+Utilization Formula
+For example:
+Actual Utilized Hours / Operationally Available Hours
+Visualization
+Display utilization through:
+ Heatmaps
+ Trend charts
+ Resource rankings
+ Venue comparison
+ Day/time analysis
+ Capacity curves
+Example
+Ski Instructors — Saturday
+Available Capacity: 420 hrs
+Scheduled: 376 hrs
+Actual: 354 hrs
+Utilization:
+84.3%
+Underutilization
+TICVAI shall identify resources consistently below configured utilization targets.
+Example:
+Meeting Room C averages 21% utilization over the last 90 days.
+Overutilization
+Example:
+Level 3 instructors have operated above 92% utilization for five consecutive weekends.
+This may indicate capacity risk rather than good performance.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 156
+AI Recommendation
+Consider increasing Level 3 instructor capacity for weekend operations.
+Acceptance Condition
+Managers can understand resource utilization, idle capacity, overutilization, and capacity pressure across the 
+organization.
+Screen 03 — Resource Cost, Revenue & Efficiency Analytics
+Purpose
+Measure the financial and operational efficiency of resources.
+Cost Metrics
+Support analysis of:
+ Labor cost
+ Overtime cost
+ Maintenance cost
+ Rental cost
+ External-resource cost
+ Transfer cost
+ Asset operating cost
+ Resource replacement cost
+Revenue Association
+Where commercial relationships exist, TICVAI shall associate resources with:
+ Ticket revenue
+ Experience revenue
+ Rental revenue
+ Event revenue
+ Upsell revenue
+The Finance module remains the financial system of record where applicable.
+Efficiency Metrics
+Examples:
+Revenue per Resource Hour
+Cost per Participant
+Labor Cost per Experience
+Maintenance Cost per Asset
+Revenue / Resource Cost
+Example
+Private Ski Lessons
+Revenue: AED 420,000
+Instructor Cost: AED 112,000
+Resource Hours: 1,480
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 157
+Revenue / Instructor Hour:
+AED 284
+AI Insight
+Private lessons generate 34% more revenue per instructor hour than group lessons during weekday 
+afternoons.
+The AI should present this as management insight rather than automatically changing commercial policies.
+Acceptance Condition
+Authorized users can analyze resource-related costs and operational/commercial efficiency while maintaining
+clear ownership boundaries with Finance.
+Screen 04 — Demand Forecast Accuracy & Planning Performance
+Purpose
+Measure how accurately TICVAI's forecasting and planning engines predicted actual resource demand.
+Comparison
+Display:
+ Forecast Demand
+vs.
+ Planned Resources
+vs.
+ Actual Demand
+vs.
+ Actual Resources Used
+Metrics
+Track:
+ Attendance forecast accuracy
+ Resource demand forecast accuracy
+ Staffing forecast accuracy
+ Equipment forecast accuracy
+ Forecast shortage rate
+ Overstaffing rate
+ Understaffing rate
+Example
+Saturday — Waterpark
+Forecast Visitors: 5,200
+Actual Visitors: 5,410
+Forecast Accuracy:
+96.1%
+Forecast Lifeguards Required: 21
+Actual Requirement: 22
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 158
+Trend Analysis
+Managers shall see whether forecast quality improves over time.
+AI Learning Feedback
+Where permitted:
+Forecast Actual Variance Learning Signal → → →
+shall feed model evaluation and future forecasting improvement.
+Acceptance Condition
+TICVAI can measure forecast accuracy and provide management with evidence of whether AI-assisted 
+resource planning is improving operational performance.
+Screen 05 — Resource KPI, SLA & Performance Framework
+Purpose
+Allow organizations to define measurable Resource Management performance standards.
+KPI Library
+Administrators may configure KPIs such as:
+ Resource utilization
+ Assignment fulfillment
+ Staffing coverage
+ Resource readiness
+ Equipment availability
+ Maintenance downtime
+ Conflict resolution time
+ Resource replacement time
+ Attendance compliance
+ Overtime
+ Rental return rate
+ Forecast accuracy
+KPI Configuration
+Each KPI shall support:
+ Name
+ Description
+ Formula
+ Target
+ Warning threshold
+ Critical threshold
+ Applicable venue
+ Applicable resource
+ Effective period
+ Owner
+Example
+Resource Assignment Fulfillment
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 159
+Target:
+≥ 98%
+Warning:
+95–97.9%
+Critical:
+<95%
+SLA Monitoring
+Example:
+Critical Resource Replacement
+Target:
+Replacement identified within 10 minutes
+Scorecards
+Display:
+ Target | Actual | Variance | Trend | Status
+Acceptance Condition
+Administrators can configure Resource Management KPIs and SLAs and management can continuously 
+monitor performance against those targets.
+Screen 06 — Resource Governance & Policy Center
+Purpose
+Centralize the administrative policies controlling how Resource Management behaves.
+Policy Areas
+Administrators shall manage policies relating to:
+ Resource assignment
+ Availability
+ Booking
+ Resource priority
+ Customer selection
+ Qualification
+ Certification
+ Overtime
+ Maintenance blocking
+ Rental
+ Deposits
+ Resource replacement
+ Event allocation
+ AI autonomy
+ Overrides
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 160
+Policy Structure
+Each policy shall support:
+ Policy name
+ Scope
+ Tenant
+ Venue
+ Resource category
+ Effective date
+ Expiry date
+ Owner
+ Version
+ Approval requirement
+Policy Hierarchy
+TICVAI shall support inheritance such as:
+ Global
+ ↓
+ Tenant
+ ↓
+ Region
+ ↓
+ Venue
+ ↓
+ Resource Category
+ ↓
+ Specific Resource
+The interface must clearly show inherited versus locally overridden values.
+Example
+Automatic Staff Replacement
+Global: Allowed
+Venue A: Allowed
+Venue B: Manager Approval Required
+Acceptance Condition
+Administrators can centrally manage Resource Management policies with controlled inheritance, versioning, 
+and effective dating.
+Screen 07 — Approval, Exception & Override Control Center
+Purpose
+Provide one centralized workspace for governed Resource Management exceptions.
+Approval Types
+Include:
+ Resource override
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 161
+ Qualification exception
+ Overtime
+ Resource conflict
+ Shift change
+ Event allocation
+ Maintenance override
+ Rental adjustment
+ Deposit adjustment
+ AI-generated operational change
+Approval Queue
+Each request shall show:
+ Request
+ Resource
+ Requester
+ Venue
+ Reason
+ Operational impact
+ Financial impact
+ Risk
+ AI recommendation
+ Required approver
+Example
+Resource Override
+Request
+Assign David to Corporate Event A.
+Issue
+Would create 2 overtime hours.
+Mandatory Rules
+✓ Qualification
+✓ Certification
+✓ Rest period
+AI Recommendation
+Approve with Overtime
+Actions
+Approve
+Reject
+Request Changes
+Escalate
+Non-Overrideable Rules
+Safety-critical or legally mandatory policies may be configured so that no user can override them.
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 162
+Acceptance Condition
+Resource exceptions and overrides are processed through controlled, permission-based workflows rather 
+than informal administrative changes.
+Screen 08 — Audit Trail & Resource Decision History
+Purpose
+Provide immutable traceability of significant Resource Management changes and decisions.
+Audit Events
+Capture:
+ Resource creation
+ Resource modification
+ Availability change
+ Assignment
+ Reassignment
+ Cancellation
+ Staff override
+ Maintenance block
+ Rental transaction
+ Deposit adjustment
+ Event allocation
+ AI recommendation
+ AI execution
+ Approval
+ Policy change
+Audit Record
+Each event shall capture:
+ Who
+ What
+ When
+ Where
+ Previous Value
+ New Value
+ Reason
+ Approval
+ Source
+Source Identification
+Actions shall clearly indicate whether initiated by:
+ User
+ Employee App
+ POS
+ API
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 163
+ Integration
+ Automated rule
+ TICVAI AI
+Example
+Assignment Changed
+Resource: Maria Garcia
+Original: Private Lesson — Zone A
+New: Group Lesson — Zone B
+Initiated By: TICVAI AI Recommendation
+Approved By: Operations Manager
+Reason: Critical staffing gap
+Search
+Users shall search audit history by:
+ Resource
+ Employee
+ Event
+ User
+ Date
+ Action
+ Venue
+ Source
+Acceptance Condition
+Authorized users can reconstruct the complete history of material Resource Management decisions and 
+identify exactly how and why each change occurred.
+Screen 09 — Resource Integration & System Health Center
+Purpose
+Monitor all technical integrations and synchronization services supporting Resource Management.
+Connected Systems
+Potential connections include:
+ HRMS
+ Workforce Management
+ Payroll
+ Event Management
+ Ticketing
+ POS
+ B2C
+ Employee App
+ Finance
+ Inventory
+ Procurement
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 164
+ Access Control
+ External APIs
+Integration Dashboard
+Display:
+ System
+ Status
+ Last Sync
+ Transactions
+ Errors
+ Latency
+Health Status
+Use clear indicators:
+Healthy
+Warning
+Degraded
+Offline
+Example
+HRMS
+Status: Healthy
+Last Sync: 2 min ago
+Records: 4,284
+Errors: 0
+Workforce Provider
+Status: Warning
+Last Sync: 18 min ago
+Failed Records: 12
+Operational Impact
+This is important.
+TICVAI shall not simply say:
+“Integration failed.”
+It should explain:
+12 employee availability updates could not be synchronized. Four employees have assignments within 
+the next 24 hours.
+Actions
+Authorized users may:
+ Retry
+ View error
+ Inspect payload/reference
+ Reprocess
+ Escalate
+ Open affected records
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 165
+Acceptance Condition
+Administrators can monitor integration health and understand the operational impact of synchronization 
+failures.
+Screen 10 — Executive Resource Intelligence & AI Improvement Center
+Purpose
+Complete the Resource Management module with an executive AI workspace that converts operational data 
+into management recommendations.
+This should be the hero screen of Board 10.
+Executive Question
+Management should be able to ask:
+“How did our resources perform this month?”
+TICVAI may respond:
+Resource Performance — August
+Overall Utilization
+78% 6% ↑
+Resource Readiness
+96%
+Assignment Fulfillment
+98.4%
+Forecast Accuracy
+92%
+Overtime
+↓ 14%
+Resource-Related Cost
+↓ 4.8%
+AI Findings
+1. Ski School Capacity Pressure
+Level 3 instructors exceeded 90% utilization on four weekends.
+2. Event Equipment Underutilization
+AV equipment utilization averaged 38%.
+3. Maintenance Risk
+Three projectors account for 41% of AV maintenance expenditure.
+4. Workforce Optimization
+AI roster recommendations reduced estimated overtime by 64 hours.
+Recommended Actions
+TICVAI may recommend:
+Increase Level 3 instructor capacity
+Expected effect:
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 166
++8% peak availability
+Redistribute AV equipment
+Expected effect:
++12% utilization
+Replace Projectors P-17, P-22 and P-31
+Expected effect:
+AED 18,400 estimated annual maintenance reduction
+Adjust Saturday workforce templates
+Expected effect:
+-11 overtime hours/week
+Action Governance
+Each recommendation shall show:
+ Evidence
+ Confidence
+ Expected benefit
+ Risk
+ Affected resources
+ Financial impact
+ Operational impact
+Management may:
+ Review
+ Simulate
+ Create Action
+ Assign Owner
+ Dismiss
+The AI should never silently make strategic management changes.
+Acceptance Condition
+Executives can use Resource Management data and AI intelligence to identify measurable opportunities for 
+improving capacity, cost, reliability, utilization, and operational performance.
+Board 10 — Resource Management Control Tower
+Board 10 effectively becomes the Control Tower sitting above the previous nine boards.
+The architecture should conceptually operate as:
+Board 1–2
+Resource Master + Availability
+↓
+Board 3–4
+Workforce + Rostering
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 167
+↓
+Board 5
+Experience & Dynamic Assignment
+↓
+Board 6
+Equipment & Physical Assets
+↓
+Board 7
+Event Resource Planning
+↓
+Board 8
+AI Forecasting & Optimization
+↓
+Board 9
+Mobile Operations
+↓
+BOARD 10
+ANALYZE GOVERN AUDIT IMPROVE → → →
+Board 10 should therefore consume information from all Resource Management services rather than 
+creating another independent data store.
+Board 10 — Executive Resource Health Score
+TICVAI should calculate a configurable overall Resource Health Score.
+For example:
+RESOURCE HEALTH
+94 / 100
+Availability — 97%
+Utilization — 88%
+Workforce Coverage — 98%
+Asset Reliability — 91%
+Event Readiness — 96%
+Forecast Accuracy — 93%
+Compliance — 100%
+The exact weighting shall be configurable by organization.
+Selecting any component should drill down into the underlying issues.
+Board 10 — AI Performance Governance
+Because AI plays an important role throughout Resource Management, TICVAI should also measure the AI 
+itself.
+Track:
+ Recommendations generated
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 168
+ Recommendations accepted
+ Recommendations rejected
+ Auto-actions executed
+ Forecast accuracy
+ Optimization savings predicted
+ Optimization savings realized
+ Replacement success
+ Conflict-resolution success
+Example:
+ AI Resource Intelligence — August
+ Recommendations: 1,284
+ Accepted: 81%
+ Rejected: 12%
+ Expired/No Action: 7%
+ Forecast Accuracy: 92.4%
+ Estimated Savings: AED 148,000
+ Validated Savings: AED 121,000
+This gives management measurable evidence of the value delivered by TICVAI's AI layer.
+Board 10 — Governance Architecture
+All configuration and operational actions across Resource Management shall remain governed by:
+Identity
+→ RBAC/PBAC
+→ Policy
+→ Validation
+→ Approval
+→ Execution
+→ Audit
+→ Analytics
+AI shall operate inside this governance chain rather than outside it.
+Board 10 — Shared Security & Administration
+All screens shall support, where applicable:
+ Multi-tenant architecture
+ Multi-region operation
+ Multi-venue operation
+ RBAC/PBAC
+ Maker-checker workflows
+ Effective dating
+ Versioning
+ Immutable audit history
+
+TICVAI | RESOURCE MANAGEMENT
+CONFIDENTIAL • 169
+ Data retention policies
+ API security
+ Integration monitoring
+ AI explainability
+ AI decision logging
+ Data lineage
+ Arabic and English
+ Accessibility
+ Export permissions
+ Sensitive-data controls
+Board 10 — End-to-End Outcome
+After Board 10, the entire Resource Management lifecycle is complete.
+TICVAI can now move from:
+Create Resource
+→ Define Availability
+→ Configure Workforce
+→ Build Roster
+→ Assign to Experience
+→ Manage Physical Asset
+→ Allocate to Event
+→ Predict & Optimize
+→ Operate through Mobile
+→ Measure & Govern
+And management should ultimately receive something as simple as:
+RESOURCE HEALTH — 94/100
+Tomorrow
+96% Resource Ready
+3 predicted shortages
+2 maintenance risks
+11 overtime hours avoidable
+AED 3,800 optimization opportunity
+ TICVAI Recommendation
+5 actions identified
+4 can be resolved using existing resources
+1 requires management decision
+[Review AI Action Plan]

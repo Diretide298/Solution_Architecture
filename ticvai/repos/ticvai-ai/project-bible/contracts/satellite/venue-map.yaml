@@ -147,6 +147,7 @@ paths:
     get:
       operationId: getVenueMap
       x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
         - "P02 GST-021 Interactive Map"
         - "P06 EMP-030 Venue map"
         - "P08 BO-094 Map Editor & Publish"
@@ -488,6 +489,7 @@ paths:
     get:
       operationId: getVenueMapGraph
       x-ticvai-consumed-by:
+        - "P01 WEB-039 Venue Map & Wait Times"
         - "P02 GST-021 Interactive Map"
         - "P08 BO-094 Map Editor & Publish"
       summary: The navigation graph, ready to route over
@@ -579,6 +581,7 @@ paths:
     post:
       operationId: setPathClosure
       x-ticvai-consumed-by:
+        - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-094 Map Editor & Publish"
       summary: Close a route during works or an incident
       description: >

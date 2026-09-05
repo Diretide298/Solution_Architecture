@@ -238,7 +238,19 @@ def main() -> int:
     boards = json.loads((ROOT / "handoff" / "board-panel-map.json").read_text(encoding="utf-8")) \
         if (ROOT / "handoff" / "board-panel-map.json").exists() else {}
     lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
-    frames = json.loads(Path("/tmp/reads.json").read_text(encoding="utf-8"))
+    # **A deriver that reads /tmp is a deriver that works until the machine restarts.** This one
+    # crashed `refresh.sh` outright after a container reset — the panel map is derived from board
+    # reads that were extracted once into a scratch file and never brought into the package.
+    #
+    # **The existing map is the artefact; the scratch file was the working step.** Absent it, the
+    # right behaviour is to leave `board-panel-map.json` alone and say so, not to halt every
+    # other deriver behind it.
+    scratch = Path("/tmp/reads.json")
+    if not scratch.exists():
+        print("  board-panel-map: /tmp/reads.json absent — keeping the existing map")
+        print("    the scratch extract does not survive a restart; handoff/board-panel-map.json is the artefact")
+        return 0
+    frames = json.loads(scratch.read_text(encoding="utf-8"))
 
     out = {
         "note": (

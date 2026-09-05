@@ -11,9 +11,9 @@
 | **States** | 11 |
 | **Events** | 11 |
 | **Tables** | 50 |
-| **Screens** | 32 |
+| **Screens** | 33 |
 | **Flows** | 11 |
-| **Documents** | 14 |
+| **Documents** | 17 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -150,6 +150,7 @@
 - `GST-052` Suggested Itineraries — wave 3, 1 operation
 - `GST-054` AI Optimized Itinerary — wave 3, 2 operations
 - `GST-059` Plan My Day – In Progress — wave 3, 1 operation
+- `GST-068` Help & My Cases — wave 2, 1 operation
 
 **P04 Venue POS**
 
@@ -223,6 +224,7 @@
 |---|---|---|
 | [AI scope — for confirmation](../docs/active/ai-scope-for-confirmation.md) |  | 1 |
 | [Deep audit — ten invariants, run adversarially](../docs/active/deep-audit-24-august.md) |  | 4 |
+| [Deployment architecture — four configurations, costed on AWS and GCP](../docs/active/deployment-configs-costed.md) |  | 6 |
 | [Full-layer audit — 20 August](../docs/active/full-layer-audit-20aug.md) |  | 4 |
 | [TICVAI — Hierarchy, Data Segregation and Services](../docs/active/hierarchy-segregation-services.md) |  | 1 |
 | [Optimisation assessment — RAG, caching, backend, frontend](../docs/active/optimisation-assessment.md) |  | 4 |
@@ -233,6 +235,8 @@
 | [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](../docs/adr/0021-qdrant-partitioning.md) | Proposed · 17 August 2026 | 4 |
 | [ADR-0023 — Personal data lives apart from the append-only ledger](../docs/adr/0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 3 |
 | [ADR-0028: Sixteen services, and the data boundary decides where they split](../docs/adr/0028-service-decomposition.md) | Accepted — the data topology is reopened (CF-161, 24 August) | 1 |
+| [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](../docs/adr/0033-outbox-and-dead-letters.md) | Accepted | 2 |
+| [ADR-0034: The cheapest AI call is the one that never reaches a provider](../docs/adr/0034-ai-retrieval-and-cost.md) | Accepted | 7 |
 | [Architecture](../docs/architecture/README.md) |  | 1 |
 | [AI provider credentials — where the key lives and who can reach it](../docs/architecture/ai-credentials.md) |  | 4 |
 

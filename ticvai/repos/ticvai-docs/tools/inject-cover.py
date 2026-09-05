@@ -29,6 +29,44 @@ def swap(xml: str, old: str, new: str) -> str:
     return xml.replace(f">{old}<", f">{new}<")
 
 
+
+def fix_media(path) -> int:
+    """Restore image content types before touching anything else.
+
+    **Word refuses a document whose  does not declare an extension it
+    contains**, and pandoc drops the  default even when the reference document declares it.
+    The file passes every other check — the zip is intact,  parses, relationships
+    resolve — and reports *unreadable content*, which is the least diagnostic error Word produces.
+    Both deployment documents shipped that way on 31 August.
+
+    **Done here because every document in this package goes through the cover injection**, so it is
+    the one place the fix cannot be forgotten.
+    """
+    import zipfile, shutil
+    from pathlib import Path as _P
+    TYPES = {"png": "image/png", "jpeg": "image/jpeg", "jpg": "image/jpeg",
+             "gif": "image/gif", "bmp": "image/bmp", "svg": "image/svg+xml",
+             "emf": "image/x-emf", "wmf": "image/x-wmf", "tiff": "image/tiff"}
+    p = _P(path)
+    with zipfile.ZipFile(p) as z:
+        names = z.namelist()
+        ct = z.read("[Content_Types].xml").decode("utf-8")
+        blobs = {n: z.read(n) for n in names}
+    present = {n.rsplit(".", 1)[-1].lower() for n in names if "." in n}
+    missing = [e for e in sorted(present & set(TYPES)) if f'Extension="{e}"' not in ct]
+    if not missing:
+        return 0
+    ins = "".join(f'<Default Extension="{e}" ContentType="{TYPES[e]}"/>' for e in missing)
+    i = ct.index(">", ct.index("<Types")) + 1
+    blobs["[Content_Types].xml"] = (ct[:i] + ins + ct[i:]).encode("utf-8")
+    tmp = p.with_suffix(".tmp.docx")
+    with zipfile.ZipFile(tmp, "w", zipfile.ZIP_DEFLATED) as out:
+        for n in names:
+            out.writestr(n, blobs[n])
+    shutil.move(str(tmp), str(p))
+    return len(missing)
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("docx")
@@ -83,7 +121,11 @@ def main() -> int:
                 data = doc.encode("utf-8")
             zout.writestr(item, data)
     shutil.move(tmp, src)
-    print(f"  cover injected -> {src.name}")
+    # **After the rewrite, not before.** This function rebuilds the archive part by part, so a
+    # content type restored earlier would be carried through untouched — but the fix belongs on the
+    # final artefact, and running it last means it also catches anything the rewrite itself drops.
+    n = fix_media(src)
+    print(f"  cover injected -> {src.name}" + (f" ({n} content type(s) restored)" if n else ""))
     return 0
 
 

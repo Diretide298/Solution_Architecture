@@ -1,0 +1,78 @@
+-- References that cross the control/tenant database boundary.
+-- **Derived by tools/derive-ddl.py. Do not hand-edit.**
+--
+-- 20 declared references stopped being constraints when ADR-0039 made `control` a
+-- database of its own. **Postgres has no cross-database foreign key**, so each one is now
+-- a rule the caller has to keep, and the index below is all the database can offer.
+--
+-- **This is the price of the split and it is stated rather than absorbed.** A reference
+-- that quietly stops being enforced is a reference that will be violated by the first
+-- code path nobody reviewed.
+--
+-- The ALTER TABLE lines are commented out on purpose: they are what the constraint would
+-- have been, kept so the rule is still readable at the place it used to be enforced.
+--
+-- **This file is applied to neither database.** The index for each column is in its own
+-- database's 910-indexes.sql — the join did not stop happening just because Postgres
+-- stopped checking it.
+
+-- ai.provider.tenant_id -> control.tenant
+-- tenant database -> control database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE ai.provider ADD CONSTRAINT fk_provider_tenant_id FOREIGN KEY (tenant_id) REFERENCES control.tenant(id);
+-- control.cell.region_id -> platform.org_unit
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.cell ADD CONSTRAINT fk_cell_region_id FOREIGN KEY (region_id) REFERENCES platform.org_unit(id);
+-- control.cell_cluster.region_id -> platform.org_unit
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.cell_cluster ADD CONSTRAINT fk_cell_cluster_region_id FOREIGN KEY (region_id) REFERENCES platform.org_unit(id);
+-- control.channel_listing.price_list_id -> catalogue.price_list
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.channel_listing ADD CONSTRAINT fk_channel_listing_price_list_id FOREIGN KEY (price_list_id) REFERENCES catalogue.price_list(id);
+-- control.channel_listing.product_id -> catalogue.product
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.channel_listing ADD CONSTRAINT fk_channel_listing_product_id FOREIGN KEY (product_id) REFERENCES catalogue.product(id);
+-- control.invoice.tenant_id -> platform.tenant
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.invoice ADD CONSTRAINT fk_invoice_tenant_id FOREIGN KEY (tenant_id) REFERENCES platform.tenant(id);
+-- control.migration_run.started_by_principal_id -> identity.principal
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.migration_run ADD CONSTRAINT fk_migration_run_started_by_principal_id FOREIGN KEY (started_by_principal_id) REFERENCES identity.principal(id);
+-- control.partner_agreement.approval_request_id -> approvals.request
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.partner_agreement ADD CONSTRAINT fk_partner_agreement_approval_request_id FOREIGN KEY (approval_request_id) REFERENCES approvals.request(id);
+-- control.partner_agreement.partner_id -> platform.tenant
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.partner_agreement ADD CONSTRAINT fk_partner_agreement_partner_id FOREIGN KEY (partner_id) REFERENCES platform.tenant(id);
+-- control.partner_user.principal_id -> identity.principal
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.partner_user ADD CONSTRAINT fk_partner_user_principal_id FOREIGN KEY (principal_id) REFERENCES identity.principal(id);
+-- control.rollout.approved_by_principal_id -> identity.principal
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.rollout ADD CONSTRAINT fk_rollout_approved_by_principal_id FOREIGN KEY (approved_by_principal_id) REFERENCES identity.principal(id);
+-- control.rollout.started_by_principal_id -> identity.principal
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.rollout ADD CONSTRAINT fk_rollout_started_by_principal_id FOREIGN KEY (started_by_principal_id) REFERENCES identity.principal(id);
+-- control.subscription.tenant_id -> platform.tenant
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.subscription ADD CONSTRAINT fk_subscription_tenant_id FOREIGN KEY (tenant_id) REFERENCES platform.tenant(id);
+-- control.support_notice.published_by_principal_id -> identity.principal
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.support_notice ADD CONSTRAINT fk_support_notice_published_by_principal_id FOREIGN KEY (published_by_principal_id) REFERENCES identity.principal(id);
+-- control.tenant.account_manager_principal_id -> identity.principal
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.tenant ADD CONSTRAINT fk_tenant_account_manager_principal_id FOREIGN KEY (account_manager_principal_id) REFERENCES identity.principal(id);
+-- control.upgrade_schedule.tenant_id -> platform.tenant
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.upgrade_schedule ADD CONSTRAINT fk_upgrade_schedule_tenant_id FOREIGN KEY (tenant_id) REFERENCES platform.tenant(id);
+-- control.usage_record.venue_id -> platform.org_unit
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.usage_record ADD CONSTRAINT fk_usage_record_venue_id FOREIGN KEY (venue_id) REFERENCES platform.org_unit(id);
+-- control.webhook_delivery.event_id -> catalogue.event
+-- control database -> tenant database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE control.webhook_delivery ADD CONSTRAINT fk_webhook_delivery_event_id FOREIGN KEY (event_id) REFERENCES catalogue.event(id);
+-- maintenance.work_order.source_plan_id -> control.subscription_plan
+-- tenant database -> control database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE maintenance.work_order ADD CONSTRAINT fk_work_order_source_plan_id FOREIGN KEY (source_plan_id) REFERENCES control.subscription_plan(id);
+-- whitelabel.tenant_config.footer -> control.footer_config
+-- tenant database -> control database. Enforced by the caller, not by Postgres.
+-- ALTER TABLE whitelabel.tenant_config ADD CONSTRAINT fk_tenant_config_footer FOREIGN KEY (footer) REFERENCES control.footer_config(id);

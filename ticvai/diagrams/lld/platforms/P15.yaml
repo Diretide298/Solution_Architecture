@@ -117,7 +117,8 @@ screens:
   - stationId<-session
   - ticketId<-KIT-002
   - visitId<-deepLink
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3b
   wireframe: wireframes/FnB Board 3.dc.html#fnb-3b
@@ -151,7 +152,8 @@ screens:
   - stationId<-session
   - ticketId<-KIT-002
   - outletId<-session
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3c
   wireframe: wireframes/FnB Board 3.dc.html#fnb-3c
@@ -179,7 +181,8 @@ screens:
   - venueId<-session
   - stationId<-session
   - orderId<-KIT-002
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3d
   wireframe: wireframes/P15 Kitchen Display.dc.html#kit-004
@@ -206,7 +209,8 @@ screens:
   entryParams:
   - venueId<-session
   - stationId<-session
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3e
   wireframe: wireframes/FnB Board 3.dc.html#fnb-3e
@@ -236,7 +240,8 @@ screens:
   - stationId<-session
   - ticketId<-KIT-002
   - orderId<-session
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3f
   wireframe: wireframes/FnB Board 3.dc.html#fnb-3f
@@ -263,7 +268,8 @@ screens:
   - venueId<-session
   - stationId<-session
   - orderId<-KIT-002
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3g
   wireframe: wireframes/P15 Kitchen Display.dc.html#kit-007
@@ -294,7 +300,8 @@ screens:
   - itemId<-KIT-002
   - ticketId<-KIT-002
   - outletId<-session
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3h
   wireframe: wireframes/FnB Board 3.dc.html#fnb-3h
@@ -321,7 +328,8 @@ screens:
   - venueId<-session
   - stationId<-session
   - ticketId<-KIT-002
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3j
   wireframe: wireframes/FnB Board 3.dc.html#fnb-3j
@@ -347,7 +355,8 @@ screens:
   - venueId<-session
   - stationId<-session
   - dashboardId<-KIT-002
-  goesTo: []
+  goesTo:
+  - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3k
   wireframe: wireframes/P15 Kitchen Display.dc.html#kit-010

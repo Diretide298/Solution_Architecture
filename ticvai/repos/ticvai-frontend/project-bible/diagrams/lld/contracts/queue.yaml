@@ -10,7 +10,8 @@ operations:
   path: /queues/{queueId}/call-next
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -23,7 +24,8 @@ operations:
   path: /queue-feeds
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -36,7 +38,8 @@ operations:
   path: /queues
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -49,27 +52,19 @@ operations:
   path: /queues/{queueId}
   scope: venue
   permission: QUEUE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - queue.queue
-  writes: []
-- operation: getQueueEntry
-  verb: GET
-  path: /queue-entries/{entryId}
-  scope: venue
-  permission: null
-  audience: null
-  offline: false
-  reads:
-  - queue.entry
   writes: []
 - operation: getQueueFeedHealth
   verb: GET
   path: /queue-feeds/{feedId}/health
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - queue.feed
@@ -79,7 +74,8 @@ operations:
   path: /signage/queue-board
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - device
   offline: true
   reads:
   - queue.queue
@@ -90,65 +86,83 @@ operations:
   path: /signage/queue-calls
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - device
   offline: true
   reads:
-  - queue.entry
+  - queue.waiting_guest
   writes: []
 - operation: getWaitTimes
   verb: GET
   path: /queues/wait-times
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
+  - public
   offline: true
   reads:
-  - queue.entry
   - queue.queue
   - queue.reading
+  - queue.waiting_guest
+  writes: []
+- operation: getWaitingGuest
+  verb: GET
+  path: /waiting-guests/{entryId}
+  scope: venue
+  permission: null
+  audience:
+  - guest
+  offline: false
+  reads:
+  - queue.waiting_guest
   writes: []
 - operation: joinQueue
   verb: POST
-  path: /queue-entries
+  path: /waiting-guests
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
 - operation: leaveQueue
   verb: DELETE
-  path: /queue-entries/{entryId}
+  path: /waiting-guests/{entryId}
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - guest
   offline: false
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
 - operation: listQueueEntries
   verb: GET
   path: /queues/{queueId}/entries
   scope: venue
   permission: QUEUE_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
-  - queue.entry
+  - queue.waiting_guest
   writes: []
 - operation: listQueueFeeds
   verb: GET
   path: /queue-feeds
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - queue.feed
@@ -158,43 +172,48 @@ operations:
   path: /queues
   scope: venue
   permission: QUEUE_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: true
   reads:
   - queue.queue
   writes: []
-- operation: overrideQueueEntry
+- operation: overrideWaitingGuest
   verb: POST
-  path: /queue-entries/{entryId}/override
+  path: /waiting-guests/{entryId}/override
   scope: venue
   permission: QUEUE_OVERRIDE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
-- operation: redeemQueueEntry
+  - queue.waiting_guest
+- operation: redeemWaitingGuest
   verb: POST
-  path: /queue-entries/{entryId}/redeem
+  path: /waiting-guests/{entryId}/redeem
   scope: workstation
   permission: QUEUE_REDEEM
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
   writes:
   - cache:idempotency
-  - queue.entry
+  - queue.waiting_guest
 - operation: setQueueStatus
   verb: PUT
   path: /queues/{queueId}/status
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -207,7 +226,8 @@ operations:
   path: /queues/{queueId}/wait-time
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -220,7 +240,8 @@ operations:
   path: /queue-feeds/readings
   scope: venue
   permission: null
-  audience: null
+  audience:
+  - device
   offline: false
   reads:
   - cache:idempotency
@@ -233,7 +254,8 @@ operations:
   path: /queue-feeds/{feedId}/test
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -246,7 +268,8 @@ operations:
   path: /queues/{queueId}
   scope: venue
   permission: QUEUE_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

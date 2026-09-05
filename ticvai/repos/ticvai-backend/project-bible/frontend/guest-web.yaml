@@ -21,8 +21,10 @@ packages:
 - api-client
 contracts:
 - access
+- ai
 - catalogue
 - finance
+- fnb
 - identity
 - marketing-crm
 - orders
@@ -30,6 +32,7 @@ contracts:
 - queue
 - retail
 - seating
+- venue-map
 - white-label
 deployment:
   target: browser

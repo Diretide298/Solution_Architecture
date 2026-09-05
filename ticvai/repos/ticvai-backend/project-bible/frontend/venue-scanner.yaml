@@ -22,7 +22,7 @@ packages:
 - offline-core
 contracts:
 - access
-- cross-cell
+- cross-region
 - identity
 - orders
 - shift

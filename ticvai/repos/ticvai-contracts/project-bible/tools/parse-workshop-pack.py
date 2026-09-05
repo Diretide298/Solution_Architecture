@@ -1,0 +1,341 @@
+#!/usr/bin/env python3
+"""Parse the workshop reference pack into one record per screen.
+
+**Seventeen module documents, 1,058 pages, 59 boards, 590 screens.** They arrived as
+`Workshop Docs.zip` on 3 September and they are the largest single addition the package has ever
+been asked to absorb — larger than its entire current screen inventory.
+
+Writes `sources/workshop/pack.json`. Nothing downstream should read the PDFs again.
+
+## Why the table of contents and not the body
+
+**A body scan counts 741 screens where there are 590.** Every document repeats screen titles as
+cross-references — "as configured in 11.1.4" — and a title-matching pass cannot tell a reference
+from a declaration. The table of contents lists each screen exactly once, which is what makes it
+the canonical list rather than merely a convenient one.
+
+## Three numbering conventions, sometimes two in one document
+
+    Screen 7 - Access Control Graphical Map Designer     board 1 of Access Control
+    Screen 2.7 - Multi-Park & Crossover Rules            board 2 of the same document
+    11.1.7 - Person-Type, Product & Entitlement Rules    area.board.screen, most documents
+
+**`Access Control` and `Product Lifecycle` use the first form for board 1 and the second from
+board 2 on.** A parser that assumes one convention silently returns a board's worth of screens and
+looks like it worked.
+
+## The reconciliation is the point
+
+Every board in this pack is ten screens, so 59 boards is 590 screens and the two numbers check each
+other. **`--check` exits non-zero unless the parse reconciles**, because a partial parse of a
+source document is worse than no parse: it is a number somebody will plan against.
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from pathlib import Path
+
+import pdfplumber
+from rapidfuzz import fuzz
+
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "sources" / "workshop"
+OUT = SRC / "pack.json"
+
+EXPECTED_SCREENS = 590
+EXPECTED_BOARDS = 59
+
+DASH = r"[—–-]"
+
+# `Screen 2.7 - x`, `Screen 7 - x`, or `11.1.7 - x`. The leading `Screen` is optional because the
+# area-numbered form never carries it.
+SCREEN_LINE = re.compile(r"^(?:Screen\s+)?(\d+(?:\.\d+){0,2})\s*" + DASH + r"\s*(.+)$")
+BOARD_LINE = re.compile(r"^Board\s+(\d+)\s*(?:of\s+\d+\s*)?" + DASH + r"?\s*(.*)$")
+AREA_LINE = re.compile(r"^Area\s+(\d+)\s*" + DASH + r"\s*(.+)$")
+
+# Section headings inside a screen's own specification. The pack is consistent about these, which
+# is what makes a field-level extract possible at all.
+# **Headings that end a section.** `Display`, `Support` and `Each configuration displays` are
+# deliberately *not* here: they are sub-labels the pack puts immediately under a real heading —
+# "KPI Cards" then "Display:" then the bullets — so treating one as a boundary truncated every
+# list to nothing and made a working extract look like a bullet-parsing failure.
+SECTIONS = ("Purpose", "KPI Cards", "Configuration Directory", "Transaction Types",
+            "Fields", "Actions", "Rules", "Validation", "Filters", "Tabs",
+            "Operational Activity", "Governance", "AI Assistance")
+
+# The pack bullets with a private-use Wingdings glyph, not a bullet character.
+BULLET = "•●▪*-–— "
+
+
+def page_texts(pdf: Path) -> list[str]:
+    with pdfplumber.open(pdf) as doc:
+        return [(p.extract_text() or "") for p in doc.pages]
+
+
+def toc_block(pages: list[str]) -> tuple[str, int]:
+    """The table of contents, ending where the first screen specification begins.
+
+    **`Privacy, Consent & Preference Management` is why this is not a single `find`.** Cutting at
+    the first `Purpose` works for sixteen documents and truncates that one to two screens, because
+    the word appears inside its contents list. Cutting at the first page that *starts* a screen
+    specification works for all seventeen.
+    """
+    start = next((i for i, t in enumerate(pages) if "Table of Contents" in t), 0)
+    end = len(pages)
+    for i in range(start + 1, len(pages)):
+        body = pages[i]
+        # A specification page carries a screen heading and then a section heading under it.
+        if SCREEN_LINE.match(body.strip().split("\n")[0].strip() if body.strip() else ""):
+            continue
+        if any(f"\n{s}\n" in body for s in ("Purpose", "KPI Cards")) and "Table of Contents" not in body:
+            end = i
+            break
+    return "\n".join(pages[start:end]), end
+
+
+def parse_toc(block: str) -> tuple[list[dict], list[str], list[str]]:
+    """Screens in declaration order, plus the boards and areas the document claims."""
+    screens, boards, areas, seen = [], [], [], set()
+    board = None
+    for raw in block.split("\n"):
+        line = raw.strip()
+        if not line:
+            continue
+        if m := AREA_LINE.match(line):
+            if m.group(1) not in areas:
+                areas.append(m.group(1))
+            continue
+        if m := BOARD_LINE.match(line):
+            board = m.group(1)
+            if board not in boards:
+                boards.append(board)
+            continue
+        if m := SCREEN_LINE.match(line):
+            number, title = m.group(1), m.group(2).strip()
+            # **A title repeated in the contents is a page-break artefact, not a screen.** The
+            # number is unreliable for de-duplication because the three conventions collide:
+            # `Screen 7` in board 1 and `7` from `11.1.7` are different screens.
+            if title in seen or len(title) < 4:
+                continue
+            seen.add(title)
+            screens.append({"number": number, "title": title, "board": board})
+
+    # **The board comes from the screen number, not from the header above it.** Every contents
+    # list repeats "Board N —" in summary lines — `Board 2 — Final Screen Register`,
+    # `Board 1 — Commercial Pricing FoundationWhat prices exist?` — so header tracking put two
+    # boards' screens under one label twice and left Access Control's first ten with no board at
+    # all, because that document opens `ACCESS CONTROL — BOARD 1` in capitals.
+    #
+    # The numbering already carries it: `11.1.7` is area 11 board 1, `2.7` is board 2, and a bare
+    # `7` only ever occurs in a document's first board.
+    bare = 0
+    seq = 0
+    for s_ in screens:
+        parts = s_["number"].split(".")
+        if len(parts) == 3:
+            s_["board"] = parts[1]
+        elif len(parts) == 2:
+            s_["board"] = parts[0]
+        else:
+            # **A bare number restarts at 1 for every board**, which is how Promotions numbers all
+            # ten of its. The restart is the board boundary; nothing else in that document marks
+            # one that a contents list does not also repeat three times in prose.
+            n = int(parts[0])
+            if n <= bare:
+                seq += 1
+            bare = n
+            s_["board"] = str(seq + 1)
+    boards = sorted({s_["board"] for s_ in screens}, key=int)
+    return screens, boards, areas
+
+
+def body_headings(pages: list[str], start: int = 0) -> list[dict]:
+    """Every screen heading in the body, with where it starts.
+
+    **Matched by heading rather than by searching for the title anywhere on a page.** The first
+    cut looked for the title as a substring and missed 65 of 590, because `pdfplumber` breaks a
+    long heading across two lines and the substring is then never present. A heading is a line
+    that begins a screen, and finding those first turns the problem into matching two lists.
+    """
+    out = []
+    for i, text in enumerate(pages):
+        # **The contents entries match this pattern too**, and they come first — so without this
+        # every record cited page 2 and carried an empty specification, which looked like a
+        # bullet-parsing failure and was not.
+        if i < start:
+            continue
+        pos = 0
+        for line in text.split("\n"):
+            m = SCREEN_LINE.match(line.strip())
+            if m and len(m.group(2).strip()) > 3:
+                out.append({"page": i + 1, "index": i, "offset": pos,
+                            "number": m.group(1), "title": m.group(2).strip()})
+            pos += len(line) + 1
+    return out
+
+
+def spec_for(screen: dict, pages: list[str], headings: list[dict]) -> dict:
+    """The body text under the heading that best matches this screen.
+
+    **Fuzzy, because the heading and the contents entry are not always the same string** — a
+    trailing degree sign, an ampersand that extracted as `and`, a line break in the middle of a
+    noun phrase. The number is used to break ties where the document carries one.
+    """
+    best, score = None, 0
+    for h in headings:
+        r = fuzz.ratio(h["title"].lower(), screen["title"].lower())
+        if h["number"] == screen["number"]:
+            r += 15
+        if r > score:
+            best, score = h, r
+    if not best or score < 70:
+        return {"page": None, "body": "", "match": score}
+
+    text = pages[best["index"]][best["offset"]:]
+    # Continue into following pages until the next screen heading.
+    nxt = next((h for h in headings if (h["index"], h["offset"]) > (best["index"], best["offset"])),
+               None)
+    last = nxt["index"] if nxt else min(best["index"] + 5, len(pages) - 1)
+    for j in range(best["index"] + 1, last + 1):
+        chunk = pages[j]
+        if nxt and j == nxt["index"]:
+            chunk = chunk[:nxt["offset"]]
+        text += "\n" + chunk
+    return {"page": best["page"], "body": text[:9000], "match": score}
+
+
+def sections(body: str, doc_title: str) -> dict:
+    """Split a screen specification into its labelled blocks.
+
+    **The pack has one universal shape and seventeen local vocabularies.** `Purpose` appears on all
+    590 screens and `Acceptance Condition` on 476, but the lists in between sit under verb labels
+    that differ per document — `Display:`, `Configure:`, `Support:`, `Show:`, `Capture:`,
+    `Allow:`, `Analyze:`. An extractor built around one document's nouns — `KPI Cards`, `Fields`,
+    `Actions` — found them on 29 screens of 590 and looked broken when it was merely provincial.
+
+    So the blocks are keyed by whatever label introduces them, and **`terms` is the union**: every
+    bullet on the screen, whatever it was called. That union is the vocabulary signature the
+    redundancy pass compares, and for that purpose the label matters far less than the nouns.
+    """
+    label = re.compile(r"^([A-Z][A-Za-z0-9 ,&/'-]{2,40}):?$")
+    blocks: dict[str, list[str]] = {}
+    current = None
+    for raw in body.split(chr(10)):
+        line = raw.strip()
+        if not line:
+            continue
+        # **The running header and footer are on every page of every document.** Left in, the
+        # module name became the most common "field" in the pack.
+        if line.startswith("TICVAI") or line == doc_title or re.match(r"^TICVAI\s*[.]\s*\d+$", line):
+            continue
+        if line[0] in BULLET:
+            t = line.lstrip(BULLET).strip()
+            if t and current and len(t) < 160:
+                blocks.setdefault(current, []).append(t)
+            continue
+        m = label.match(line)
+        if m and len(line.split()) <= 5:
+            current = m.group(1).strip()
+            blocks.setdefault(current, [])
+            continue
+        # An unbulleted continuation line under a label is still content.
+        if current and len(line) < 160:
+            blocks.setdefault(current, []).append(line)
+    return blocks
+
+
+def prose(blocks: dict, *names: str) -> str:
+    for n in names:
+        if blocks.get(n):
+            return " ".join(blocks[n])[:600]
+    return ""
+
+
+def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--check", action="store_true",
+                    help="exit non-zero unless the parse reconciles to 59 boards and 590 screens")
+    ap.add_argument("--apply", action="store_true", help="write sources/workshop/pack.json")
+    a = ap.parse_args()
+
+    if not SRC.exists():
+        print(f"no {SRC.relative_to(ROOT)} — extract Workshop Docs.zip there first")
+        return 1
+
+    records, per_doc = [], []
+    for pdf in sorted(SRC.glob("*.pdf")):
+        pages = page_texts(pdf)
+        toc, body_starts_at = toc_block(pages)
+        screens, boards, areas = parse_toc(toc)
+        # **The area number is scanned over the whole document, not the contents block.** Four
+        # documents state their area only in a body heading, and four area numbers are claimed by
+        # two documents each — 10, 11, 12 and 13. Screen ids cannot be assigned until the client
+        # settles that, so under-reporting it here would hide the conflict rather than surface it.
+        if not areas:
+            found = set()
+            for text in pages:
+                for line in text.split(chr(10)):
+                    if m := AREA_LINE.match(line.strip()):
+                        found.add(m.group(1))
+            areas = sorted(found, key=int)
+        module = re.sub(r"[_ ]*Reference$", "", pdf.stem.replace("_", " ")).strip()
+        # The running page header, which is the document's own title.
+        doc_title = pages[0].split(chr(10))[0].strip() if pages else module
+        headings = body_headings(pages, body_starts_at)
+        for s in screens:
+            spec = spec_for(s, pages, headings)
+            blocks = sections(spec["body"], doc_title)
+            records.append({
+                "module": module,
+                "source": pdf.name,
+                "page": spec["page"],
+                "area": areas[0] if areas else None,
+                "board": s["board"],
+                "number": s["number"],
+                "title": s["title"],
+                "purpose": prose(blocks, "Purpose"),
+                "acceptance": prose(blocks, "Acceptance Condition", "Acceptance Criteria"),
+                "aiCapability": prose(blocks, "AI Capability"),
+                "sections": {k: v for k, v in blocks.items() if v},
+                "terms": sorted({t for k, v in blocks.items()
+                                 for t in v if k not in ("Purpose", "Example", "Examples",
+                                                         "Acceptance Condition")}),
+            })
+        per_doc.append((pdf.name, areas, len(boards), len(screens)))
+
+    print(f"{'document':46} {'area':>7} {'boards':>7} {'screens':>8}")
+    for name, areas, nb, ns in per_doc:
+        print(f"{name[:44]:46} {','.join(areas) or '-':>7} {nb:>7} {ns:>8}")
+    boards_total = sum(b for _, _, b, _ in per_doc)
+    print(f"\n{'TOTAL':46} {'':7} {boards_total:>7} {len(records):>8}")
+
+    unspecified = [r for r in records if not r["page"]]
+    if unspecified:
+        print(f"\n  {len(unspecified)} screen(s) with no specification body found — "
+              f"first: {unspecified[0]['title']}")
+
+    ok = len(records) == EXPECTED_SCREENS and boards_total == EXPECTED_BOARDS
+    if not ok:
+        print(f"\n  DOES NOT RECONCILE — expected {EXPECTED_BOARDS} boards and "
+              f"{EXPECTED_SCREENS} screens. **A partial parse of a source document is a number "
+              f"somebody will plan against.**")
+
+    if a.apply:
+        OUT.write_text(json.dumps(records, indent=1, ensure_ascii=False), encoding="utf-8")
+        print(f"  -> {OUT.relative_to(ROOT)}")
+    elif not a.check:
+        print("  nothing written — pass --apply")
+
+    return 0 if ok or not a.check else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

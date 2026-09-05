@@ -7,28 +7,102 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 37,
-  "operations": 110,
-  "contracts": 9,
-  "modules": 2,
+  "screens": 318,
+  "operations": 402,
+  "contracts": 15,
+  "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 79
+  "operationsWithNoScreen": 149
  },
  "waves": {
-  "wave1": 11,
+  "wave1": 12,
   "wave2": 16,
-  "wave3": 10
+  "wave3": 290
  },
  "modules": [
   {
-   "module": "TODO",
-   "screens": 36,
+   "module": "Commercial",
+   "screens": 230,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Platform",
+   "screens": 30,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Catalogue",
+   "screens": 20,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Tenants & Licensing",
+   "screens": 9,
    "waves": [
     1,
     2,
+    3
+   ]
+  },
+  {
+   "module": "Releases & Environments",
+   "screens": 7,
+   "waves": [
+    1,
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Overview & Health",
+   "screens": 5,
+   "waves": [
+    1,
+    2
+   ]
+  },
+  {
+   "module": "Infrastructure & Resilience",
+   "screens": 4,
+   "waves": [
+    2,
+    3
+   ]
+  },
+  {
+   "module": "Branding & Localisation",
+   "screens": 4,
+   "waves": [
+    2
+   ]
+  },
+  {
+   "module": "Access & Identity",
+   "screens": 3,
+   "waves": [
+    1
+   ]
+  },
+  {
+   "module": "Security & Compliance",
+   "screens": 2,
+   "waves": [
+    3
+   ]
+  },
+  {
+   "module": "Support & Communications",
+   "screens": 2,
+   "waves": [
     3
    ]
   },
@@ -38,16 +112,39 @@
    "waves": [
     1
    ]
+  },
+  {
+   "module": "Platform Ops",
+   "screens": 1,
+   "waves": [
+    1
+   ]
   }
  ],
  "contracts": [
+  {
+   "contract": "catalogue",
+   "operations": 110
+  },
+  {
+   "contract": "promotions",
+   "operations": 99
+  },
+  {
+   "contract": "orders",
+   "operations": 40
+  },
   {
    "contract": "subscription",
    "operations": 33
   },
   {
    "contract": "platform-ops",
-   "operations": 24
+   "operations": 32
+  },
+  {
+   "contract": "approvals",
+   "operations": 22
   },
   {
    "contract": "white-label",
@@ -58,23 +155,31 @@
    "operations": 16
   },
   {
+   "contract": "marketing-crm",
+   "operations": 10
+  },
+  {
    "contract": "ai",
    "operations": 5
+  },
+  {
+   "contract": "public-api",
+   "operations": 4
   },
   {
    "contract": "reporting",
    "operations": 4
   },
   {
-   "contract": "public-api",
-   "operations": 3
-  },
-  {
-   "contract": "cross-cell",
+   "contract": "cross-region",
    "operations": 3
   },
   {
    "contract": "tenancy",
+   "operations": 2
+  },
+  {
+   "contract": "workforce",
    "operations": 2
   }
  ],
@@ -82,7 +187,7 @@
   {
    "id": "ADM-001",
    "name": "Platform Login / MFA",
-   "module": "TODO",
+   "module": "Access & Identity",
    "wave": 1,
    "route": "/general/platform-login-mfa",
    "operations": 8,
@@ -91,7 +196,7 @@
   {
    "id": "ADM-002",
    "name": "Platform Dashboard",
-   "module": "TODO",
+   "module": "Overview & Health",
    "wave": 1,
    "route": "/general/platform-dashboard",
    "operations": 6,
@@ -100,7 +205,7 @@
   {
    "id": "ADM-003",
    "name": "Cross-Tenant Health Dashboard",
-   "module": "TODO",
+   "module": "Overview & Health",
    "wave": 2,
    "route": "/general/cross-tenant-health-dashboard",
    "operations": 10,
@@ -109,7 +214,7 @@
   {
    "id": "ADM-004",
    "name": "Platform Audit Log",
-   "module": "TODO",
+   "module": "Overview & Health",
    "wave": 2,
    "route": "/general/platform-audit-log",
    "operations": 1,
@@ -118,7 +223,7 @@
   {
    "id": "ADM-005",
    "name": "Tenant Directory",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 1,
    "route": "/general/tenant-directory",
    "operations": 15,
@@ -127,7 +232,7 @@
   {
    "id": "ADM-006",
    "name": "Tenant Hierarchy Explorer",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 1,
    "route": "/general/tenant-hierarchy-explorer",
    "operations": 9,
@@ -136,7 +241,7 @@
   {
    "id": "ADM-007",
    "name": "Module & Feature Entitlement",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 1,
    "route": "/general/module-and-feature-entitlement",
    "operations": 9,
@@ -145,7 +250,7 @@
   {
    "id": "ADM-008",
    "name": "Subscription & Plan Management",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 1,
    "route": "/general/subscription-and-plan-management",
    "operations": 19,
@@ -154,7 +259,7 @@
   {
    "id": "ADM-009",
    "name": "Tenant Billing & Invoicing",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 2,
    "route": "/general/tenant-billing-and-invoicing",
    "operations": 9,
@@ -163,7 +268,7 @@
   {
    "id": "ADM-010",
    "name": "Usage Metering",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 2,
    "route": "/general/usage-metering",
    "operations": 7,
@@ -172,7 +277,7 @@
   {
    "id": "ADM-011",
    "name": "Licence & Seat Management",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 2,
    "route": "/general/licence-and-seat-management",
    "operations": 11,
@@ -181,7 +286,7 @@
   {
    "id": "ADM-012",
    "name": "Tenant Isolation & Resource Pool",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 1,
    "route": "/general/tenant-isolation-and-resource-pool",
    "operations": 8,
@@ -190,7 +295,7 @@
   {
    "id": "ADM-013",
    "name": "Tenant Performance Monitor",
-   "module": "TODO",
+   "module": "Overview & Health",
    "wave": 2,
    "route": "/general/tenant-performance-monitor",
    "operations": 7,
@@ -199,16 +304,16 @@
   {
    "id": "ADM-014",
    "name": "Auto-Scaling Configuration",
-   "module": "TODO",
+   "module": "Infrastructure & Resilience",
    "wave": 3,
    "route": "/general/auto-scaling-configuration",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
    "id": "ADM-015",
    "name": "API Rate Limit & Quota Management",
-   "module": "TODO",
+   "module": "Tenants & Licensing",
    "wave": 3,
    "route": "/general/api-rate-limit-and-quota-management",
    "operations": 9,
@@ -217,7 +322,7 @@
   {
    "id": "ADM-016",
    "name": "White-Label Branding Management",
-   "module": "TODO",
+   "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/white-label-branding-management",
    "operations": 11,
@@ -226,7 +331,7 @@
   {
    "id": "ADM-017",
    "name": "Domain & Certificate Management",
-   "module": "TODO",
+   "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/domain-and-certificate-management",
    "operations": 4,
@@ -235,7 +340,7 @@
   {
    "id": "ADM-018",
    "name": "Localisation & Language Pack",
-   "module": "TODO",
+   "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/localisation-and-language-pack",
    "operations": 5,
@@ -244,7 +349,7 @@
   {
    "id": "ADM-019",
    "name": "Global Configuration & Defaults",
-   "module": "TODO",
+   "module": "Branding & Localisation",
    "wave": 2,
    "route": "/general/global-configuration-and-defaults",
    "operations": 4,
@@ -253,7 +358,7 @@
   {
    "id": "ADM-020",
    "name": "Platform User Directory",
-   "module": "TODO",
+   "module": "Access & Identity",
    "wave": 1,
    "route": "/general/platform-user-directory",
    "operations": 4,
@@ -262,7 +367,7 @@
   {
    "id": "ADM-021",
    "name": "Platform Role Management",
-   "module": "TODO",
+   "module": "Access & Identity",
    "wave": 1,
    "route": "/general/platform-role-management",
    "operations": 2,
@@ -271,7 +376,7 @@
   {
    "id": "ADM-022",
    "name": "Release & Version Management",
-   "module": "TODO",
+   "module": "Releases & Environments",
    "wave": 2,
    "route": "/general/release-and-version-management",
    "operations": 7,
@@ -280,7 +385,7 @@
   {
    "id": "ADM-023",
    "name": "Staging Promotion & Approval",
-   "module": "TODO",
+   "module": "Releases & Environments",
    "wave": 2,
    "route": "/general/staging-promotion-and-approval",
    "operations": 7,
@@ -289,16 +394,16 @@
   {
    "id": "ADM-024",
    "name": "Release Notification Composer",
-   "module": "TODO",
+   "module": "Releases & Environments",
    "wave": 3,
    "route": "/general/release-notification-composer",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "ADM-025",
    "name": "Tenant Upgrade Scheduler",
-   "module": "TODO",
+   "module": "Releases & Environments",
    "wave": 2,
    "route": "/general/tenant-upgrade-scheduler",
    "operations": 2,
@@ -307,16 +412,16 @@
   {
    "id": "ADM-026",
    "name": "End-of-Support Notice Management",
-   "module": "TODO",
+   "module": "Releases & Environments",
    "wave": 3,
    "route": "/general/end-of-support-notice-management",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
    "id": "ADM-027",
    "name": "Database Migration Console",
-   "module": "TODO",
+   "module": "Releases & Environments",
    "wave": 1,
    "route": "/general/database-migration-console",
    "operations": 6,
@@ -325,7 +430,7 @@
   {
    "id": "ADM-028",
    "name": "Environment Registry",
-   "module": "TODO",
+   "module": "Releases & Environments",
    "wave": 2,
    "route": "/general/environment-registry",
    "operations": 2,
@@ -334,7 +439,7 @@
   {
    "id": "ADM-029",
    "name": "Deployment Monitor",
-   "module": "TODO",
+   "module": "Overview & Health",
    "wave": 2,
    "route": "/general/deployment-monitor",
    "operations": 12,
@@ -343,16 +448,16 @@
   {
    "id": "ADM-030",
    "name": "Infrastructure Sizing & Scaling Policy",
-   "module": "TODO",
+   "module": "Infrastructure & Resilience",
    "wave": 3,
    "route": "/general/infrastructure-sizing-and-scaling-policy",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
    "id": "ADM-031",
    "name": "Security & Compliance Dashboard",
-   "module": "TODO",
+   "module": "Security & Compliance",
    "wave": 3,
    "route": "/general/security-and-compliance-dashboard",
    "operations": 4,
@@ -361,34 +466,34 @@
   {
    "id": "ADM-032",
    "name": "WAF & Security Policy View",
-   "module": "TODO",
+   "module": "Security & Compliance",
    "wave": 3,
    "route": "/general/waf-and-security-policy-view",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
    "id": "ADM-033",
    "name": "Backup & DR Status",
-   "module": "TODO",
+   "module": "Infrastructure & Resilience",
    "wave": 2,
    "route": "/general/backup-and-dr-status",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
    "id": "ADM-034",
    "name": "Archival Job Monitor",
-   "module": "TODO",
+   "module": "Infrastructure & Resilience",
    "wave": 3,
    "route": "/general/archival-job-monitor",
-   "operations": 7,
+   "operations": 8,
    "drawn": true
   },
   {
    "id": "ADM-035",
    "name": "Support & Escalation Console",
-   "module": "TODO",
+   "module": "Support & Communications",
    "wave": 3,
    "route": "/general/support-and-escalation-console",
    "operations": 2,
@@ -397,10 +502,10 @@
   {
    "id": "ADM-036",
    "name": "Platform Notification Broadcast",
-   "module": "TODO",
+   "module": "Support & Communications",
    "wave": 3,
    "route": "/general/platform-notification-broadcast",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -410,6 +515,2535 @@
    "wave": 1,
    "route": "/ai/providers",
    "operations": 4,
+   "drawn": true
+  },
+  {
+   "id": "ADM-038",
+   "name": "Communication Service Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/communication-service-command-center-adm-038",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-039",
+   "name": "Channel & Provider Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/channel-provider-configuration-adm-039",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-040",
+   "name": "Sender Identity, Domain & Brand Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/sender-identity-domain-brand-configuration-adm-040",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-041",
+   "name": "System Transactional Template Registry",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/system-transactional-template-registry-adm-041",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-042",
+   "name": "Business Event & Notification Trigger Mapping",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/business-event-notification-trigger-mapping-adm-042",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-043",
+   "name": "Routing, Priority, Throttling & Fallback Rules",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/routing-priority-throttling-fallback-rules-adm-043",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-044",
+   "name": "Consent, Preference & Communication Policy Enforcement",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/consent-preference-communication-policy-enforcement-adm-044",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-045",
+   "name": "Delivery Queue, Failure & Retry Management",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/delivery-queue-failure-retry-management-adm-045",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-046",
+   "name": "Provider Health, Usage & Cost Monitoring",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/provider-health-usage-cost-monitoring-adm-046",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-047",
+   "name": "AI Delivery Optimization & Communication Platform Diagnostics",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-delivery-optimization-communication-platform-diagnost-adm-047",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-048",
+   "name": "Commercial Pricing Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/commercial-pricing-command-center-adm-048",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-049",
+   "name": "Price List Master Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/price-list-master-configuration-adm-049",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-050",
+   "name": "Price Category & Rate Type Library",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/price-category-rate-type-library-adm-050",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-051",
+   "name": "Rate Structure Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/rate-structure-builder-adm-051",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-052",
+   "name": "Product & Service Price Assignment",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/product-service-price-assignment-adm-052",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-053",
+   "name": "Package, Bundle & Add-On Pricing",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/package-bundle-add-on-pricing-adm-053",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-054",
+   "name": "Market, Venue & Currency Pricing Structure",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/market-venue-currency-pricing-structure-adm-054",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-055",
+   "name": "Price Hierarchy & Inheritance Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/price-hierarchy-inheritance-configuration-adm-055",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-056",
+   "name": "Price List Templates, Clone & Reuse",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/price-list-templates-clone-reuse-adm-056",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-057",
+   "name": "Commercial Pricing Structure Validation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/commercial-pricing-structure-validation-adm-057",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-058",
+   "name": "Pricing Rule Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-rule-command-center-adm-058",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-059",
+   "name": "Customer Segment & Profile Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-segment-profile-pricing-rules-adm-059",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-060",
+   "name": "Membership & Loyalty Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/membership-loyalty-pricing-rules-adm-060",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-061",
+   "name": "Residency, Nationality & Market Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/residency-nationality-market-pricing-rules-adm-061",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-062",
+   "name": "Channel-Based Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-based-pricing-rules-adm-062",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-063",
+   "name": "Location, Venue & Event Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/location-venue-event-pricing-rules-adm-063",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-064",
+   "name": "Quantity, Group & Volume Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/quantity-group-volume-pricing-rules-adm-064",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-065",
+   "name": "Effective Date, Season & Day-Based Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/effective-date-season-day-based-pricing-rules-adm-065",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-066",
+   "name": "Timeslot, Performance & Time-of-Day Pricing Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/timeslot-performance-time-of-day-pricing-rules-adm-066",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-067",
+   "name": "Pricing Rule Priority, Conflict Resolution & Testing",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-rule-priority-conflict-resolution-testing-adm-067",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-068",
+   "name": "Tax, Fee & Calculation Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/tax-fee-calculation-command-center-adm-068",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-069",
+   "name": "Tax Profile & Jurisdiction Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/tax-profile-jurisdiction-configuration-adm-069",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-070",
+   "name": "Tax Rule & Treatment Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/tax-rule-treatment-builder-adm-070",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-071",
+   "name": "Fee & Surcharge Library",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/fee-surcharge-library-adm-071",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-072",
+   "name": "Fee Applicability & Charging Rule Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/fee-applicability-charging-rule-builder-adm-072",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-073",
+   "name": "Fee Waiver, Tax Exemption & Exception Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/fee-waiver-tax-exemption-exception-rules-adm-073",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-074",
+   "name": "Price Calculation Sequence & Formula Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/price-calculation-sequence-formula-engine-adm-074",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-075",
+   "name": "Currency Precision, Rounding & Monetary Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/currency-precision-rounding-monetary-rules-adm-075",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-076",
+   "name": "Price Breakdown, Calculation Simulation & Explainability",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/price-breakdown-calculation-simulation-explainability-adm-076",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-077",
+   "name": "Calculation Validation, Reconciliation & Service Interface",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/calculation-validation-reconciliation-service-interface-adm-077",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-078",
+   "name": "Pricing Governance Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-governance-command-center-adm-078",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-079",
+   "name": "Pricing Change Request & Workspace",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-change-request-workspace-adm-079",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-080",
+   "name": "Bulk Pricing Update, Import & Mass Maintenance",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bulk-pricing-update-import-mass-maintenance-adm-080",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-081",
+   "name": "Pricing Version & Baseline Management",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-version-baseline-management-adm-081",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-082",
+   "name": "Pricing Change Impact Analysis",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-change-impact-analysis-adm-082",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-083",
+   "name": "Pricing Approval Workflow & Authority Matrix",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-approval-workflow-authority-matrix-adm-083",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-084",
+   "name": "Pricing Publication & Effective-Date Scheduler",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-publication-effective-date-scheduler-adm-084",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-085",
+   "name": "Pricing Distribution, Synchronization & Publication Monitor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-distribution-synchronization-publication-monitor-adm-085",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-086",
+   "name": "Pricing Rollback & Emergency Control Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-rollback-emergency-control-center-adm-086",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-087",
+   "name": "Pricing History, Audit & Compliance Explorer",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-history-audit-compliance-explorer-adm-087",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-088",
+   "name": "Dynamic Pricing Strategy Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-pricing-strategy-command-center-adm-088",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-089",
+   "name": "Dynamic Pricing Strategy Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-pricing-strategy-builder-adm-089",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-090",
+   "name": "Demand, Occupancy & Availability Rule Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/demand-occupancy-availability-rule-builder-adm-090",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-091",
+   "name": "Booking Velocity & Time-to-Event Rule Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/booking-velocity-time-to-event-rule-builder-adm-091",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-092",
+   "name": "Seasonal, Calendar, Day & Timeslot Dynamic Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/seasonal-calendar-day-timeslot-dynamic-rules-adm-092",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-093",
+   "name": "Channel, Customer Segment & Location Dynamic Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-customer-segment-location-dynamic-rules-adm-093",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-094",
+   "name": "Dynamic Price Bands, Ladders & Adjustment Matrix",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-price-bands-ladders-adjustment-matrix-adm-094",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-095",
+   "name": "Dynamic Pricing Guardrails & Commercial Protection",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-pricing-guardrails-commercial-protection-adm-095",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-096",
+   "name": "Dynamic Pricing Automation Policy & Control",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-pricing-automation-policy-control-adm-096",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-097",
+   "name": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/rule-priority-conflict-resolution-dynamic-pricing-test-c-adm-097",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-098",
+   "name": "AI Pricing Intelligence Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-pricing-intelligence-command-center-adm-098",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-099",
+   "name": "Internal Demand & Booking Signal Hub",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/internal-demand-booking-signal-hub-adm-099",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-100",
+   "name": "Weather Intelligence & Demand Impact Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/weather-intelligence-demand-impact-configuration-adm-100",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-101",
+   "name": "Nearby Event, Exhibition & Local Demand Intelligence",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/nearby-event-exhibition-local-demand-intelligence-adm-101",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-102",
+   "name": "Competitor Pricing & Market Position Intelligence",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/competitor-pricing-market-position-intelligence-adm-102",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-103",
+   "name": "Market, Tourism, Holiday & Contextual Signal Hub",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/market-tourism-holiday-contextual-signal-hub-adm-103",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-104",
+   "name": "AI Demand Forecasting & Booking Curve Studio",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-demand-forecasting-booking-curve-studio-adm-104",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-105",
+   "name": "Price Elasticity & Revenue Response Intelligence",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/price-elasticity-revenue-response-intelligence-adm-105",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-106",
+   "name": "AI Pricing Recommendation & Explainability Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-pricing-recommendation-explainability-center-adm-106",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-107",
+   "name": "AI Signal Registry, Data Quality & Model Governance",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-signal-registry-data-quality-model-governance-adm-107",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-108",
+   "name": "Revenue Optimization Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/revenue-optimization-command-center-adm-108",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-109",
+   "name": "Pricing Simulation Studio",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pricing-simulation-studio-adm-109",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-110",
+   "name": "Scenario Modeling & What-If Analysis",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/scenario-modeling-what-if-analysis-adm-110",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-111",
+   "name": "A/B Pricing Experiment Studio",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/a-b-pricing-experiment-studio-adm-111",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-112",
+   "name": "Revenue & Demand Impact Forecasting",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/revenue-demand-impact-forecasting-adm-112",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-113",
+   "name": "AI Recommendation Review & Decision Queue",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-recommendation-review-decision-queue-adm-113",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-114",
+   "name": "Automation Policy & Autonomous Pricing Orchestrator",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/automation-policy-autonomous-pricing-orchestrator-adm-114",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-115",
+   "name": "Live Dynamic Price Execution & Deployment Monitor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/live-dynamic-price-execution-deployment-monitor-adm-115",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-116",
+   "name": "Dynamic Pricing Performance & Optimization Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-pricing-performance-optimization-analytics-adm-116",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-117",
+   "name": "AI Learning, Model Performance & Optimization Feedback",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-learning-model-performance-optimization-feedback-adm-117",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-118",
+   "name": "Product Lifecycle Command Center",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-lifecycle-command-center-adm-118",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-119",
+   "name": "Product Creation Workspace",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-creation-workspace-adm-119",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-120",
+   "name": "Lifecycle Status & Workflow Configuration",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/lifecycle-status-workflow-configuration-adm-120",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-121",
+   "name": "Bulk Product Creation & Catalogue Import",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/bulk-product-creation-catalogue-import-adm-121",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-122",
+   "name": "Product Import / Export & Environment Transfer",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-import-export-environment-transfer-adm-122",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-123",
+   "name": "Product Context, Ownership & Assignment",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-context-ownership-assignment-adm-123",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-124",
+   "name": "Channel Publication & Availability",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/channel-publication-availability-adm-124",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-125",
+   "name": "Publication & Activation Scheduler",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/publication-activation-scheduler-adm-125",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-126",
+   "name": "Product Duplication & Template Library",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-duplication-template-library-adm-126",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-127",
+   "name": "AI Catalogue Builder & Configuration Review",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/ai-catalogue-builder-configuration-review-adm-127",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-128",
+   "name": "Product Governance Command Center",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-governance-command-center-adm-128",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-129",
+   "name": "Approval Workflow Designer",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/approval-workflow-designer-adm-129",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-130",
+   "name": "Approval Review & Decision Workspace",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/approval-review-decision-workspace-adm-130",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-131",
+   "name": "Product Version Management",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-version-management-adm-131",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-132",
+   "name": "Rollback & Recovery Management",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/rollback-recovery-management-adm-132",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-133",
+   "name": "Change Impact Analysis",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/change-impact-analysis-adm-133",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-134",
+   "name": "Change Propagation & Dependency Control",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/change-propagation-dependency-control-adm-134",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-135",
+   "name": "Product Retirement, Suspension & Archive",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-retirement-suspension-archive-adm-135",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-136",
+   "name": "Product Audit Trail & Change History",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/product-audit-trail-change-history-adm-136",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-137",
+   "name": "Governance Risk, AI Monitoring & Control Center",
+   "module": "Catalogue",
+   "wave": 3,
+   "route": "/catalogue/governance-risk-ai-monitoring-control-center-adm-137",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-138",
+   "name": "Promotion Command Center Dashboard",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-command-center-dashboard-adm-138",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ADM-139",
+   "name": "Promotion & Campaign Directory",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-campaign-directory-adm-139",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-140",
+   "name": "Promotion Overview",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-overview-adm-140",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-141",
+   "name": "Promotion Lifecycle & Status Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-lifecycle-status-manager-adm-141",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-142",
+   "name": "Campaign Calendar & Timeline",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/campaign-calendar-timeline-adm-142",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-143",
+   "name": "Promotion Channel & Publication Monitor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-channel-publication-monitor-adm-143",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-144",
+   "name": "Promotion Alerts & Exception Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-alerts-exception-center-adm-144",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-145",
+   "name": "Promotion Approval Inbox",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-approval-inbox-adm-145",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "ADM-146",
+   "name": "Promotion Health & Performance Monitor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-health-performance-monitor-adm-146",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-147",
+   "name": "Promotion Audit, Activity & Version History",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-audit-activity-version-history-adm-147",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-148",
+   "name": "Promotion Rule Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-rule-builder-adm-148",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-149",
+   "name": "Percentage & Fixed Discount Configurator",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/percentage-fixed-discount-configurator-adm-149",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-150",
+   "name": "Cart & Transaction Threshold Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/cart-transaction-threshold-rules-adm-150",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-151",
+   "name": "Volume, Bulk & Tier Discount Configurator",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/volume-bulk-tier-discount-configurator-adm-151",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-152",
+   "name": "Time-Based & Seasonal Discount Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/time-based-seasonal-discount-rules-adm-152",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-153",
+   "name": "Customer, Membership & Segment Discount Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-membership-segment-discount-rules-adm-153",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-154",
+   "name": "Payment Method, Bank & Partner Discount Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/payment-method-bank-partner-discount-rules-adm-154",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-155",
+   "name": "Special Price & Guest Offer Configurator",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/special-price-guest-offer-configurator-adm-155",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-156",
+   "name": "Discount Limits, Guardrails & Commercial Controls",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/discount-limits-guardrails-commercial-controls-adm-156",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-157",
+   "name": "Rule Test, Simulation & AI Recommendation Workspace",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/rule-test-simulation-ai-recommendation-workspace-adm-157",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-158",
+   "name": "Coupon & Promo Code Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/coupon-promo-code-command-center-adm-158",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-159",
+   "name": "Coupon & Promo Code Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/coupon-promo-code-builder-adm-159",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-160",
+   "name": "Unique Code Generation & Batch Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/unique-code-generation-batch-manager-adm-160",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-161",
+   "name": "Code Eligibility & Restriction Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/code-eligibility-restriction-manager-adm-161",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-162",
+   "name": "Usage, Capacity & Frequency Control",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/usage-capacity-frequency-control-adm-162",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-163",
+   "name": "Validity, Date & Time Control",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/validity-date-time-control-adm-163",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-164",
+   "name": "Code Distribution & Assignment Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/code-distribution-assignment-manager-adm-164",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-165",
+   "name": "Redemption Monitor & Code Lookup",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/redemption-monitor-code-lookup-adm-165",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-166",
+   "name": "Code Security, Fraud & Exception Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/code-security-fraud-exception-center-adm-166",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-167",
+   "name": "Redemption Analytics, Audit & AI Optimization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/redemption-analytics-audit-ai-optimization-adm-167",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-168",
+   "name": "Advanced Offer Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/advanced-offer-command-center-adm-168",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-169",
+   "name": "Buy X Get Y / BOGO Rule Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/buy-x-get-y-bogo-rule-builder-adm-169",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-170",
+   "name": "Multi-Buy & Quantity Offer Configurator",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/multi-buy-quantity-offer-configurator-adm-170",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-171",
+   "name": "Cheapest / Lowest-Value Item Promotion",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/cheapest-lowest-value-item-promotion-adm-171",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-172",
+   "name": "Fixed-Price & \u201cN for X\u201d Offer Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/fixed-price-n-for-x-offer-builder-adm-172",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-173",
+   "name": "Gift, Free Product & Added-Value Offer Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/gift-free-product-added-value-offer-builder-adm-173",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-174",
+   "name": "Cross-Category Promotion Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/cross-category-promotion-builder-adm-174",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-175",
+   "name": "Reward Selection, Substitution & Customer Choice",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/reward-selection-substitution-customer-choice-adm-175",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-176",
+   "name": "Advanced Offer Guardrails & Conflict Controls",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/advanced-offer-guardrails-conflict-controls-adm-176",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-177",
+   "name": "Offer Simulation, Basket Trace & AI Optimization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/offer-simulation-basket-trace-ai-optimization-adm-177",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-178",
+   "name": "Bundle & Combo Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-combo-command-center-adm-178",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-179",
+   "name": "Bundle Definition & Setup",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-definition-setup-adm-179",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-180",
+   "name": "Bundle Component Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-component-builder-adm-180",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-181",
+   "name": "Guest Choice & Build-Your-Own Bundle Designer",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/guest-choice-build-your-own-bundle-designer-adm-181",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-182",
+   "name": "Bundle Pricing & Commercial Model",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-pricing-commercial-model-adm-182",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-183",
+   "name": "Bundle Availability, Capacity & Validation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-availability-capacity-validation-adm-183",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-184",
+   "name": "Bundle Validity, Scheduling & Redemption Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-validity-scheduling-redemption-rules-adm-184",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-185",
+   "name": "Partner & External Product Bundle Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/partner-external-product-bundle-manager-adm-185",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-186",
+   "name": "Revenue Allocation, Cost & Settlement Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/revenue-allocation-cost-settlement-rules-adm-186",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-187",
+   "name": "Bundle Preview, Simulation & AI Recommendation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-preview-simulation-ai-recommendation-adm-187",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-188",
+   "name": "Dynamic Bundle Operations Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-bundle-operations-command-center-adm-188",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-189",
+   "name": "Component Inventory & Availability Matrix",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/component-inventory-availability-matrix-adm-189",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-190",
+   "name": "Bundle Sellability & Dependency Rule Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-sellability-dependency-rule-engine-adm-190",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-191",
+   "name": "Capacity Pool & Reservation Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/capacity-pool-reservation-manager-adm-191",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-192",
+   "name": "Dynamic Component Substitution Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-component-substitution-engine-adm-192",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-193",
+   "name": "Dynamic Bundle Rule & Composition Engine",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-bundle-rule-composition-engine-adm-193",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-194",
+   "name": "Real-Time Availability & Checkout Validation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/real-time-availability-checkout-validation-adm-194",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-195",
+   "name": "Bundle Availability by Channel, Venue & Partner",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-availability-by-channel-venue-partner-adm-195",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-196",
+   "name": "Bundle Availability Forecast, Alerts & Recovery",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-availability-forecast-alerts-recovery-adm-196",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-197",
+   "name": "Dynamic Bundle Simulation & AI Optimization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/dynamic-bundle-simulation-ai-optimization-adm-197",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-198",
+   "name": "Targeting & Eligibility Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/targeting-eligibility-command-center-adm-198",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-199",
+   "name": "Eligibility Rule Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/eligibility-rule-builder-adm-199",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-200",
+   "name": "CRM & Customer Segment Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/crm-customer-segment-manager-adm-200",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-201",
+   "name": "Membership, Loyalty & Guest Eligibility",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/membership-loyalty-guest-eligibility-adm-201",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-202",
+   "name": "Behavioral & Transaction Targeting",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/behavioral-transaction-targeting-adm-202",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-203",
+   "name": "Context, Location, Channel & Time Targeting",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/context-location-channel-time-targeting-adm-203",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-204",
+   "name": "Partner, B2B & Payment Eligibility",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/partner-b2b-payment-eligibility-adm-204",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-205",
+   "name": "Audience Preview, Reach & Eligibility Simulator",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/audience-preview-reach-eligibility-simulator-adm-205",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-206",
+   "name": "Targeting Conflict, Frequency & Exclusion Controls",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/targeting-conflict-frequency-exclusion-controls-adm-206",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-207",
+   "name": "AI Audience Discovery & Targeting Optimization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-audience-discovery-targeting-optimization-adm-207",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-208",
+   "name": "Stacking & Conflict Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/stacking-conflict-command-center-adm-208",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-209",
+   "name": "Promotion Priority & Hierarchy Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-priority-hierarchy-manager-adm-209",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-210",
+   "name": "Promotion Stacking Rule Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-stacking-rule-builder-adm-210",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-211",
+   "name": "Promotion Exclusion & Compatibility Matrix",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-exclusion-compatibility-matrix-adm-211",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-212",
+   "name": "Discount Calculation & Application Sequence",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/discount-calculation-application-sequence-adm-212",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-213",
+   "name": "Best Offer & Customer Benefit Resolver",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/best-offer-customer-benefit-resolver-adm-213",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-214",
+   "name": "Discount Cap & Maximum Benefit Controller",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/discount-cap-maximum-benefit-controller-adm-214",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-215",
+   "name": "Conflict Detection & Resolution Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/conflict-detection-resolution-center-adm-215",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-216",
+   "name": "Promotion Decision Trace & Transaction Explainer",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-decision-trace-transaction-explainer-adm-216",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-217",
+   "name": "Conflict Simulation & AI Optimization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/conflict-simulation-ai-optimization-adm-217",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-218",
+   "name": "Campaign Governance & Budget Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/campaign-governance-budget-command-center-adm-218",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-219",
+   "name": "Campaign Budget & Financial Limit Setup",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/campaign-budget-financial-limit-setup-adm-219",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-220",
+   "name": "Redemption, Discount & Exposure Limit Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/redemption-discount-exposure-limit-manager-adm-220",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-221",
+   "name": "Budget Consumption & Forecast Monitor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/budget-consumption-forecast-monitor-adm-221",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-222",
+   "name": "Threshold Actions & Automatic Suspension",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/threshold-actions-automatic-suspension-adm-222",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-223",
+   "name": "Campaign Approval Workflow Designer",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/campaign-approval-workflow-designer-adm-223",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-224",
+   "name": "Approval Inbox & Decision Workspace",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/approval-inbox-decision-workspace-adm-224",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-225",
+   "name": "Campaign Financial & Commercial Simulator",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/campaign-financial-commercial-simulator-adm-225",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-226",
+   "name": "Campaign Experiment & A/B Test Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/campaign-experiment-a-b-test-manager-adm-226",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-227",
+   "name": "Governance Audit, AI Risk & Launch Readiness",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/governance-audit-ai-risk-launch-readiness-adm-227",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-228",
+   "name": "Promotion Performance Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/promotion-performance-command-center-adm-228",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-229",
+   "name": "Campaign & Promotion Performance Explorer",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/campaign-promotion-performance-explorer-adm-229",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-230",
+   "name": "Redemption, Conversion & Funnel Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/redemption-conversion-funnel-analytics-adm-230",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-231",
+   "name": "Discount, Margin & Profitability Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/discount-margin-profitability-analytics-adm-231",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-232",
+   "name": "Bundle, BOGO & Advanced Offer Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bundle-bogo-advanced-offer-analytics-adm-232",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-233",
+   "name": "Upsell, Cross-Sell & Attach-Rate Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upsell-cross-sell-attach-rate-analytics-adm-233",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-234",
+   "name": "Customer, Segment, Channel & Partner Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-segment-channel-partner-analytics-adm-234",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-235",
+   "name": "Incrementality, Attribution & Cannibalization Analysis",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/incrementality-attribution-cannibalization-analysis-adm-235",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-236",
+   "name": "AI Optimization & Next-Best-Action Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-optimization-next-best-action-center-adm-236",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-237",
+   "name": "Executive Promotion Intelligence & Reporting Studio",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/executive-promotion-intelligence-reporting-studio-adm-237",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-238",
+   "name": "Rules & Workflow Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/rules-workflow-command-center-adm-238",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-239",
+   "name": "Visual Business Rule Builder",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/visual-business-rule-builder-adm-239",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-240",
+   "name": "Conditions, Decision Logic & Decision Tables",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/conditions-decision-logic-decision-tables-adm-240",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-241",
+   "name": "Visual Workflow Designer",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/visual-workflow-designer-adm-241",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-242",
+   "name": "Approval Matrix & Multi-Level Approval Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-matrix-multi-level-approval-configuration-adm-242",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-243",
+   "name": "Roles, Authority, Delegation & Approval Limits",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/roles-authority-delegation-approval-limits-adm-243",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-244",
+   "name": "SLA, Escalation, Reminder & Timeout Rules",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/sla-escalation-reminder-timeout-rules-adm-244",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-245",
+   "name": "Trigger, Action & Cross-Module Orchestration Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/trigger-action-cross-module-orchestration-configuration-adm-245",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-246",
+   "name": "Workflow Testing, Simulation & Impact Analysis",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-testing-simulation-impact-analysis-adm-246",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-247",
+   "name": "Versioning, Governance, Approval & Publication",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/versioning-governance-approval-publication-adm-247",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-248",
+   "name": "Workflow Operations Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-operations-command-center-adm-248",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-249",
+   "name": "Unified Approval Inbox & Decision Workspace",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/unified-approval-inbox-decision-workspace-adm-249",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-250",
+   "name": "Workflow Instance Monitor & Process Timeline",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-instance-monitor-process-timeline-adm-250",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-251",
+   "name": "Workflow Exception, Failure & Recovery Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-exception-failure-recovery-center-adm-251",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-252",
+   "name": "SLA, Escalation & Bottleneck Monitor",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/sla-escalation-bottleneck-monitor-adm-252",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-253",
+   "name": "Automation Execution & Autonomous Action Monitor",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/automation-execution-autonomous-action-monitor-adm-253",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-254",
+   "name": "Cross-Module Orchestration Monitor",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/cross-module-orchestration-monitor-adm-254",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-255",
+   "name": "Workflow Analytics & Process Performance",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-analytics-process-performance-adm-255",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-256",
+   "name": "Process Optimization & Automation Opportunity Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/process-optimization-automation-opportunity-center-adm-256",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-257",
+   "name": "AI Workflow Intelligence & Autonomous Governance Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-workflow-intelligence-autonomous-governance-center-adm-257",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-258",
+   "name": "Sales Channel Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/sales-channel-command-center-adm-258",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-259",
+   "name": "Channel Creation & Profile Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-creation-profile-configuration-adm-259",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-260",
+   "name": "Product & Catalogue Assignment",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/product-catalogue-assignment-adm-260",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-261",
+   "name": "Channel Pricing & Commercial Profile Assignment",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-pricing-commercial-profile-assignment-adm-261",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-262",
+   "name": "Inventory, Capacity & Channel Allocation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/inventory-capacity-channel-allocation-adm-262",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-263",
+   "name": "Channel Sales Schedule & Availability Windows",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-sales-schedule-availability-windows-adm-263",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-264",
+   "name": "Customer & Eligibility Rules by Channel",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/customer-eligibility-rules-by-channel-adm-264",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-265",
+   "name": "Channel Sales Rules, Limits & Restrictions",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-sales-rules-limits-restrictions-adm-265",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-266",
+   "name": "Channel Fees, Payment & Fulfillment Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-fees-payment-fulfillment-configuration-adm-266",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-267",
+   "name": "Channel Publication, Readiness & AI Validation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-publication-readiness-ai-validation-adm-267",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-268",
+   "name": "Channel Operations Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-operations-command-center-adm-268",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-269",
+   "name": "Channel Connection & Integration Manager",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-connection-integration-manager-adm-269",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-270",
+   "name": "Product, Price & Availability Synchronization",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/product-price-availability-synchronization-adm-270",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-271",
+   "name": "Real-Time Channel Availability & Inventory Monitor",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/real-time-channel-availability-inventory-monitor-adm-271",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-272",
+   "name": "Channel Allocation & Rebalancing Operations",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-allocation-rebalancing-operations-adm-272",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-273",
+   "name": "Channel Exceptions, Incidents & Recovery",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-exceptions-incidents-recovery-adm-273",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-274",
+   "name": "Channel Performance & Commercial Analytics",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-performance-commercial-analytics-adm-274",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-275",
+   "name": "Channel Audit, Logs & Transaction Traceability",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-audit-logs-transaction-traceability-adm-275",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-276",
+   "name": "Channel Governance, SLA & Partner Control",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/channel-governance-sla-partner-control-adm-276",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-277",
+   "name": "AI Channel Optimization & Intelligence Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-channel-optimization-intelligence-center-adm-277",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-278",
+   "name": "Resale Marketplace Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-marketplace-command-center-adm-278",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-279",
+   "name": "Resale Eligibility Rule Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-eligibility-rule-configuration-adm-279",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-280",
+   "name": "Resale Policy & Marketplace Settings",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-policy-marketplace-settings-adm-280",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-281",
+   "name": "Listing Creation & Seller Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/listing-creation-seller-configuration-adm-281",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-282",
+   "name": "Resale Pricing & Price Guardrails",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-pricing-price-guardrails-adm-282",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-283",
+   "name": "Resale Fees, Commission & Seller Proceeds",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-fees-commission-seller-proceeds-adm-283",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-284",
+   "name": "Listing Approval & Moderation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/listing-approval-moderation-adm-284",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-285",
+   "name": "Resale Inventory & Availability Management",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-inventory-availability-management-adm-285",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-286",
+   "name": "Listing Lifecycle, Expiry & Cancellation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/listing-lifecycle-expiry-cancellation-adm-286",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-287",
+   "name": "AI Resale Configuration & Marketplace Recommendations",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ai-resale-configuration-marketplace-recommendations-adm-287",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-288",
+   "name": "Resale Operations Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-operations-command-center-adm-288",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-289",
+   "name": "Buyer Purchase & Resale Order Management",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/buyer-purchase-resale-order-management-adm-289",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-290",
+   "name": "Ticket Ownership Transfer Management",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/ticket-ownership-transfer-management-adm-290",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-291",
+   "name": "Credential Revocation & Regeneration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/credential-revocation-regeneration-adm-291",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-292",
+   "name": "Resale Fraud & Duplicate Sale Protection",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-fraud-duplicate-sale-protection-adm-292",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-293",
+   "name": "Capacity & Inventory Reconciliation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/capacity-inventory-reconciliation-adm-293",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-294",
+   "name": "Seller Settlement & Payout Management",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/seller-settlement-payout-management-adm-294",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-295",
+   "name": "Refunds, Disputes & Resale Exceptions",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/refunds-disputes-resale-exceptions-adm-295",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-296",
+   "name": "Resale Audit & Ownership History",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-audit-ownership-history-adm-296",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-297",
+   "name": "Resale Analytics & AI Intelligence",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-analytics-ai-intelligence-adm-297",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-298",
+   "name": "My Tickets & Resale Marketplace Entry",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/my-tickets-resale-marketplace-entry-adm-298",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-299",
+   "name": "Resale Eligibility & Ticket Selection",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-eligibility-ticket-selection-adm-299",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-300",
+   "name": "Create Listing & Resale Price Selection",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/create-listing-resale-price-selection-adm-300",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-301",
+   "name": "Fees, Seller Proceeds & Listing Confirmation",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/fees-seller-proceeds-listing-confirmation-adm-301",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-302",
+   "name": "My Resale Listings & Seller Dashboard",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/my-resale-listings-seller-dashboard-adm-302",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-303",
+   "name": "Official Resale Marketplace & Buyer Discovery",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/official-resale-marketplace-buyer-discovery-adm-303",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-304",
+   "name": "Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-ticket-detail-seat-selection-primary-vs-resale-ex-adm-304",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-305",
+   "name": "Buyer Checkout, Inventory Hold & Secure Payment",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/buyer-checkout-inventory-hold-secure-payment-adm-305",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-306",
+   "name": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/resale-confirmation-ownership-transfer-ticket-delivery-adm-306",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-307",
+   "name": "White-Label Marketplace Deployment & Experience Architecture",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/white-label-marketplace-deployment-experience-architectu-adm-307",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-308",
+   "name": "Upgrade & Conversion Command Center",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-conversion-command-center-adm-308",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-309",
+   "name": "Upgrade & Conversion Path Builder",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-conversion-path-builder-adm-309",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-310",
+   "name": "Upgrade Eligibility & Qualification Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-eligibility-qualification-rules-adm-310",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-311",
+   "name": "Upgrade Timing, Usage & Ticket Status Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-timing-usage-ticket-status-rules-adm-311",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-312",
+   "name": "Upgrade Financial Treatment & Price Difference Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-financial-treatment-price-difference-rules-adm-312",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-313",
+   "name": "Pro-Rata, Residual Value & Entitlement Credit Configuration",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/pro-rata-residual-value-entitlement-credit-configuration-adm-313",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-314",
+   "name": "Person-Type, Product & Entitlement Conversion Rules",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/person-type-product-entitlement-conversion-rules-adm-314",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-315",
+   "name": "Bulk, Group & Assisted Upgrade Operations",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/bulk-group-assisted-upgrade-operations-adm-315",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-316",
+   "name": "Upgrade Execution, Credential Regeneration & Channel Controls",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-execution-credential-regeneration-channel-contro-adm-316",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-317",
+   "name": "Upgrade History, Exception Management & Audit Explorer",
+   "module": "Commercial",
+   "wave": 3,
+   "route": "/commercial/upgrade-history-exception-management-audit-explorer-adm-317",
+   "operations": 1,
+   "drawn": true
+  },
+  {
+   "id": "ADM-318",
+   "name": "Dead Letters",
+   "module": "Platform Ops",
+   "wave": 1,
+   "route": "/platform/dead-letters",
+   "operations": 2,
    "drawn": true
   }
  ],
@@ -438,12 +3072,6 @@
     "contract": "ai",
     "verb": "GET",
     "summary": "What is indexed, and how current it is"
-   },
-   {
-    "operation": "listKnowledgeCollections",
-    "contract": "ai",
-    "verb": "GET",
-    "summary": "Collections available to this tenant"
    },
    {
     "operation": "proposeTranslations",
@@ -482,88 +3110,118 @@
     "summary": ""
    },
    {
+    "operation": "issueAccreditationBadge",
+    "contract": "approvals",
+    "verb": "POST",
+    "summary": "Issue a badge"
+   },
+   {
+    "operation": "assessProductChange",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "What a change would touch, before making it"
+   },
+   {
+    "operation": "bulkChangePrices",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Reprice a category or a whole catalogue"
+   },
+   {
+    "operation": "cloneProduct",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Copy a product as a new draft"
+   },
+   {
+    "operation": "commitCatalogueImport",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Apply a parsed catalogue import"
+   },
+   {
+    "operation": "createDonationCampaign",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Create a campaign"
+   },
+   {
+    "operation": "freezeEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Pause a membership at the guest's request"
+   },
+   {
+    "operation": "listDonationCampaigns",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Campaigns a guest can give to"
+   },
+   {
+    "operation": "listWaitlistEntries",
+    "contract": "catalogue",
+    "verb": "GET",
+    "summary": "Who is waiting for capacity"
+   },
+   {
+    "operation": "offerWaitlistCapacity",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Tell a waiting guest that capacity appeared"
+   },
+   {
+    "operation": "reinstateEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Lift a suspension"
+   },
+   {
+    "operation": "restoreProductVersion",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Put a previous version back"
+   },
+   {
+    "operation": "suspendEntitlement",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Suspend or reinstate an entitlement"
+   },
+   {
+    "operation": "updateDonationCampaign",
+    "contract": "catalogue",
+    "verb": "PATCH",
+    "summary": "Amend or close a campaign"
+   },
+   {
     "operation": "authoriseWalletSpend",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "POST",
     "summary": "Hold funds against the guest's home-cell balance"
    },
    {
     "operation": "captureWalletAuthorisation",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "POST",
     "summary": "Capture a held amount"
    },
    {
-    "operation": "createDsarRequest",
-    "contract": "cross-cell",
-    "verb": "POST",
-    "summary": "Raise a data subject request across every linked cell"
-   },
-   {
-    "operation": "createGuestLink",
-    "contract": "cross-cell",
-    "verb": "POST",
-    "summary": "Link a guest's records across cells"
-   },
-   {
-    "operation": "getDsarRequest",
-    "contract": "cross-cell",
-    "verb": "GET",
-    "summary": "Track fan-out progress per cell"
-   },
-   {
     "operation": "getWalletAllocation",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "GET",
     "summary": "The consuming cell's bounded offline allocation"
    },
    {
     "operation": "releaseWalletAuthorisation",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "POST",
     "summary": "Release a hold without capturing"
    },
    {
-    "operation": "resolveGuestLink",
-    "contract": "cross-cell",
-    "verb": "GET",
-    "summary": "Find the link for a local subject"
-   },
-   {
-    "operation": "revokeGuestLink",
-    "contract": "cross-cell",
-    "verb": "DELETE",
-    "summary": "Sever a link on consent withdrawal"
-   },
-   {
-    "operation": "revokeRedemptionRight",
-    "contract": "cross-cell",
-    "verb": "DELETE",
-    "summary": "Revoke a right"
-   },
-   {
     "operation": "setWalletAllocationPolicy",
-    "contract": "cross-cell",
+    "contract": "cross-region",
     "verb": "PUT",
     "summary": "Set the allocation cap policy"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "deleteGuestAccount",
-    "contract": "identity",
-    "verb": "DELETE",
-    "summary": "Self-service account deletion"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
    },
    {
     "operation": "setPasswordPolicy",
@@ -578,10 +3236,370 @@
     "summary": "Which permissions may not be held together"
    },
    {
+    "operation": "activateJourney",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Start it, or stop it"
+   },
+   {
+    "operation": "addGuestNote",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "What the floor needs to know about this table"
+   },
+   {
+    "operation": "addSuppression",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Suppress an address"
+   },
+   {
+    "operation": "createChallenge",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a challenge, mission or streak"
+   },
+   {
+    "operation": "createForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Define a waiver, survey or capture form"
+   },
+   {
+    "operation": "createInvitationCampaign",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A quota-bounded, addressed invitation"
+   },
+   {
+    "operation": "createLoyaltyProgramme",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Create a loyalty programme"
+   },
+   {
+    "operation": "createUrlRedirect",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "301, 302 and custom redirects"
+   },
+   {
+    "operation": "getJourneyPerformance",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Entrants, completions, goals reached"
+   },
+   {
+    "operation": "getLostItemMatches",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Candidate matches, scored"
+   },
+   {
+    "operation": "getSuppressionList",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "Addresses suppressed from all sending"
+   },
+   {
+    "operation": "listMessageTriggers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "What fires a message, and when"
+   },
+   {
+    "operation": "listReviews",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guest reviews and ratings"
+   },
+   {
+    "operation": "listSegmentMembers",
+    "contract": "marketing-crm",
+    "verb": "GET",
+    "summary": "List guests currently matching a segment"
+   },
+   {
+    "operation": "matchGuest",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Is this the same person we already have?"
+   },
+   {
+    "operation": "mergeGuests",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Two records, one person"
+   },
+   {
+    "operation": "recordLostItem",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Report something lost, or hand something in"
+   },
+   {
+    "operation": "recordPrivacyIncident",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Log a personal-data breach and start the clock"
+   },
+   {
+    "operation": "respondToReview",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Respond to a review"
+   },
+   {
+    "operation": "retryMessageDispatch",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Send it again, or by another channel"
+   },
+   {
+    "operation": "setCallDisposition",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Why the conversation ended, and any callback"
+   },
+   {
+    "operation": "setMessageTrigger",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Fire a message from a platform event"
+   },
+   {
+    "operation": "startKioskAssist",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "A staff member helps a guest at a kiosk, remotely"
+   },
+   {
+    "operation": "submitForm",
+    "contract": "marketing-crm",
+    "verb": "POST",
+    "summary": "Sign a waiver, answer a survey, capture details"
+   },
+   {
+    "operation": "captureStoredValue",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Take some or all of a held balance"
+   },
+   {
+    "operation": "convertReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Convert a reservation into an order"
+   },
+   {
+    "operation": "convertToTermProduct",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Turn a visit into a membership or season pass"
+   },
+   {
+    "operation": "createCart",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Start a cart"
+   },
+   {
+    "operation": "createPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Send a guest a link to pay later"
+   },
+   {
+    "operation": "createReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Hold without payment"
+   },
+   {
+    "operation": "extendReservation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Extend a reservation"
+   },
+   {
+    "operation": "issueInvitation",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Issue a complimentary entitlement, with no payment expected"
+   },
+   {
+    "operation": "listAbandonedCarts",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Carts that lapsed without checking out"
+   },
+   {
+    "operation": "listChargebacks",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Open disputes, by deadline"
+   },
+   {
+    "operation": "listFraudRules",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": ""
+   },
+   {
+    "operation": "listInvitationAllowances",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Who may issue comps, and how many are left"
+   },
+   {
+    "operation": "listPaymentProviders",
+    "contract": "orders",
+    "verb": "GET",
+    "summary": "Gateways configured for this scope"
+   },
+   {
+    "operation": "openGuestCreditAccount",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "A credit limit for an individual booking ahead"
+   },
+   {
+    "operation": "printTicketProof",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Print a sample without selling anything"
+   },
+   {
+    "operation": "pushWalletPassUpdate",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Push a change to every device holding it"
+   },
+   {
+    "operation": "quoteUpgrade",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "What an upgrade costs, pro-rata"
+   },
+   {
+    "operation": "reissueEntitlement",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Zero-value reissue of an expired entitlement for a later date"
+   },
+   {
+    "operation": "resendPaymentLink",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": ""
+   },
+   {
+    "operation": "respondToChargeback",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Submit evidence, or accept the loss"
+   },
+   {
+    "operation": "setFraudRules",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": ""
+   },
+   {
+    "operation": "setPaymentProvider",
+    "contract": "orders",
+    "verb": "PUT",
+    "summary": "Configure a gateway and its routing"
+   },
+   {
+    "operation": "splitOrder",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Break one order into independent orders"
+   },
+   {
+    "operation": "voidPayment",
+    "contract": "orders",
+    "verb": "POST",
+    "summary": "Release an authorisation before it is captured"
+   },
+   {
     "operation": "skipRolloutCell",
     "contract": "platform-ops",
     "verb": "POST",
     "summary": "Exclude a cell from this wave"
+   },
+   {
+    "operation": "assignCoupon",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Assign a coupon to a named guest"
+   },
+   {
+    "operation": "createUpsellRule",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Create an upsell rule"
+   },
+   {
+    "operation": "createVoucherBatch",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Issue a voucher batch"
+   },
+   {
+    "operation": "deleteUpsellRule",
+    "contract": "promotions",
+    "verb": "DELETE",
+    "summary": "Remove an upsell rule"
+   },
+   {
+    "operation": "listAllocationSplits",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List allocation split definitions"
+   },
+   {
+    "operation": "listBundles",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List bundles"
+   },
+   {
+    "operation": "listVoucherBatches",
+    "contract": "promotions",
+    "verb": "GET",
+    "summary": "List voucher batches"
+   },
+   {
+    "operation": "previewAllocationSplit",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Preview how an amount divides"
+   },
+   {
+    "operation": "redeemVoucher",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Redeem voucher value against an order"
+   },
+   {
+    "operation": "setPromotionVariants",
+    "contract": "promotions",
+    "verb": "PUT",
+    "summary": "A/B test two versions against each other"
+   },
+   {
+    "operation": "updateBundle",
+    "contract": "promotions",
+    "verb": "PATCH",
+    "summary": "Amend a bundle"
+   },
+   {
+    "operation": "voidVoucher",
+    "contract": "promotions",
+    "verb": "POST",
+    "summary": "Cancel a voucher"
    },
    {
     "operation": "cancelReportExecution",
@@ -668,10 +3686,22 @@
     "summary": "Add a user to a partner branch"
    },
    {
+    "operation": "decommissionBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Tear it down"
+   },
+   {
     "operation": "disputeInvoice",
     "contract": "subscription",
     "verb": "POST",
     "summary": "Raise a dispute"
+   },
+   {
+    "operation": "drainBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Stop taking orders, let in-flight ones finish"
    },
    {
     "operation": "executeTenantMigration",
@@ -690,6 +3720,12 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Launch an identical cluster"
+   },
+   {
+    "operation": "listBurstEnvironments",
+    "contract": "subscription",
+    "verb": "GET",
+    "summary": "On-sale environments"
    },
    {
     "operation": "listCellClusters",
@@ -722,22 +3758,28 @@
     "summary": "Plan moving a tenant to another cell"
    },
    {
+    "operation": "reconcileBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Move the orders into the permanent platform"
+   },
+   {
     "operation": "recordInvoicePayment",
     "contract": "subscription",
     "verb": "POST",
     "summary": "Record payment against an invoice"
    },
    {
-    "operation": "recordUsage",
-    "contract": "subscription",
-    "verb": "POST",
-    "summary": "Record metered usage"
-   },
-   {
     "operation": "registerPartner",
     "contract": "subscription",
     "verb": "POST",
     "summary": "A business applies to become a partner"
+   },
+   {
+    "operation": "requestBurstEnvironment",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "Stand one up for a performance"
    },
    {
     "operation": "resolveInvoiceDispute",
@@ -756,6 +3798,12 @@
     "contract": "subscription",
     "verb": "POST",
     "summary": "Turn metered AI interactions into a billable usage record"
+   },
+   {
+    "operation": "submitOnboardingApplication",
+    "contract": "subscription",
+    "verb": "POST",
+    "summary": "A prospect signs themselves up"
    },
    {
     "operation": "getRegionSettings",
@@ -888,11 +3936,39 @@
     "contract": "white-label",
     "verb": "PATCH",
     "summary": "Amend a promotional block"
+   },
+   {
+    "operation": "broadcastToGuests",
+    "contract": "workforce",
+    "verb": "POST",
+    "summary": ""
    }
   ],
   "modulesSplitAcrossWaves": [
    {
-    "module": "TODO",
+    "module": "Infrastructure & Resilience",
+    "waves": [
+     2,
+     3
+    ]
+   },
+   {
+    "module": "Overview & Health",
+    "waves": [
+     1,
+     2
+    ]
+   },
+   {
+    "module": "Releases & Environments",
+    "waves": [
+     1,
+     2,
+     3
+    ]
+   },
+   {
+    "module": "Tenants & Licensing",
     "waves": [
      1,
      2,

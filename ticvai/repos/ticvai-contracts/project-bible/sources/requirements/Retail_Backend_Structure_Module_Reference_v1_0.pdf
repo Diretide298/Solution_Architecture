@@ -1,0 +1,6372 @@
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 1
+TICVAI
+Retail Backend Structure 
+Module
+Functional Reference & Dashboard Screen Guide
+Configuration • Catalog • Sales • Inventory • Commerce • Analytics
+REFERENCE DOCUMENT
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 2
+Table of Contents
+TICVAI RETAIL — BOARD 1.........................................................................................................................4
+PAGE 1 — Retail Command Center......................................................................................................6
+PAGE 2 — Store Management..............................................................................................................8
+PAGE 3 — Create / Edit Retail Store...................................................................................................10
+PAGE 4 — Store Types & Templates...................................................................................................12
+PAGE 5 — Operating Hours & Sales Periods....................................................................................14
+PAGE 6 — POS & Device Assignment.................................................................................................16
+PAGE 7 — Sales Channel Configuration............................................................................................18
+PAGE 8 — Store Inventory & Replenishment Configuration..........................................................20
+PAGE 9 — Store Rules, Controls & Permissions...............................................................................22
+PAGE 10 — Retail Global Settings & Controls...................................................................................24
+TICVAI RETAIL — BOARD 2.......................................................................................................................28
+PAGE 1 — Retail Product & Catalog Command Center...................................................................30
+PAGE 2 — Product / SKU Master........................................................................................................32
+PAGE 3 — Variants, Attributes, Barcode & RFID Management......................................................35
+PAGE 4 — Category, Brand & Merchandise Hierarchy....................................................................37
+PAGE 5 — Catalog Builder & Store Assortment................................................................................39
+PAGE 6 — Price Book & Retail Pricing Management.......................................................................41
+PAGE 7 — Bundle, Kit & Gift Set Builder............................................................................................43
+PAGE 8 — Merchandising & Product Presentation..........................................................................45
+PAGE 9 — Product Availability, Lifecycle & Publishing....................................................................47
+PAGE 10 — Product Import, Governance & AI Configuration Assistant.......................................50
+TICVAI RETAIL — BOARD 3.......................................................................................................................59
+PAGE 1 — Retail Sales & POS Command Center..............................................................................61
+PAGE 2 — Retail POS Selling Workspace...........................................................................................63
+PAGE 3 — Guest, Membership, Loyalty & Entitlement Interaction................................................65
+PAGE 4 — Cart, Promotions, Discounts & Price Control.................................................................67
+PAGE 5 — Checkout, Payment & Receipt..........................................................................................69
+PAGE 6 — Transaction Search, Hold, Recall & Post-Sale Management.........................................71
+PAGE 7 — Returns, Refunds & Exchanges........................................................................................73
+PAGE 8 — Omnichannel Order & Fulfilment Center........................................................................76
+PAGE 9 — Mobile POS, Event Sales & Offline Operations...............................................................78
+PAGE 10 — Sales Exceptions, Controls & Operational Action Center............................................81
+TICVAI RETAIL — BOARD 4.......................................................................................................................93
+PAGE 1 — Retail Inventory Command Center..................................................................................95
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 3
+PAGE 2 — Store Stock & SKU Availability...........................................................................................97
+PAGE 3 — Requisition & Smart Store Replenishment.....................................................................99
+PAGE 4 — Store-to-Store & Warehouse Transfers.........................................................................102
+PAGE 5 — Receiving & Store Put-Away............................................................................................104
+PAGE 6 — Stock Count & Cycle Count Management.....................................................................106
+PAGE 7 — Damage, Loss, Shrinkage & Stock Adjustment............................................................108
+PAGE 8 — Reservation, Allocation & Omnichannel Inventory.....................................................110
+PAGE 9 — Barcode, RFID, Serialized Stock & Traceability.............................................................113
+PAGE 10 — Inventory Exceptions, AI Replenishment & Action Center.......................................116
+TICVAI RETAIL — BOARD 5.....................................................................................................................128
+PAGE 1 — Retail Commercial Command Center............................................................................130
+PAGE 2 — Promotion & Offer Builder..............................................................................................132
+PAGE 3 — Promotion Eligibility, Priority & Conflict Rules.............................................................134
+PAGE 4 — Campaign & Audience Management............................................................................137
+PAGE 5 — Coupons, Vouchers & Promotional Codes....................................................................139
+PAGE 6 — Cross-Sell, Upsell & Recommendation Rules................................................................141
+PAGE 7 — Omnichannel Commerce & Journey Configuration.....................................................143
+PAGE 8 — Ticketing, Event & Experience Commerce Integration...............................................145
+PAGE 9 — Personalized Offers & Guest Engagement...................................................................147
+PAGE 10 — Promotion Performance, AI Optimization & Action Center.....................................149
+TICVAI RETAIL — BOARD 6.....................................................................................................................161
+PAGE 1 — Retail Executive Command Center................................................................................163
+PAGE 2 — Sales, Revenue & Channel Analytics..............................................................................165
+PAGE 3 — Store & Operational Performance.................................................................................168
+PAGE 4 — Product, SKU & Merchandise Performance..................................................................170
+PAGE 5 — Inventory, Sell-Through & Stock Intelligence...............................................................172
+PAGE 6 — Guest, Conversion & Basket Intelligence......................................................................175
+PAGE 7 — Promotion, Pricing & Margin Intelligence....................................................................177
+PAGE 8 — Demand Forecasting & Merchandise Planning...........................................................179
+PAGE 9 — AI Recommendation, Simulation & Optimization Center...........................................182
+PAGE 10 — AI Assistant, Alerts & Management Action Center....................................................185
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 4
+TICVAI RETAIL — BOARD 1
+• Retail Store & Operational Configuration — Scope of Work
+1. Purpose
+The Retail Store & Operational Configuration Board shall provide the centralized administrative 
+foundation for configuring and managing all retail operations across TICVAI.
+The Board shall allow authorized users to create, configure, activate, monitor and control retail 
+stores, shops, kiosks, carts, pop-up stores and other retail selling locations across multiple 
+tenants, companies, parks and venues.
+The architecture shall support:
+Tenant Company Park Venue Retail Store Zone/Area POS/Device Sales → → → → → → →
+Channel
+The Board shall establish the operational structure used by all downstream Retail capabilities, 
+including:
+• Product Catalog
+• Pricing
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 5
+• Merchandising
+• POS
+• Inventory
+• Stock Transfers
+• Promotions
+• Returns
+• Click & Collect
+• Omnichannel Commerce
+• Guest Profile
+• Loyalty
+• Payments
+• Finance
+Reporting
+• AI & Forecasting
+Retail outlets shall not operate as isolated systems. They shall consume common TICVAI services
+including Product, Inventory, Procurement, Payment, Finance, Guest, Loyalty, Promotion, 
+Approval and Audit capabilities.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 6
+PAGE 1 — Retail Command Center
+Purpose
+Provide Retail management with a centralized operational overview of all stores and retail selling
+locations.
+Global Filters
+Tenant
+Company
+Park
+Venue
+Store
+Store Type
+Channel
+Date
+Status
+KPI Cards
+Today's Retail Sales
+Orders / Transactions
+Average Transaction Value
+Units Sold
+Open Stores
+Active POS
+Stores Offline
+Stock-Out Items
+Low-Stock Items
+Pending Transfers
+Pending Approvals
+Operational Alerts
+• Store Performance Snapshot
+Display retail locations with:
+Store Sales Transactions ATV Active POS Stock Health Status
+Main Gift Shop AED 84K 1,240 AED 67.7 6/6 Healthy Open
+Waterpark Shop AED 52K 890 AED 58.4 4/4 Warning Open
+Adventure Store AED 31K 420 AED 73.8 3/3 Healthy Open
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 7
+Store Sales Transactions ATV Active POS Stock Health Status
+Exit Kiosk AED 18K 510 AED 35.3 2/2 Critical Open
+Operational Alerts
+Examples:
+POS Terminal Offline
+Payment Device Offline
+Low Stock
+Product Out of Stock
+Transfer Delayed
+Store Opening Delayed
+Price Synchronization Failure
+Inventory Synchronization Failure
+Pending Approval
+Device Sync Failure
+Quick Actions
++ Store | + POS | + Device | View Stock | Create Transfer | View Alerts
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 8
+PAGE 2 — Store Management
+Purpose
+Provide a master list of all Retail stores and selling locations configured within TICVAI.
+Store Types
+The system shall support configurable store types such as:
+Gift Shop
+Merchandise Store
+Souvenir Shop
+Retail Kiosk
+Mobile Cart
+Pop-Up Store
+Photo Shop
+Specialty Store
+Event Merchandise Store
+Exit Shop
+Online Store
+Warehouse-Linked Store
+Store types shall be configurable rather than hard-coded.
+Store List
+Each store shall display:
+Store Name
+Store Code
+Store Type
+Tenant
+Company
+Park
+Venue
+Zone
+Cost Center
+Revenue Center
+Currency
+POS Count
+Stock Location
+Sales Channels
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 9
+Status
+Last Synchronization
+Actions
+View | Edit | Duplicate | Activate | Deactivate | Audit History
+Bulk Actions
+Authorized users should be able to:
+Activate Stores
+Deactivate Stores
+Assign Products
+Assign Price Books
+Assign Promotions
+Change Operating Hours
+Export Store List
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 10
+PAGE 3 — Create / Edit Retail Store
+Purpose
+Provide the configuration workflow for creating or maintaining a retail selling location.
+• General Information
+Store Name
+Store Code
+Store Type
+Description
+Tenant
+Company
+Business Unit
+Park
+Venue
+Facility
+Zone
+Floor / Area
+Cost Center
+Revenue Center
+Currency
+Tax Profile
+Store Logo
+Status
+• Contact Information
+Where applicable:
+Store Manager
+Phone
+Email
+Internal Contact
+Operational Contact
+• Commerce Configuration
+Configure:
+Default Product Catalog
+Default Price Book
+Promotion Set
+Tax Rules
+Accepted Payment Methods
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 11
+Refund Policy
+Return Policy
+Exchange Policy
+Receipt Template
+Guest Identification Rules
+• Inventory Configuration
+Assign:
+Stock Location
+Warehouse
+Replenishment Source
+Default Transfer Location
+Par Stock Profile
+Reorder Rules
+Stock Count Profile
+The actual inventory logic shall remain within TICVAI's shared Inventory Engine.
+• Save Options
+Cancel | Save Draft | Save & Next
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 12
+PAGE 4 — Store Types & Templates
+Purpose
+Allow administrators to create reusable Retail operating templates.
+Instead of configuring every new store manually, TICVAI shall allow a template to define 
+standard operational behavior.
+• Example Templates
+• Full Retail Store
+✓ POS
+✓ Inventory
+✓ Returns
+✓ Exchanges
+✓ Loyalty
+✓ Promotions
+✓ Click & Collect
+✓ Multiple Payment Methods
+✓ Stock Transfers
+• Retail Kiosk
+✓ POS
+✓ Limited Catalog
+✓ Barcode Scanner
+✓ Card Payment
+✓ Local Stock
+✕ Complex Returns
+• Mobile Cart
+✓ Mobile POS
+✓ Limited Inventory
+✓ Cashless
+✓ Mobile Connectivity
+✓ Assigned Staff
+• Event Merchandise Store
+✓ Event-Specific Catalog
+✓ Temporary Pricing
+✓ Temporary Stock
+✓ High-Volume POS
+✓ Event Operating Period
+• Photo Shop
+✓ Photo Products
+✓ Digital Asset Link
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 13
+✓ Print Fulfilment
+✓ Guest / Ticket Identification
+• Template Configuration
+Templates may define:
+Product Catalog
+Price Book
+Payment Methods
+Inventory Rules
+Return Rules
+Promotion Rules
+POS Layout
+Receipt Rules
+Operating Hours
+Required Devices
+Sales Channels
+• Template Usage
+The system shall show:
+• Template Number of Stores Using Template →
+Changes to templates shall support controlled propagation rather than automatically changing 
+active stores without authorization.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 14
+PAGE 5 — Operating Hours & Sales Periods
+Purpose
+Configure when each retail location is operational and when specific selling rules apply.
+• Weekly Operating Schedule
+Configure by:
+Monday
+Tuesday
+Wednesday
+Thursday
+Friday
+Saturday
+Sunday
+For each day:
+Opening Time
+Closing Time
+Status
+Break / Closure Periods
+• Special Operating Calendar
+Support:
+Public Holidays
+Ramadan
+Special Events
+Private Events
+School Groups
+Seasonal Operations
+Temporary Closures
+Extended Hours
+Example:
+• New Year's Eve
+Standard Closing:
+• 22:00
+Override:
+• 02:00
+• Sales Periods
+Allow configurable periods such as:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 15
+Morning
+Day
+Evening
+Event Period
+Closing Period
+These periods may later drive:
+Pricing
+Promotions
+Product Availability
+Staffing
+Reporting
+AI Forecasting
+• Scheduled Activation
+Store configuration changes may have:
+• Effective From
+• and
+• Effective Until
+This allows temporary retail operations without manual reconfiguration.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 16
+PAGE 6 — POS & Device Assignment
+Purpose
+Manage all POS terminals and supporting Retail devices assigned to each selling location.
+• Device Types
+Support:
+Fixed POS
+Mobile POS
+Self-Service Kiosk
+Payment Terminal
+Barcode Scanner
+QR Scanner
+RFID Reader
+RFID Handheld Scanner
+Receipt Printer
+Label Printer
+Cash Drawer
+Customer Display
+Tablet
+Handheld Device
+• Device Registry
+Display:
+Device ID
+Device Name
+Device Type
+Store
+POS
+Assigned Operator
+IP / Network Reference
+Software Version
+Last Sync
+Connectivity
+Status
+• Statuses
+Online
+Offline
+Sync Pending
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 17
+Maintenance
+Disabled
+• POS Detail
+Selecting a POS should display:
+Store
+POS Type
+Assigned Cashier
+Cash Drawer
+Payment Terminal
+Barcode Scanner
+Receipt Printer
+Customer Display
+Software Version
+Last Transaction
+Last Sync
+• Device Actions
+Assign | Reassign | Disable | Replace | Sync | View Logs
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 18
+PAGE 7 — Sales Channel Configuration
+Purpose
+Define where and how Retail products may be sold.
+Supported Channels
+Retail POS
+Mobile POS
+Self-Service Kiosk
+B2C Website
+Guest Mobile App
+QR Commerce
+Click & Collect
+Event Sales
+Staff-Assisted Sales
+Third-Party Commerce
+API Sales
+Each channel may be:
+Active | Inactive | Scheduled
+• Channel Configuration
+For each channel configure:
+Product Catalog
+Price Book
+Promotion Eligibility
+Payment Methods
+Inventory Source
+Fulfilment Method
+Receipt Method
+Guest Login Requirement
+Maximum Quantity
+Sales Restrictions
+• Example
+• Guest Mobile App
+• Catalog:
+Dubai Park Retail
+• Price Book:
+Standard Retail AED
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 19
+• Inventory:
+Main Gift Shop
+Fulfilment:
+• Click & Collect / Delivery to Designated Location
+Payment:
+• Online Payment / Wallet / Loyalty where eligible
+• Channel-Level Product Control
+Authorized users shall be able to define:
+• Product available on POS but unavailable online
+or:
+Event merchandise available only through Event Store + Mobile POS.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 20
+PAGE 8 — Store Inventory & Replenishment Configuration
+Purpose
+Configure how each Retail store connects to the shared TICVAI Inventory Engine.
+This screen shall configure the relationship; it shall not duplicate the Inventory Management 
+module.
+• Inventory Source
+Example:
+• Main Gift Shop
+Primary Stock Location:
+• STORE-MGS-01
+Replenishment Warehouse:
+• WH-DUBAI-01
+Emergency Source:
+• Waterpark Warehouse
+• Replenishment Rules
+Configure:
+Par Stock
+Minimum Stock
+Maximum Stock
+Safety Stock
+Reorder Point
+Reorder Quantity
+Replenishment Frequency
+Lead Time
+Automatic Requisition
+Approval Requirement
+• Example
+• ORYX Plush Toy
+• On Hand:
+22
+• Minimum:
+20
+• Par:
+60
+Recommended Replenishment:
+• 38 Units
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 21
+• Replenishment Modes
+Manual
+Scheduled
+Min/Max
+Par Stock
+Demand-Based
+Forecast-Based
+AI Recommended
+• Approval
+Example:
+• Replenishment Request
+• → Store Manager
+• → Inventory Manager
+• → Warehouse Fulfilment
+The common TICVAI Approval Engine shall control approval workflows.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 22
+PAGE 9 — Store Rules, Controls & Permissions
+Purpose
+Configure operational controls at Retail-store level.
+• Sales Controls
+Maximum Quantity per Transaction
+Maximum Quantity per Guest
+Restricted Products
+Age Restrictions
+Employee Purchase Rules
+Complimentary Item Rules
+Manual Price Override
+Discount Override
+Negative Sale Rules
+• Return Controls
+Configure:
+Return Window
+Receipt Required
+No-Receipt Return
+Original Tender Requirement
+Exchange Allowed
+Store Credit Allowed
+Damaged Item Handling
+Non-Returnable Products
+• Example
+• Manual Price Override
+Up to AED 20:
+• Supervisor
+AED 20–100:
+• Store Manager
+Above AED 100:
+• Retail Manager
+• Stock Controls
+Configure:
+Negative Stock Allowed
+Transfer Approval
+Adjustment Approval
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 23
+Waste / Damage Approval
+Count Variance Tolerance
+• User / Role Controls
+Permissions shall use TICVAI's common RBAC/PBAC engine.
+Examples:
+• Cashier
+• Sell + Basic Return
+• Supervisor
+• Void + Discount + Price Override
+• Store Manager
+• Store Operations + Stock Adjustments
+• Retail Director
+• Cross-Store Management
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 24
+PAGE 10 — Retail Global Settings & Controls
+Purpose
+Provide tenant-level Retail configuration applicable across all stores.
+• Tabs
+Commerce | Returns | Inventory | Pricing | Approvals | Devices | Receipts | Notifications 
+| Offline | Audit
+• Commerce Settings
+Configure:
+Default Currency
+Tax Handling
+Rounding
+Guest Identification
+Receipt Behavior
+Transaction Numbering
+Barcode Behavior
+• Return / Refund Settings
+Configure:
+Default Return Period
+Original Tender Rules
+Store Credit
+Exchanges
+Gift Receipt Returns
+Refund Approval Levels
+• Inventory Controls
+Configure:
+Negative Inventory
+Stock Reservation
+Stock Synchronization Frequency
+Replenishment Behavior
+Count Variance Rules
+Transfer Rules
+• Approval Matrix
+Examples:
+Action Threshold Required Role
+Manual Discount ≤ 10% Supervisor
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 25
+Action Threshold Required Role
+Manual Discount > 10% Store Manager
+Price Override ≤ AED 50 Store Manager
+Price Override > AED 50 Retail Manager
+Stock Adjustment ≤ AED 500 Store Manager
+Stock Adjustment > AED 500 Inventory Manager
+• Offline Configuration
+Because TICVAI may operate in attractions where connectivity can be interrupted, Retail shall 
+support configurable offline policies.
+Configure:
+Offline Sales Allowed
+Offline Payment Rules
+Maximum Offline Transaction
+Local Product Cache
+Local Price Cache
+Local Inventory Cache
+Synchronization Rules
+Conflict Handling
+Offline Transaction Queue
+Notifications
+Configure alerts for:
+Store Offline
+POS Offline
+Payment Device Offline
+Inventory Sync Failure
+Price Sync Failure
+Low Stock
+Stock-Out
+Pending Transfer
+Pending Approval
+High Return Rate
+Unusual Discount Activity
+• CROSS-MODULE ARCHITECTURE
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 26
+Board 1 shall configure Retail operations while consuming TICVAI shared services.
+The architecture should follow:
+• Retail Store
+• ↓
+• Sales Channels & POS
+• ↓
+• Product / Catalog / Pricing
+• ↓
+• Shared Inventory Engine
+• ↓
+• Shared Procurement Engine
+• ↓
+• Shared Promotion Engine
+• ↓
+• Payment / Wallet / Loyalty
+• ↓
+• Guest Profile
+• ↓
+• Finance
+• ↓
+• Analytics & AI
+This distinction is important.
+For example, a store may configure:
+Replenish from Warehouse A when stock reaches minimum.
+But the actual warehouse stock, transfer transaction, goods movement and valuation should be 
+managed by the Shared Inventory Engine.
+Similarly, Retail may consume a supplier cost, but supplier quotation comparison, purchase 
+requisition, PO, receiving and supplier invoice workflows should belong to the later Shared 
+Procurement module.
+• Recommended Retail Architecture
+One architectural principle should remain consistent with what we did for F&B:
+Do not build Retail as another isolated POS + stock system.
+The same product sold from a Gift Shop POS, Mobile POS, Guest App, B2C website, event 
+merchandise stand, or self-service kiosk should use a common commerce architecture:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 27
+Product SKU/Variant Catalog Price Promotion Channel Store Inventory → → → → → → →
+Location Sale Fulfilment Return Finance → → → →
+Then Retail adds its specialized capabilities such as merchandising, barcode/RFID, variants, 
+returns/exchanges, store stock and omnichannel fulfilment.
+This will become particularly important when we reach Shared Inventory & Procurement, 
+because F&B and Retail should both consume that same central inventory/procurement 
+architecture rather than maintaining two separate stock systems.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 28
+TICVAI RETAIL — BOARD 2
+Product, Catalog, Pricing & Merchandising Management — Scope of Work
+1. Purpose
+The Product, Catalog, Pricing & Merchandising Management Board shall provide the centralized 
+Retail product-management layer for creating, organizing, pricing, merchandising, publishing 
+and controlling all retail products sold through TICVAI.
+The Board shall support physical merchandise, souvenirs, apparel, accessories, toys, collectibles,
+photos, personalized products, event merchandise, bundles and other configurable retail 
+product types.
+The core structure shall follow:
+Product SKU / Variant Attributes Barcode / RFID Catalog Price Promotion → → → → → →
+Eligibility Channel Store Availability Publication → → → →
+The objective is to maintain one centralized Retail Product Master, while allowing different 
+stores, parks, venues and digital channels to determine where, when and at what price each 
+product is sold.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 29
+The Board shall integrate with TICVAI's shared:
+Inventory Engine
+Procurement Engine
+Promotion Engine
+Payment Engine
+Loyalty & Membership
+Guest Profile
+Finance
+Approval Engine
+Audit Engine
+Analytics & AI
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 30
+PAGE 1 — Retail Product & Catalog Command Center
+Purpose
+Provide Retail management with a centralized overview of product configuration, catalogs, 
+pricing, merchandising and publication health.
+Global Filters
+Tenant
+Company
+Park
+Venue
+Store
+Catalog
+Category
+Brand
+Product Status
+Channel
+KPI Cards
+Total Products
+Active SKUs
+Active Catalogs
+Products Published
+Draft Products
+Products Missing Prices
+Products Missing Images
+Products Missing Barcodes
+Products Without Inventory Mapping
+Low-Margin Products
+Products Pending Approval
+Scheduled Changes
+• Catalog Status
+Example:
+• Dubai Park Retail Catalog — Published
+• Waterpark Catalog — Published
+• Summer Collection 2026 — Scheduled
+• Halloween Merchandise — Draft
+• VIP Merchandise Catalog — Published
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 31
+• Configuration Health
+TICVAI shall identify configuration gaps such as:
+18 SKUs missing barcode information.
+7 products have no active price.
+12 products are not assigned to a catalog.
+5 products are missing inventory mapping.
+4 products have margins below the configured threshold.
+9 scheduled price changes require approval.
+• Product Performance Snapshot
+Display:
+Product
+Category
+Selling Price
+Cost
+Margin
+Available Stock
+Sales
+Status
+Quick Actions
++ Product | + Catalog | + Category | + Price Book | Import Products | Publish Changes
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 32
+PAGE 2 — Product / SKU Master
+Purpose
+Provide the central Retail Product Master used by all retail channels and locations.
+A distinction shall be maintained between:
+• Product — Commercial parent item
+• and
+SKU — Specific sellable/inventory variant.
+Example:
+• Product
+• TICVAI Logo T-Shirt
+• SKUs
+• Black / Small
+• Black / Medium
+• Black / Large
+• White / Small
+• White / Medium
+• White / Large
+Each SKU may have its own:
+SKU Code
+Barcode
+RFID/EPC
+Cost
+Price
+Inventory
+Weight
+Dimensions
+Status
+• Product Information
+Capture:
+Product Name
+Product Code
+SKU
+Short Name
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 33
+Description
+Product Type
+Category
+Subcategory
+Brand
+Collection
+Season
+Supplier Reference
+Manufacturer Reference
+Country of Origin
+Tax Classification
+Product Images
+Product Video, where applicable
+Status
+• Product Types
+Configurable examples:
+Standard Product
+Apparel
+Footwear
+Souvenir
+Toy
+Collectible
+Personalized Product
+Photo Product
+Digital Product
+Bundle
+Gift Item
+Event Merchandise
+• Commercial Information
+Standard Selling Price
+Standard Cost
+Currency
+Tax
+Margin
+Revenue Account
+Cost Account
+Revenue Center
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 34
+Cost Center
+• Physical Information
+Weight
+Length
+Width
+Height
+UOM
+Pack Size
+Case Size
+• Lifecycle Status
+Draft Review Approved Published Suspended Discontinued Archived → → → → → →
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 35
+PAGE 3 — Variants, Attributes, Barcode & RFID Management
+Purpose
+Manage complex product variations and product-identification methods without requiring 
+separate manually maintained products for every configuration.
+• Attribute Groups
+Examples:
+• Apparel
+Size
+Color
+Gender
+Fit
+Material
+• Souvenir
+Design
+Color
+Edition
+• Collectible
+Series
+Edition
+Number
+Rarity
+• Variant Matrix
+Example:
+• TICVAI T-Shirt
+Color S M L XL
+Black SKU-001 SKU-002 SKU-003 SKU-004
+White SKU-005 SKU-006 SKU-007 SKU-008
+The system should allow automatic generation of SKU combinations from selected attributes.
+• SKU Generation
+Authorized users may define naming patterns.
+Example:
+• DXB-APP-TSH-BLK-M
+Where:
+• DXB = Park
+• APP = Apparel
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 36
+• TSH = T-Shirt
+• BLK = Black
+• M = Medium
+• Barcode Management
+Support:
+EAN
+UPC
+Code 128
+QR
+Internal Barcode
+Supplier Barcode
+A SKU may support multiple barcodes where required.
+• RFID
+Where RFID is deployed, capture:
+RFID Enabled
+EPC
+Tag Type
+Tag Status
+Last Read
+Last Known Location
+The actual RFID stock movement shall be handled by the Shared Inventory Engine.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 37
+PAGE 4 — Category, Brand & Merchandise Hierarchy
+Purpose
+Provide a flexible product hierarchy for merchandising, navigation, reporting and operational 
+control.
+• Example Hierarchy
+• Retail
+• ↓
+• Apparel
+• ↓
+• T-Shirts
+• Hoodies
+• Caps
+• ↓
+• Adult / Kids
+or:
+• Souvenirs
+• ↓
+• Magnets
+• Keychains
+• Mugs
+• Plush Toys
+• Collectibles
+• Hierarchy Levels
+TICVAI shall support configurable hierarchy levels rather than hard-coded structures.
+Possible dimensions include:
+Department
+Category
+Subcategory
+Product Family
+Collection
+Brand
+Season
+Theme
+Event
+• Category Configuration
+For each category:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 38
+Category Name
+Code
+Parent
+Description
+Image
+Display Order
+Tax Profile
+Default Margin Target
+Default Attributes
+Default Return Policy
+Default Inventory Behavior
+• Brand Management
+Capture:
+Brand Name
+Brand Code
+Logo
+Description
+Supplier Relationship
+Active Products
+• Seasonal / Themed Collections
+Examples:
+• Summer 2026
+• Halloween
+• National Day
+• Christmas
+• Formula 1 Weekend
+• Concert Merchandise
+Products may belong to multiple collections without duplicating the Product Master.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 39
+PAGE 5 — Catalog Builder & Store Assortment
+Purpose
+Define which products are available to specific parks, venues, stores and digital channels.
+The Product Master answers:
+What is the product?
+The Catalog answers:
+Where is the product commercially available?
+• Catalog Types
+Examples:
+Global Retail Catalog
+Park Catalog
+Venue Catalog
+Store Catalog
+Online Catalog
+Event Catalog
+VIP Catalog
+Employee Catalog
+Seasonal Catalog
+• Visual Catalog Builder
+Authorized users shall be able to:
+Search Products
+Drag Products
+Add Categories
+Reorder Categories
+Assign Collections
+Hide Products
+Highlight Products
+Copy Catalogs
+• Assortment Matrix
+Example:
+Product Main Gift Shop Waterpark Exit Kiosk Online
+Logo T-Shirt ✓ ✓ ✓ ✓
+Large Plush ✓ ✓ ✕ ✓
+Glass Collectible ✓ ✕ ✕ ✓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 40
+Product Main Gift Shop Waterpark Exit Kiosk Online
+Water Bottle ✓ ✓ ✓ ✓
+• Bulk Assignment
+Support:
+• Assign Collection 12 Stores →
+• Remove Category Event Stores →
+• Copy Assortment New Store →
+• Effective Dates
+Products may have:
+Available From
+Available Until
+This supports temporary merchandise and events.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 41
+PAGE 6 — Price Book & Retail Pricing Management
+Purpose
+Provide centralized configuration of retail selling prices across stores, channels, customer 
+segments and time periods.
+• Price Book Examples
+Standard AED
+Standard SAR
+Online Retail
+VIP Retail
+Member Retail
+Employee Retail
+Event Pricing
+Seasonal Pricing
+• Price Record
+Each price may include:
+Product / SKU
+Price Book
+Selling Price
+Currency
+Tax
+Effective From
+Effective Until
+Store
+Channel
+Customer Segment
+Membership Tier
+Status
+• Pricing Hierarchy
+Example:
+• Base Price
+• ↓
+• Park Price
+• ↓
+• Store Price
+• ↓
+• Channel Price
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 42
+• ↓
+• Customer / Membership Price
+The system shall apply a defined precedence rule where multiple prices are eligible.
+• Margin Visibility
+When changing a price:
+• Current Price:
+AED 100
+• Cost:
+AED 45
+• Current Margin:
+55%
+• Proposed Price:
+AED 90
+• New Margin:
+50%
+TICVAI should show the impact before approval.
+• Bulk Pricing
+Authorized users may:
+Increase Category by %
+Decrease Collection by %
+Copy Price Book
+Import Prices
+Schedule Price Changes
+Example:
+Increase all Summer Collection products by 5% from 1 September.
+This creates a proposed change set for review.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 43
+PAGE 7 — Bundle, Kit & Gift Set Builder
+Purpose
+Create retail products containing multiple component SKUs while maintaining correct stock 
+consumption.
+• Bundle Types
+Fixed Bundle
+Gift Set
+Kit
+Multi-Pack
+Mix & Match
+Build Your Own
+Promotional Bundle
+• Example
+• Dubai Park Gift Set — AED 149
+Contains:
+• 1 × Logo T-Shirt
+• 1 × Cap
+• 1 × Mug
+• 1 × Keychain
+• Component Rules
+Configure:
+Required Component
+Quantity
+Optional Component
+Choice Group
+Substitute Allowed
+Variant Selection
+Price Adjustment
+• Inventory Behavior
+The bundle itself should not create false inventory where component-level stock is required.
+Sale:
+• 1 × Gift Set
+shall consume:
+• 1 × T-Shirt
+• 1 × Cap
+• 1 × Mug
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 44
+• 1 × Keychain
+from the Shared Inventory Engine.
+• Availability
+If a mandatory component becomes unavailable, TICVAI shall determine whether the bundle:
+Becomes Unavailable
+Uses Approved Substitute
+Remains Available with Reduced Options
+according to configured rules.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 45
+PAGE 8 — Merchandising & Product Presentation
+Purpose
+Control how Retail products are commercially presented across physical and digital selling 
+channels.
+• Digital Product Presentation
+Configure:
+Product Name
+Short Description
+Long Description
+Primary Image
+Image Gallery
+Video
+Feature Highlights
+Product Specifications
+Size Guide
+Care Instructions
+Search Keywords
+Tags
+• Merchandising Controls
+Featured Product
+Bestseller
+New Arrival
+Limited Edition
+Exclusive
+Recommended
+Trending
+Staff Pick
+Event Merchandise
+• Display Ordering
+Administrators should be able to control:
+• Category Position
+• Product Position
+• Featured Placement
+• Digital Display Order
+• Cross-Sell
+Example:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 46
+Guest selects:
+• TICVAI T-Shirt
+Suggested:
+• Cap
+• Water Bottle
+• Bag
+• Upsell
+Example:
+Standard Plush:
+• AED 65
+Suggested:
+• Limited Edition Plush — AED 95
+• Related Products
+Relationships may include:
+Similar Product
+Complementary Product
+Alternative
+Upgrade
+Accessory
+Replacement
+These relationships shall later feed Board 5 and Board 6's commerce and AI capabilities.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 47
+PAGE 9 — Product Availability, Lifecycle & Publishing
+Purpose
+Control when and where products become available and provide a safe publication workflow for 
+product changes.
+• Availability Rules
+Configure by:
+Tenant
+Park
+Venue
+Store
+Channel
+Date
+Time
+Inventory
+Customer Segment
+Membership
+Event
+Season
+• Product Availability
+Example:
+• Limited Edition F1 Cap
+Available:
+• 15–18 November
+Locations:
+• Event Store ✓
+• Main Gift Shop ✓
+• Online ✓
+• Exit Kiosk ✕
+• Stock-Based Availability
+The system shall support:
+• Available
+• Low Stock
+• Out of Stock
+• Temporarily Unavailable
+• Discontinued
+• Publishing Workflow
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 48
+Changes shall follow:
+• Draft
+• ↓
+• Validation
+• ↓
+• Approval
+• ↓
+• Scheduled
+• ↓
+• Published
+• Pre-Publish Validation
+Before publishing, TICVAI should validate:
+• ✓ Product Code
+• ✓ SKU
+• ✓ Barcode
+• ✓ Price
+• ✓ Tax
+• ✓ Inventory Mapping
+• ✓ Images
+• ✓ Catalog Assignment
+• ✓ Channel Assignment
+• ⚠ Margin Below Target
+• ⚠ Missing Translation
+• ⚠ Stock Not Available
+• Publication Summary
+Example:
+• Retail Publication V42
+Affected:
+• 148 Products
+• 312 SKUs
+• 6 Stores
+• 4 Channels
+• 28 Price Changes
+• 12 New Products
+Actions
+Validate | Submit for Approval | Publish Now | Schedule | Rollback
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 49
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 50
+PAGE 10 — Product Import, Governance & AI Configuration 
+Assistant
+Purpose
+Provide enterprise-grade tools for bulk product management, governance, quality control and 
+AI-assisted configuration.
+• Bulk Import
+Support structured imports for:
+Products
+SKUs
+Attributes
+Barcodes
+Categories
+Prices
+Catalog Assignments
+Images / Image References
+Supplier References
+• Import Workflow
+• Upload
+• ↓
+• Map Fields
+• ↓
+• Validate
+• ↓
+• Preview Errors
+• ↓
+• Correct
+• ↓
+• Submit
+• ↓
+• Approval
+• ↓
+• Import
+• Validation Examples
+SKU 1842 already exists.
+Barcode 6291041500213 assigned to another SKU.
+17 products have no category.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 51
+8 prices are below configured margin threshold.
+3 products reference invalid tax profiles.
+• AI PRODUCT CONFIGURATION ASSISTANT
+Authorized users shall be able to use natural language to create or modify product 
+configurations.
+Example:
+Create a new Summer 2027 kids merchandise collection for Dubai Park. Include T-shirts in four 
+sizes and three colors, caps, water bottles and a gift set. Make the collection available at Main 
+Gift Shop, Exit Shop and online from 1 June to 31 August.
+TICVAI should create a draft configuration, including:
+Collection
+Product Structures
+Variant Matrix
+Proposed SKUs
+Categories
+Catalog Assignment
+Availability Dates
+Store Assignment
+Channel Assignment
+The AI shall not automatically publish.
+• AI Pricing Assistance
+Example:
+Which products are below our 55% target margin?
+TICVAI identifies products and may propose pricing scenarios.
+• AI Product Data Quality
+TICVAI should identify:
+Duplicate Products
+Duplicate SKUs
+Missing Attributes
+Missing Images
+Missing Prices
+Missing Barcodes
+Incorrect Category Assignment
+Unusual Pricing
+Missing Inventory Mapping
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 52
+• PRODUCT VERSIONING & AUDIT
+The system shall maintain version history for significant product changes.
+Example:
+• SKU-TSH-001
+• Version 12
+• Price:
+AED 89 AED 95 →
+• Category:
+No Change
+• Description:
+Updated
+• Availability:
+Online added
+• Changed By:
+Retail Manager
+• Approved By:
+Commercial Director
+• Effective:
+01 Sep 2026
+Users shall be able to:
+View Version | Compare Versions | View Approval | Rollback where permitted
+• MULTILINGUAL PRODUCT MANAGEMENT
+Product-facing content shall support multiple languages.
+At minimum, the architecture shall support:
+English
+Arabic
+and allow additional tenant-configurable languages.
+Fields may include:
+Product Name
+Description
+Category Name
+Specifications
+Care Instructions
+Digital Merchandising Text
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 53
+The system shall show translation completeness before publication.
+Example:
+• English:
+100%
+• Arabic:
+92%
+Warning:
+3 products are missing Arabic descriptions.
+• PERSONALIZED PRODUCTS
+The Product Master shall support configurable personalization where applicable.
+Examples:
+Name Printing
+Jersey Number
+Custom Text
+Photo Printing
+Engraving
+Color Selection
+• Example
+• Personalized Jersey
+• Base:
+AED 120
+Add Name:
+AED 20
+Add Number:
+AED 15
+• Personalization Data
+Capture:
+Personalization Type
+Customer Input
+Character Limit
+Allowed Characters
+Additional Price
+Production Location
+Preparation Time
+Fulfilment Method
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 54
+Personalization information shall be passed to the appropriate fulfilment workflow.
+• LIMITED-EDITION & SERIALIZED PRODUCTS
+TICVAI should support merchandise where individual units may need unique identification.
+Example:
+• Limited Edition Collectible
+Edition:
+• 500 units
+Item:
+• #184 / 500
+The product configuration may include:
+Edition Size
+Serial Number
+Certificate
+RFID/EPC
+Unique Barcode
+Ownership/Guest Link where required
+This can later support collectible and premium merchandise use cases.
+• PROMOTION ENGINE BOUNDARY
+Board 2 shall define whether a product is:
+Promotion Eligible
+Discount Eligible
+Coupon Eligible
+Loyalty Discount Eligible
+Employee Discount Eligible
+However, Board 2 shall not create a separate promotion engine.
+Actual promotion logic such as:
+• Buy 2 Get 1
+• 20% Off
+• Spend AED 300 Get AED 50
+• Member Exclusive
+shall use TICVAI's shared Promotion Engine and be addressed more deeply in Retail Board 5.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 55
+• INVENTORY BOUNDARY
+Board 2 shall configure the SKU's inventory characteristics and mappings.
+Examples:
+Inventory Tracked
+Inventory Item
+UOM
+Barcode
+RFID
+Pack Size
+Stock Location Eligibility
+But Board 2 shall not maintain:
+Stock Ledger
+Warehouse Quantity
+Goods Receipt
+Transfers
+Stock Counts
+Inventory Valuation
+Those functions belong to the Shared Inventory Engine and Retail Board 4's operational 
+inventory interface.
+• PROCUREMENT BOUNDARY
+Retail Product Master may reference:
+Preferred Supplier
+Supplier Product Code
+Standard Cost
+Lead Time
+Pack Size
+However:
+RFQ
+Quotation Comparison
+Purchase Requisition
+Purchase Order
+Goods Receipt
+Supplier Invoice
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 56
+Supplier Contract Management
+shall belong to the shared Procurement module.
+• APPROVAL CONTROLS
+Sensitive changes shall integrate with TICVAI's shared Approval Engine.
+Examples:
+• New Product
+• Retail Manager
+→ Commercial Approval
+• Price Reduction
+• If margin remains above threshold
+→ Retail Manager
+• If margin drops below threshold
+→ Finance + Commercial
+• Product Discontinuation
+• → Retail Director
+• Bulk Price Change
+• → Commercial + Finance
+• Publication
+• → Configurable approval workflow
+• BOARD 2 — FINAL 10 SCREENS
+# Screen
+1 Retail Product & Catalog Command Center
+2 Product / SKU Master
+3 Variants, Attributes, Barcode & RFID Management
+4 Category, Brand & Merchandise Hierarchy
+5 Catalog Builder & Store Assortment
+6 Price Book & Retail Pricing Management
+7 Bundle, Kit & Gift Set Builder
+8 Merchandising & Product Presentation
+9 Product Availability, Lifecycle & Publishing
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 57
+# Screen
+10 Product Import, Governance & AI Configuration Assistant
+• COMPLETE BOARD 2 FLOW
+• Create Product
+• ↓
+• Assign Category / Brand / Collection
+• ↓
+• Define Attributes
+• ↓
+• Generate SKUs / Variants
+• ↓
+• Assign Barcode / RFID
+• ↓
+• Map Shared Inventory Item
+• ↓
+• Configure Cost + Price
+• ↓
+• Assign Catalog
+• ↓
+• Assign Stores
+• ↓
+• Assign Channels
+• ↓
+• Configure Merchandising
+• ↓
+• Configure Availability
+• ↓
+• Validate
+• ↓
+• Approval
+• ↓
+• Schedule / Publish
+• ↓
+POS + Mobile POS + Kiosk + B2C + Guest App synchronized
+• ↓
+Sales + Inventory + Finance + Analytics consume the same Product/SKU definition
+• ARCHITECTURAL REQUIREMENT
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 58
+Retail Board 2 shall use a single Retail Product & Catalog Engine.
+TICVAI should not create separate product masters for POS, online, kiosk, mobile or 
+individual stores.
+The required architecture is:
+• Product Master
+• ↓
+• SKU / Variant
+• ↓
+• Attributes + Barcode / RFID
+• ↓
+• Catalog / Assortment
+• ↓
+• Pricing
+• ↓
+• Merchandising
+• ↓
+• Availability
+• ↓
+• Channel Publication
+• ↓
+POS / Mobile / Kiosk / B2C / Guest App
+This is particularly important for Retail because the same physical SKU may be sold 
+simultaneously through several stores and digital channels while drawing from shared or 
+different inventory locations. A centralized product model will prevent duplicate SKUs, conflicting
+prices, inconsistent descriptions and fragmented reporting.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 59
+TICVAI RETAIL — BOARD 3
+Retail POS, Sales, Returns & Fulfilment — Scope of Work
+1. Purpose
+The Retail POS, Sales, Returns & Fulfilment Board shall provide the complete transactionexecution layer for Retail operations across TICVAI.
+The Board shall manage the end-to-end retail transaction lifecycle:
+Product Selection Guest Identification Price & Promotion Cart Payment → → → → →
+Inventory Commitment Receipt Fulfilment Return / Exchange Financial Posting → → → →
+The solution shall support high-volume attraction, entertainment, leisure, event and venue retail
+environments, including:
+Gift Shops
+Merchandise Stores
+Souvenir Shops
+Retail Kiosks
+Mobile Carts
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 60
+Pop-Up Stores
+Event Merchandise Stores
+Photo Shops
+Specialty Stores
+Mobile POS
+Self-Service Kiosks
+Click & Collect
+B2C / Guest App Orders
+The objective is to create one unified Retail Commerce Engine, rather than separate 
+transaction logic for each sales channel.
+All Retail transactions shall integrate in real time, or through controlled offline synchronization, 
+with TICVAI's shared:
+Product & Catalog Engine
+Pricing Engine
+Promotion Engine
+Inventory Engine
+Payment Engine
+Wallet
+Loyalty & Membership
+Guest Profile
+Finance
+Approval Engine
+Audit Engine
+Analytics & AI
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 61
+PAGE 1 — Retail Sales & POS Command Center
+Purpose
+Provide Retail management with real-time visibility into transactions, POS activity, fulfilment, 
+returns and operational issues across all stores and channels.
+Global Filters
+Tenant
+Company
+Park
+Venue
+Store
+POS
+Channel
+Date
+Shift
+Cashier
+KPI Cards
+Today's Gross Sales
+Net Sales
+Transactions
+Units Sold
+Average Transaction Value
+Units per Transaction
+Active POS
+Offline POS
+Returns
+Refund Value
+Exchanges
+Pending Fulfilment
+Click & Collect Orders
+Operational Alerts
+• Live Store Status
+Store Sales Transactions PO
+S
+Returns Pending Orders Status
+Main Gift Shop AED 84K 1,240 6/6 18 12 Healthy
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 62
+Store Sales Transactions PO
+S
+Returns Pending Orders Status
+Waterpark Shop AED 52K 890 4/4 11 8 Healthy
+Adventure Store AED 31K 420 3/3 6 4 Warning
+Exit Kiosk AED 18K 510 1/2 3 0 POS Offline
+• Transaction Channel Breakdown
+Display sales by:
+Fixed POS
+Mobile POS
+Self-Service Kiosk
+Guest App
+B2C
+Click & Collect
+Event Sales
+• Live Alerts
+Examples:
+POS-EXIT-02 has been offline for 12 minutes.
+14 Click & Collect orders are awaiting preparation.
+Refund value at Waterpark Shop is 38% above normal.
+SKU-TSH-BLK-M is unavailable at Main Gift Shop.
+3 transactions are awaiting offline synchronization.
+Quick Actions
+Open POS | Search Transaction | Returns | Fulfilment | Offline Queue | View Alerts
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 63
+PAGE 2 — Retail POS Selling Workspace
+Purpose
+Provide a fast, intuitive and configurable selling interface for cashiers and retail employees.
+The POS should be optimized for both:
+• Touchscreen operation
+• and
+Barcode / RFID-driven high-speed selling.
+• POS Header
+Display:
+Store
+POS ID
+Cashier
+Shift
+Connectivity
+Guest
+Current Time
+• Product Entry Methods
+Support:
+Barcode Scan
+RFID Scan
+Product Search
+SKU Search
+Category Navigation
+Product Tiles
+Favorites
+Recently Sold
+Manual Product Entry where authorized
+• Product Tiles
+Tiles may display:
+Image
+Product Name
+Price
+Availability
+Promotion
+Variant Indicator
+• Cart
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 64
+Each line shall support:
+Product
+SKU
+Variant
+Quantity
+Unit Price
+Discount
+Promotion
+Tax
+Total
+• Line Actions
+Authorized users may:
+• Change Quantity
+• Remove Item
+• Change Variant
+• Apply Discount
+• Price Override
+• Add Note
+• Gift Receipt
+• Personalization
+• Cart Actions
+Hold Transaction
+Retrieve Transaction
+Clear Cart
+Add Guest
+Apply Promotion
+Apply Loyalty
+Apply Voucher
+Suspend Sale
+Checkout
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 65
+PAGE 3 — Guest, Membership, Loyalty & Entitlement Interaction
+Purpose
+Connect Retail transactions with the unified TICVAI Guest Profile while allowing guest checkout 
+when identification is not required.
+• Guest Identification
+Support:
+Mobile Number
+Email
+Membership Card
+QR Code
+Ticket QR
+RFID Wristband
+Guest App
+Loyalty ID
+UAE Pass where configured
+Manual Search
+• Guest Summary
+Once identified, POS may display permitted information such as:
+• Guest Name
+• Membership:
+Gold
+• Loyalty Balance:
+2,480 Points
+• Wallet:
+AED 120
+• Available Benefits:
+10% Retail Discount
+• Active Voucher:
+AED 25
+• Guest Checkout Modes
+Support:
+Anonymous Guest
+Registered Guest
+Member
+VIP
+Group Guest
+Employee where permitted
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 66
+• Benefit Validation
+The system shall determine applicable:
+Member Pricing
+Loyalty Discounts
+Vouchers
+Entitlements
+Wallet Credit
+VIP Benefits
+Employee Benefits
+• Important Architecture
+Retail shall consume the common Guest, Loyalty, Membership, Wallet and Entitlement engines.
+Board 3 shall not maintain separate guest balances or membership logic.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 67
+PAGE 4 — Cart, Promotions, Discounts & Price Control
+Purpose
+Provide controlled calculation and application of prices, promotions and discounts during the 
+Retail transaction.
+• Pricing Resolution
+The transaction engine shall determine the applicable price based on:
+• SKU
+• ↓
+• Store
+• ↓
+• Channel
+• ↓
+• Price Book
+• ↓
+• Guest / Membership
+• ↓
+• Promotion
+• ↓
+• Manual Adjustment where authorized
+• Promotion Examples
+Support execution of promotions configured through the common Promotion Engine, including:
+Percentage Discount
+Fixed Discount
+Buy X Get Y
+Buy 2 Get 1
+Bundle Price
+Spend Threshold
+Member Exclusive
+Event Promotion
+Coupon
+Voucher
+Promotional Code
+• Promotion Calculation
+Example:
+• T-Shirt:
+AED 95
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 68
+• Cap:
+AED 65
+Promotion:
+• Buy T-Shirt + Cap AED 145 →
+Saving:
+• AED 15
+• Discount Controls
+Manual discounts shall require appropriate permission.
+Example:
+• 0–10%
+• → Supervisor
+• 10–20%
+• → Store Manager
+• Above 20%
+• → Retail Manager
+• Price Override
+Display:
+• Original Price:
+AED 95
+• Override:
+AED 80
+• Difference:
+-AED 15
+• Reason:
+Damaged Packaging
+• Approval:
+Required
+• Promotion Conflict Resolution
+Where multiple promotions are eligible, TICVAI shall apply configured rules such as:
+Best Price
+Highest Priority
+Stackable
+Non-Stackable
+Mutually Exclusive
+Customer Choice
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 69
+PAGE 5 — Checkout, Payment & Receipt
+Purpose
+Complete the Retail transaction through TICVAI's shared Payment Engine.
+• Order Summary
+Display:
+Subtotal
+Discount
+Promotion
+Tax
+Loyalty Redemption
+Voucher
+Wallet
+Amount Due
+• Payment Methods
+Depending on tenant configuration:
+Cash
+Credit / Debit Card
+Contactless
+Apple Pay
+Google Pay
+TICVAI Wallet
+Gift Card
+Voucher
+Loyalty Points
+Account / Credit
+Other Integrated Payment Methods
+• Split Tender
+Support combinations such as:
+• AED 100 Card
+• AED 50 Cash
+• AED 25 Wallet
+• Payment Status
+Pending
+Authorized
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 70
+Paid
+Partially Paid
+Declined
+Cancelled
+Reversed
+• Receipt Options
+Printed Receipt
+Email
+SMS
+WhatsApp where integrated
+Guest App
+QR Receipt
+No Receipt
+• Gift Receipt
+Allow generation of a receipt without displaying product price where permitted.
+• Transaction Completion
+Once payment succeeds:
+• Payment Confirmed
+• ↓
+• Sale Posted
+• ↓
+• Inventory Reduced / Committed
+• ↓
+• Finance Posting Generated
+• ↓
+• Loyalty Updated
+• ↓
+• Receipt Generated
+• ↓
+• Analytics Updated
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 71
+PAGE 6 — Transaction Search, Hold, Recall & Post-Sale Management
+Purpose
+Provide authorized employees with tools to locate and manage current and historical Retail 
+transactions.
+• Search By
+Transaction Number
+Receipt Number
+Guest
+Membership
+Mobile
+Email
+Date
+Store
+POS
+Cashier
+Product
+SKU
+Barcode
+Payment Reference
+• Transaction Detail
+Display:
+Transaction Number
+Date / Time
+Store
+POS
+Cashier
+Guest
+Products
+Quantity
+Prices
+Discounts
+Promotions
+Tax
+Payment
+Receipt
+Fulfilment
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 72
+Inventory Posting
+Loyalty
+Return History
+• Transaction Timeline
+Example:
+• 14:32:18 — Transaction Started
+• 14:33:04 — Guest Identified
+• 14:34:12 — Promotion Applied
+• 14:35:08 — Payment Authorized
+• 14:35:11 — Sale Completed
+• 14:35:13 — Inventory Posted
+• Held Transactions
+Cashiers may:
+• Hold Retrieve Continue Complete → → →
+subject to configurable timeout and permission rules.
+• Post-Sale Actions
+Depending on permission:
+Reprint Receipt
+Send Receipt
+Gift Receipt
+Start Return
+Start Exchange
+View Audit
+View Payment
+View Fulfilment
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 73
+PAGE 7 — Returns, Refunds & Exchanges
+Purpose
+Manage controlled product returns, refunds and exchanges across Retail channels.
+• Return Lookup
+Locate original transaction using:
+Receipt
+Transaction ID
+Guest
+Barcode
+Membership
+Order Number
+• Return Validation
+TICVAI shall automatically evaluate:
+Return Window
+Receipt Requirement
+Product Eligibility
+Product Condition
+Original Purchase
+Original Tender
+Previous Returns
+Non-Returnable Rules
+Promotion Impact
+Loyalty Impact
+• Return Reasons
+Configurable examples:
+Wrong Size
+Wrong Product
+Changed Mind
+Defective
+Damaged
+Duplicate Purchase
+Incorrect Item
+Gift Return
+Other
+• Product Condition
+Resellable
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 74
+Damaged
+Defective
+Opened
+Used
+Missing Packaging
+Write-Off
+• Return Outcome
+Support:
+Refund
+Exchange
+Store Credit
+Gift Card
+Replacement
+No Refund / Reject
+• Exchange Example
+Original:
+• T-Shirt Black / M
+• AED 95
+Exchange:
+• T-Shirt Black / L
+• AED 95
+Difference:
+• AED 0
+or:
+• Original:
+AED 95
+• New Product:
+AED 120
+Guest Pays:
+• AED 25
+• Refund Methods
+Subject to payment policy:
+Original Tender
+Cash
+Card
+Wallet
+Store Credit
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 75
+Gift Card
+Voucher
+• Multi-Tender Refunds
+If the original purchase used multiple tenders, the system shall retain the original tender 
+composition and apply configured refund rules.
+• Inventory Impact
+A returned product shall be routed according to condition:
+• Resellable
+• → Return to Available Stock
+• Damaged
+• → Quarantine / Damaged Stock
+• Defective
+• → Quality / Supplier Workflow
+• Write-Off
+• → Inventory Adjustment Approval
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 76
+PAGE 8 — Omnichannel Order & Fulfilment Center
+Purpose
+Manage Retail orders created outside the physical store and provide one operational fulfilment 
+workspace.
+• Order Sources
+B2C Website
+Guest App
+QR Commerce
+Self-Service Kiosk
+Event Commerce
+API / Third Party
+Assisted Sale
+Another Store
+• Fulfilment Types
+Support:
+Click & Collect
+Store Pickup
+Venue Pickup
+Hotel / Room Delivery where integrated
+Table / Cabana Delivery where applicable
+Guest Delivery
+Event Pickup
+Ship to Address where supported
+• Order Queue
+Order Guest Source Fulfilment Items SLA Status
+R-18421 Ahmed App Main Gift Shop Pickup 3 12 min Picking
+R-18422 Guest Web Hotel Delivery 2 25 min Ready
+R-18423 Sara QR Cabana 18 1 8 min Dispatched
+• Fulfilment Lifecycle
+• Order Received
+• ↓
+• Inventory Reserved
+• ↓
+• Accepted
+• ↓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 77
+• Picking
+• ↓
+• Packed
+• ↓
+• Ready
+• ↓
+• Guest Notified
+• ↓
+• Collected / Dispatched
+• ↓
+• Completed
+• Picking
+Employee shall see:
+Product
+SKU
+Variant
+Quantity
+Stock Location
+Bin where applicable
+Barcode
+Barcode/RFID verification should be supported.
+• Guest Notification
+Examples:
+Your order is ready for collection at Main Gift Shop.
+or:
+Your merchandise is on the way to Cabana 18.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 78
+PAGE 9 — Mobile POS, Event Sales & Offline Operations
+Purpose
+Support Retail selling outside traditional fixed-store environments.
+• Mobile POS Use Cases
+Event Merchandise
+Queue-Line Selling
+VIP Areas
+Temporary Shops
+Pop-Up Stores
+Mobile Carts
+Stadium / Arena Selling
+Outdoor Attractions
+• Mobile POS
+The same Retail Commerce Engine shall support:
+Product Search
+Barcode Scan
+RFID Scan
+Cart
+Guest Identification
+Promotions
+Payment
+Digital Receipt
+Inventory Posting
+• Temporary Store Assignment
+Example:
+• Concert Merchandise Stand 04
+• Event:
+Summer Live 2026
+• Operating:
+18:00–00:30
+• Catalog:
+Concert Merchandise
+• Stock:
+EVENT-STOCK-04
+• POS:
+4 Mobile Devices
+• Offline Mode
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 79
+Retail shall support controlled offline operation where connectivity is interrupted.
+Local cache may include:
+Products
+SKUs
+Barcodes
+Prices
+Tax Rules
+Approved Promotions
+Limited Inventory Snapshot
+Device Configuration
+• Offline Transaction Queue
+Statuses:
+Local
+Awaiting Sync
+Syncing
+Synchronized
+Conflict
+Failed
+• Conflict Management
+Example:
+Product sold offline:
+• SKU-1842
+• Local Inventory:
+2
+• Central inventory before synchronization:
+0
+The system shall not silently overwrite the discrepancy.
+It shall create:
+• Inventory Synchronization Conflict
+for resolution according to configured policy.
+• Offline Payment Controls
+Tenant configuration shall determine:
+Whether offline payment is allowed
+Maximum transaction value
+Allowed tender types
+Maximum offline duration
+Risk thresholds
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 80
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 81
+PAGE 10 — Sales Exceptions, Controls & Operational Action Center
+Purpose
+Provide one centralized workspace for managing transaction exceptions, approvals, 
+synchronization issues and unusual Retail activities.
+• Exception Categories
+• Transaction
+Suspended Sale
+Failed Sale
+Duplicate Transaction
+Negative Sale
+Transaction Sync Failure
+• Payment
+Declined Payment
+Payment Timeout
+Reversal Pending
+Tender Mismatch
+• Pricing
+Missing Price
+Price Conflict
+Unauthorized Discount
+Margin Warning
+• Returns
+Return Outside Window
+No Receipt
+High-Value Refund
+Repeated Return
+Non-Returnable Product
+• Inventory
+Negative Stock
+Stock Conflict
+Fulfilment Shortage
+Inventory Sync Failure
+• Devices
+POS Offline
+Scanner Offline
+Payment Terminal Offline
+Printer Offline
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 82
+• Severity
+Information | Warning | High | Critical
+• Exception Card
+Example:
+• High-Value Refund
+• Transaction:
+TX-48192
+• Store:
+Main Gift Shop
+• Refund:
+AED 1,850
+• Cashier:
+Employee 184
+• Policy Threshold:
+AED 500
+• Status:
+Approval Required
+Actions:
+Review | Approve | Reject | Request Information
+• RETURNS FRAUD / ANOMALY SUPPORT
+TICVAI should identify unusual return patterns without automatically accusing employees or 
+guests.
+Example:
+Return rate for SKU-1842 is 3.8× above the category average.
+Possible reasons:
+Product Quality
+Incorrect Sizing
+Product Description
+Packaging Damage
+Fulfilment Error
+Unusual Return Behavior
+Actions:
+Analyze Product | View Returns | View Guest Pattern | Review Supplier Quality
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 83
+• CROSS-STORE RETURNS
+The system should support configurable policies allowing products purchased from one store to 
+be returned to another.
+Example:
+Purchased:
+• Waterpark Shop
+Return Requested:
+• Main Gift Shop
+TICVAI validates:
+Same Tenant
+Return Policy
+Product Eligibility
+Original Transaction
+Tax
+Tender
+Inventory Destination
+If allowed, the return proceeds without requiring the guest to return to the original location.
+• CROSS-CHANNEL RETURNS
+Where permitted, TICVAI should support:
+• Online Purchase Store Return →
+• App Purchase Store Exchange →
+• Store Purchase Central Guest Service Refund →
+The original transaction remains the single source of truth.
+• PRODUCT PERSONALIZATION FULFILMENT
+For personalized merchandise, the transaction shall create an operational fulfilment instruction.
+Example:
+• Personalized Jersey
+• Name:
+OMAR
+• Number:
+10
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 84
+• Size:
+M
+• Base Price:
+AED 120
+• Personalization:
+AED 35
+• Total:
+AED 155
+Fulfilment:
+• Print Station 02
+Status:
+• In Production
+The workflow may be:
+• Paid
+• → Personalization Queue
+• → In Production
+• → Quality Check
+• → Ready
+• → Guest Notified
+• → Collected
+• PHOTO / DIGITAL PRODUCT SUPPORT
+Retail shall support products associated with digital assets where applicable.
+Example:
+Guest scans:
+• Ticket / Wristband
+• ↓
+• TICVAI retrieves eligible attraction photos
+• ↓
+• Guest selects photo
+• ↓
+Chooses:
+• Digital Download
+• Printed Photo
+• Photo Frame
+• Photo Package
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 85
+• ↓
+• Payment
+• ↓
+• Digital / Physical Fulfilment
+The actual media-management platform may be integrated externally, while Retail manages the 
+commercial transaction.
+• INVENTORY COMMITMENT
+The Retail transaction shall communicate inventory events to the Shared Inventory Engine.
+Example:
+• Physical POS Sale
+• Sale Confirmed
+• → Inventory Consumption
+• Online Order
+• Order Confirmed
+• → Inventory Reservation
+• Picking
+• → Inventory Allocated
+• Collection
+• → Inventory Issued
+• Return
+• → Inventory Inspection
+• → Available / Damaged / Quarantine
+Board 3 shall not maintain a separate Retail inventory ledger.
+• SERIALIZED / RFID PRODUCT SALE
+For serialized or individually identified products, the transaction shall capture the exact physical 
+unit.
+Example:
+Product:
+• Limited Edition Collectible
+• SKU:
+COL-001
+Serial:
+• #184 / 500
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 86
+RFID EPC:
+E280...
+The sale shall associate that specific unit with the transaction.
+Where configured, it may also be associated with the Guest Profile.
+• SHIFT & CASHIER INTEGRATION
+Retail POS shall integrate with TICVAI's common POS shift management.
+The POS workspace should display:
+Current Cashier
+Shift Start
+Transaction Count
+Cash Drawer
+Tender Totals
+Exceptions
+Break Status
+Cash-management functionality should use the shared POS/Finance architecture rather than 
+creating a separate Retail cash-management engine.
+• EMPLOYEE APP INTEGRATION
+The TICVAI Employee App should support relevant Retail operational actions such as:
+View Orders
+Pick Order
+Pack Order
+Confirm Ready
+Scan Product
+Confirm Collection
+Process Approved Return
+View Stock Availability
+Request Stock
+Receive Alerts
+View Approval Requests
+Example:
+• Click & Collect — Order R-18421
+• 3 items
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 87
+• SLA:
+12 minutes
+Action:
+• Start Picking
+• AI-ASSISTED SELLING
+The POS may provide contextual recommendations to the cashier.
+Example:
+Guest cart:
+• TICVAI T-Shirt
+AI Suggestion:
+72% of guests purchasing this T-shirt also purchase the TICVAI Cap.
+Suggested:
+• Add Cap — AED 65
+AI recommendations should be configurable and should never obstruct high-speed checkout.
+• AI TRANSACTION RISK & ANOMALY DETECTION
+TICVAI should identify unusual operational patterns such as:
+Excessive Manual Discounts
+Repeated Voids
+High Refund Activity
+Unusual Price Overrides
+Abnormal Complimentary Items
+Excessive No-Receipt Returns
+Repeated Offline Transactions
+Unexpected Negative Sales
+Example:
+Manual discount activity at Exit Shop is 2.7× above its 30-day average.
+TICVAI should surface the anomaly for review without automatically concluding fraud.
+• APPROVAL ENGINE INTEGRATION
+Sensitive Retail actions shall use TICVAI's common Approval Engine.
+Examples:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 88
+• High Discount
+• → Store Manager
+• Price Override
+• → Supervisor / Manager based on threshold
+• High-Value Refund
+• → Retail Manager
+• No-Receipt Return
+• → Authorized Role
+• Offline Exception
+• → Operations
+• Inventory Write-Off
+• → Inventory Manager
+The workflow shall be configurable by tenant.
+• AUDIT TRAIL
+All sensitive Retail transaction actions shall be auditable.
+Capture:
+User
+Role
+Store
+POS / Device
+Date / Time
+Transaction
+Action
+Original Value
+New Value
+Reason
+Approval
+Device
+Online / Offline Status
+Examples:
+• Discount Applied
+• Price Overridden
+• Item Voided
+• Return Approved
+• Refund Processed
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 89
+• Transaction Reopened
+• Offline Transaction Synchronized
+• BOARD 3 — FINAL 10 SCREENS
+# Screen
+1 Retail Sales & POS Command Center
+2 Retail POS Selling Workspace
+3 Guest, Membership, Loyalty & Entitlement Interaction
+4 Cart, Promotions, Discounts & Price Control
+5 Checkout, Payment & Receipt
+6 Transaction Search, Hold, Recall & Post-Sale Management
+7 Returns, Refunds & Exchanges
+8 Omnichannel Order & Fulfilment Center
+9 Mobile POS, Event Sales & Offline Operations
+10 Sales Exceptions, Controls & Operational Action Center
+• COMPLETE BOARD 3 TRANSACTION FLOW
+• Store / Channel
+• ↓
+• Scan / Select Product
+• ↓
+• Product + SKU Validation
+• ↓
+• Check Availability
+• ↓
+• Identify Guest — Optional / Required by Policy
+• ↓
+• Resolve Price
+• ↓
+• Apply Membership / Loyalty / Promotion / Entitlement
+• ↓
+• Build Cart
+• ↓
+• Inventory Availability Check
+• ↓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 90
+• Checkout
+• ↓
+• Payment Authorization
+• ↓
+• If Physical Sale
+• Inventory Issue
+• ↓
+• Receipt
+• ↓
+• Transaction Complete
+• If Omnichannel Order
+• Inventory Reservation
+• ↓
+• Fulfilment Location
+• ↓
+• Picking
+• ↓
+• Packing
+• ↓
+• Ready
+• ↓
+• Guest Notification
+• ↓
+• Collection / Delivery
+• ↓
+• Inventory Issue
+• ↓
+• Transaction Complete
+• If Return / Exchange
+• Original Transaction Validation
+• ↓
+• Return Policy
+• ↓
+• Product Condition
+• ↓
+• Approval if Required
+• ↓
+• Refund / Exchange / Credit
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 91
+• ↓
+• Inventory Disposition
+• ↓
+• Finance + Loyalty Adjustment
+• ↓
+• Transaction Closed
+• ARCHITECTURAL REQUIREMENT
+Retail Board 3 shall use one common TICVAI Commerce Transaction Engine across all Retail 
+channels.
+Development should not build separate transaction engines for:
+• Fixed POS
+• Mobile POS
+• Kiosk
+• B2C
+• Guest App
+• Click & Collect
+• Event Sales
+Instead:
+• Commerce Transaction Engine
+• ↓
+• Product / SKU
+• ↓
+• Price
+• ↓
+• Promotion
+• ↓
+• Guest / Loyalty / Entitlement
+• ↓
+• Inventory
+• ↓
+• Payment
+• ↓
+• Fulfilment
+• ↓
+• Return / Exchange
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 92
+• ↓
+• Finance
+• ↓
+• Analytics
+The channel changes the user experience, not the underlying commercial transaction 
+logic.
+This is especially important for TICVAI because a guest may purchase a product through the 
+mobile app, collect it from a physical store, exchange it at another store, receive loyalty points, 
+and have all of those activities remain part of one traceable transaction and guest journey.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 93
+TICVAI RETAIL — BOARD 4
+Store Stock, Transfers & Operational Inventory — Scope of Work
+1. Purpose
+The Store Stock, Transfers & Operational Inventory Board shall provide Retail teams with a realtime operational interface for managing stock availability, store replenishment, transfers, 
+receiving, stock counts, reservations, damaged goods, serialized/RFID merchandise and 
+inventory exceptions.
+Board 4 shall serve as the Retail operational layer of TICVAI's Shared Inventory Engine.
+It shall not create a separate Retail inventory ledger.
+The architecture shall follow:
+Retail Product / SKU Inventory Item Stock Location Available / Reserved / In → → →
+Transit / Damaged Retail Operation Shared Inventory Ledger → →
+The Board shall support:
+Retail Stores
+Gift Shops
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 94
+Kiosks
+Mobile Carts
+Pop-Up Stores
+Event Merchandise Locations
+Photo Shops
+Online / Click & Collect Stock
+Back-of-House Store Rooms
+Central Warehouses
+Temporary Event Stock Locations
+The objective is to give Retail teams everything required to operate inventory while maintaining 
+one enterprise inventory source of truth across Retail, F&B and other TICVAI modules.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 95
+PAGE 1 — Retail Inventory Command Center
+Purpose
+Provide Retail and Inventory managers with a centralized real-time view of stock health across 
+all Retail locations.
+Global Filters
+Tenant
+Company
+Park
+Venue
+Store
+Stock Location
+Warehouse
+Category
+Brand
+Collection
+Date
+KPI Cards
+Total Retail Stock Value
+Units On Hand
+Available Units
+Reserved Units
+Low-Stock SKUs
+Out-of-Stock SKUs
+Overstocked SKUs
+Stock in Transit
+Pending Requisitions
+Pending Transfers
+Pending Receipts
+Count Variances
+Damaged Stock
+Stock Alerts
+• Store Stock Health
+Store SKUs Available Low Stock OOS In Transit Health
+Main Gift Shop 1,842 18,420 24 7 380 94%
+Waterpark Shop 1,120 9,840 31 12 240 87%
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 96
+Store SKUs Available Low Stock OOS In Transit Health
+Adventure Store 864 6,280 11 3 90 96%
+Exit Kiosk 320 1,940 18 9 120 78%
+• Stock Risk Panel
+Examples:
+12 SKUs at Waterpark Shop are projected to run out before 18:00.
+Main Gift Shop has AED 18,400 of slow-moving Summer Collection stock.
+Transfer TR-18421 is 45 minutes overdue.
+Exit Kiosk physical count variance exceeds tolerance.
+38 units of Event Merchandise remain at temporary locations after event closure.
+Quick Actions
+Stock Lookup | Create Requisition | Request Transfer | Receive Stock | Start Count | 
+Record Damage | AI Replenishment
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 97
+PAGE 2 — Store Stock & SKU Availability
+Purpose
+Provide detailed stock visibility for every Retail SKU across stores, warehouses and other 
+approved stock locations.
+• Inventory Status Dimensions
+For each SKU, display:
+On Hand
+Available
+Reserved
+Allocated
+Picked
+In Transit
+Incoming
+Damaged
+Quarantine
+Blocked
+Returned
+Available-to-Promise
+• Stock Table
+SKU Product On Hand Reserved Available Pa
+r
+Incoming Status
+TSH-BLK-M Logo T-Shirt 42 8 34 60 20 Low
+CAP-BLK Logo Cap 86 12 74 60 0 Healthy
+PLUSH-L Large Plush 7 4 3 20 0 Critical
+BTL-001 Water Bottle 124 18 106 80 40 Healthy
+• SKU Drill-Down
+Selecting a SKU shall display:
+Product
+Variant
+Barcode
+RFID Status
+Current Location
+Bin / Shelf
+On Hand
+Available
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 98
+Reserved
+Incoming
+In Transit
+Damaged
+Last Receipt
+Last Sale
+Last Transfer
+Last Count
+Current Cost
+Stock Value
+Replenishment Settings
+• Multi-Location Stock Lookup
+Example:
+• TICVAI Logo T-Shirt — Black / Medium
+• Main Gift Shop:
+34 available
+• Waterpark Shop:
+4 available
+• Adventure Store:
+18 available
+• Exit Kiosk:
+0 available
+• Central Warehouse:
+220 available
+• Event Warehouse:
+68 available
+This information shall allow TICVAI to recommend internal stock redistribution before 
+procurement.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 99
+PAGE 3 — Requisition & Smart Store Replenishment
+Purpose
+Allow Retail stores to request stock from warehouses or other authorized supply locations and 
+enable automated replenishment recommendations.
+• Requisition Information
+Capture:
+Requisition Number
+Requesting Store
+Supply Location
+Required Date
+Required Time
+Priority
+Product
+SKU
+Current Stock
+Available Stock
+Par Level
+Minimum Level
+Maximum Level
+Forecast Demand
+Reserved Quantity
+Incoming Quantity
+Requested Quantity
+Recommended Quantity
+UOM
+Reason
+• Example
+• Logo T-Shirt — Black / Medium
+• Available:
+12
+• Minimum:
+15
+• Par:
+50
+• Expected Sales Today:
+34
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 100
+• Incoming:
+0
+Recommended Replenishment:
+• 38 Units
+• Requisition Lifecycle
+• Draft
+• → Submitted
+• → Approval
+• → Approved
+• → Warehouse Picking
+• → Packed
+• → Dispatched
+• → In Transit
+• → Received
+• → Closed
+• Replenishment Modes
+Support:
+Manual
+Scheduled
+Min / Max
+Par Stock
+Sales Velocity
+Demand-Based
+Event-Based
+Forecast-Based
+AI Recommended
+• Auto-Requisition
+Where enabled:
+• Stock / Forecast Trigger
+• ↓
+• TICVAI creates proposed requisition
+• ↓
+• Authorized user reviews
+• ↓
+• Approve / Modify / Reject
+The system shall not automatically create external purchase orders from Retail.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 101
+If internal stock is unavailable, the requirement shall be passed to the Shared Procurement 
+workflow.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 102
+PAGE 4 — Store-to-Store & Warehouse Transfers
+Purpose
+Manage stock movement between Retail stores, warehouses and temporary selling locations.
+• Supported Transfer Types
+Warehouse Store →
+Store Store →
+Store Warehouse →
+Warehouse Event Store →
+Event Store Warehouse →
+Store Pop-Up Location →
+Temporary Location Store →
+Store Fulfilment Location →
+• Transfer Request
+Capture:
+Transfer Number
+Source
+Destination
+Required Date
+Priority
+SKU
+Requested Quantity
+Approved Quantity
+Picked Quantity
+Dispatched Quantity
+Received Quantity
+Reason
+Requester
+• Transfer Lifecycle
+• Requested
+• → Approved
+• → Picking
+• → Packed
+• → Dispatched
+• → In Transit
+• → Partially Received / Received
+• → Reconciled
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 103
+• → Closed
+• Transfer Example
+• TR-18421
+From:
+• Central Warehouse
+To:
+• Waterpark Shop
+Items:
+• 24 SKUs
+Units:
+• 380
+Status:
+• In Transit
+ETA:
+• 11:45
+• Emergency Transfer
+Example:
+Large Plush projected to stock out at Main Gift Shop in 45 minutes.
+Nearby availability:
+• Adventure Store:
+38
+• Central Warehouse:
+120
+TICVAI Recommendation:
+Transfer 20 units from Adventure Store immediately.
+Actions:
+Create Transfer | Select Different Source | Ignore
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 104
+PAGE 5 — Receiving & Store Put-Away
+Purpose
+Provide Retail stores with controlled receiving of stock transferred from warehouses, other 
+stores or approved supply processes.
+• Receiving Methods
+Support:
+Transfer Receipt
+Warehouse Delivery
+Procurement Delivery where authorized
+Event Stock Receipt
+Return to Store
+Inter-Store Receipt
+• Receipt Header
+Capture:
+Receipt Number
+Source
+Destination
+Transfer / PO Reference
+Dispatch Date
+Receipt Date
+Receiver
+Shipment / Container Reference
+Status
+• Receiving Verification
+Employees should be able to verify items using:
+Barcode
+QR
+RFID
+Manual Search
+• Example
+Expected:
+• Logo T-Shirt / M
+• 50 units
+Received:
+• 48
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 105
+Damaged:
+• 1
+Missing:
+• 1
+TICVAI creates:
+• Receiving Discrepancy — 2 units
+• Discrepancy Types
+Short
+Over
+Damaged
+Wrong Product
+Wrong Variant
+Missing
+Unexpected Item
+Serial Mismatch
+RFID Mismatch
+• Put-Away
+After receiving, employees may assign stock to:
+Store Room
+Shelf
+Bin
+Display
+Pickup Area
+Secure Storage
+• Receipt Lifecycle
+• Expected
+• → Receiving
+• → Verified
+• → Discrepancy Review where applicable
+• → Put Away
+• → Available
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 106
+PAGE 6 — Stock Count & Cycle Count Management
+Purpose
+Support accurate physical stock counting across Retail locations.
+• Count Types
+Opening Count
+Closing Count
+Shift Count
+Spot Count
+Cycle Count
+Category Count
+Full Store Count
+Event Close Count
+Investigation Count
+• Count Creation
+Configure:
+Store
+Location
+Category
+Product Range
+Count Type
+Scheduled Date
+Assigned Employees
+Blind Count
+Recount Rules
+Variance Tolerance
+• Blind Count
+When enabled:
+Employees shall not see expected system quantities while counting.
+• Count Methods
+Support:
+Barcode Scan
+RFID Scan
+Manual Quantity
+Mobile Device
+Employee App
+• Count Results
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 107
+SKU System Physical Variance Variance % Value
+TSH-BLK-M 42 40 -2 -4.8% -AED 90
+CAP-BLK 86 86 0 0% AED 0
+PLUSH-L 7 5 -2 -28.6% -AED 70
+• Variance Workflow
+• Count Completed
+• ↓
+• Variance Detected
+• ↓
+• Tolerance Check
+• ↓
+• Within Policy
+• → Process according to configuration
+• Outside Policy
+• → Recount / Investigation
+• ↓
+• Approval
+• ↓
+• Shared Inventory Adjustment
+• Count Locking
+Where required, the system shall support temporary transaction controls while a full physical 
+count is being conducted.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 108
+PAGE 7 — Damage, Loss, Shrinkage & Stock Adjustment
+Purpose
+Provide controlled management of inventory that cannot remain in normal sellable stock.
+• Adjustment Reasons
+Configurable examples:
+Damaged
+Defective
+Lost
+Theft / Shrinkage
+Display Damage
+Packaging Damage
+Sample
+Promotional Use
+Employee Use
+Event Loss
+Count Correction
+System Correction
+Other
+• Stock Adjustment
+Capture:
+Store
+SKU
+Quantity
+Current Status
+New Status
+Reason
+Cost
+Estimated Retail Value
+Employee
+Date / Time
+Notes
+Photo Evidence, optional
+• Example
+• Limited Edition Mug
+• Quantity:
+6
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 109
+• Reason:
+Damaged During Display
+• Cost:
+AED 108
+• Retail Value:
+AED 270
+Action:
+• Move to Damaged Stock
+• Approval Threshold
+Example:
+• Up to AED 250
+• → Store Supervisor
+• AED 251–1,000
+• → Store Manager
+• Above AED 1,000
+• → Retail / Inventory Manager
+Thresholds shall be configurable.
+• Shrinkage Analysis
+TICVAI shall track:
+• Expected Stock
+• vs
+• Physical Stock
+• vs
+• Recorded Adjustments
+to support shrinkage analytics in Board 6.
+The system shall surface discrepancies for investigation without automatically attributing them 
+to theft or employee misconduct.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 110
+PAGE 8 — Reservation, Allocation & Omnichannel Inventory
+Purpose
+Manage Retail inventory commitments created by digital and omnichannel orders.
+This page is particularly important because On Hand Stock is not the same as Available Stock.
+• Inventory States
+Example:
+• On Hand:
+100
+• Reserved:
+20
+• Allocated:
+10
+• Picked:
+5
+Available:
+• 65
+• Reservation Sources
+Inventory may be reserved for:
+B2C Order
+Guest App Order
+Click & Collect
+Event Order
+VIP Order
+Personalized Product
+Store Pickup
+Delivery Order
+• Reservation Lifecycle
+• Available
+• ↓
+• Reserved
+• ↓
+• Allocated
+• ↓
+• Picked
+• ↓
+• Packed
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 111
+• ↓
+• Collected / Delivered
+• ↓
+• Issued
+• Reservation Expiry
+Example:
+Click & Collect Order:
+• R-18421
+Reservation:
+• 4 units
+Hold Until:
+• 18:00
+If the guest does not collect within the configured period:
+• Reservation Expired
+• ↓
+• Stock Released
+unless another policy applies.
+• Available-to-Promise
+TICVAI should calculate whether an item can be promised based on:
+Current Available
+Existing Reservations
+Incoming Transfers
+Expected Receipt
+Fulfilment SLA
+Store / Warehouse Eligibility
+• Cross-Location Fulfilment
+Example:
+Online order requests:
+• Limited Edition Plush
+• Main Gift Shop:
+0
+• Waterpark Shop:
+2
+• Central Warehouse:
+40
+TICVAI may recommend:
+Fulfil from Central Warehouse rather than rejecting the order.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 112
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 113
+PAGE 9 — Barcode, RFID, Serialized Stock & Traceability
+Purpose
+Provide advanced operational management for merchandise requiring individual identification 
+or rapid stock scanning.
+• Barcode Operations
+Support barcode use for:
+Receiving
+Selling
+Stock Lookup
+Transfer
+Picking
+Packing
+Stock Count
+Return
+Adjustment
+• RFID Operations
+Where enabled:
+Bulk Stock Count
+Receiving
+Transfer Verification
+Store Movement
+Item Search
+Exit Verification
+Inventory Audit
+• RFID Count Example
+Expected Items:
+• 1,842
+RFID Read:
+• 1,836
+Missing:
+• 6
+Unexpected:
+• 2
+Actions:
+Review Missing | Review Unexpected | Re-Scan
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 114
+• Serialized Products
+For individually tracked products:
+Serial Number
+SKU
+Barcode
+RFID EPC
+Current Location
+Inventory Status
+Receipt
+Transfer History
+Sale
+Return
+Guest Link where applicable
+• Example
+• Limited Edition Collectible
+• SKU:
+COL-001
+• Serial:
+#184 / 500
+• Status:
+Available
+• Location:
+Main Gift Shop / Secure Cabinet 02
+• Traceability Timeline
+• Received
+• ↓
+• Warehouse
+• ↓
+• Transferred
+• ↓
+• Main Gift Shop
+• ↓
+• Moved to Display
+• ↓
+• Sold
+• ↓
+• Returned
+• ↓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 115
+• Inspected
+• ↓
+• Available / Quarantine
+This complete history shall remain accessible according to role permissions.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 116
+PAGE 10 — Inventory Exceptions, AI Replenishment & Action Center
+Purpose
+Provide a centralized operational workspace for Retail inventory risks, exceptions and AI 
+recommendations.
+• Alert Categories
+• Stock
+Low Stock
+Critical Stock
+Out of Stock
+Overstock
+Negative Stock
+• Replenishment
+Requisition Pending
+Replenishment Late
+Insufficient Source Stock
+• Transfers
+Transfer Delayed
+Partial Transfer
+Receiving Discrepancy
+Missing Transfer
+• Counts
+Count Variance
+Recount Required
+Unapproved Adjustment
+• Omnichannel
+Reservation Conflict
+Fulfilment Stock Shortage
+Reservation Expiring
+• Devices
+RFID Reader Offline
+Scanner Offline
+Sync Failure
+• Severity
+Information | Warning | High | Critical
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 117
+• AI — SMART REPLENISHMENT
+TICVAI should not depend solely on:
+• Stock < Minimum Reorder →
+The recommendation engine should consider:
+Current Available Stock
+Reserved Stock
+Incoming Stock
+Sales Velocity
+Historical Demand
+Current Attendance
+Future Ticket Sales
+Events
+Seasonality
+Promotions
+Product Lifecycle
+Store Type
+Safety Stock
+Internal Lead Time
+Supplier Lead Time
+• Example
+• Logo T-Shirt — Medium
+• Main Gift Shop
+• Available:
+22
+• Tomorrow Forecast:
+48
+• Reserved:
+5
+• Incoming:
+10
+• Safety Stock:
+8
+Projected Shortfall:
+• 29 Units
+Recommendation:
+Transfer 30 units from Central Warehouse before tomorrow's opening.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 118
+Actions:
+Simulate | Create Transfer | Create Requisition | Ignore
+• AI — INTERNAL STOCK REDISTRIBUTION
+Before recommending procurement, TICVAI should evaluate stock across the network.
+Example:
+• Limited Edition Cap
+Main Gift Shop:
+• Projected shortage:
+40
+Waterpark Shop:
+• Projected excess:
+22
+Adventure Store:
+• Projected excess:
+28
+AI Recommendation:
+• Waterpark Main Gift Shop: 20 →
+• Adventure Main Gift Shop: 20 →
+External Procurement:
+• Not Required
+This reduces unnecessary purchasing while improving product availability.
+• AI — EVENT STOCK PLANNING
+TICVAI should use ticketing and event data to predict merchandise requirements.
+Example:
+• Concert — Saturday
+Expected Attendance:
+• 18,500
+Historical Merchandise Conversion:
+• 21%
+Expected Retail Transactions:
+• 3,885
+Expected Top Product:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 119
+• Concert T-Shirt
+Forecast Demand:
+• 2,150 units
+Current Event Stock:
+• 1,420
+Incoming:
+• 400
+Projected Shortfall:
+• 330 units
+Recommendation:
+Allocate an additional 350 units before event opening.
+This integration between Ticketing + Events + Retail Inventory should be a key TICVAI 
+differentiator.
+• AI — SLOW-MOVING & OVERSTOCK IDENTIFICATION
+TICVAI shall identify stock where supply materially exceeds expected demand.
+Example:
+• Summer Plush Collection
+Stock Value:
+• AED 84,000
+30-Day Sales:
+• AED 12,400
+Projected Days of Supply:
+• 184 Days
+AI Recommendation:
+Reduce future replenishment
+Transfer stock to higher-demand stores
+Consider promotion
+Consider bundle
+Review markdown scenario
+Actual pricing/promotion changes shall be handled through the appropriate Retail boards and 
+Approval Engine.
+• AI — STOCK-OUT LOST SALES
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 120
+TICVAI should estimate commercial impact when a Retail product becomes unavailable.
+Example:
+• Limited Edition Plush
+Out of Stock:
+• 14:10–18:35
+Expected Units:
+• 68
+Actual:
+• 4
+Estimated Lost Sales:
+• AED 6,080
+Estimated Lost Margin:
+• AED 3,420
+Recommended Action:
+Increase weekend safety stock from 15 to 45 units.
+This information shall feed Board 6 Retail Intelligence.
+• AI — INVENTORY ANOMALY DETECTION
+The system should identify abnormal patterns such as:
+Unexpected Stock Variance
+Repeated Negative Stock
+Excessive Adjustments
+Unusual Damage
+Repeated Transfer Discrepancies
+High Return-to-Stock Variance
+RFID / Physical Count Difference
+Example:
+Waterpark Shop stock variance for souvenir mugs is 4.2× above the 30-day average.
+Potential areas to investigate:
+Receiving
+Transfer
+POS Posting
+Returns
+Damage
+Count Accuracy
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 121
+TICVAI shall not automatically conclude fraud or misconduct.
+• EMPLOYEE APP INTEGRATION
+Board 4 shall integrate directly with the TICVAI Employee App.
+Authorized Retail employees should be able to:
+Scan SKU
+View Stock
+Check Other Locations
+Request Replenishment
+Request Transfer
+Pick Transfer
+Dispatch Transfer
+Receive Transfer
+Count Stock
+Record Damage
+Process Put-Away
+Pick Online Order
+Confirm Packing
+Locate RFID Item
+View Alerts
+• Example
+• Low Stock — Large Plush
+• Available:
+3
+• Expected Demand:
+18
+Nearby Stock:
+• Adventure Store:
+28
+Action:
+• Request Transfer
+• APPROVAL ENGINE INTEGRATION
+Board 4 shall use TICVAI's shared Approval Engine.
+Examples:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 122
+• Stock Adjustment
+• → Store Manager
+• High-Value Write-Off
+• → Retail Manager + Inventory
+• Emergency Transfer
+• → Configurable Approval
+• Count Variance
+• → Inventory Supervisor
+• Requisition
+• → Store Manager / Inventory Manager
+• Negative Stock Override
+• → Authorized Inventory Role
+No separate Retail approval engine shall be created.
+• SHARED INVENTORY & PROCUREMENT BOUNDARY
+This separation is mandatory.
+• RETAIL BOARD 4 SHALL OWN
+Store Stock Visibility
+SKU Availability
+Retail Replenishment Requests
+Store Transfer Requests
+Retail Receiving Interface
+Store Put-Away
+Retail Stock Counts
+Retail Damage / Loss Recording
+Retail Reservations
+Omnichannel Stock Allocation
+RFID / Barcode Retail Operations
+Retail Stock Alerts
+Retail AI Replenishment Recommendations
+• SHARED INVENTORY SHALL OWN
+Enterprise Inventory Item Master
+Stock Ledger
+Warehouse Master
+Storage Locations / Bins
+Enterprise Stock Transactions
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 123
+Transfer Posting
+Goods Receipt
+Inventory Adjustments
+Inventory Valuation
+Costing Methods
+Batch / Serial Master
+Enterprise Inventory Reconciliation
+• PROCUREMENT SHALL OWN
+Supplier Master
+Supplier Contracts
+Purchase Requisitions
+RFQs
+Quotations
+Quotation Comparison
+Purchase Orders
+Supplier Deliveries
+Supplier Invoices
+Supplier Performance
+• RETAIL REPLENISHMENT FLOW
+• Retail Demand
+• ↓
+• Current Store Availability
+• ↓
+• Reservations
+• ↓
+• Forecast Demand
+• ↓
+• Minimum / Par / Safety Stock
+• ↓
+• Replenishment Requirement
+• ↓
+• Check Internal Stock
+• If Available Internally
+• Create Transfer
+• ↓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 124
+• Warehouse / Store Picking
+• ↓
+• Dispatch
+• ↓
+• Receive
+• ↓
+• Put Away
+• ↓
+• Store Stock Available
+• If Internal Stock Is Insufficient
+• Create Requisition
+• ↓
+• Shared Procurement
+• ↓
+• Purchase Order
+• ↓
+• Supplier Delivery
+• ↓
+• Shared Inventory Receipt
+• ↓
+• Warehouse Stock
+• ↓
+• Retail Replenishment
+• ↓
+• Store Availability Updated
+• BOARD 4 — FINAL 10 SCREENS
+# Screen
+1 Retail Inventory Command Center
+2 Store Stock & SKU Availability
+3 Requisition & Smart Store Replenishment
+4 Store-to-Store & Warehouse Transfers
+5 Receiving & Store Put-Away
+6 Stock Count & Cycle Count Management
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 125
+# Screen
+7 Damage, Loss, Shrinkage & Stock Adjustment
+8 Reservation, Allocation & Omnichannel Inventory
+9 Barcode, RFID, Serialized Stock & Traceability
+10 Inventory Exceptions, AI Replenishment & Action Center
+• COMPLETE BOARD 4 OPERATIONAL FLOW
+• Retail Sale / Online Order / Forecast
+• ↓
+• SKU Demand
+• ↓
+Check:
+• On Hand – Reserved – Allocated = Available
+• ↓
+• If Stock Is Healthy
+• Continue Selling
+• If Stock Is Low
+• TICVAI calculates replenishment requirement
+• ↓
+• Check Internal Network
+• ↓
+• Internal Stock Available
+Recommend:
+• Warehouse Transfer / Store-to-Store Transfer
+• ↓
+• Approval where required
+• ↓
+• Pick
+• ↓
+• Dispatch
+• ↓
+• Receive
+• ↓
+• Put Away
+• ↓
+• Available Stock Updated
+• Internal Stock Not Available
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 126
+Create:
+• Requisition
+• ↓
+• Shared Procurement
+• ↓
+• Goods Received into Shared Inventory
+• ↓
+• Retail Replenishment
+• ↓
+• Stock Available
+Meanwhile:
+POS + B2C + Guest App + Click & Collect
+consume the same real-time availability.
+• ↓
+• Physical Count
+• ↓
+• Variance Detection
+• ↓
+• Investigation / Approval
+• ↓
+• Shared Inventory Adjustment
+• ↓
+Board 6 Analytics & AI.
+• ARCHITECTURAL REQUIREMENT
+The most important requirement for Board 4 is that Development must not build a Retail 
+Inventory System separate from the Inventory & Procurement module we will design later.
+There should be one TICVAI Shared Inventory Engine:
+• Inventory Item
+• → Location
+• → Quantity
+• → Status
+• → Reservation
+• → Movement
+• → Cost
+• → Transaction
+• → Audit
+Then each operational module uses that engine differently:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 127
+Retail
+SKU + Store + Sale + Return + Omnichannel Reservation
+F&B
+Ingredient + Recipe + Production + Waste + 86
+• Rental
+Individual Asset + Check-Out + Check-In
+• Operations
+Consumables + Equipment + Internal Usage
+This is particularly important because when we start the Shared Inventory & Procurement 
+boards, we should not redesign the Retail stock functionality again. Instead, those boards will 
+provide the enterprise engine underneath both F&B Board 5 and Retail Board 4.
+That architecture will give TICVAI one stock source of truth across the entire platform, while 
+still giving Retail users a backend designed specifically for their day-to-day operational needs.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 128
+TICVAI RETAIL — BOARD 5
+Promotions, Omnichannel Commerce & Guest Engagement — Scope of Work
+1. Purpose
+The Promotions, Omnichannel Commerce & Guest Engagement Board shall provide the 
+centralized commercial orchestration layer for Retail, allowing TICVAI operators to configure 
+promotions, campaigns, coupons, vouchers, cross-sell, upsell, omnichannel journeys, guest
+targeting and personalized retail experiences across physical and digital sales channels.
+The Board shall answer five key commercial questions:
+What offer should we provide? To whom? Where? When? Through which channel? → → → →
+The architecture shall follow:
+Guest / Segment Product / SKU Offer Eligibility Channel Store Inventory → → → → → → →
+Transaction Fulfilment Measurement → →
+Board 5 shall work across:
+Fixed POS
+Mobile POS
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 129
+Self-Service Kiosk
+B2C Website
+Guest Mobile App
+QR Commerce
+Click & Collect
+Event Merchandise
+Retail Stores
+Pop-Up Stores
+Other integrated commerce channels
+The Board shall integrate with TICVAI's shared:
+Product & Catalog Engine
+Pricing Engine
+Promotion Engine
+Guest Profile / CRM
+Loyalty & Membership
+Wallet / Entitlement Engine
+Inventory Engine
+Payment Engine
+Ticketing & Attendance
+Events & Experiences
+Approval Engine
+Finance
+Analytics & AI
+The objective is to avoid building promotions separately inside POS, mobile, B2C or individual 
+stores.
+There shall be one TICVAI Promotion & Commerce Rules Engine consumed by all channels.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 130
+PAGE 1 — Retail Commercial Command Center
+Purpose
+Provide Retail and Commercial management with a consolidated real-time view of promotions, 
+campaigns, omnichannel sales and guest engagement.
+Global Filters
+Tenant
+Company
+Park
+Venue
+Store
+Channel
+Campaign
+Promotion
+Guest Segment
+Membership Tier
+Date / Period
+KPI Cards
+Retail Net Sales
+Promotion Revenue
+Promotion Transactions
+Discount Value
+Average Transaction Value
+Units per Transaction
+Promotion Conversion
+Coupon Redemptions
+Cross-Sell Revenue
+Upsell Revenue
+Digital Retail Revenue
+Click & Collect Orders
+Member Revenue
+Campaign ROI
+• Channel Performance
+Example:
+Channel Sales Transactions ATV Promotion Use Growth
+Store POS AED 420K 6,820 AED 61.6 24% +6%
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 131
+Channel Sales Transactions ATV Promotion Use Growth
+Mobile POS AED 92K 1,180 AED 78.0 18% +14%
+Guest App AED 118K 1,420 AED 83.1 31% +22%
+B2C AED 84K 940 AED 89.4 28% +18%
+Kiosk AED 46K 720 AED 63.9 16% +9%
+• Campaign Snapshot
+Display:
+Campaign
+Status
+Audience
+Revenue
+Discount Cost
+Conversion
+ROI
+End Date
+• Commercial Alerts
+Examples:
+Summer Merchandise campaign is 18% above revenue target.
+Member promotion redemption is below forecast.
+Promotion PR-1842 is producing margin below configured threshold.
+14 campaign products are projected to stock out today.
+Online conversion increased 21% after cross-sell activation.
+Quick Actions
++ Promotion | + Campaign | + Coupon | + Segment Offer | Cross-Sell | View Performance
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 132
+PAGE 2 — Promotion & Offer Builder
+Purpose
+Allow authorized commercial users to configure Retail promotions without software 
+development.
+• Promotion Types
+The system shall support configurable promotion structures including:
+Percentage Discount
+Fixed Amount Discount
+Fixed Promotional Price
+Buy X Get Y
+Buy One Get One
+Multi-Buy
+Bundle Price
+Spend Threshold
+Quantity Discount
+Category Discount
+Product Discount
+Member Discount
+VIP Offer
+Coupon
+Voucher
+Event Offer
+Time-Based Offer
+Store-Specific Offer
+Channel-Specific Offer
+• Example
+• Buy 2 Get 1 Free
+Eligible Category:
+• Souvenirs
+Minimum Quantity:
+• 3
+Benefit:
+• Lowest-Priced Eligible Item Free
+Stores:
+• All Dubai Park Retail Stores
+Channels:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 133
+• POS + Mobile + App
+Effective:
+• 1 Sep – 30 Sep
+• Promotion Builder
+The interface should follow:
+• IF
+Guest / Product / Store / Channel / Date / Quantity / Spend condition
+• THEN
+Apply Discount / Free Product / Fixed Price / Voucher / Benefit
+• Example Rule
+• IF
+• Guest Membership = Gold
+• AND
+• Category = Apparel
+• AND
+• Spend AED 200 ≥
+• THEN
+• Apply 15% Discount
+• Rule Groups
+Support:
+• AND / OR
+logic for advanced eligibility.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 134
+PAGE 3 — Promotion Eligibility, Priority & Conflict Rules
+Purpose
+Control which offers may be applied and resolve situations where several promotions are 
+simultaneously eligible.
+• Eligibility Dimensions
+Promotions may be restricted by:
+Product
+SKU
+Category
+Brand
+Collection
+Store
+Venue
+Park
+Channel
+Guest
+Guest Segment
+Membership Tier
+Ticket Type
+Event
+Date
+Time
+Day of Week
+Quantity
+Basket Value
+Payment Method
+Inventory Availability
+• Exclusions
+Allow:
+Excluded Products
+Excluded Categories
+Excluded Stores
+Excluded Channels
+Excluded Guests
+Excluded Dates
+Non-Discountable Products
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 135
+• Promotion Priority
+Example:
+Contractual / Entitlement Benefit
+VIP Benefit
+Membership Price
+Campaign Promotion
+Coupon
+Manual Discount
+Priority shall be tenant-configurable.
+• Stacking Rules
+Support:
+Stackable
+Non-Stackable
+Exclusive
+Best Price
+Highest Priority
+Maximum Discount Cap
+Customer Choice
+• Conflict Example
+Guest qualifies for:
+• Gold Member:
+10%
+• Summer Campaign:
+15%
+• Coupon:
+AED 20
+TICVAI calculates permitted combinations and displays:
+• Best Eligible Benefit: AED 42 Saving
+• Margin Protection
+Promotion execution shall be capable of checking:
+Product Cost
+Current Price
+Promotion Price
+Expected Margin
+Minimum Margin Threshold
+Example:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 136
+• Promotion Price:
+AED 70
+• Cost:
+AED 48
+• Margin:
+31.4%
+• Required Minimum:
+40%
+Result:
+• Approval Required
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 137
+PAGE 4 — Campaign & Audience Management
+Purpose
+Allow Retail teams to group offers into structured commercial campaigns and define the 
+intended audience.
+• Campaign Information
+Capture:
+Campaign Name
+Campaign Code
+Description
+Objective
+Start Date
+End Date
+Budget
+Revenue Target
+Target Audience
+Stores
+Channels
+Products / Collections
+Promotions
+Status
+• Campaign Objectives
+Examples:
+Increase Revenue
+Increase ATV
+Increase Units per Transaction
+Clear Slow-Moving Stock
+Launch New Product
+Increase Member Spend
+Increase Digital Conversion
+Drive Event Merchandise Sales
+Increase Cross-Sell
+Recover Abandoned Cart
+• Audience Segments
+Campaigns may use guest segments such as:
+All Guests
+Members
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 138
+VIP
+Families
+Tourists
+Residents
+Repeat Visitors
+High-Spend Guests
+Event Attendees
+Ticket Holders
+Specific Membership Tier
+Custom CRM Segment
+Guest data shall come from the shared Guest / CRM layer.
+• Dynamic Segment Example
+Guests who:
+• Visited Dubai Park
+• within last 90 days
+• AND
+• Purchased Retail AED 300 ≥
+• AND
+• Did not purchase Apparel
+• Campaign Lifecycle
+• Draft
+• → Review
+• → Approval
+• → Scheduled
+• → Active
+• → Paused
+• → Completed
+• → Performance Review
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 139
+PAGE 5 — Coupons, Vouchers & Promotional Codes
+Purpose
+Provide centralized management of Retail coupons and promotional codes.
+• Coupon Types
+Support:
+Single Use
+Multi-Use
+Guest-Specific
+Public Code
+Campaign Code
+QR Coupon
+Barcode Coupon
+Ticket-Linked Coupon
+Membership Coupon
+Event Coupon
+• Coupon Configuration
+Capture:
+Coupon Name
+Code
+Barcode / QR
+Promotion
+Value
+Valid From
+Valid Until
+Maximum Redemptions
+Maximum per Guest
+Eligible Products
+Eligible Stores
+Eligible Channels
+Guest Segment
+Minimum Spend
+• Example
+• WELCOME20
+Benefit:
+• 20% Off
+Minimum Spend:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 140
+• AED 150
+Maximum Discount:
+• AED 50
+Usage:
+• 1 per Guest
+Channels:
+• Guest App + B2C
+• Distribution
+Coupons may be distributed through:
+Email
+SMS
+WhatsApp where integrated
+Guest App
+Ticket Confirmation
+Membership
+QR Campaign
+Physical Voucher
+• Redemption Tracking
+Display:
+• Issued:
+25,000
+• Activated:
+8,420
+• Redeemed:
+5,840
+• Conversion:
+23.4%
+• Revenue Generated:
+AED 486K
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 141
+PAGE 6 — Cross-Sell, Upsell & Recommendation Rules
+Purpose
+Increase Retail basket value by recommending relevant complementary or upgraded products.
+• Cross-Sell
+Example:
+Guest selects:
+• TICVAI T-Shirt
+Recommend:
+Cap
+Water Bottle
+Bag
+• Upsell
+Example:
+Guest selects:
+• Standard Plush — AED 65
+Recommend:
+• Limited Edition Plush — AED 95
+• Recommendation Sources
+Recommendations may be:
+Manually Configured
+Product Relationship
+Category Based
+Basket Based
+Guest Segment Based
+Historical Purchase Based
+AI Recommended
+• Rule Example
+• IF
+• Cart contains:
+T-Shirt
+• AND
+• No Cap in Cart
+• THEN
+• Recommend:
+Logo Cap
+• Channel Placement
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 142
+Recommendations may appear on:
+POS
+Mobile POS
+Kiosk
+B2C
+Guest App
+Cart
+Checkout
+Order Confirmation
+• Recommendation Limits
+Configure:
+Maximum Recommendations
+Priority
+Stock Requirement
+Margin Requirement
+Channel
+Guest Eligibility
+Products with insufficient inventory should not normally be promoted unless explicitly 
+permitted.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 143
+PAGE 7 — Omnichannel Commerce & Journey Configuration
+Purpose
+Configure consistent Retail customer journeys across physical and digital channels.
+• Supported Journeys
+Examples:
+• Browse Online Buy Online Collect in Store → →
+• Browse App Reserve Product Buy at Store → →
+• Buy at Store Deliver to Hotel →
+• Buy Online Return at Store →
+• Buy at Waterpark Exchange at Main Gift Shop →
+• Event Ticket Pre-Order Merchandise Collect at Event → →
+• Journey Builder
+Configure:
+• Source Channel
+• ↓
+• Transaction Channel
+• ↓
+• Inventory Source
+• ↓
+• Fulfilment Method
+• ↓
+• Collection / Delivery Location
+• ↓
+• Return Location
+• Example
+• Click & Collect
+Order Channel:
+• Guest App
+Inventory:
+• Central Warehouse
+Collection:
+• Main Gift Shop
+Preparation SLA:
+• 30 minutes
+Reservation Hold:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 144
+• 4 hours
+Guest Notification:
+• App + SMS
+• Cross-Channel Rules
+Configure:
+Cross-Store Return
+Cross-Channel Return
+Cross-Store Exchange
+Online-to-Store Return
+Store-to-Delivery
+Reserve Online / Pay Store
+Buy Online / Collect Event
+• Journey Availability
+Journeys may be enabled by:
+Tenant
+Park
+Venue
+Store
+Product
+Channel
+Guest Type
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 145
+PAGE 8 — Ticketing, Event & Experience Commerce Integration
+Purpose
+Connect Retail commerce directly with TICVAI's core Ticketing, Event and Experience platform.
+This should be a significant differentiator for TICVAI.
+• Ticket + Merchandise
+Example:
+Guest purchases:
+• Theme Park Admission
+TICVAI offers:
+Add Limited Edition Park T-Shirt for AED 75 and collect at Main Gift Shop.
+• Event Merchandise
+Event:
+• Concert 2026
+• Ticket Purchased:
+VIP
+TICVAI may offer:
+Event T-Shirt
+Cap
+Poster
+VIP Collectible
+Pre-Order Package
+• Ticket-Based Eligibility
+Promotions may depend on:
+Ticket Product
+Ticket Category
+Event
+Attraction
+Membership
+Package
+Visit Date
+VIP Status
+• Example
+• IF
+• Guest holds VIP Concert Ticket
+• THEN
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 146
+• Enable exclusive merchandise catalog
+• AND
+• 10% VIP Merchandise Benefit
+• Attendance-Based Offer
+Example:
+Guest scans into Waterpark.
+At 15:00:
+Enjoy 15% off Waterpark merchandise before 18:00.
+• Attraction-Based Merchandise
+Where appropriate, TICVAI may associate merchandise with:
+Attraction
+Experience
+Event
+Tour
+Venue
+Example:
+• Guest completes attraction
+• ↓
+Relevant photo / souvenir / collectible offer becomes available.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 147
+PAGE 9 — Personalized Offers & Guest Engagement
+Purpose
+Allow TICVAI to deliver contextual Retail offers using guest behavior, transaction history, 
+membership, visit context and available inventory.
+• Personalization Inputs
+Where permitted and available:
+Guest Purchase History
+Visit History
+Membership
+Loyalty
+Ticket / Event
+Previous Retail Categories
+Basket Behavior
+Current Location / Venue Context
+Language
+Preferred Channel
+Campaign Response
+• Example
+Guest:
+• Gold Member
+Previous Purchases:
+• Kids Apparel + Plush
+Current Visit:
+• Waterpark
+TICVAI Recommendation:
+New Waterpark Kids Collection available today — Gold Members receive 10% off.
+• Next-Best-Offer
+TICVAI may rank eligible offers based on:
+Relevance
+Probability of Purchase
+Margin
+Stock Availability
+Campaign Priority
+Guest Eligibility
+• Communication Channels
+Where consent and integration permit:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 148
+Guest App
+Email
+SMS
+WhatsApp
+B2C
+POS
+Kiosk
+• Frequency Controls
+Configure:
+Maximum Offers per Day
+Contact Frequency
+Quiet Period
+Channel Preference
+Campaign Exclusions
+All engagement shall respect guest consent and communication preferences maintained in the 
+shared Guest / CRM layer.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 149
+PAGE 10 — Promotion Performance, AI Optimization & Action Center
+Purpose
+Provide a centralized workspace for evaluating commercial performance, identifying risks and 
+receiving AI recommendations.
+• Promotion KPIs
+Revenue
+Transactions
+Units
+Discount Cost
+Gross Margin
+Conversion
+Redemption
+Incremental Revenue
+Average Transaction Value
+Units per Transaction
+Cross-Sell Rate
+Upsell Rate
+ROI
+• Promotion Comparison
+Promotion Revenue Discount Margin Conversion ROI
+Summer 15% AED 186K AED 22K 52% 18% 4.2x
+Member Bundle AED 94K AED 8K 61% 24% 6.8x
+Buy 2 Get 1 AED 72K AED 14K 44% 31% 2.9x
+• Performance Against Control / Baseline
+Where sufficient data exists, TICVAI should distinguish between:
+• Revenue generated during a promotion
+• and
+estimated incremental revenue caused by the promotion.
+This is important because high promotional sales do not automatically mean the promotion 
+created additional demand.
+• AI — PROMOTION OPTIMIZATION
+TICVAI should analyze:
+Historical Promotion Performance
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 150
+Product Margin
+Inventory
+Sales Velocity
+Guest Segments
+Ticket Sales
+Event Attendance
+Seasonality
+Channel
+Conversion
+Basket Composition
+• Example Recommendation
+Main Gift Shop has 840 units of Summer Collection stock with declining sales velocity.
+Recommendation:
+• Launch 15% Member Promotion for 7 days
+Expected:
+• Revenue:
+AED 72K
+• Stock Reduction:
+28%
+• Expected Margin:
+48%
+• Confidence:
+86%
+Actions:
+Simulate | Create Draft Promotion | Ignore
+• AI — PROMOTION SIMULATION
+Before activating a promotion, authorized users should be able to model its expected effect.
+Example:
+• Proposed Promotion
+• 20% Off Summer Collection
+Duration:
+• 7 Days
+• Current Forecast Without Promotion
+• Units:
+620
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 151
+• Revenue:
+AED 68K
+• Margin:
+AED 39K
+• Forecast With Promotion
+• Units:
+980
+• Revenue:
+AED 86K
+• Margin:
+AED 41K
+Inventory Reduction:
+• +360 Units
+• Result
+• Revenue:
++26%
+• Margin Value:
++5%
+• Margin %:
+Reduced
+• Stock Reduction:
++58%
+The user may then:
+Modify | Save Scenario | Submit for Approval
+• AI — CROSS-SELL DISCOVERY
+TICVAI should analyze basket relationships.
+Example:
+Guests purchasing:
+• Logo T-Shirt
+also purchase:
+• Cap — 64%
+• Bag — 38%
+• Water Bottle — 32%
+AI Recommendation:
+Add Cap as primary cross-sell recommendation across POS, App and B2C.
+Estimated Monthly Revenue Impact:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 152
+• +AED 28,000
+• AI — PROMOTION CANNIBALIZATION
+The system should identify when a promotion appears to discount sales that likely would have 
+happened anyway.
+Example:
+• Gold Member 10% Apparel Promotion
+• Promotional Revenue:
+AED 140K
+• Estimated Incremental Revenue:
+AED 18K
+• Discount Cost:
+AED 14K
+AI Observation:
+Most promoted purchases came from guests with historically high apparel purchase probability.
+Recommendation:
+Test narrower targeting rather than continuing the promotion across all Gold Members.
+• AI — INVENTORY-AWARE COMMERCE
+Board 5 shall integrate directly with Retail Board 4.
+TICVAI should avoid aggressively promoting unavailable or critically low-stock products.
+Example:
+Campaign wants to promote:
+• Limited Edition Plush
+• Available:
+28
+• Forecast Organic Demand:
+24
+• Promotion Forecast:
+68
+Result:
+• Inventory Risk
+TICVAI recommends:
+Increase stock before campaign launch.
+Limit promotion to selected stores.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 153
+Reduce campaign duration.
+Select alternative product.
+• ABANDONED CART & DIGITAL RECOVERY
+Where digital commerce channels support persistent carts, TICVAI may identify abandoned 
+baskets.
+Example:
+Guest added:
+• T-Shirt
+• Cap
+• Plush
+• Basket:
+AED 245
+• No Purchase:
+2 hours
+If guest consent permits, TICVAI may trigger:
+Your selected items are still available.
+or an approved recovery offer.
+• Recovery Rules
+Configure:
+Delay
+Minimum Basket
+Guest Segment
+Product Eligibility
+Offer
+Communication Channel
+Maximum Attempts
+• CART / CHECKOUT MERCHANDISING
+TICVAI shall support merchandising at different points of the purchase journey.
+• Product Page
+• You May Also Like
+• Cart
+• Complete Your Visit
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 154
+• Checkout
+• Add for AED 20
+• Post-Purchase
+• Collect During Your Visit
+Different placements may use different recommendation rules.
+• MEMBER & LOYALTY COMMERCE
+Board 5 shall integrate with the shared Loyalty & Membership Engine.
+Examples:
+• Member Exclusive
+Gold Members:
+15% off selected merchandise.
+• Points Redemption
+Use:
+• 2,000 Points
+to receive:
+AED 20 Retail Credit.
+• Member-Only Product
+Limited Edition Collectible:
+• Gold / Platinum Members Only
+Retail shall validate eligibility but shall not maintain loyalty balances itself.
+• WALLET & ENTITLEMENT COMMERCE
+Retail shall be able to consume guest entitlements.
+Example:
+Guest Package includes:
+• AED 100 Retail Credit
+At checkout:
+• Basket:
+AED 180
+• Retail Entitlement:
+-AED 100
+• Remaining:
+AED 80
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 155
+The entitlement shall be validated and consumed through the common TICVAI Portfolio / 
+Wallet / Entitlement layer.
+• EVENT PRE-ORDERING
+TICVAI should support merchandise pre-order during ticket purchase or before the event.
+• Example
+Concert Ticket:
+• AED 450
+Add:
+• Event T-Shirt:
+AED 95
+• VIP Poster:
+AED 60
+Collection:
+• Event Merchandise Counter
+The Retail order is created before arrival and inventory is reserved accordingly.
+This directly connects:
+• Ticketing Retail Inventory Fulfilment → → →
+• PROMOTION BUDGET & COMMERCIAL CONTROL
+Campaigns may include:
+Promotion Budget
+Maximum Discount Exposure
+Maximum Redemptions
+Revenue Target
+Margin Target
+Example:
+Campaign Budget:
+• AED 50,000
+Discount Used:
+• AED 42,800
+Remaining:
+• AED 7,200
+Status:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 156
+• 86% Consumed
+The system may warn or automatically stop a promotion according to configured policy.
+• APPROVAL ENGINE INTEGRATION
+Board 5 shall use TICVAI's common Approval Engine.
+Examples:
+• Standard Promotion
+• → Retail Manager
+• Promotion Below Margin Threshold
+• → Retail Director + Finance
+• High Discount
+• → Commercial Director
+• VIP / Member Benefit Change
+• → Commercial + Loyalty Owner
+• Large Campaign Budget
+• → Finance Approval
+• AI-Generated Promotion
+• → Human Review + Approval
+No separate Retail approval engine shall be developed.
+• PROMOTION VERSIONING & AUDIT
+Every significant commercial change shall be traceable.
+Capture:
+Promotion ID
+Version
+Created By
+Changed By
+Approved By
+Date / Time
+Previous Rule
+New Rule
+Products
+Stores
+Channels
+Audience
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 157
+Budget
+Margin Impact
+Effective Period
+• Example
+• SUMMER-15 — Version 4
+Previous:
+• 15% Off All Apparel
+New:
+• 15% Off Kids Apparel Only
+Reason:
+• Margin Optimization
+Approved:
+• Retail Director
+Effective:
+• 22 Aug 2026
+• BOARD 5 — FINAL 10 SCREENS
+# Screen
+1 Retail Commercial Command Center
+2 Promotion & Offer Builder
+3 Promotion Eligibility, Priority & Conflict Rules
+4 Campaign & Audience Management
+5 Coupons, Vouchers & Promotional Codes
+6 Cross-Sell, Upsell & Recommendation Rules
+7 Omnichannel Commerce & Journey Configuration
+8 Ticketing, Event & Experience Commerce Integration
+9 Personalized Offers & Guest Engagement
+10 Promotion Performance, AI Optimization & Action Center
+• COMPLETE BOARD 5 COMMERCIAL FLOW
+• Commercial Objective
+• ↓
+Select:
+• Product / Collection
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 158
+• ↓
+Define:
+• Audience
+• ↓
+Define:
+• Offer / Promotion
+• ↓
+Configure:
+• Eligibility + Exclusions
+• ↓
+Configure:
+• Priority + Stacking
+• ↓
+Select:
+• Store + Channel
+• ↓
+Check:
+• Inventory Availability
+• ↓
+Check:
+• Margin Impact
+• ↓
+• AI Simulation
+• Expected Sales
+• Expected Margin
+• Expected Inventory Impact
+• Expected Conversion
+• ↓
+• Approval
+• ↓
+• Schedule
+• ↓
+• Publish through Shared Promotion Engine
+• ↓
+POS + Mobile POS + Kiosk + B2C + Guest App
+• ↓
+• Guest Interaction
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 159
+• ↓
+• Transaction
+• ↓
+• Inventory + Payment + Loyalty + Finance
+• ↓
+• Performance Measurement
+• ↓
+• AI Optimization
+• ↓
+• Improve / Extend / Pause / Stop
+• ARCHITECTURAL REQUIREMENT
+The most important architectural principle for Board 5 is that TICVAI shall have one centralized 
+Promotion & Commerce Rules Engine.
+SoftLab should not create:
+• POS Promotions
+• separately from
+• B2C Promotions
+• separately from
+• Mobile App Promotions
+• separately from
+• Kiosk Promotions
+• separately from
+Membership Discounts.
+Instead:
+• Shared Promotion Engine
+• ↓
+• Eligibility
+• ↓
+• Audience
+• ↓
+• Product / SKU
+• ↓
+• Price / Benefit
+• ↓
+• Priority / Stacking
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 160
+• ↓
+• Store / Channel
+• ↓
+• Inventory Validation
+• ↓
+• Transaction Engine
+• ↓
+• Performance Measurement
+This will allow a promotion created once in TICVAI to operate consistently across every permitted
+sales channel.
+A particularly important TICVAI differentiator should be the connection between Ticketing + 
+Guest + Retail + Inventory.
+For example:
+TICVAI knows that 18,500 guests are attending Saturday's concert, 2,100 are VIP ticket holders, 
+historical merchandise conversion is 21%, current event T-shirt stock is insufficient, and VIP 
+guests historically spend 38% more on merchandise.
+The platform can therefore recommend:
+Stock Audience Offer Channel Timing Expected Commercial Result → → → → →
+rather than treating Retail as a standalone shop system.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 161
+TICVAI RETAIL — BOARD 6
+Retail Intelligence, Analytics, Forecasting & AI Optimization — Scope of Work
+1. Purpose
+The Retail Intelligence, Analytics, Forecasting & AI Optimization Board shall provide the 
+centralized decision-intelligence layer for all TICVAI Retail operations.
+Board 6 shall consolidate commercial, operational, inventory, guest, promotion, ticketing, event 
+and financial information to provide management with a complete understanding of Retail 
+performance and future demand.
+The Board shall move beyond traditional dashboards and reporting.
+The intelligence cycle shall follow:
+Measure Compare Detect Explain Forecast Recommend Simulate Approve → → → → → → →
+→ → → Act Measure Outcome Learn
+The Board shall answer:
+What happened?
+Where did it happen?
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 162
+Why did it happen?
+What is likely to happen next?
+What should TICVAI recommend?
+What will happen if we take that action?
+Board 6 shall consume information from:
+Retail POS
+Mobile POS
+Kiosk
+B2C
+Guest App
+Product & SKU Master
+Catalogs
+Pricing
+Promotions
+Retail Inventory
+Shared Inventory
+Procurement
+Guest / CRM
+Loyalty
+Membership
+Wallet & Entitlements
+Ticketing
+Attendance
+Events & Experiences
+Resource Management
+Payments
+Finance
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 163
+PAGE 1 — Retail Executive Command Center
+Purpose
+Provide executives and Retail management with a consolidated real-time overview of 
+commercial performance, profitability, inventory health, guest behavior and operational risks.
+Global Filters
+Tenant
+Company
+Park
+Venue
+Store
+Store Type
+Channel
+Category
+Brand
+Collection
+Date / Period
+• Primary KPI Cards
+Gross Sales
+Net Sales
+Transactions
+Units Sold
+Average Transaction Value
+Units per Transaction
+Gross Margin %
+Revenue per Guest
+Retail Conversion %
+Member Revenue
+Digital Revenue
+Promotion Revenue
+Inventory Value
+Stock Availability %
+Stock-Out Events
+Return Rate
+Forecast Accuracy
+• Comparisons
+Every applicable KPI shall support:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 164
+Today vs Yesterday
+Week vs Previous Week
+Month vs Previous Month
+Year vs Previous Year
+Actual vs Budget
+Actual vs Forecast
+Store vs Store
+Venue vs Venue
+Channel vs Channel
+• Retail Health Score
+TICVAI may calculate a configurable operational/commercial health score.
+Example:
+• Main Gift Shop — 94 / 100
+• Waterpark Shop — 87 / 100
+• Adventure Store — 91 / 100
+• Exit Kiosk — 76 / 100
+The score may consider:
+Sales Performance
+Margin
+Conversion
+Inventory Availability
+Stock-Outs
+Returns
+Promotion Performance
+Operational Exceptions
+• AI Executive Summary
+Example:
+Retail net sales are 9.8% above forecast today. Main Gift Shop is the strongest contributor, while 
+Exit Kiosk is 14.2% below forecast due primarily to stock-outs across five high-volume SKUs. 
+Summer Collection inventory remains 22% above target, while Event Merchandise conversion is 
+outperforming forecast by 18%.
+Quick Actions
+Sales Analysis | Store Performance | Inventory Risks | Forecast Demand | AI 
+Recommendations | Ask TICVAI
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 165
+PAGE 2 — Sales, Revenue & Channel Analytics
+Purpose
+Provide detailed analysis of Retail sales performance across all physical and digital channels.
+KPI Cards
+Gross Sales
+Net Sales
+Transactions
+Units Sold
+Average Transaction Value
+Units per Transaction
+Discounts
+Promotions
+Refunds
+Returns
+Tax
+Gross Profit
+Gross Margin
+• Revenue Analysis
+Analyze by:
+Tenant
+Park
+Venue
+Store
+Product
+SKU
+Category
+Brand
+Collection
+Channel
+Cashier
+Hour
+Day
+Event
+Guest Segment
+Membership Tier
+Promotion
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 166
+• Channel Analysis
+Compare:
+Fixed POS
+Mobile POS
+Self-Service Kiosk
+Guest App
+B2C Website
+QR Commerce
+Event Sales
+Click & Collect
+Example:
+Channel Revenue Transactions ATV Units/Txn Growth
+Store POS AED 420K 6,820 61.6 2.4 +6%
+Mobile POS AED 92K 1,180 78.0 2.8 +14%
+Guest App AED 118K 1,420 83.1 3.1 +22%
+B2C AED 84K 940 89.4 3.3 +18%
+Kiosk AED 46K 720 63.9 2.2 +9%
+• Drill-Down
+Users shall be able to navigate:
+• Company
+• → Park
+• → Venue
+• → Store
+• → Category
+• → Product
+• → SKU
+• → Transaction
+without leaving the analytical workflow.
+• Time Analysis
+Support:
+Hourly Sales
+Daily Sales
+Weekly Trends
+Monthly Trends
+Peak Period
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 167
+Event Period
+Opening vs Closing Period
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 168
+PAGE 3 — Store & Operational Performance
+Purpose
+Benchmark Retail locations and identify stores requiring management attention.
+• Store Scorecard
+Store Sales AT
+V
+Margin Conversion Availability Returns Score
+Main Gift Shop AED 184K 72 64% 28% 98% 2.1% 94
+Waterpark Shop AED 128K 61 61% 31% 94% 1.8% 87
+Adventure Store AED 92K 78 68% 22% 97% 2.4% 91
+Exit Kiosk AED 46K 39 58% 14% 86% 1.2% 76
+• Store Performance Dimensions
+Analyze:
+Sales
+Transactions
+ATV
+Units per Transaction
+Margin
+Retail Conversion
+Stock Availability
+Stock-Out Rate
+Return Rate
+Discount Rate
+Promotion Usage
+Employee Productivity
+Revenue per Operating Hour
+• Store Ranking
+Rank by:
+Revenue
+Growth
+Margin
+Conversion
+Inventory Efficiency
+Guest Spend
+• Store Comparison
+Authorized users should be able to select multiple stores and compare them side-by-side.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 169
+• Root-Cause Example
+• Exit Kiosk
+• Revenue:
+-14.2% vs Forecast
+Primary Factor:
+• Stock Availability
+Secondary Factor:
+• Low ATV
+Five high-volume SKUs unavailable during peak exit period.
+Estimated Impact:
+• AED 8,600 Lost Sales
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 170
+PAGE 4 — Product, SKU & Merchandise Performance
+Purpose
+Analyze product performance using sales, profitability, demand, stock, returns and guest 
+behavior.
+• Product KPIs
+Units Sold
+Revenue
+Cost
+Gross Profit
+Margin %
+Sales Velocity
+Stock Availability
+Days of Supply
+Stock-Out Frequency
+Return Rate
+Promotion Dependency
+Cross-Sell Rate
+Sell-Through %
+Markdown %
+• Merchandise Classification
+TICVAI should classify merchandise using commercial performance.
+Examples:
+• STAR
+• High Sales + High Margin
+• TRAFFIC DRIVER
+• High Sales + Lower Margin
+• OPPORTUNITY
+• Lower Sales + High Margin
+• UNDERPERFORMER
+• Low Sales + Low Margin
+• OVERSTOCK RISK
+Inventory materially exceeds expected demand.
+• Product Example
+• TICVAI Logo T-Shirt
+• Revenue:
+AED 186K
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 171
+• Units:
+2,140
+• Margin:
+62%
+• Sell-Through:
+74%
+• Stock Availability:
+97%
+• Return Rate:
+3.1%
+Classification:
+• STAR
+• Variant Analysis
+For apparel and similar products, performance shall be available by:
+Size
+Color
+Gender
+Style
+Other Attributes
+Example:
+• Black / M:
+Strong Demand
+• Black / XL:
+Low Stock
+• White / S:
+Slow Moving
+• AI Recommendation
+Black / XL is forecast to stock out within 1.4 days while White / S has 68 days of supply. Consider 
+adjusting future assortment and replenishment.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 172
+PAGE 5 — Inventory, Sell-Through & Stock Intelligence
+Purpose
+Transform Board 4's operational stock information into management-level inventory 
+intelligence.
+KPI Cards
+Inventory Value
+Available Stock
+Reserved Stock
+In-Transit Stock
+Stock Turnover
+Sell-Through %
+Days of Supply
+Low-Stock SKUs
+Stock-Out SKUs
+Overstock SKUs
+Slow-Moving Stock
+Dead Stock
+Shrinkage
+Stock Adjustment Value
+• Inventory Aging
+Analyze stock by:
+0–30 Days
+31–60 Days
+61–90 Days
+91–180 Days
+180+ Days
+Example:
+Aging Inventory Value %
+0–30 Days AED 1.2M 42%
+31–60 Days AED 720K 25%
+61–90 Days AED 420K 15%
+91–180 Days AED 310K 11%
+180+ Days AED 190K 7%
+• Sell-Through
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 173
+TICVAI should calculate sell-through by:
+Product
+SKU
+Category
+Brand
+Collection
+Store
+Event
+Season
+• Days of Supply
+Example:
+• Limited Edition Plush
+• Available:
+280
+• Average Daily Sales:
+42
+Days of Supply:
+• 6.7 Days
+• Slow-Moving Inventory
+Example:
+• Summer Kids Collection
+• Inventory Value:
+AED 84K
+• 30-Day Sales:
+AED 12.4K
+• Projected Days of Supply:
+184
+Status:
+• Overstock Risk
+• Internal Redistribution Opportunity
+Before recommending external procurement or markdown:
+Main Gift Shop requires 30 units of SKU-1842.
+Waterpark Shop has projected excess of 18 units.
+Adventure Store has projected excess of 22 units.
+Recommendation:
+Redistribute internally.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 174
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 175
+PAGE 6 — Guest, Conversion & Basket Intelligence
+Purpose
+Connect Retail performance with TICVAI's ticketing and guest ecosystem.
+This is one of the most important differentiators of TICVAI Retail.
+• Guest KPIs
+Unique Retail Guests
+Retail Conversion %
+Spend per Visitor
+Spend per Retail Customer
+Member Spend
+Non-Member Spend
+VIP Spend
+Repeat Retail Customers
+Cross-Channel Customers
+Products per Guest
+• Ticket-to-Retail Conversion
+Example:
+Park Attendance:
+• 18,500
+• ↓
+Retail Customers:
+• 4,255
+• ↓
+• Retail Conversion
+• 23%
+• Conversion Analysis
+Analyze by:
+Ticket Type
+Membership
+Event
+Attraction
+Park
+Venue
+Visit Time
+Guest Segment
+Example:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 176
+• VIP Ticket Holders:
+42% Retail Conversion
+• Members:
+34%
+• Standard Tickets:
+19%
+• Basket Analysis
+Analyze:
+Products per Basket
+Categories per Basket
+ATV
+Attach Rate
+Cross-Sell
+Upsell
+Product Associations
+• Market Basket Example
+Guests purchasing:
+• TICVAI T-Shirt
+also purchase:
+• Cap — 64%
+• Bag — 38%
+• Water Bottle — 32%
+• Guest Journey
+Where permitted, TICVAI should analyze:
+• Ticket Purchase
+• → Visit
+• → Attraction / Event
+• → Retail Interaction
+• → Purchase
+• → Repeat Purchase
+without creating a separate guest identity inside Retail.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 177
+PAGE 7 — Promotion, Pricing & Margin Intelligence
+Purpose
+Analyze whether pricing and promotional activity creates profitable incremental demand.
+• KPIs
+Promotion Revenue
+Promotion Transactions
+Discount Value
+Promotion Margin
+Redemption
+Conversion
+Incremental Revenue
+Promotion ROI
+Markdown Cost
+Member Discount Cost
+Coupon Redemption
+• Promotion Performance
+Example:
+Promotion Revenue Discount Margin Conversion ROI
+Summer 15% AED 186K AED 22K 52% 18% 4.2x
+Member Bundle AED 94K AED 8K 61% 24% 6.8x
+Buy 2 Get 1 AED 72K AED 14K 44% 31% 2.9x
+• Incrementality
+TICVAI should distinguish:
+• Sales during promotion
+• from
+Estimated additional sales generated because of the promotion.
+• Margin Waterfall
+• Gross Retail Sales
+• ↓
+• Discounts
+• ↓
+• Promotions
+• ↓
+• Returns
+• ↓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 178
+• Net Revenue
+• ↓
+• Product Cost
+• ↓
+• Inventory Adjustments / Shrinkage where applicable
+• ↓
+• Contribution Margin
+• Price Sensitivity
+Where sufficient historical data exists, TICVAI may estimate:
+Demand Elasticity
+Price Sensitivity
+Margin Impact
+Revenue Impact
+• Example
+• Current Price:
+AED 95
+• Proposed:
+AED 105
+• Estimated Demand:
+-4.2%
+• Projected Revenue:
++6.1%
+• Projected Margin:
++9.8%
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 179
+PAGE 8 — Demand Forecasting & Merchandise Planning
+Purpose
+Forecast future Retail demand and convert it into actionable merchandise, inventory and 
+staffing requirements.
+• Forecast Inputs
+The engine should be capable of using:
+Advance Ticket Sales
+Attendance Forecast
+Event Schedule
+Historical Retail Sales
+Retail Conversion
+Product Sales Velocity
+Membership Visits
+Promotions
+Seasonality
+Day of Week
+Time of Day
+Store
+Product Lifecycle
+Current Stock
+Incoming Stock
+Reservations
+Weather where integrated
+Holidays
+School / Group Visits
+• Example
+• Tomorrow — Dubai Park
+Expected Attendance:
+• 16,800
+Expected Retail Conversion:
+• 24%
+Expected Retail Customers:
+• 4,032
+Expected Transactions:
+• 4,280
+Expected Revenue:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 180
+• AED 298,000
+• Product Forecast
+• Logo T-Shirt:
+1,140 units
+• Cap:
+720
+• Water Bottle:
+1,280
+• Plush:
+440
+• Keychain:
+1,860
+• Store Forecast
+• Main Gift Shop:
+AED 126K
+• Waterpark Shop:
+AED 78K
+• Adventure Store:
+AED 52K
+• Exit Kiosk:
+AED 42K
+• Inventory Requirement
+For each SKU:
+• Forecast Demand
+• Safety Stock
+• Available
+• Incoming
+• =
+• Projected Requirement
+• Staffing Forecast
+Board 6 should integrate with TICVAI Resource Management.
+Example:
+• Main Gift Shop
+• 18:00–21:00
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 181
+• Forecast Transactions:
+680
+• Current Cashiers:
+4
+Recommended:
+• +2 Cashiers
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 182
+PAGE 9 — AI Recommendation, Simulation & Optimization Center
+Purpose
+Provide a centralized AI workspace for identifying commercial and operational opportunities and
+simulating changes before execution.
+• Recommendation Categories
+Revenue
+Pricing
+Promotions
+Assortment
+Inventory
+Replenishment
+Redistribution
+Markdown
+Cross-Sell
+Upsell
+Staffing
+Store Operations
+Guest Engagement
+• Recommendation Card
+Each recommendation should display:
+• Issue / Opportunity
+• Business Impact
+• Root Cause
+• Recommended Action
+• Confidence
+• Expected Result
+• Affected Stores / Products
+• Example — Stock Redistribution
+Issue:
+Main Gift Shop T-Shirt shortage.
+Recommendation:
+Transfer:
+• 20 units from Waterpark Shop
+• 20 units from Adventure Store
+Expected Lost Sales Avoided:
+• AED 4,200
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 183
+Confidence:
+• 92%
+• Example — Pricing
+Increase Limited Edition Collectible from AED 150 to AED 165.
+Estimated:
+• Demand:
+-2.8%
+• Revenue:
++6.9%
+• Margin:
++11.4%
+• Example — Promotion
+Create targeted 15% promotion for slow-moving Summer Collection among members visiting 
+during the next 14 days.
+Expected Stock Reduction:
+• 28%
+Expected Revenue:
+• AED 72K
+• WHAT-IF SIMULATION
+Authorized users shall be able to simulate commercial scenarios.
+Example:
+What happens if we discount Summer Collection by 20% for seven days?
+• Simulation
+Current Forecast:
+• 620 units
+• AED 68K Revenue
+• AED 39K Margin
+• Proposed Scenario
+• 980 units
+• AED 86K Revenue
+• AED 41K Margin
+Inventory Reduction:
+• +58%
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 184
+Actions
+Save Scenario | Modify | Compare | Submit for Approval
+• MULTI-SCENARIO COMPARISON
+Users should be able to compare alternative strategies.
+Example:
+Scenario Revenue Margin Units Ending Stock
+No Action AED 68K AED 39K 620 840
+10% Discount AED 78K AED 42K 790 670
+20% Discount AED 86K AED 41K 980 480
+Bundle Offer AED 83K AED 44K 860 610
+This enables management to optimize for more than revenue alone.
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 185
+PAGE 10 — AI Assistant, Alerts & Management Action Center
+Purpose
+Provide a conversational interface for management to query Retail data, investigate issues and 
+initiate controlled actions.
+• Natural-Language Questions
+Authorized users should be able to ask:
+How did Retail perform yesterday?
+Which store is underperforming today?
+Why is Exit Kiosk revenue down?
+Which products are likely to run out tomorrow?
+Which products are overstocked?
+Which promotion generated the highest incremental margin?
+Which stores have the highest return rate?
+What are our top-selling products among VIP guests?
+What merchandise should we prepare for Saturday's concert?
+How much revenue did we lose because of stock-outs?
+Which products should we transfer between stores?
+Which products should we consider marking down?
+• Example Response
+Retail generated AED 618,540 today, 9.8% above forecast.
+Main Gift Shop contributed most of the increase.
+Exit Kiosk is 14.2% below forecast, primarily because five high-volume products were unavailable
+between 17:10 and 20:05.
+Estimated lost revenue from stock-outs is AED 8,600.
+I identified sufficient excess stock at Waterpark Shop and Adventure Store to cover 72% of the 
+shortage without external procurement.
+• Suggested Actions
+• View Exit Kiosk
+• Review Stock-Outs
+• Create Transfers
+• View Forecast
+• NATURAL-LANGUAGE CONTROLLED ACTIONS
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 186
+The AI Assistant should allow authorized users to propose business actions.
+Example:
+Transfer 30 black medium T-shirts from Waterpark Shop to Main Gift Shop tomorrow morning.
+TICVAI creates:
+• Proposed Transfer
+• SKU:
+TSH-BLK-M
+• From:
+Waterpark Shop
+• To:
+Main Gift Shop
+• Quantity:
+30
+• Current Source Available:
+86
+• Source Forecast Demand:
+32
+• Destination Available:
+8
+• Destination Forecast Demand:
+44
+Expected Benefit:
+Avoid approximately AED 2,850 of potential lost sales.
+Actions:
+Simulate | Edit | Submit for Approval | Cancel
+The AI shall not bypass operational approvals.
+• AI ROOT-CAUSE ANALYSIS
+TICVAI should correlate information across modules rather than only identify symptoms.
+• Example
+• Issue
+Exit Kiosk Revenue:
+• -14.2% vs Forecast
+• Analysis
+Primary Cause:
+• Product Availability
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 187
+• ↓
+• 5 Top-Selling SKUs Out of Stock
+• ↓
+Underlying Cause:
+• Replenishment Request Submitted Late
+• ↓
+Underlying Cause:
+• Event Demand exceeded original forecast
+• Secondary Cause
+Average Transaction Value:
+• -6.1%
+because cross-sell products were unavailable.
+• Estimated Impact
+Lost Revenue:
+• AED 8,600
+Lost Margin:
+• AED 5,120
+• Recommended Actions
+Transfer stock from nearby stores.
+Increase event safety stock.
+Move replenishment trigger earlier.
+Update event-demand forecast.
+Add alternative cross-sell products.
+• AI EXPLAINABILITY
+Every material AI recommendation shall explain its reasoning.
+Example:
+• Recommendation
+Transfer 40 Logo T-Shirts to Main Gift Shop.
+Why?
+• Available:
+8
+• Forecast Demand:
+52
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 188
+• Safety Stock:
+10
+• Incoming:
+0
+• Waterpark Excess:
+22
+• Adventure Excess:
+28
+• Expected Result
+• Avoided Stock-Out:
+44 units
+• Potential Revenue Protected:
+AED 4,180
+• Confidence
+• 92%
+• Data Used
+Current Inventory
+Reservations
+Sales Velocity
+Attendance Forecast
+Historical Conversion
+Event Schedule
+Store Demand
+• FORECAST ACCURACY & MODEL PERFORMANCE
+TICVAI shall measure its own forecasting accuracy.
+Forecast Predicted Actual Accuracy
+Retail Revenue AED 298K AED 305K 97.7%
+Transactions 4,280 4,390 97.5%
+T-Shirt Units 1,140 1,188 96.0%
+Retail Conversion 24% 24.8% 96.8%
+Accuracy shall be available by:
+Store
+Product
+SKU
+Category
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 189
+Channel
+Forecast Horizon
+Event
+Forecast versions shall be retained so the system compares actual performance with the 
+forecast that existed at that point in time, rather than recalculating historical forecasts.
+• RECOMMENDATION OUTCOME TRACKING
+TICVAI shall measure whether accepted recommendations achieved the expected result.
+• Example
+Recommendation:
+Transfer 40 T-Shirts to Main Gift Shop.
+Expected:
+Avoid AED 4,180 Lost Sales.
+• Outcome
+• Units Transferred:
+40
+• Units Sold:
+37
+• Revenue Generated:
+AED 3,515
+• Remaining:
+3
+• Result
+Recommendation Effectiveness:
+• 84% of predicted revenue impact achieved
+This creates the intelligence loop:
+Detect Recommend Approve Execute Measure Learn → → → → →
+• ANOMALY DETECTION
+TICVAI should proactively identify unusual patterns.
+Examples:
+Sudden Sales Drop
+Unusual Sales Increase
+Margin Deterioration
+Return Spike
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 190
+Excessive Discounts
+Unusual Refunds
+Stock Variance
+Shrinkage Increase
+Stock-Out Pattern
+Promotion Underperformance
+Abnormal Product Demand
+Channel Conversion Drop
+Excessive Manual Price Overrides
+• Example
+• Return Alert — Kids T-Shirt
+Current Return Rate:
+• 11.4%
+Category Average:
+• 3.2%
+Primary Reason:
+• Wrong Size
+AI Observation:
+Size-related returns increased after the new collection launch.
+Recommendation:
+Review size guide and product description before assuming a product-quality issue.
+• LOST SALES INTELLIGENCE
+TICVAI should estimate revenue lost because a product was unavailable.
+• Example
+• Limited Edition Plush
+Unavailable:
+• 14:10–18:35
+• Expected Units:
+68
+• Actual:
+4
+• Estimated Lost Units:
+64
+Estimated Lost Revenue:
+• AED 6,080
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 191
+Estimated Lost Margin:
+• AED 3,420
+Lost-sales analytics shall support:
+Store
+Product
+SKU
+Category
+Event
+Time
+Channel
+• MERCHANDISE / EVENT INTELLIGENCE
+TICVAI should directly correlate Retail demand with ticket and event information.
+• Example
+• Saturday Concert
+• Tickets Sold:
+16,800
+• Forecast Attendance:
+18,500
+• VIP:
+2,100
+• Historical Merchandise Conversion:
+21%
+Forecast Retail Transactions:
+• 3,885
+• Product Forecast
+• Concert T-Shirt:
+2,150
+• Cap:
+980
+• Poster:
+720
+• VIP Collectible:
+640
+• Current Inventory Risk
+Concert T-Shirt:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 192
+• Requirement:
+2,150
+• Available + Incoming:
+1,820
+Projected Shortfall:
+• 330 Units
+• Recommendation
+Allocate additional:
+• 350 units
+before event opening.
+• LOCATION / TIME INTELLIGENCE
+Where permitted by the platform architecture and available data, TICVAI should identify where 
+and when retail demand occurs.
+Example:
+• Main Gift Shop
+Peak:
+• 18:00–21:00
+• Waterpark Shop
+Peak:
+• 14:00–17:00
+• Exit Kiosk
+Peak:
+30 minutes before park closing through 45 minutes after major attraction/event release.
+This information can support:
+Stock Placement
+POS Allocation
+Staff Scheduling
+Mobile POS Deployment
+Promotion Timing
+• CROSS-SELL & MARKET BASKET INTELLIGENCE
+TICVAI should analyze product relationships.
+Example:
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 193
+• T-Shirt Purchasers
+• Cap:
+64%
+• Bag:
+38%
+• Water Bottle:
+32%
+• Keychain:
+18%
+AI Recommendation:
+Promote Logo Cap as the primary cross-sell item for T-Shirt purchases.
+Expected Monthly Revenue Impact:
+• +AED 28,000
+• Negative Relationship
+The system may also identify when products cannibalize each other.
+Example:
+Product A promotion increases sales but reduces Product B sales significantly.
+Board 6 should present net category impact, not only promoted-product performance.
+• RETURN INTELLIGENCE
+Returns should be analyzed as a commercial and operational signal.
+Analyze by:
+Product
+SKU
+Variant
+Store
+Channel
+Supplier
+Return Reason
+Guest Segment
+Employee
+Fulfilment Method
+• Example
+• Kids Hoodie — Size M
+• Return Rate:
+12.4%
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 194
+• Main Reason:
+Sizing
+• Online Return Rate:
+18%
+• Store Return Rate:
+5%
+Possible Action:
+Review digital size guidance.
+This may reveal problems with:
+Product Quality
+Sizing
+Description
+Images
+Fulfilment
+Packaging
+Supplier
+• SHRINKAGE & INVENTORY VARIANCE INTELLIGENCE
+Board 6 shall consume inventory adjustment and stock-count data from Board 4.
+• KPIs
+Shrinkage Value
+Shrinkage %
+Count Variance
+Adjustment Value
+Damage
+Loss
+RFID Variance
+TICVAI may identify unusual patterns for investigation but shall not automatically accuse 
+employees or guests of misconduct.
+• PROFITABILITY INTELLIGENCE
+Retail performance should not be measured only by revenue.
+The system shall support:
+• Gross Sales
+• ↓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 195
+• Discount
+• ↓
+• Promotion
+• ↓
+• Returns
+• ↓
+• Net Sales
+• ↓
+• Product Cost
+• ↓
+• Inventory Loss / Shrinkage
+• ↓
+• Applicable Fulfilment Cost
+• ↓
+• Contribution Margin
+Analysis should be possible by:
+Product
+Category
+Store
+Channel
+Campaign
+Guest Segment
+Event
+• ROLE-BASED INTELLIGENCE
+Board 6 shall use TICVAI's common RBAC/PBAC framework.
+• Executive / CEO
+Revenue
+Margin
+Growth
+Forecast
+Risks
+AI Opportunities
+• Retail Director
+Store Performance
+Product Performance
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 196
+Inventory
+Promotions
+Forecast
+• Store Manager
+Store Sales
+Stock
+Staff
+Returns
+Operational Alerts
+• Commercial / Marketing
+Campaigns
+Promotions
+Conversion
+Guest Segments
+Cross-Sell
+ROI
+• Inventory Manager
+Stock
+Sell-Through
+Replenishment
+Transfers
+Forecast
+• Finance
+Revenue
+Margin
+Discount
+Refund
+Cost
+Profitability
+• CONFIGURABLE DASHBOARD BUILDER
+Authorized users shall be able to configure Retail dashboards without software development.
+• Widget Library
+Examples:
+Revenue
+Transactions
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 197
+ATV
+Units per Transaction
+Margin
+Conversion
+Inventory
+Sell-Through
+Stock-Outs
+Returns
+Promotions
+Forecast
+Guest Spend
+AI Insights
+Alerts
+Users may:
+• Add Widget
+• Drag
+• Resize
+• Filter
+• Save
+• Share
+Dashboards may be:
+Private
+Role-Based
+Store-Based
+Venue-Based
+Shared
+Executive
+• REPORTING, EXPORT & SCHEDULING
+Analytical views shall support appropriate:
+Excel Export
+CSV Export
+PDF Export
+Scheduled Reports
+Email Distribution
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 198
+Saved Views
+Saved Filters
+• Example
+• Weekly Retail Executive Report
+• Every Monday — 08:00
+Recipients:
+• CEO
+Retail Director
+Finance Director
+Contents:
+Sales
+Margin
+Store Performance
+Inventory
+Promotions
+Returns
+Forecast
+Top Risks
+AI Recommendations
+All distribution shall respect tenant and user permissions.
+• APPROVAL & ACTION INTEGRATION
+Board 6 shall not create a separate approval workflow.
+Recommended actions shall use TICVAI's common Approval Engine.
+Examples:
+• Price Change
+• → Retail + Finance
+• Promotion
+• → Commercial + Finance where required
+• Stock Transfer
+• → Inventory
+• Markdown
+• → Retail / Commercial
+• Replenishment
+• → Inventory / Procurement
+• Staffing Change
+• → Resource Management
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 199
+• Product Discontinuation
+• → Retail Management
+• AUDITABILITY
+Material AI-driven or analytical actions shall be traceable.
+Capture where applicable:
+Recommendation ID
+Recommendation Date
+Data Context
+Model / Rule Version
+User
+Simulation
+Decision
+Approval
+Executed Action
+Previous Value
+New Value
+Outcome
+Timestamp
+Management should be able to answer:
+Why did TICVAI recommend this?
+and:
+Who approved it?
+and:
+What happened after implementation?
+• BOARD 6 — FINAL 10 SCREENS
+# Screen
+1 Retail Executive Command Center
+2 Sales, Revenue & Channel Analytics
+3 Store & Operational Performance
+4 Product, SKU & Merchandise Performance
+5 Inventory, Sell-Through & Stock Intelligence
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 200
+# Screen
+6 Guest, Conversion & Basket Intelligence
+7 Promotion, Pricing & Margin Intelligence
+8 Demand Forecasting & Merchandise Planning
+9 AI Recommendation, Simulation & Optimization Center
+10 AI Assistant, Alerts & Management Action Center
+• COMPLETE BOARD 6 INTELLIGENCE FLOW
+POS + Mobile POS + Kiosk + B2C + Guest App
+• ↓
+• Product + SKU + Catalog + Price
+• ↓
+• Retail Inventory + Shared Inventory
+• ↓
+• Promotion + Loyalty + Membership
+• ↓
+• Guest + Ticketing + Attendance + Events
+• ↓
+• Payment + Finance + Resource Management
+• ↓
+• TICVAI RETAIL INTELLIGENCE LAYER
+• Collect
+• ↓
+• Normalize
+• ↓
+• Measure
+• ↓
+• Compare
+• ↓
+• Detect Anomalies
+• ↓
+• Root-Cause Analysis
+• ↓
+• Forecast
+• ↓
+• Recommend
+• ↓
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 201
+• Simulate
+• ↓
+• Approval
+• ↓
+• Execute through Source Module
+• ↓
+• Measure Outcome
+• ↓
+• Improve Future Recommendations
+• ARCHITECTURAL REQUIREMENT
+Board 6 should not be developed as ten independent reporting screens.
+It should sit on TICVAI's common Analytics, Forecasting & AI Intelligence Layer, the same 
+underlying intelligence architecture we established for F&B.
+The architecture should therefore be:
+• Operational Modules
+Retail + F&B + Ticketing + Inventory + Procurement + CRM + Loyalty + Resource Management + 
+Finance
+• ↓
+• Unified Data & Analytics Layer
+• ↓
+• KPI / Reporting Engine
+• ↓
+• Forecasting Engine
+• ↓
+• Anomaly Detection
+• ↓
+• Root-Cause Analysis
+• ↓
+• AI Recommendation Engine
+• ↓
+• Simulation / What-If Engine
+• ↓
+• Approval & Action Engine
+• ↓
+• Operational Modules
+
+TICVAI | RETAIL BACKEND STRUCTURE
+FUNCTIONAL REFERENCE • 202
+• ↓
+• Outcome Measurement
+The specialized Retail Board 6 sits on top of this common intelligence architecture.
+This means TICVAI does not need one AI engine for F&B and another AI engine for Retail. The 
+underlying AI and analytics architecture should be shared, while each module provides its own 
+business context, KPIs, forecasting models, rules and recommendations.
+• Final Retail Structure
+With Board 6, the Retail backend is structured as:
+• Board 1 — Store & Operational Configuration
+• Board 2 — Product, Catalog, Pricing & Merchandising
+• Board 3 — POS, Sales, Returns & Fulfilment
+• Board 4 — Store Stock, Transfers & Operational Inventory
+• Board 5 — Promotions, Omnichannel Commerce & Guest Engagement
+• Board 6 — Intelligence, Analytics, Forecasting & AI Optimization
+This gives us a clean boundary for the next stage: Shared Inventory & Procurement should 
+provide the common enterprise backbone underneath both Retail Board 4 and the 
+corresponding F&B inventory/production workflows, rather than rebuilding inventory for a 
+third time.

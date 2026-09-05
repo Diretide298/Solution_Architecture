@@ -20,10 +20,13 @@ packages:
 - ui
 - api-client
 contracts:
+- ai
 - finance
 - identity
 - marketing-crm
+- queue
 - reporting
+- white-label
 deployment:
   target: browser, desktop
   distribution: served from the cell

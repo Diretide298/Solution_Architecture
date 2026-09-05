@@ -1,0 +1,110 @@
+_note: '**The issue log for screen ids, and the reason it exists.** On 4 September two workstreams both
+  allocated ADM-038 — each took max+1 of the same prefix, neither could see the other, and nothing in
+  the package held a number. One was ''Dead Letters'', the other ''Communication Service Command Center''.
+  The collision was silent on both sides.
+
+
+  **An id appears here when it is issued, not when it is built.** That is the whole mechanism: a number
+  in this file is spent, and the next allocator starts above the highest number recorded rather than above
+  the highest number it can see.
+
+
+  **A retired id is never reissued.** `nextFree` is the high-water mark plus one, gaps included — reusing
+  a deleted screen''s number is how an old link opens the wrong screen.
+
+
+  `tools/check-screens.py` fails on a screen issued above the recorded high-water mark. Regenerate with
+  `tools/derive-id-register.py --apply` and commit it in the same change.'
+generatedBy: tools/derive-id-register.py
+updated: '2026-09-04'
+prefixes:
+  ACC:
+    issued: 8
+    highWaterMark: 8
+    nextFree: 9
+    authored: 1-8
+    generatedPack: null
+  ADM:
+    issued: 318
+    highWaterMark: 318
+    nextFree: 319
+    authored: 1-318
+    generatedPack: 38-317
+  ANL:
+    issued: 10
+    highWaterMark: 10
+    nextFree: 11
+    authored: 1-10
+    generatedPack: null
+  BO:
+    issued: 363
+    highWaterMark: 363
+    nextFree: 364
+    authored: 1-143
+    generatedPack: 144-363
+  CMS:
+    issued: 60
+    highWaterMark: 60
+    nextFree: 61
+    authored: 1-20
+    generatedPack: 21-60
+  DEV:
+    issued: 8
+    highWaterMark: 8
+    nextFree: 9
+    authored: 1-8
+    generatedPack: null
+  EMP:
+    issued: 66
+    highWaterMark: 70
+    nextFree: 71
+    authored: 1-70
+    generatedPack: null
+  GST:
+    issued: 71
+    highWaterMark: 73
+    nextFree: 74
+    authored: 1-73
+    generatedPack: null
+  KIT:
+    issued: 10
+    highWaterMark: 10
+    nextFree: 11
+    authored: 1-10
+    generatedPack: null
+  KSK:
+    issued: 17
+    highWaterMark: 17
+    nextFree: 18
+    authored: 1-17
+    generatedPack: null
+  POS:
+    issued: 24
+    highWaterMark: 24
+    nextFree: 25
+    authored: 1-24
+    generatedPack: null
+  PTR:
+    issued: 51
+    highWaterMark: 51
+    nextFree: 52
+    authored: 1-21
+    generatedPack: 22-51
+  SCN:
+    issued: 11
+    highWaterMark: 16
+    nextFree: 17
+    authored: 1-16
+    generatedPack: null
+  SUP:
+    issued: 28
+    highWaterMark: 28
+    nextFree: 29
+    authored: 1-8
+    generatedPack: 9-28
+  WEB:
+    issued: 46
+    highWaterMark: 46
+    nextFree: 47
+    authored: 1-46
+    generatedPack: null

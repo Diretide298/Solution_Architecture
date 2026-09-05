@@ -603,6 +603,35 @@ function sectionHead(group) {
   return wrap;
 }
 
+/**
+ * Where a frame came from, in terms somebody can act on.
+ *
+ * **This column used to say "a screen" on almost every row, which is true and useless.**
+ * `f.source` only records which artefact supplied the frame's NAME — the board's own markup or
+ * the screen pointing at it — so every generated board collapsed to one word that answered a
+ * question nobody was asking.
+ *
+ * The question the column is actually for is *who made this*, because that decides who can change
+ * it. A client pack is drawn by the design team and must never be regenerated over; a `P##` board
+ * is written by `derive-wireframes.py` from `screens/`; a `WS##` board is a client workshop board
+ * rendered by `derive-pack-boards.py`. Those are three different obligations wearing one label.
+ *
+ * The name-source is kept as the second half, because it still matters for the unnamed rows.
+ */
+function provenance(b, f) {
+  const file = b.file ?? '';
+  let made;
+  if (b.folder !== 'wireframes') made = 'an earlier design drop';
+  else if (/^P\d\d /.test(file)) made = 'we generated it, from screens';
+  else if (/^WS\d\d /.test(file)) made = 'a client workshop board';
+  else made = 'a client pack, drawn';
+
+  const named = f.source === 'board' ? 'named in the board'
+    : f.source === 'screen' ? 'named by the screen that points at it'
+      : 'nothing names it';
+  return `${made} · ${named}`;
+}
+
 /** The flat worklist: one row per frame, across every board on the page. */
 function framesTable(shown) {
   const rows = [];
@@ -621,7 +650,7 @@ function framesTable(shown) {
   const table = el('table', 'bd-table');
   const thead = el('thead');
   const hr = el('tr');
-  for (const h of ['Frame', 'What names it', 'Board', 'From']) hr.append(el('th', null, h));
+  for (const h of ['Frame', 'What names it', 'Board', 'Where it came from']) hr.append(el('th', null, h));
   thead.append(hr);
   table.append(thead);
 
@@ -650,8 +679,7 @@ function framesTable(shown) {
     boardCell.append(pickIt);
     tr.append(boardCell);
 
-    tr.append(el('td', 'bd-dim',
-      f.source === 'board' ? 'the board' : f.source === 'screen' ? 'a screen' : '—'));
+    tr.append(el('td', 'bd-dim', provenance(b, f)));
     tb.append(tr);
   }
   table.append(tb);

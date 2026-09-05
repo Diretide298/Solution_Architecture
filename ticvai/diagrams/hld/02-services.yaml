@@ -16,8 +16,8 @@ tiers:
     Identity and 289 tables anchor on `platform.org_unit`.
   services:
   - service: TenancyService
-    operations: 52
-    tables: 35
+    operations: 76
+    tables: 38
     schemas:
     - platform
     - workforce
@@ -46,7 +46,7 @@ tiers:
   meaning: The sale path. Highest availability and the highest write rate in the platform.
   services:
   - service: CatalogueService
-    operations: 136
+    operations: 340
     tables: 40
     schemas:
     - catalogue
@@ -62,7 +62,7 @@ tiers:
     ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
     ref: diagrams/lld/services/CatalogueService.yaml
   - service: OrderService
-    operations: 97
+    operations: 186
     tables: 34
     schemas:
     - orders
@@ -73,6 +73,18 @@ tiers:
     scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
     ifDown: '**Down means no sales.** Highest availability target in the platform.'
     ref: diagrams/lld/services/OrderService.yaml
+  - service: AccessService
+    operations: 177
+    tables: 8
+    schemas:
+    - access
+    contracts:
+    - access
+    flowCoverage: 57%
+    scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than
+      replayed** precisely because the gate cannot afford the arithmetic.
+    ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
+    ref: diagrams/lld/services/AccessService.yaml
   - service: LedgerService
     operations: 56
     tables: 18
@@ -85,18 +97,6 @@ tiers:
     ifDown: '**Correctness over availability.** A ledger that is briefly unavailable is recoverable;
       one that is briefly wrong is not.'
     ref: diagrams/lld/services/LedgerService.yaml
-  - service: AccessService
-    operations: 31
-    tables: 8
-    schemas:
-    - access
-    contracts:
-    - access
-    flowCoverage: 57%
-    scale: Read-heavy, extreme latency sensitivity, edge-cached. **`frozenDays` is held rather than
-      replayed** precisely because the gate cannot afford the arithmetic.
-    ifDown: Down means the gates stop. Runs at the edge with a local decision cache.
-    ref: diagrams/lld/services/AccessService.yaml
 - tier: operations
   meaning: What a venue does with what it sold. **Licensed per module** — a venue that bought none of
     these runs none of them.
@@ -145,8 +145,8 @@ tiers:
     ifDown: Down blocks receiving and counting; selling continues from the till's cache.
     ref: diagrams/lld/services/InventoryService.yaml
   - service: RetailService
-    operations: 35
-    tables: 14
+    operations: 37
+    tables: 15
     schemas:
     - retail
     contracts:
@@ -160,8 +160,8 @@ tiers:
     property and one that should be tested rather than assumed.
   services:
   - service: MarketingService
-    operations: 96
-    tables: 37
+    operations: 166
+    tables: 38
     schemas:
     - marketing
     contracts:
@@ -171,8 +171,8 @@ tiers:
     ifDown: Down stops campaigns and guest lookup. Neither stops trading.
     ref: diagrams/lld/services/MarketingService.yaml
   - service: AiService
-    operations: 30
-    tables: 15
+    operations: 31
+    tables: 16
     schemas:
     - ai
     - qdrant
@@ -186,8 +186,8 @@ tiers:
   meaning: Provisioning, publishing, reporting, and the one path that crosses a region.
   services:
   - service: PlatformService
-    operations: 102
-    tables: 42
+    operations: 167
+    tables: 50
     schemas:
     - control
     contracts:
@@ -226,7 +226,7 @@ tiers:
     schemas:
     - sync
     contracts:
-    - cross-cell
+    - cross-region
     flowCoverage: 31%
     scale: Low volume, high scrutiny.
     ifDown: Down blocks cross-region entitlements. Each region continues alone.
@@ -246,6 +246,16 @@ crossServiceWrites:
   to: AccessService
   writes: 7
   reads: 12
+  kind: strong
+- from: PlatformService
+  to: TenancyService
+  writes: 7
+  reads: 7
+  kind: strong
+- from: OrderService
+  to: TenancyService
+  writes: 5
+  reads: 8
   kind: strong
 - from: OrderService
   to: CatalogueService
@@ -272,10 +282,25 @@ crossServiceWrites:
   writes: 3
   reads: 4
   kind: ordinary
+- from: InventoryService
+  to: TenancyService
+  writes: 3
+  reads: 0
+  kind: ordinary
+- from: LedgerService
+  to: TenancyService
+  writes: 3
+  reads: 3
+  kind: ordinary
 - from: OrderService
   to: MarketingService
   writes: 3
   reads: 1
+  kind: ordinary
+- from: PlatformService
+  to: OrderService
+  writes: 3
+  reads: 4
   kind: ordinary
 - from: WhiteLabelService
   to: PlatformService
@@ -286,6 +311,11 @@ crossServiceWrites:
   to: IdentityService
   writes: 2
   reads: 8
+  kind: ordinary
+- from: CatalogueService
+  to: TenancyService
+  writes: 2
+  reads: 1
   kind: ordinary
 - from: FnbService
   to: CatalogueService
@@ -307,11 +337,6 @@ crossServiceWrites:
   writes: 2
   reads: 1
   kind: ordinary
-- from: PlatformService
-  to: TenancyService
-  writes: 2
-  reads: 4
-  kind: ordinary
 - from: ReportingService
   to: AiService
   writes: 2
@@ -323,8 +348,18 @@ crossServiceWrites:
   reads: 0
   kind: ordinary
 - from: VenueOpsService
+  to: TenancyService
+  writes: 2
+  reads: 4
+  kind: ordinary
+- from: VenueOpsService
   to: OrderService
   writes: 2
+  reads: 0
+  kind: ordinary
+- from: AccessService
+  to: TenancyService
+  writes: 1
   reads: 0
   kind: ordinary
 - from: AccessService
@@ -336,6 +371,11 @@ crossServiceWrites:
   to: MarketingService
   writes: 1
   reads: 1
+  kind: ordinary
+- from: FnbService
+  to: TenancyService
+  writes: 1
+  reads: 5
   kind: ordinary
 - from: IdentityService
   to: OrderService
@@ -352,15 +392,10 @@ crossServiceWrites:
   writes: 1
   reads: 5
   kind: ordinary
-- from: InventoryService
+- from: MarketingService
   to: TenancyService
   writes: 1
-  reads: 0
-  kind: ordinary
-- from: LedgerService
-  to: TenancyService
-  writes: 1
-  reads: 3
+  reads: 1
   kind: ordinary
 - from: MarketingService
   to: OrderService
@@ -387,6 +422,11 @@ crossServiceWrites:
   writes: 1
   reads: 0
   kind: ordinary
+- from: PlatformService
+  to: CrossRegionService
+  writes: 1
+  reads: 0
+  kind: ordinary
 - from: TenancyService
   to: MarketingService
   writes: 1
@@ -407,6 +447,11 @@ crossServiceWrites:
   writes: 1
   reads: 0
   kind: ordinary
+- from: WhiteLabelService
+  to: TenancyService
+  writes: 1
+  reads: 0
+  kind: ordinary
 deployOrder:
 - order: 1
   tier: foundation
@@ -423,8 +468,8 @@ deployOrder:
   rule: '**Can ship late and be down.**'
 - order: 5
   tier: platform
-  rule: Control provisions a tenant rather than serving one. CrossCell only matters once a second region
-    exists.
+  rule: Control provisions a tenant rather than serving one. CrossRegion only matters once a second
+    region exists.
 canBeDownWithoutStoppingASale:
 - MarketingService
 - AiService

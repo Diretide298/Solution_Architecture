@@ -30,7 +30,7 @@ operationsByContract:
     path: /alerts/{alertId}/acknowledge
     scope: venue
     permission: REPORT_VIEW_VENUE
-    offline: true
+    offline: false
     reads: 3
     writes: 2
   - operation: askReportingQuestion
@@ -258,6 +258,13 @@ operationsByContract:
     reads: 3
     writes: 3
 tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: reporting.alert
   columns: 12
   store: postgres
@@ -266,23 +273,23 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.alert_rule
-  columns: 12
+  columns: 13
   store: postgres
   parent: null
   writtenBy:
   - reporting
   foreignWriters: null
 - table: reporting.dashboard
-  columns: 9
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - reporting
   foreignWriters: null
 - table: reporting.dashboard_tile
-  columns: 7
+  columns: 8
   store: postgres
-  parent: null
+  parent: reporting.dashboard
   writtenBy:
   - reporting
   foreignWriters: null
@@ -301,48 +308,48 @@ tables:
   - reporting
   foreignWriters: null
 - table: reporting.report_column
-  columns: 8
+  columns: 9
   store: postgres
-  parent: null
+  parent: reporting.report_definition
   writtenBy:
   - reporting
   foreignWriters: null
 - table: reporting.report_definition
-  columns: 18
-  store: postgres
-  parent: null
-  writtenBy:
-  - reporting
-  foreignWriters: null
-- table: reporting.report_field
-  columns: 1
-  store: derived
-  parent: null
-  writtenBy: []
-  foreignWriters: null
-- table: reporting.report_filter
-  columns: 7
-  store: postgres
-  parent: null
-  writtenBy:
-  - reporting
-  foreignWriters: null
-- table: reporting.report_parameter
-  columns: 6
-  store: postgres
-  parent: null
-  writtenBy:
-  - reporting
-  foreignWriters: null
-- table: reporting.schedule
   columns: 16
   store: postgres
   parent: null
   writtenBy:
   - reporting
   foreignWriters: null
+- table: reporting.report_field
+  columns: 2
+  store: derived
+  parent: null
+  writtenBy: []
+  foreignWriters: null
+- table: reporting.report_filter
+  columns: 8
+  store: postgres
+  parent: reporting.report_definition
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.report_parameter
+  columns: 7
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
+- table: reporting.schedule
+  columns: 15
+  store: postgres
+  parent: null
+  writtenBy:
+  - reporting
+  foreignWriters: null
 - table: reporting.schedule_recipient
-  columns: 3
+  columns: 4
   store: postgres
   parent: null
   writtenBy:

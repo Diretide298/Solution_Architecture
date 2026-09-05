@@ -1,7 +1,3 @@
-# P12 — Support Agent Console
-# Generated from handoff/page-inventory.md. Layout, states and purpose are TODO.
-# Validated against _schema.yaml; component kinds from _components.yaml.
-
 platform:
   code: P12
   audience: staff
@@ -17,7 +13,7 @@ platform:
   directions:
   - ltr
   - rtl
-  screenCount: 8
+  screenCount: 28
   app: venue-support-web
   appStatus: not scaffolded
   packages:
@@ -55,7 +51,7 @@ platform:
 screens:
 - id: SUP-001
   name: Agent Login
-  module: TODO
+  module: Access & Availability
   purpose: Get someone into the app, fast, on a device that may be shared.
   wave: 3
   layout:
@@ -68,8 +64,17 @@ screens:
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `SESSION_FORCE_LOGOUT` to use sessions; a person without it sees the reason and who to ask,
+      because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Could not load. Editing is blocked
   wireframe:
     status: generated
@@ -130,9 +135,10 @@ screens:
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: core
+  statesDerived: true
 - id: SUP-002
   name: Agent Dashboard
-  module: TODO
+  module: Overview
   purpose: The screen this app sits on. Everything else is entered from here and returns to it.
   wave: 3
   layout:
@@ -145,11 +151,23 @@ screens:
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who to
+      ask, because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
-    board: wireframes/P12 Venue Support.dc.html#sup-002
+    status: designed
+    board: wireframes/Dashboards Board.dc.html#sup-002
+    generatedFallback: wireframes/P12 Venue Support.dc.html#sup-002
   capability: C32
   apis:
   - operationId: listCases
@@ -203,17 +221,27 @@ screens:
     - SUP-004
   notes: States derived from the screen pattern on 17 August, not individually considered — sound for
     a list, a form or a money screen, and worth revisiting where this screen is unusual. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
+    from the screen name and its operations on 17 August, not from a requirement. **Drawn 26 August**
+    — `Dashboards Board` frame `sup-002`. **One board draws five dashboards across five platforms** —
+    platform admin, partner, support, guest web and cross-tenant health. A dashboard is a shape rather
+    than a domain, and the pack recognised that before the package did.
   density: compact
   entryState:
     params:
     - name: caseId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `caseId`.'
   requiresModule: marketing
+  statesDerived: true
+  boardFrames:
+  - Dashboards Board.dc.html#sup-002
 - id: SUP-003
   name: Availability & Routing Settings
-  module: TODO
+  module: Access & Availability
   purpose: Change how availability behaves here, and see which level the current value came from.
   wave: 3
   layout:
@@ -227,9 +255,19 @@ screens:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
       (ADR-0018)
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
-    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
-      overwrites what someone else set'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE` to manage cases; a person without it sees the reason and who to ask, because
+      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
+      what someone else set'
   wireframe:
     status: generated
     board: wireframes/P12 Venue Support.dc.html#sup-003
@@ -258,9 +296,10 @@ screens:
     trigger: onAction
   density: compact
   requiresModule: marketing
+  statesDerived: true
 - id: SUP-004
   name: Conversation Queue
-  module: TODO
+  module: Conversations
   purpose: Find the right one quickly, and act on it without opening it.
   wave: 2
   layout:
@@ -273,8 +312,21 @@ screens:
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who to
+      ask, because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
     status: generated
@@ -350,9 +402,10 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
   requiresModule: marketing
+  statesDerived: true
 - id: SUP-005
   name: Live Chat Workspace
-  module: TODO
+  module: Conversations
   purpose: Work with live chat workspace for this venue.
   wave: 2
   layout:
@@ -361,11 +414,41 @@ screens:
     - name: contentBody
       components:
       - kind: detailPanel
+      - kind: primaryButton
+        derived: true
+        impliedBy: addCaseMessage
+        label: Add case message
+        notes: The act the screen exists for.
+      - kind: dataTable
+        derived: true
+        impliedBy: listCases
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addCaseMessage
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_MANAGE`, `CASE_VIEW` to manage cases; a person without it sees the reason and who to
+      ask, because an empty table reads as *there is no data* and sends somebody to support with the wrong
+      question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
+    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
+      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
+      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
+      when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
     status: generated
     board: wireframes/P12 Venue Support.dc.html#sup-005
@@ -445,9 +528,10 @@ screens:
       from: SUP-004
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
   requiresModule: marketing
+  statesDerived: true
 - id: SUP-006
   name: Knowledge Base Search
-  module: TODO
+  module: Knowledge & Responses
   purpose: Find something when the guest does not know what it is called.
   wave: 3
   layout:
@@ -460,14 +544,26 @@ screens:
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Never rendered as an empty list.** A person who cannot see this screen is told so
+      and told who to ask — an empty table reads as *there is no data*, which sends somebody to support
+      with the wrong question.'
     error: Could not load
   wireframe:
     status: generated
     board: wireframes/P12 Venue Support.dc.html#sup-006
   capability: C105
-  apis: []
+  apis:
+  - operationId: listKnowledgeCollections
+    contract: ai
+    purpose: Collections an agent may search
+    trigger: onLoad
+  - operationId: listFaqs
+    contract: white-label
+    purpose: Published answers, as the guest sees them
+    trigger: onLoad
   implementation:
     app: venue-support-web
     route: /general/knowledge-base-search
@@ -500,11 +596,15 @@ screens:
       from: deepLink
     - name: version
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A version link is expected to point at something superseded — that is what versions
+      are for.** The screen opens the requested version read-only, says it is not current, and links to
+      the one that is. **An old version is history, not an error.** Arrives with `bannerId`, `pageId`,
+      `policyKind`.'
   requiresModule: core
+  statesDerived: true
 - id: SUP-007
   name: Canned Response Management
-  module: TODO
+  module: Knowledge & Responses
   purpose: Find canned response management for this venue.
   wave: 3
   layout:
@@ -518,9 +618,20 @@ screens:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
       (ADR-0018)
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
-    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently
-      overwrites what someone else set'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `MARKETING_MANAGE`, `MARKETING_VIEW` to manage marketings; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `marketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
+    error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
+      what someone else set'
   wireframe:
     status: generated
     board: wireframes/P12 Venue Support.dc.html#sup-007
@@ -552,9 +663,10 @@ screens:
     from the screen name and its operations on 17 August, not from a requirement.
   density: compact
   requiresModule: marketing
+  statesDerived: true
 - id: SUP-008
   name: Agent Performance & SLA View
-  module: TODO
+  module: Overview
   purpose: Produce agent performance & sla view for this venue.
   wave: 3
   layout:
@@ -567,7 +679,18 @@ screens:
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASE_VIEW`, `REPORT_MANAGE`, `REPORT_VIEW_VENUE` to read cases; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
   wireframe:
     status: generated
@@ -640,3 +763,1131 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
   requiresModule: analytics
+  statesDerived: true
+- id: SUP-009
+  name: Customer Service Command Center
+  module: Support
+  requiresModule: marketing
+  purpose: Provide every customer-service agent with a personalized operational workspace showing customers,
+    cases, tasks, SLAs, alerts and workload.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: My Open Cases
+      - kind: metricTile
+        notes: New Cases
+      - kind: metricTile
+        notes: Cases Due Today
+      - kind: metricTile
+        notes: SLA At Risk
+      - kind: metricTile
+        notes: SLA Breached
+      - kind: metricTile
+        notes: Awaiting Customer
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first customer entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCustomerService
+    contract: marketing-crm
+    purpose: Customer Service Command Center
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/customer-service-command-center-sup-009
+    component: apps/venue-support-web/src/routes/support/CustomerServiceCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-009
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-009
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.1
+    page: 3
+  navigation:
+    entryFrom:
+    - SUP-001
+    exitTo:
+    - SUP-001
+    - SUP-010
+    - SUP-011
+    - SUP-012
+    - SUP-013
+    - SUP-014
+    - SUP-015
+    - SUP-016
+    - SUP-017
+    - SUP-018
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: SUP-010
+  name: Customer 360° Service Profile
+  module: Support
+  requiresModule: marketing
+  purpose: Provide the agent with a complete customer-service view of the customer. This should be one
+    of the most important screens in the entire Customer Service module.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first customer entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCustomerServiceProfile
+    contract: marketing-crm
+    purpose: Customer 360° Service Profile
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/customer-360-service-profile-sup-010
+    component: apps/venue-support-web/src/routes/support/Customer360ServiceProfile.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-010
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-010
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.2
+    page: 5
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-011
+  name: Unified Interaction & Communication History
+  module: Support
+  requiresModule: marketing
+  purpose: Provide one chronological timeline of customer interactions across supported service channels.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: timeline
+        notes: What changed, when, and by whom
+      - kind: searchField
+        notes: Find a change
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first unified entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listUnifiedInteractionCommunication
+    contract: marketing-crm
+    purpose: Unified Interaction & Communication History
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/unified-interaction-communication-history-sup-011
+    component: apps/venue-support-web/src/routes/support/UnifiedInteractionCommunicationHistory.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-011
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-011
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.3
+    page: 7
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-012
+  name: Case Creation, Classification & Intelligent Routing
+  module: Support
+  requiresModule: marketing
+  purpose: Create structured customer-service cases and ensure they reach the correct team.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first case entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: createCaseClassificationIntelligent
+    contract: marketing-crm
+    purpose: Case Creation, Classification & Intelligent Routing
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /support/case-creation-classification-intelligent-routing-sup-012
+    component: apps/venue-support-web/src/routes/support/CaseCreationClassificationIntelligentRouting.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-012
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-012
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.4
+    page: 9
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-013
+  name: Case Investigation & Resolution Workspace
+  module: Support
+  requiresModule: marketing
+  purpose: Provide the primary workspace in which an agent investigates and resolves a case.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first case entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setCaseInvestigationResolution
+    contract: marketing-crm
+    purpose: Case Investigation & Resolution Workspace
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /support/case-investigation-resolution-workspace-sup-013
+    component: apps/venue-support-web/src/routes/support/CaseInvestigationResolutionWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-013
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-013
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.5
+    page: 11
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-014
+  name: Order, Booking & Ticket Service Workspace
+  module: Support
+  requiresModule: marketing
+  purpose: Allow customer-service agents to perform permitted ticket/order servicing without entering
+    the underlying technical modules.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first order, entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setOrderBookingTicket
+    contract: marketing-crm
+    purpose: Order, Booking & Ticket Service Workspace
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /support/order-booking-ticket-service-workspace-sup-014
+    component: apps/venue-support-web/src/routes/support/OrderBookingTicketServiceWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-014
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-014
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.6
+    page: 13
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-015
+  name: Refund, Compensation & Service Exception Workspace
+  module: Support
+  requiresModule: marketing
+  purpose: Manage cases requiring money, compensation, goodwill or policy exceptions.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first refund, entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setRefundCompensationService
+    contract: marketing-crm
+    purpose: Refund, Compensation & Service Exception Workspace
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /support/refund-compensation-service-exception-workspace-sup-015
+    component: apps/venue-support-web/src/routes/support/RefundCompensationServiceExceptionWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-015
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-015
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.7
+    page: 15
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-016
+  name: Escalation, Collaboration & Internal Resolution
+  module: Support
+  requiresModule: marketing
+  purpose: Allow Customer Service to collaborate with other TICVAI departments without losing ownership
+    of the customer case.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first escalation, entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listEscalationCollaborationInternal
+    contract: marketing-crm
+    purpose: Escalation, Collaboration & Internal Resolution
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/escalation-collaboration-internal-resolution-sup-016
+    component: apps/venue-support-web/src/routes/support/EscalationCollaborationInternalResolution.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-016
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-016
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.8
+    page: 16
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-017
+  name: Case Resolution, Closure & Customer Feedback
+  module: Support
+  requiresModule: marketing
+  purpose: Govern how cases are resolved and formally closed.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first case entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCaseResolutionClosure
+    contract: marketing-crm
+    purpose: Case Resolution, Closure & Customer Feedback
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/case-resolution-closure-customer-feedback-sup-017
+    component: apps/venue-support-web/src/routes/support/CaseResolutionClosureCustomerFeedback.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-017
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-017
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.9
+    page: 17
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-018
+  name: AI Customer Service Copilot & Knowledge Workspace
+  module: Support
+  requiresModule: marketing
+  purpose: Create the AI intelligence layer assisting agents throughout the service journey. This should
+    not be a simple chatbot added to the side of the screen. It should understand the customer + transaction
+    + policy + case context.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first ai entry, and this state
+      carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setCustomerServiceCopilot
+    contract: marketing-crm
+    purpose: AI Customer Service Copilot & Knowledge Workspace
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /support/ai-customer-service-copilot-knowledge-workspace-sup-018
+    component: apps/venue-support-web/src/routes/support/AiCustomerServiceCopilotKnowledgeWorkspace.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-018
+    workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-018
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '1'
+    number: 10.1.10
+    page: 19
+  navigation:
+    entryFrom:
+    - SUP-009
+    exitTo:
+    - SUP-009
+    inferred: false
+    notes: '**Reached from SUP-009, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-019
+  name: Contact Center Operations Command Center
+  module: Support
+  requiresModule: marketing
+  purpose: Provide supervisors and management with a real-time view of customer-service operations across
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Cases Today
+      - kind: metricTile
+        notes: Open Cases
+      - kind: metricTile
+        notes: Unassigned Cases
+      - kind: metricTile
+        notes: Customers Waiting
+      - kind: metricTile
+        notes: Critical Cases
+      - kind: metricTile
+        notes: SLA At Risk
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first contact entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listContact
+    contract: marketing-crm
+    purpose: Contact Center Operations Command Center
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/contact-center-operations-command-center-sup-019
+    component: apps/venue-support-web/src/routes/support/ContactCenterOperationsCommandCenter.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-019
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-019
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.1
+    page: 24
+  navigation:
+    entryFrom:
+    - SUP-001
+    exitTo:
+    - SUP-001
+    - SUP-020
+    - SUP-021
+    - SUP-022
+    - SUP-023
+    - SUP-024
+    - SUP-025
+    - SUP-026
+    - SUP-027
+    - SUP-028
+    inferred: false
+    notes: '**The board''s hub.** The workshop specified this module as boards of ten and opened each
+      with a command centre; the other nine screens are that board''s detail, so they are reached from
+      here and return here.'
+- id: SUP-020
+  name: Queue Configuration & Management
+  module: Support
+  requiresModule: marketing
+  purpose: Configure and operate the queues through which customer-service cases are organized.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: detailPanel
+        notes: The configuration being edited
+      - kind: selectField
+        notes: Scope this applies at
+      - kind: toggle
+        notes: Active
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first queue entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listQueues
+    contract: queue
+    purpose: List queues
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/queue-configuration-management-sup-020
+    component: apps/venue-support-web/src/routes/support/QueueConfigurationManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-020
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-020
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.2
+    page: 25
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-021
+  name: Intelligent Routing, Skills & Assignment Engine
+  module: Support
+  requiresModule: marketing
+  purpose: Determine the best agent or team to handle each customer request.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first intelligent entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: setIntelligentRoutingSkill
+    contract: marketing-crm
+    purpose: Intelligent Routing, Skills & Assignment Engine
+    trigger: onAction
+  implementation:
+    app: venue-support-web
+    route: /support/intelligent-routing-skills-assignment-engine-sup-021
+    component: apps/venue-support-web/src/routes/support/IntelligentRoutingSkillsAssignmentEngine.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-021
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-021
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.3
+    page: 27
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-022
+  name: SLA Policy & Service-Level Management
+  module: Support
+  requiresModule: marketing
+  purpose: Define and monitor service-level commitments for different customer-service scenarios.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first sla entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listSlaPolicyService
+    contract: marketing-crm
+    purpose: SLA Policy & Service-Level Management
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/sla-policy-service-level-management-sup-022
+    component: apps/venue-support-web/src/routes/support/SlaPolicyServiceLevelManagement.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-022
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-022
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.4
+    page: 29
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-023
+  name: Agent Workload, Availability & Workforce Control
+  module: Support
+  requiresModule: marketing
+  purpose: Give supervisors visibility and control over active customer-service resources.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first agent entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listAgentWorkloadAvailability
+    contract: marketing-crm
+    purpose: Agent Workload, Availability & Workforce Control
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/agent-workload-availability-workforce-control-sup-023
+    component: apps/venue-support-web/src/routes/support/AgentWorkloadAvailabilityWorkforceControl.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-023
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-023
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.5
+    page: 31
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-024
+  name: Escalation & Critical Case Monitor
+  module: Support
+  requiresModule: marketing
+  purpose: Provide supervisors with one workspace for cases requiring elevated attention.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Escalated Cases
+      - kind: metricTile
+        notes: Critical Cases
+      - kind: metricTile
+        notes: SLA Breaches
+      - kind: metricTile
+        notes: VIP Escalations
+      - kind: metricTile
+        notes: Financial Escalations
+      - kind: metricTile
+        notes: Event-Day Escalations
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first escalation entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listEscalationCriticalCase
+    contract: marketing-crm
+    purpose: Escalation & Critical Case Monitor
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/escalation-critical-case-monitor-sup-024
+    component: apps/venue-support-web/src/routes/support/EscalationCriticalCaseMonitor.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-024
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-024
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.6
+    page: 32
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-025
+  name: Quality Management & Agent Evaluation
+  module: Support
+  requiresModule: marketing
+  purpose: Measure whether customer-service interactions meet TICVAI's defined service-quality standards.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first quality entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listQualityAgentEvaluation
+    contract: marketing-crm
+    purpose: Quality Management & Agent Evaluation
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/quality-management-agent-evaluation-sup-025
+    component: apps/venue-support-web/src/routes/support/QualityManagementAgentEvaluation.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-025
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-025
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.7
+    page: 34
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-026
+  name: Customer Satisfaction, Feedback & Voice of Customer
+  module: Support
+  requiresModule: marketing
+  purpose: Measure customer perception of TICVAI's support experience and identify recurring service problems.
+  wave: 3
+  density: compact
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      components:
+      - kind: searchField
+        notes: Find a record
+      - kind: dataTable
+        notes: Every record with its status
+      - kind: detailPanel
+        notes: The selected record
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first customer entry, and
+      this state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listCustomerSatisfactionFeedback
+    contract: marketing-crm
+    purpose: Customer Satisfaction, Feedback & Voice of Customer
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/customer-satisfaction-feedback-voice-of-customer-sup-026
+    component: apps/venue-support-web/src/routes/support/CustomerSatisfactionFeedbackVoiceOfCustomer.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-026
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-026
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.8
+    page: 35
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-027
+  name: Service Analytics & Root-Cause Intelligence
+  module: Support
+  requiresModule: marketing
+  purpose: Provide comprehensive analytics explaining why customers contact TICVAI and what is driving
+    service demand.
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first service entry, and this
+      state carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listServiceRootCause
+    contract: marketing-crm
+    purpose: Service Analytics & Root-Cause Intelligence
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/service-analytics-root-cause-intelligence-sup-027
+    component: apps/venue-support-web/src/routes/support/ServiceAnalyticsRootCauseIntelligence.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-027
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-027
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.9
+    page: 37
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'
+- id: SUP-028
+  name: AI Contact Center Intelligence & Automation Studio
+  module: Support
+  requiresModule: marketing
+  purpose: Create the management-level AI intelligence layer for Customer Service. This is different from
+    10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board 2 AI
+    Intelligence = improves the entire service op
+  wave: 3
+  density: compact
+  layout:
+    template: dashboard
+    regions:
+    - name: contentBody
+      components:
+      - kind: metricTile
+        notes: Headline figure
+      - kind: dataTable
+        notes: The records behind the figures
+  states:
+    loading: Skeleton while the configuration loads
+    emptyFirstRun: '**Nothing configured yet.** The action is to create the first ai entry, and this state
+      carries it'
+    emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
+      somebody concluding the record does not exist'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
+      table reads as *there is no data* and sends somebody to support with the wrong question'
+    error: Configuration service unavailable. Says what is unaffected
+  apis:
+  - operationId: listContactAutomation
+    contract: marketing-crm
+    purpose: AI Contact Center Intelligence & Automation Studio
+    trigger: onLoad
+  implementation:
+    app: venue-support-web
+    route: /support/ai-contact-center-intelligence-automation-studio-sup-028
+    component: apps/venue-support-web/src/routes/support/AiContactCenterIntelligenceAutomationStudio.tsx
+    status: notStarted
+  wireframe:
+    status: generated
+    board: wireframes/P12 Venue Support.dc.html#sup-028
+    workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-028
+  source:
+    pack: Customer Service_Reference.pdf
+    board: '2'
+    number: 10.2.10
+    page: 39
+  navigation:
+    entryFrom:
+    - SUP-019
+    exitTo:
+    - SUP-019
+    inferred: false
+    notes: '**Reached from SUP-019, the hub of its workshop board.** Stated on 4 September: the pack groups
+      its screens ten to a board behind a command centre, and that grouping is the navigation.'

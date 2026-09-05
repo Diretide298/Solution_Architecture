@@ -1,5 +1,5 @@
 id: LLD-catalogue
-title: catalogue — 66 operations
+title: catalogue — 174 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -22,6 +22,36 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.inventory_hold
+- operation: approvePricingWorkflowAuthority
+  verb: PUT
+  path: /pricing-workflow-authority
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveReviewDecision
+  verb: PUT
+  path: /review-decision
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveWorkflow
+  verb: PUT
+  path: /workflow
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: assessProductChange
   verb: POST
   path: /products/{productId}/change-impact
@@ -66,6 +96,7 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.performance
+  - platform.outbox
 - operation: cloneProduct
   verb: POST
   path: /products/{productId}/clone
@@ -112,6 +143,16 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.price_list
+- operation: createBulkProductCatalogue
+  verb: POST
+  path: /bulk-product-catalogue
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createChannelCapacity
   verb: POST
   path: /channel-capacities
@@ -127,6 +168,16 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.channel_capacity
+- operation: createChannelProfile
+  verb: POST
+  path: /channel-profile
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createDonationCampaign
   verb: POST
   path: /donation-campaigns
@@ -169,6 +220,16 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.event
+- operation: createLiveDynamicPrice
+  verb: POST
+  path: /live-dynamic-price
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createPerformances
   verb: POST
   path: /events/{eventId}/performances
@@ -234,7 +295,6 @@ operations:
   permission: PRODUCT_CONFIGURE
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - access.entitlement
@@ -396,6 +456,36 @@ operations:
   reads:
   - catalogue.alternative_code
   writes: []
+- operation: listAutomationPolicyAutonomous
+  verb: GET
+  path: /automation-policy-autonomou
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBulkPricingUpdate
+  verb: GET
+  path: /bulk-pricing-update
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCalculationValidationReconciliation
+  verb: GET
+  path: /calculation-validation-reconciliation
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listCatalogueBundles
   verb: GET
   path: /catalogue/bundles
@@ -409,6 +499,66 @@ operations:
   - catalogue.product
   - catalogue.published_bundle
   writes: []
+- operation: listChangeImpactAnalysis
+  verb: GET
+  path: /change-impact-analysi
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChangePropagationDependency
+  verb: GET
+  path: /change-propagation-dependency
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannel
+  verb: GET
+  path: /channel
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannel2
+  verb: GET
+  path: /channel
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelAllocationRebalancing
+  verb: GET
+  path: /channel-allocation-rebalancing
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelBasedPricing
+  verb: GET
+  path: /channel-based-pricing
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listChannelCapacities
   verb: GET
   path: /channel-capacities
@@ -421,6 +571,156 @@ operations:
   reads:
   - catalogue.channel_capacity
   writes: []
+- operation: listChannelConnectionIntegration
+  verb: GET
+  path: /channel-connection-integration
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelCustomerSegment
+  verb: GET
+  path: /channel-customer-segment
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelExceptionIncident
+  verb: GET
+  path: /channel-exception-incident
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelGovernanceSla
+  verb: GET
+  path: /channel-governance-sla
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelLogTransaction
+  verb: GET
+  path: /channel-log-transaction
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelPerformanceCommercial
+  verb: GET
+  path: /channel-performance-commercial
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelSaleRule
+  verb: GET
+  path: /channel-sale-rule
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listChannelSaleSchedule
+  verb: GET
+  path: /channel-sale-schedule
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCommercialPricing
+  verb: GET
+  path: /commercial-pricing
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCommercialPricingStructure
+  verb: GET
+  path: /commercial-pricing-structure
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCompetitorPricingMarket
+  verb: GET
+  path: /competitor-pricing-market
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCurrencyPrecisionRounding
+  verb: GET
+  path: /currency-precision-rounding
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerEligibilityRule
+  verb: GET
+  path: /customer-eligibility-rule
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerSegmentProfile
+  verb: GET
+  path: /customer-segment-profile
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDemandBookingCurve
+  verb: GET
+  path: /demand-booking-curve
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listDonationCampaigns
   verb: GET
   path: /donation-campaigns
@@ -431,6 +731,66 @@ operations:
   offline: true
   reads:
   - catalogue.donation_campaign
+  writes: []
+- operation: listDynamicPriceBand
+  verb: GET
+  path: /dynamic-price-band
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicPricingAutomation
+  verb: GET
+  path: /dynamic-pricing-automation
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicPricingGuardrail
+  verb: GET
+  path: /dynamic-pricing-guardrail
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicPricingPerformance
+  verb: GET
+  path: /dynamic-pricing-performance
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicPricingStrategy
+  verb: GET
+  path: /dynamic-pricing-strategy
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listEffectiveDateSeason
+  verb: GET
+  path: /effective-date-season
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listEntitlementTemplates
   verb: GET
@@ -454,6 +814,36 @@ operations:
   reads:
   - catalogue.event
   writes: []
+- operation: listFeeSurcharge
+  verb: GET
+  path: /fee-surcharge
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listFeeWaiverTax
+  verb: GET
+  path: /fee-waiver-tax
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGovernanceRiskMonitoring
+  verb: GET
+  path: /governance-risk-monitoring
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listGuestMemberships
   verb: GET
   path: /guest/memberships
@@ -468,6 +858,26 @@ operations:
   - catalogue.product
   - orders.sales_order
   writes: []
+- operation: listInternalDemandBooking
+  verb: GET
+  path: /internal-demand-booking
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listInventoryCapacityChannel
+  verb: GET
+  path: /inventory-capacity-channel
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listInventoryHolds
   verb: GET
   path: /inventory-holds
@@ -478,6 +888,76 @@ operations:
   offline: false
   reads:
   - catalogue.inventory_hold
+  writes: []
+- operation: listLearningModelPerformance
+  verb: GET
+  path: /learning-model-performance
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listLocationVenueEvent
+  verb: GET
+  path: /location-venue-event
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMarketTourismHoliday
+  verb: GET
+  path: /market-tourism-holiday
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMarketVenueCurrency
+  verb: GET
+  path: /market-venue-currency
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipLoyaltyPricing
+  verb: GET
+  path: /membership-loyalty-pricing
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listNearbyEventExhibition
+  verb: GET
+  path: /nearby-event-exhibition
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPackageBundleAdd
+  verb: GET
+  path: /package-bundle-add
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listPerformances
   verb: GET
@@ -490,6 +970,46 @@ operations:
   offline: true
   reads:
   - catalogue.performance
+  writes: []
+- operation: listPriceCalculationSequence
+  verb: GET
+  path: /price-calculation-sequence
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPriceCategoryRate
+  verb: GET
+  path: /price-category-rate
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPriceElasticityRevenue
+  verb: GET
+  path: /price-elasticity-revenue
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPriceListTemplate
+  verb: GET
+  path: /price-list-template
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listPriceLists
   verb: GET
@@ -517,6 +1037,106 @@ operations:
   - catalogue.price
   writes:
   - cache:resolution
+- operation: listPricing
+  verb: GET
+  path: /pricing
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingChangeImpact
+  verb: GET
+  path: /pricing-change-impact
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingCompliance
+  verb: GET
+  path: /pricing-compliance
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingDistributionSynchronization
+  verb: GET
+  path: /pricing-distribution-synchronization
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingGovernance
+  verb: GET
+  path: /pricing-governance
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingRecommendationExplainability
+  verb: GET
+  path: /pricing-recommendation-explainability
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingRollbackEmergency
+  verb: GET
+  path: /pricing-rollback-emergency
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingRule
+  verb: GET
+  path: /pricing-rule
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingRulePriority
+  verb: GET
+  path: /pricing-rule-priority
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPricingVersionBaseline
+  verb: GET
+  path: /pricing-version-baseline
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listProductCategories
   verb: GET
   path: /product-categories
@@ -524,11 +1144,80 @@ operations:
   permission: PRODUCT_VIEW
   audience:
   - staff
-  - guest
   offline: true
   reads:
   - catalogue.product
   - catalogue.product_category
+  writes: []
+- operation: listProductDuplicationTemplate
+  verb: GET
+  path: /product-duplication-template
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductGovernance
+  verb: GET
+  path: /product-governance
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductImportExport
+  verb: GET
+  path: /product-import-export
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductLifecycle
+  verb: GET
+  path: /product-lifecycle
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductPriceAvailability
+  verb: GET
+  path: /product-price-availability
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductRetirementSuspension
+  verb: GET
+  path: /product-retirement-suspension
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProductTrailChange
+  verb: GET
+  path: /product-trail-change
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listProductVariants
   verb: GET
@@ -567,6 +1256,146 @@ operations:
   reads:
   - catalogue.product
   writes: []
+- operation: listQuantityGroupVolume
+  verb: GET
+  path: /quantity-group-volume
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRealTimeChannel
+  verb: GET
+  path: /real-time-channel
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRecommendationReviewDecision
+  verb: GET
+  path: /recommendation-review-decision
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listResidencyNationalityMarket
+  verb: GET
+  path: /residency-nationality-market
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRevenue
+  verb: GET
+  path: /revenue
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRevenueDemandImpact
+  verb: GET
+  path: /revenue-demand-impact
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRollbackRecovery
+  verb: GET
+  path: /rollback-recovery
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRulePriorityConflict
+  verb: GET
+  path: /rule-priority-conflict
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSaleChannel
+  verb: GET
+  path: /sale-channel
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listScenarioModelingWhat
+  verb: GET
+  path: /scenario-modeling-what
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSeasonalCalendarDay
+  verb: GET
+  path: /seasonal-calendar-day
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSignalDataQuality
+  verb: GET
+  path: /signal-data-quality
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTaxFeeCalculation
+  verb: GET
+  path: /tax-fee-calculation
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTimeslotPerformanceTime
+  verb: GET
+  path: /timeslot-performance-time
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listWaitlistEntries
   verb: GET
   path: /waitlist-entries
@@ -578,6 +1407,16 @@ operations:
   reads:
   - catalogue.performance
   - catalogue.waitlist_entry
+  writes: []
+- operation: listWeatherDemandImpact
+  verb: GET
+  path: /weather-demand-impact
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: offerWaitlistCapacity
   verb: POST
@@ -595,6 +1434,16 @@ operations:
   - cache:idempotency
   - catalogue.inventory_hold
   - catalogue.waitlist_entry
+- operation: publishActivationScheduler
+  verb: PUT
+  path: /activation-scheduler
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: publishBundle
   verb: POST
   path: /catalogue/bundles
@@ -609,6 +1458,36 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.published_bundle
+- operation: publishChannelAvailability
+  verb: PUT
+  path: /channel-availability
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: publishChannelReadinessValidation
+  verb: PUT
+  path: /channel-readiness-validation
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: publishPricingEffectiveDate
+  verb: PUT
+  path: /pricing-effective-date
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: reinstateEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/reinstate
@@ -735,6 +1614,26 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.alternative_code
+- operation: setBookingVelocityTime
+  verb: PUT
+  path: /booking-velocity-time
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCatalogueReview
+  verb: PUT
+  path: /catalogue-review
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setChannelAllocations
   verb: PUT
   path: /channel-capacities/{channelCapacityId}/channel-allocations
@@ -750,6 +1649,86 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.channel_allocation
+- operation: setChannelFeePayment
+  verb: PUT
+  path: /channel-fee-payment
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setChannelPricingCommercial
+  verb: PUT
+  path: /channel-pricing-commercial
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDemandOccupancyAvailability
+  verb: PUT
+  path: /demand-occupancy-availability
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setDynamicPricingStrategy
+  verb: PUT
+  path: /dynamic-pricing-strategy
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setFeeApplicabilityCharging
+  verb: PUT
+  path: /fee-applicability-charging
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setLifecycleStatuWorkflow
+  verb: PUT
+  path: /lifecycle-statu-workflow
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPriceHierarchyInheritance
+  verb: PUT
+  path: /price-hierarchy-inheritance
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPriceListMaster
+  verb: PUT
+  path: /price-list-master
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setPrices
   verb: PUT
   path: /price-lists/{priceListId}/prices
@@ -766,6 +1745,36 @@ operations:
   - cache:idempotency
   - cache:resolution
   - catalogue.price_list
+- operation: setPricing
+  verb: PUT
+  path: /pricing
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPricingChangeRequest
+  verb: PUT
+  path: /pricing-change-request
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPricingExperiment
+  verb: PUT
+  path: /pricing-experiment
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setProductAttributes
   verb: PUT
   path: /products/{productId}/attributes
@@ -781,6 +1790,16 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.variant_dimension
+- operation: setProductCatalogue
+  verb: PUT
+  path: /product-catalogue
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setProductCategories
   verb: PUT
   path: /product-categories
@@ -796,6 +1815,66 @@ operations:
   - cache:idempotency
   - cache:resolution
   - catalogue.product_category
+- operation: setProductContextOwnership
+  verb: PUT
+  path: /product-context-ownership
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setProductServicePrice
+  verb: PUT
+  path: /product-service-price
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setRateStructure
+  verb: PUT
+  path: /rate-structure
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setTaxProfileJurisdiction
+  verb: PUT
+  path: /tax-profile-jurisdiction
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setTaxRuleTreatment
+  verb: PUT
+  path: /tax-rule-treatment
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulatePriceBreakdownCalculation
+  verb: PUT
+  path: /price-breakdown-calculation
+  scope: venue
+  permission: PRODUCT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: suspendEntitlement
   verb: POST
   path: /entitlements/{entitlementId}/suspend
@@ -826,6 +1905,7 @@ operations:
   writes:
   - cache:idempotency
   - catalogue.product
+  - platform.outbox
 - operation: updateChannelCapacity
   verb: PATCH
   path: /channel-capacities/{channelCapacityId}

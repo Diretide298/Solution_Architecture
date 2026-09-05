@@ -142,7 +142,9 @@ paths:
     get:
       operationId: listApiClients
       x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
         - "P09 ADM-015 API Rate Limit & Quota Management"
+        - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Registered clients for this developer
       tags: [publicApi]
@@ -163,6 +165,8 @@ paths:
     post:
       operationId: createApiClient
       x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
+        - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Create a client with scopes and an environment
       description: >
@@ -209,6 +213,7 @@ paths:
     post:
       operationId: rotateApiCredential
       x-ticvai-consumed-by:
+        - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Issue a new secret, with an overlap window
       description: >
@@ -244,6 +249,7 @@ paths:
     delete:
       operationId: revokeApiCredential
       x-ticvai-consumed-by:
+        - "P10 PTR-019 API Credentials & Integration"
         - "P14 DEV-003 Clients & Credentials"
       summary: Revoke immediately
       description: >
@@ -402,6 +408,7 @@ paths:
     get:
       operationId: listWebhookSubscriptions
       x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
         - "P14 DEV-005 Webhooks"
       summary: What this client is subscribed to
       tags: [publicApi]
@@ -422,6 +429,7 @@ paths:
     post:
       operationId: createWebhookSubscription
       x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
         - "P14 DEV-005 Webhooks"
       summary: Subscribe to business events
       description: >
@@ -462,6 +470,7 @@ paths:
     get:
       operationId: listWebhookDeliveries
       x-ticvai-consumed-by:
+        - "P08 BO-067 Integrations"
         - "P14 DEV-005 Webhooks"
       summary: What was sent, what failed, and why
       description: >
@@ -640,6 +649,7 @@ paths:
     post:
       operationId: deprecateApiVersion
       x-ticvai-consumed-by:
+        - "P09 ADM-026 End-of-Support Notice Management"
         - "P14 DEV-008 Programme Administration"
       summary: Announce a sunset date and notify subscribers
       description: >

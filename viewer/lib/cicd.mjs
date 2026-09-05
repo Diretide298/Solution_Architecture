@@ -354,6 +354,19 @@ async function readConfigs(root) {
         // their argument in comments and cite it, which is what makes this
         // checkable at all.
         cites: [...new Set((text.match(/ADR-0\d{3}/g) ?? []).map((m) => m.slice(4)))].sort(),
+        // **And which of those it already acknowledges as stale.** Rule 15's
+        // test is not "cites a superseded ADR" but "cites one *without saying
+        // so on any line that mentions it*" — the acknowledgement clause is the
+        // whole point, because a file that names the supersession has done the
+        // reading the rule exists to force. Without this, the check fired on
+        // `c-flash-sale.yml` for the very ADR whose supersession its header
+        // spends four lines explaining, and a check that flags the corrected
+        // file is a check people learn to scroll past.
+        acknowledges: new Set(text.split(/\r?\n/).flatMap((line) => (
+          /upersed|amend|no longer/.test(line)
+            ? (line.match(/ADR-0\d{3}/g) ?? []).map((m) => m.slice(4))
+            : []
+        ))),
         header: header.slice(0, 400),
       });
     }
@@ -511,7 +524,7 @@ function findFindings({ workflows, images, recipes, configs, repos, storage, sta
   // the artefact somebody actually deploys.
   if (stale?.size) {
     for (const [num, adr] of stale) {
-      const citing = configs.filter((c) => c.cites?.includes(num));
+      const citing = configs.filter((c) => c.cites?.includes(num) && !c.acknowledges?.has(num));
       if (!citing.length) continue;
       out.push({
         severity: 'error',

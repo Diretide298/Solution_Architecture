@@ -1,5 +1,5 @@
 id: LLD-FnbService
-title: FnbService — 96 operations, 34 tables
+title: FnbService — 99 operations, 34 tables
 generatedBy: tools/derive-diagrams.py
 tier: operations
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**96 operations and 34 tables — the largest single domain after marketin
 scale: Write-heavy during service, idle between. **Two peaks a day, sharply.**
 ifDown: Down means the kitchen falls back to paper. Offline-capable by design.
 coverage:
-  operations: 96
+  operations: 99
   inAFlow: 70
   percent: 73%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -19,10 +19,10 @@ schemas:
   tables: 34
   stores:
   - postgres
-  largestTable: fnb.kitchen_ticket
+  largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
-  count: 96
+  count: 99
   operations:
   - operation: acceptFnbOrder
     verb: POST
@@ -103,6 +103,14 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: true
     reads: 2
+    writes: 2
+  - operation: closeCorrectiveAction
+    verb: POST
+    path: /food-safety/corrective-actions/{actionId}/close
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 3
     writes: 2
   - operation: closeTableVisit
     verb: POST
@@ -192,6 +200,14 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 1
+  - operation: escalateCorrectiveAction
+    verb: POST
+    path: /food-safety/corrective-actions/{actionId}/escalate
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
   - operation: fireCourse
     verb: POST
     path: /kitchen-tickets/{ticketId}/fire
@@ -229,7 +245,7 @@ operationsByContract:
     path: /outlets/{outletId}/guest-menu
     scope: venue
     permission: null
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: getGuestOrderStatus
@@ -309,7 +325,7 @@ operationsByContract:
     path: /venues/{venueId}/delivery-locations
     scope: venue
     permission: null
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: listDiningOutlets
@@ -349,7 +365,7 @@ operationsByContract:
     path: /menus
     scope: venue
     permission: PRODUCT_VIEW
-    offline: false
+    offline: true
     reads: 2
     writes: 0
   - operation: listModifierGroups
@@ -357,7 +373,7 @@ operationsByContract:
     path: /modifier-groups
     scope: venue
     permission: PRODUCT_VIEW
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: listProductionRuns
@@ -520,6 +536,14 @@ operationsByContract:
     offline: true
     reads: 2
     writes: 2
+  - operation: recordCorrectiveAction
+    verb: POST
+    path: /food-safety/corrective-actions/{actionId}/action
+    scope: venue
+    permission: INCIDENT_MANAGE
+    offline: false
+    reads: 3
+    writes: 2
   - operation: recordOrderHandover
     verb: POST
     path: /guest-orders/{orderId}/delivery
@@ -663,7 +687,7 @@ operationsByContract:
     permission: ORDER_MODIFY
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: setMenuSections
     verb: PUT
     path: /menus/{menuId}/sections
@@ -793,6 +817,20 @@ operationsByContract:
     reads: 4
     writes: 0
 tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: fnb.bill_split
   columns: 3
   store: postgres
@@ -822,7 +860,7 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.corrective_action
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -835,7 +873,7 @@ tables:
   writtenBy: []
   foreignWriters: null
 - table: fnb.delivery_location_outlet
-  columns: 2
+  columns: 3
   store: postgres
   parent: fnb.delivery_location
   writtenBy: []
@@ -887,14 +925,14 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.kitchen_ticket_line
-  columns: 10
+  columns: 11
   store: postgres
   parent: fnb.kitchen_ticket
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.location_code
-  columns: 1
+  columns: 2
   store: postgres
   parent: null
   writtenBy: []
@@ -921,14 +959,14 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.menu_section
-  columns: 4
+  columns: 5
   store: postgres
   parent: fnb.menu
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.modifier_group
-  columns: 5
+  columns: 6
   store: postgres
   parent: null
   writtenBy:
@@ -955,14 +993,14 @@ tables:
   - fnb
   foreignWriters: null
 - table: fnb.recipe
-  columns: 3
+  columns: 4
   store: postgres
   parent: fnb.menu_item
   writtenBy:
   - fnb
   foreignWriters: null
 - table: fnb.recipe_ingredient
-  columns: 5
+  columns: 6
   store: postgres
   parent: fnb.recipe
   writtenBy: []
@@ -1049,6 +1087,11 @@ writesOutside:
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
+- P01:WEB-036 F&B – Browse & Order
+- P01:WEB-037 Menu Item Detail
+- P01:WEB-038 F&B – Order Tracking
+- P01:WEB-044 AI Concierge – Home
+- P01:WEB-046 In-Venue Notifications
 - P02:GST-024 F&B – Browse & Order
 - P02:GST-025 F&B – Order Tracking
 - P02:GST-029 Venue Info & Services
@@ -1056,6 +1099,7 @@ screens:
 - P02:GST-031 AI Concierge – Home
 - P02:GST-032 AI Concierge – Chat
 - P02:GST-061 Menu Item Detail
+- P02:GST-070 Reserve a Table or Cabana
 - P04:POS-012 Omnichannel Order & Fulfilment Center
 - P04:POS-021 Sell — Food & Drink
 - P04:POS-022 Send to Kitchen
@@ -1075,7 +1119,6 @@ screens:
 - P06:EMP-065 Receiving & Store Put-Away
 - P06:EMP-066 Stock Count & Cycle Count Management
 - P06:EMP-067 Damage, Loss, Shrinkage & Stock Adjustment
-- P08:BO-003 Queue Integration Setup
 - P08:BO-007 Product Directory
 - P08:BO-014 Catalogue Publishing
 - P08:BO-020 F&B Order Management
@@ -1087,6 +1130,7 @@ screens:
 - P08:BO-062 Venue Profile
 - P08:BO-065 Venue Configuration
 - P08:BO-079 Stock Count
+- P08:BO-104 Food & Beverage
 - P08:BO-109 Menu Builder & POS Layout Designer
 - P08:BO-110 Recipe & BOM Management
 - P08:BO-111 Ingredient Substitution, Allergen & Nutrition

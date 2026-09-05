@@ -212,3 +212,43 @@ decision that F&B configuration moves to outlet level — reversing a decision A
 dates and gives as its worked example — and it settles ten open backlog entries, including one
 the walk had explicitly flagged as *worth asking whether it is wanted* on the same day the
 client answered no.
+
+---
+
+## Added 24 August — the folders that were missing
+
+**`boards/` is new.** The client's design-board PDFs — F&B, POS, Retail and Inventory dashboards —
+were in the project context and not in this folder. **They are the source the `*.dc.html` packs in
+`wireframes/` were drawn from**, and what 84 screens carrying `wireframe.status: designed`
+ultimately cite. Having the derived boards without the originals meant a disagreement about a frame
+had nowhere to be settled.
+
+Also filed: three backend structure references into `requirements/`, the second requirement matrix,
+the technical product sheet, two email attachment registers into `planning/`, and the client's
+multi-tenant hierarchy diagram into `diagrams/`.
+
+### Two things to know before reading the latest minutes
+
+**Three MoMs are named `.docx` and are markdown inside.** `TICVAI_MoM_2026-08-20`, `-08-21` and
+`-08-24` will not open in Word and will not parse with `python-docx` — **open them as text.** Kept
+exactly as received; worth correcting upstream.
+
+**The 20 August minute says so in its own header**: the session was filed as *F&B, Retail,
+Procurement & Inventory* and covered none of it — it was CRM, marketing, loyalty, RBAC and CMS.
+**That workshop is still outstanding** and is an open action in all three latest minutes.
+
+### What the latest three changed
+
+**24 August.** Dinesh recommended **segregating databases per service from the start**, arguing that
+splitting a centralised database after two or three years is harder than merging isolated ones
+later. **That is in tension with ADR-0005 and ADR-0028**, which specify one Postgres per cell with
+schema-level segregation — the tension is live, not settled. Also: 100–200 tenants centralised,
+**plus dedicated infrastructure for flash sales reaching tens of thousands concurrent within
+hours**, which the package does not yet model. Access-control vendor narrowed to HID or Suprema
+(CF-35).
+
+**21 August.** Seat-map copy/paste at full-map and section level, and layout version comparison.
+`createSeatMapTemplate` exists; **copy/paste and version diff do not.**
+
+**20 August.** Duplicate detection, identity resolution and merge rules are covered by `mergeGuests`
+and CF-160. **Consent retention and archival policy is not**, and it was discussed.

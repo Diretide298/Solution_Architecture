@@ -25,9 +25,18 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import sys
 from pathlib import Path
 
 import yaml
+
+# **The last line of this tool crashed on Windows** — a `→` in the closing print against a
+# cp1252 console, after the file had already been written. Every other deriver carries this guard;
+# this one did not, so the tool reported a traceback on a run that had succeeded.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
 
 ROOT = Path(__file__).resolve().parents[1]
 CONTRACTS = ROOT / "contracts"
@@ -117,6 +126,32 @@ def resolve_type(spec: dict, schemas: dict, persisted: dict) -> tuple[str, str |
 
 
 
+def retired_of(body) -> list[str]:
+    """Columns a schema used to describe and has deliberately stopped describing.
+
+    **Deleting a property is not enough to delete a column.** `Cell.tenantId` came out of the
+    contract for ADR-0038 and `control.cell.tenant_id` survived it twice over: the merge below
+    keeps any column whose source is not this contract, and the relationship graph re-creates it
+    from an edge the graph derived from the column in the first place. The graph is generated from
+    `schema-reference.json` in the next step of `refresh.sh`, so the loop feeds itself and a
+    contract-side deletion can never reach the table.
+
+    **A column that cannot be removed is worse than one that was never added**: it validates, it
+    reaches the workbook and the DDL, and it goes on asserting the rule the ADR replaced.
+
+    Read from the same branches as the persistence tag, because a schema composed with `allOf`
+    carries both in the same place.
+    """
+    out: list[str] = []
+    if not isinstance(body, dict):
+        return out
+    for src in [body] + [b for b in (body.get("allOf") or []) if isinstance(b, dict)]:
+        v = src.get("x-ticvai-retired-columns")
+        if isinstance(v, list):
+            out += [str(x) for x in v]
+    return out
+
+
 def persistence_of(body) -> str | None:
     """The persistence tag, wherever it sits.
 
@@ -183,6 +218,7 @@ def main() -> int:
     all_schemas: dict[str, dict] = {}
     persisted: dict[str, str] = {}          # schema name -> table
     owner: dict[str, str] = {}              # table -> contract
+    retired: dict[str, set[str]] = {}       # table -> columns the contract has withdrawn
     for name, (_, doc) in contracts.items():
         for sname, body in ((doc.get("components") or {}).get("schemas") or {}).items():
             all_schemas.setdefault(sname, body)
@@ -196,6 +232,8 @@ def main() -> int:
                     table = table.split("+")[0].strip()
                     persisted[sname] = table
                     owner[table] = name
+                    for rc in retired_of(body):
+                        retired.setdefault(table, set()).add(rc)
 
     # The relationship graph knows where a column points; the column did not say so. On 18 August
     # **all 514 relationships were invisible at column level** — `facility_id` on
@@ -414,7 +452,7 @@ def main() -> int:
                 # How the link was established, because 486 of 514 are conventions rather than
                 # declared references and a reader should know which they are looking at.
                 c["referenceHow"] = e.get("how", "convention")
-                c["enforced"] = "yes" if "DDL" in str(e.get("how", "")) else "no"
+                c["enforced"] = "yes" if e.get("how") == "declared" else "no"
         if cols:
             # **Merge, do not overwrite.** `orders.order_line` is declared twice — standalone as
             # `OrderLine` and as the child half of `orders.sales_order + orders.order_line` — and
@@ -491,13 +529,18 @@ def main() -> int:
         # A coupling is real and it is not a column. Skipped here and kept in the graph.
         if e.get("edgeKind") == "ambient" or col.startswith("via "):
             continue
+        # **A withdrawn column is not re-created from the graph.** The edge is still in
+        # `relationship-graph.json` because the graph was derived from the column, and without this
+        # the deletion is undone on the same run that makes it.
+        if col in retired.get(table, ()):
+            continue
         row = existing.setdefault(table, [])
         found = next((c for c in row if c["column"] == col), None)
         if found:
             found["references"] = e["to"]
             found["referenceKind"] = e.get("edgeKind", "reference")
             found["referenceHow"] = e.get("how", "convention")
-            found["enforced"] = "yes" if "DDL" in str(e.get("how", "")) else "no"
+            found["enforced"] = "yes" if e.get("how") == "declared" else "no"
             continue
         row.append({
             "column": col,
@@ -510,8 +553,125 @@ def main() -> int:
             "references": e["to"],
             "referenceKind": e.get("edgeKind", "reference"),
             "referenceHow": e.get("how", "convention"),
-            "enforced": "yes" if "DDL" in str(e.get("how", "")) else "no",
+            # **A declared reference becomes a real constraint; a convention becomes an index.**
+            # This looked for the literal string "DDL" in `how`, which only ever holds `declared`
+            # or `convention` — so it was never true, and `derive-ddl.py` emitted 774 indexes and
+            # **zero foreign keys**. A placeholder written before there was any DDL to enforce.
+            #
+            # **The distinction is ADR-0011**: 153 references are naming habits the contracts never
+            # asserted, and constraining one fails on the first row that legitimately points
+            # nowhere. The other 594 are declared and should be enforced by the database.
+            "enforced": "yes" if e.get("how") == "declared" else "no",
         })
+
+    # **Withdrawn columns come out last, after every source has had its say.** The merge above
+    # keeps a column whose source is not the contract, and the loop above re-creates one the graph
+    # still has an edge for — so a removal applied earlier is undone by the next statement. Applied
+    # here it is applied to the answer.
+    n_retired = 0
+    for table, cols_out in sorted(retired.items()):
+        row = existing.get(table)
+        if not row:
+            continue
+        before = len(row)
+        existing[table] = [c for c in row if c["column"] not in cols_out]
+        n_retired += before - len(existing[table])
+    if n_retired:
+        print(f"  columns withdrawn by their contract: {n_retired}")
+        for table, cols_out in sorted(retired.items()):
+            print(f"     {table}: {', '.join(sorted(cols_out))}")
+
+    # **A table needs a key in the DDL, not only a column that could serve as one.** 3 September:
+    # `derive-ddl` emitted `PRIMARY KEY` only where a column was literally named `id`, so 84 of 374
+    # tables reached Postgres with no key at all, and four foreign keys pointed at a column that is
+    # not unique — which `psql` rejects outright rather than warning about.
+    #
+    # **The cause is upstream of the DDL.** These tables were built from API response shapes, and a
+    # response is not a table: `Subscription` returns tenantId, planId and status — everything a
+    # caller needs and not the row's own identity.
+    #
+    # The key is added here rather than in `derive-ddl` so the SQL and the schema reference agree.
+    # **A column in one and not the other is the defect this pass exists to clear.**
+    #
+    # **`synthesised` marks every one.** No contract asserted this identity and the register must
+    # not read as though one did — `check-package` counts them so they stay a visible worklist
+    # rather than becoming the answer.
+    def _own_key(table, names):
+        if "id" in names:
+            return "id"
+        stem = table.split(".", 1)[1]
+        for cand in (f"{stem}_id", f"{stem.rstrip('s')}_id", f"{stem}_code"):
+            if cand in names:
+                return cand
+        return None
+
+    _real = {t for t in existing if "." in t and ":" not in t}
+    _synth = 0
+    for _t in sorted(_real):
+        _row = existing[_t]
+        if not _row or _own_key(_t, [c["column"] for c in _row]):
+            continue
+        _row.insert(0, {
+            "column": "id", "type": "uuid", "required": "yes",
+            "source": "derive-schema.py (surrogate)",
+            "description": ("**Synthesised key.** No contract asserts an identity for this table — "
+                            "it was derived from a response shape, and a response is not a table. "
+                            "A row still has to be addressable to be updated or deleted."),
+            "table": _t, "synthesised": "surrogate key",
+        })
+        _synth += 1
+    print(f"  surrogate keys added: {_synth}")
+
+    # **Five columns pointed at the product definition instead of at what the guest holds.**
+    # `ScanEvent.ticketId`, `WaitingGuest.entitlementId` and three others are plain strings in the
+    # contracts — nothing declares a target — so the link was inferred, written to
+    # `relationship-graph.json`, read back here as `declared` on the next run and has re-asserted
+    # itself ever since. **A number that grows because it was measured**, in the words this file
+    # already uses about the same feedback loop.
+    #
+    # `catalogue.entitlement_template` is the definition a product is sold against.
+    # `access.entitlement` is the row a guest actually holds — added 18 August precisely because
+    # five artefacts referred to a thing that did not exist. `access.yaml` says `ticketId` is
+    # "a ULID, stable for the life of the ticket and independent of the media carrying it", and a
+    # template has no such life.
+    #
+    # **A scan event pointing at the template says every guest holding that product was scanned.**
+    MISTARGETED = {
+        ("access.scan_event", "ticket_id"): "access.entitlement",
+        ("queue.waiting_guest", "entitlement_id"): "access.entitlement",
+        ("retail.shop_and_drop", "entitlement_id"): "access.entitlement",
+        ("platform.cross_region_entitlement", "ticket_id"): "access.entitlement",
+        ("ledger.inter_entity_obligation", "entitlement_id"): "access.entitlement",
+    }
+    _repointed = 0
+    for (_t, _col), _to in MISTARGETED.items():
+        for _c in existing.get(_t, []):
+            if _c["column"] == _col and _c.get("references") != _to:
+                _c["references"] = _to
+                _repointed += 1
+    print(f"  mistargeted references repointed: {_repointed}")
+
+    # **A reference column takes its target's key type.** `resolve_type` returns the literal `uuid`
+    # for every `$ref` to a persisted schema, whatever that target is actually keyed by — so a ULID
+    # parent typed `text` collected 37 children typed `uuid`, and Postgres rejects every one of
+    # those foreign keys. **Applied after the keys above, because the key is what carries the
+    # type.**
+    _keytype = {}
+    for _t in _real:
+        _k = _own_key(_t, [c["column"] for c in existing[_t]])
+        if _k:
+            _keytype[_t] = next((c.get("type") for c in existing[_t]
+                                 if c["column"] == _k), None) or "text"
+    _retyped = 0
+    for _t in sorted(_real):
+        for _c in existing[_t]:
+            _tgt = _c.get("references")
+            if _c.get("enforced") != "yes" or _tgt not in _keytype:
+                continue
+            if _c.get("type") != _keytype[_tgt]:
+                _c["type"] = _keytype[_tgt]
+                _retyped += 1
+    print(f"  reference columns retyped to their target's key: {_retyped}")
 
     S["cols"] = existing
     ref_path.write_text(json.dumps(S), encoding="utf-8")

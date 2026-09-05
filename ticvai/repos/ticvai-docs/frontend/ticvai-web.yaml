@@ -21,14 +21,20 @@ packages:
 - api-client
 contracts:
 - ai
-- cross-cell
+- approvals
+- catalogue
+- cross-region
 - identity
+- marketing-crm
+- orders
 - platform-ops
+- promotions
 - public-api
 - reporting
 - subscription
 - tenancy
 - white-label
+- workforce
 deployment:
   target: browser, desktop
   distribution: served from the Control Plane

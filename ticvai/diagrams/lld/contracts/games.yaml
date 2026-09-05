@@ -115,7 +115,7 @@ operations:
   scope: venue
   permission: null
   audience:
-  - guest
+  - staff
   offline: true
   reads:
   - cache:idempotency

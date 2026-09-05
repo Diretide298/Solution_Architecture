@@ -581,6 +581,7 @@ paths:
     post:
       operationId: setPathClosure
       x-ticvai-consumed-by:
+        - "P08 BO-019 Closures & Blackouts"
         - "P08 BO-094 Map Editor & Publish"
       summary: Close a route during works or an incident
       description: >

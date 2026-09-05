@@ -28,6 +28,7 @@ from pathlib import Path
 
 import json
 import re
+import json
 import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -69,10 +70,15 @@ def load_operation_ids() -> set[str]:
     if not CONTRACTS.exists():
         return ops
     for f in CONTRACTS.rglob("*.yaml"):
+        # **An unparseable contract used to be skipped in silence.** Its operations then looked
+        # as though they did not exist, so every screen calling one failed and the report pointed
+        # at the screens rather than at the one file that was broken. **A checker that misreports
+        # where a fault is costs more than one that stops.**
         try:
             doc = yaml.safe_load(f.read_text(encoding="utf-8"))
-        except Exception:
-            continue
+        except Exception as exc:  # noqa: BLE001
+            print(f"  FAIL  {f.name} does not parse: {exc}")
+            raise SystemExit(1)
         for item in (doc.get("paths") or {}).values():
             if not isinstance(item, dict):
                 continue
@@ -301,7 +307,7 @@ def load_staff_operations() -> set[str]:
                 for verb, op in item.items():
                     if verb in ("get", "post", "put", "patch", "delete") and isinstance(op, dict):
                         # `x-ticvai-guest-callable` marks an operation a guest performs on
-                        # their own data — createOrder, createPayment, acquireLease. The
+                        # their own data — createOrder, createPayment, acquireInventoryHold. The
                         # permission is for staff doing it on a guest's behalf at a till.
                         if op.get("x-ticvai-permission") and not "guest" in (op.get("x-ticvai-audience") or []):
                             out.add(op["operationId"])
@@ -404,6 +410,320 @@ def main() -> int:
         print(f"  {doc['platform']['code']}  {doc['platform']['name']:30} {len(doc['screens']):>3} screens")
 
     print(f"\n  {'':36} {total:>3} total\n")
+    # **A region that declares itself and puts nothing in it says nothing about being empty.**
+    # Two of 511 are like this and both are correct — `POS-001 statusStrip` renders from
+    # `getCurrentShift`, `POS-002 sideNav` from the catalogue bundle. **Declaring components in
+    # either would be declaring the same thing twice, and the second copy is the one that goes
+    # stale.**
+    #
+    # **So the warning is about the silence, not the emptiness.** A plain "region is empty" gets
+    # answered with filler components; this one is closed by a sentence saying what fills it, and
+    # the screen view prints that note where the doubt used to be.
+    #
+    # `notes` rather than a new keyword — a component already has one, and no region in the package
+    # carried one before 24 August, so nothing is silenced by accident.
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        for sc in doc.get("screens") or []:
+            layout = sc.get("layout") or {}
+            for reg in layout.get("regions") or []:
+                if (reg.get("components") or []) or reg.get("notes"):
+                    continue
+                WARNINGS.append(
+                    f"{sc['id']} declares region {reg.get('name')} and puts nothing in it on the "
+                    f"{layout.get('template')} template, and says nothing about why — add "
+                    "components, or a note saying what fills it")
+
+    # **A platform's audience and its operations' audiences have to agree.** `WEB-016 Login /
+    # Register` — a guest surface — was calling six staff-only MFA operations, `selectRole` (ADR-0002
+    # staff authorisation) and the staff session. **Nothing checked it**, because every existing
+    # check ran from the operation outward: does it exist, does it resolve, is it permitted. None
+    # ran from the platform inward asking whether this surface should be calling it at all.
+    #
+    # **The permission check does not cover this.** An operation with no permission passes it, and
+    # `createParkingEntitlement` is `service` audience with no permission — a guest screen calling
+    # a service-to-service operation looks clean to every other rule here.
+    OPEN = {"public", "anonymous", "service"}
+    _lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8")) \
+        if (ROOT / "handoff" / "api-data-lineage.json").exists() else {}
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        _pa = (doc.get("platform") or {}).get("audience")
+        for sc in doc.get("screens") or []:
+            # **A screen may declare its own audience and override the platform.** DEV-008 is
+            # Softlabs administering the developer programme on a partner portal; KSK-013 is the
+            # kiosk raising a staff call on a guest surface. Both are correct and both looked like
+            # violations until the screen could say so.
+            pa = sc.get("audience") or _pa
+            if pa not in ("guest", "partner"):
+                continue
+            for api in (sc.get("apis") or []):
+                oid = api.get("operationId")
+                oa = set((_lin.get(oid) or {}).get("audience") or [])
+                if not oa or (oa & ({pa} | OPEN)):
+                    continue
+                WARNINGS.append(
+                    f"{sc['id']} is a {pa} surface and calls '{oid}', which is declared "
+                    f"{sorted(oa)} — either the audience is wrong or this surface should not "
+                    "reach that operation")
+
+    # **The offline model was prose on one side and a flag on the other, and nothing compared
+    # them.** 190 screens describe offline behaviour; 173 operations declared the flag. A screen
+    # said *"Selling continues from the cached menu"* while every operation it loaded was
+    # `offline: false` — **and both statements passed every check in this suite**, because none had
+    # ever read one against the other.
+    #
+    # **What breaks: a till goes offline on a Saturday, the screen renders empty, and the cashier
+    # reads a design document that promised it would work.**
+    #
+    # The check is deliberately narrow. It fires only when the prose *claims continued function* —
+    # a screen saying "not available offline" is correct and silent. **The flag now means two
+    # things and both are legitimate**: servable from cache on a read, callable while offline on a
+    # write.
+    CLAIMS = re.compile(
+        r"keeps working|continues|works from|from the (cached|local)|still (works|takes|sells)|"
+        r"local journal|sells from|selling continues", re.I)
+    DENIES = re.compile(r"not available|refused|requires the primary|cannot|does not work", re.I)
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        for sc in doc.get("screens") or []:
+            text = str((sc.get("states") or {}).get("offline") or "")
+            if not text or DENIES.search(text[:80]) or not CLAIMS.search(text):
+                continue
+            loads = [a.get("operationId") for a in (sc.get("apis") or [])
+                     if a.get("trigger") == "onLoad" and a.get("operationId") in _lin]
+            if loads and not any(_lin[o].get("offline") for o in loads):
+                WARNINGS.append(
+                    f"{sc['id']} says it keeps working offline and not one of its onLoad "
+                    f"operations is offline-capable ({', '.join(loads[:3])}) — the screen renders "
+                    "empty on the day the prose is about")
+
+    # **Two guest surfaces drawing one journey must not diverge silently.** P01 Guest Web and P02
+    # Guest App had thirteen identically-named screen pairs, and `Loyalty & Rewards` shared *zero*
+    # of nine operations across them — the same name, the same journey, and one side could not do
+    # what the other could.
+    #
+    # **A guest does not know which surface they are on.** They opened a link, or they installed an
+    # app, and the ticket is the same ticket. A divergence is either a defect or a decision, and
+    # only one of those should be silent.
+    #
+    # Guest-callable operations only: a web screen legitimately lacks a device-audience operation,
+    # and demanding parity on those would report the platform working correctly.
+    _guest = {}
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        if (doc.get("platform") or {}).get("audience") != "guest":
+            continue
+        code = doc["platform"]["code"]
+        for sc in doc.get("screens") or []:
+            ops = {a.get("operationId") for a in (sc.get("apis") or [])
+                   if a.get("operationId") in _lin
+                   and ({"guest", "public", "anonymous"} & set(_lin[a["operationId"]].get("audience") or []))}
+            _guest.setdefault(sc["name"].strip().lower(), []).append((code, sc["id"], ops, sc))
+    for name, group in sorted(_guest.items()):
+        if len(group) < 2:
+            continue
+        base = set.union(*[g[2] for g in group])
+        for code, sid, ops, sc in group:
+            missing = sorted(base - ops)
+            if not missing:
+                continue
+            if "parity" in str(sc.get("notes") or "").lower():
+                continue
+            WARNINGS.append(
+                f"{sid} ({code}) and its counterpart share the name '{sc['name']}' and it cannot "
+                f"call {', '.join(missing[:3])} — a guest does not know which surface they are on, "
+                "so a divergence needs a note saying it is deliberate")
+
+    # **A placeholder that renders is a placeholder that ships.** 124 screens carried
+    # `module: TODO` — 59 of the 63 on P02 Guest App, every one on P10 Partner Web — and the
+    # frontend drew them under a group heading reading *TODO* while P01 Guest Web beside it read
+    # *Discovery & Browse* and *Booking & Selection*.
+    #
+    # **No checker looked at `module`.** It is a grouping label, not a join, so nothing resolved it
+    # against anything and nothing complained. It was found by a person looking at two boards side
+    # by side.
+    #
+    # `module` groups screens for a reader; `requiresModule` gates them by licence. **Two different
+    # fields, and only the second had a check.**
+    PLACEHOLDER = {"todo", "tbd", "fixme", "xxx", "none", "n/a", "", "-", "?"}
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        code = (doc.get("platform") or {}).get("code", "")
+        for sc in doc.get("screens") or []:
+            grp = str(sc.get("module") or "").strip()
+            if grp.lower() in PLACEHOLDER:
+                WARNINGS.append(
+                    f"{sc['id']} ({code}) has module group '{grp or 'unset'}' — a placeholder that "
+                    "renders is a placeholder that ships, and this is the heading a reviewer reads "
+                    "above the screen")
+
+    # **A destructive button with no confirmation and no label is a button nobody can undo.**
+    # `confirmDialog` and `modal` were both in the component library and used **zero times across
+    # 492 screens**, while `destructiveButton` was used 39 times and its own library entry reads
+    # *always requires confirmation*. **Seven of the 39 had a `null` label** — a red button that
+    # cannot say what it destroys, and on `BO-033 Blacklist Management` and `ADM-007 Module &
+    # Feature Entitlement` it was the only way to remove a record.
+    #
+    # **Found by a design review on 31 August, not by anything here** — the components derived
+    # correctly from the operations and nobody asked what a destructive act needs beyond a button.
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        code = (doc.get("platform") or {}).get("code", "")
+        for sc in doc.get("screens") or []:
+            regions = (sc.get("layout") or {}).get("regions") or []
+            comps = [c for r in regions for c in (r.get("components") or [])]
+            kinds = {c.get("kind") for c in comps}
+            if "destructiveButton" not in kinds:
+                continue
+            if "confirmDialog" not in kinds and "modal" not in kinds:
+                WARNINGS.append(
+                    f"{sc['id']} ({code}) has a destructive button and no confirmDialog — the "
+                    "component library says one always requires confirmation")
+            for c in comps:
+                if c.get("kind") == "destructiveButton" and not str(c.get("label") or "").strip():
+                    WARNINGS.append(
+                        f"{sc['id']} ({code}) has a destructive button with no label — a red "
+                        "button that cannot say what it destroys")
+
+    # **Coverage was only ever measured from the screen side.** Every check here asks whether a
+    # screen's operations exist and whether the audiences agree. **None asked the inverse: is there
+    # a screen for every operation a guest is allowed to call?**
+    #
+    # 51 were found by hand on 31 August, including `deleteGuestAccount` and `exportSubjectData` —
+    # **two things a guest can legally demand under UAE data protection, with nowhere to demand
+    # them from.** Also `createRefundRequest`, `createResaleListing` and `createCase`: a guest may
+    # request a refund, resell a ticket and raise a complaint, and all three were back-office only.
+    #
+    # **A contract that says a guest may do something, and no surface where they can, is a promise
+    # the package makes and the product does not keep.**
+    #
+    # Service-to-service operations are excluded by `x-ticvai-service-only`, which is a declaration
+    # rather than an inference — an operation tagged `guest` and reachable from nowhere should have
+    # to say so.
+    _guest_ops = {o for o, v in _lin.items()
+                  if {"guest", "public", "anonymous"} & set(v.get("audience") or [])
+                  and not v.get("serviceOnly")}
+    _on_guest_screen: set = set()
+    for f in sorted(SCREENS.glob("P*.yaml")):
+        doc = yaml.safe_load(f.read_text(encoding="utf-8"))
+        if (doc.get("platform") or {}).get("audience") != "guest":
+            continue
+        for sc in doc.get("screens") or []:
+            _on_guest_screen |= {a.get("operationId") for a in (sc.get("apis") or [])}
+    for _o in sorted(_guest_ops - _on_guest_screen):
+        WARNINGS.append(
+            f"{_o}: a guest may call it and no guest screen does — either a surface is missing or "
+            "the audience is wrong")
+
+    # ── a failure the platform recorded and nobody can see ──────────────────────────────────
+    #
+    # **The inverse of the guest-coverage check above.** That one asks whether a guest can reach
+    # what a guest may call; this asks whether an operator can see what the platform dropped.
+    #
+    # Two tables failed it on the first run and they failed it differently, which is why the rule
+    # tests the table rather than the operation. `platform.dead_letter` had `listDeadLetters` and
+    # `replayDeadLetter` and no screen calling either. `ai.index_failure` had **no operation at
+    # all** — a table specified, written up as "failure is a row somebody works, not a log line",
+    # and unreachable from anywhere in the package.
+    #
+    # `events/_schema.yaml` is what makes this an obligation rather than a preference: **"a
+    # dead-lettered critical event is a page, not a dashboard."** A page nobody built is the same
+    # as no page.
+    try:
+        _lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        _lin = {}
+    _failure_tables: set = set()
+    for _c in sorted((ROOT / "contracts").rglob("*.yaml")):
+        try:
+            _doc = yaml.safe_load(_c.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        for _n, _sch in ((_doc.get("components") or {}).get("schemas") or {}).items():
+            _t = (_sch or {}).get("x-ticvai-persistence")
+            # Named for what it holds: a failure, a dead letter, a rejection, an exception.
+            if _t and re.search(r"(failure|dead_letter|rejection|exception|error)s?$", str(_t)):
+                _failure_tables.add(str(_t))
+    _screen_ops: set = set()
+    for f in files:
+        _d = yaml.safe_load(f.read_text(encoding="utf-8"))
+        for sc in _d.get("screens") or []:
+            _screen_ops |= {a.get("operationId") for a in (sc.get("apis") or [])}
+    # **Readers come from the contracts, not from the lineage.** `api-data-lineage.json` is read
+    # by twenty tools as authoritative and NOTHING IN THIS PACKAGE REGENERATES IT — it arrives
+    # with the dump. So an operation added to a contract is invisible to every lineage consumer
+    # until the next drop, and this rule would report a table as unreachable while the operation
+    # that reads it sits in the file next door. Derived here instead: an operation reads a table
+    # if any schema it returns declares that table as its persistence.
+    _persist_of: dict = {}
+    _op_reads: dict = {}
+    for _c in sorted((ROOT / "contracts").rglob("*.yaml")):
+        try:
+            _doc = yaml.safe_load(_c.read_text(encoding="utf-8")) or {}
+        except yaml.YAMLError:
+            continue
+        _schemas = (_doc.get("components") or {}).get("schemas") or {}
+        for _n, _sch in _schemas.items():
+            _t = (_sch or {}).get("x-ticvai-persistence")
+            if _t:
+                _persist_of[_n] = str(_t)
+        for _path, _item in (_doc.get("paths") or {}).items():
+            for _verb, _op in (_item or {}).items():
+                if not isinstance(_op, dict) or not _op.get("operationId"):
+                    continue
+                _refs = set(re.findall(r"#/components/schemas/([A-Za-z0-9_]+)",
+                                       json.dumps(_op.get("responses") or {})))
+                _tabs = {_persist_of[r] for r in _refs if r in _persist_of}
+                if _tabs:
+                    _op_reads.setdefault(_op["operationId"], set()).update(_tabs)
+    for _t in sorted(_failure_tables):
+        _readers = sorted({o for o, ts in _op_reads.items() if _t in ts}
+                          | {o for o, v in _lin.items() if _t in (v.get("reads") or [])})
+        if not _readers:
+            WARNINGS.append(
+                f"{_t}: a failure table no operation reads — the platform records it and nothing "
+                "in the package can reach a single row")
+        elif not (set(_readers) & _screen_ops):
+            WARNINGS.append(
+                f"{_t}: read by {sorted(_readers)} and no screen calls any of them — "
+                "events/_schema.yaml says a dead-lettered critical event is a page, not a dashboard")
+
+    # ── screen ids are issued, not calculated ───────────────────────────────────────────────
+    #
+    # **Two workstreams both took ADM-038 on 4 September.** Each computed max+1 over the screens
+    # it could see, neither could see the other, and nothing held a number — so one 'Dead Letters'
+    # and one 'Communication Service Command Center' were both correct and both wrong.
+    #
+    # `screens/_id-register.yaml` is the issue log that fixes it: **a number in that file is
+    # spent.** An allocator starts above the highest number RECORDED rather than above the highest
+    # it happens to have loaded, which is the difference between the two workstreams agreeing and
+    # merely not overlapping yet.
+    #
+    # **A retired id is never reissued** — `nextFree` is the high-water mark plus one, gaps and
+    # all. Reusing a deleted screen's number is how a link in a document opens the wrong screen.
+    _reg_p = ROOT / "screens" / "_id-register.yaml"
+    if _reg_p.exists():
+        _reg = (yaml.safe_load(_reg_p.read_text(encoding="utf-8")) or {}).get("prefixes") or {}
+        _live: dict = {}
+        for f in files:
+            _d = yaml.safe_load(f.read_text(encoding="utf-8"))
+            for sc in _d.get("screens") or []:
+                _live.setdefault(sc["id"].rsplit("-", 1)[0], []).append(int(sc["id"].rsplit("-", 1)[1]))
+        for _pre, _nums in sorted(_live.items()):
+            _rec = _reg.get(_pre)
+            if not _rec:
+                ERRORS.append(f"{_pre}-: prefix is not in screens/_id-register.yaml — register it "
+                              "before issuing ids under it, or two workstreams will both claim the "
+                              "same numbers")
+                continue
+            _over = sorted(n for n in _nums if n > _rec.get("highWaterMark", 0))
+            if _over:
+                ERRORS.append(
+                    f"{_pre}-{_over[0]:03d}: issued above the register's high-water mark of "
+                    f"{_rec.get('highWaterMark')} — run tools/derive-id-register.py --apply and "
+                    "commit it in the same change, so the next allocator can see the number is spent")
+
     for w in WARNINGS:
         print(f"  WARN  {w}")
     for e in ERRORS:

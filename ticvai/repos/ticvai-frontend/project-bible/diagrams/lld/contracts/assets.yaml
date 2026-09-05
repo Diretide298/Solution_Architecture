@@ -10,7 +10,8 @@ operations:
   path: /media/uploads/{uploadId}/complete
   scope: venue
   permission: ASSET_LIBRARY_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_asset
@@ -23,7 +24,8 @@ operations:
   path: /media/collections
   scope: venue
   permission: ASSET_LIBRARY_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_collection
@@ -36,7 +38,8 @@ operations:
   path: /media/uploads
   scope: venue
   permission: ASSET_LIBRARY_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_upload
@@ -49,7 +52,8 @@ operations:
   path: /media/{mediaId}
   scope: venue
   permission: ASSET_LIBRARY_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_usage
@@ -62,7 +66,8 @@ operations:
   path: /media/rights-expiring
   scope: venue
   permission: ASSET_LIBRARY_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_asset
@@ -72,8 +77,9 @@ operations:
   path: /media/{mediaId}
   scope: venue
   permission: ASSET_LIBRARY_VIEW
-  audience: null
-  offline: false
+  audience:
+  - staff
+  offline: true
   reads:
   - assets.media_asset
   - assets.media_usage
@@ -83,7 +89,8 @@ operations:
   path: /media/collections
   scope: venue
   permission: ASSET_LIBRARY_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_collection
@@ -93,7 +100,8 @@ operations:
   path: /media/{mediaId}/replace
   scope: venue
   permission: ASSET_LIBRARY_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_asset
@@ -106,7 +114,8 @@ operations:
   path: /media
   scope: venue
   permission: ASSET_LIBRARY_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_asset
@@ -116,7 +125,8 @@ operations:
   path: /media/{mediaId}
   scope: venue
   permission: ASSET_LIBRARY_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - assets.media_asset

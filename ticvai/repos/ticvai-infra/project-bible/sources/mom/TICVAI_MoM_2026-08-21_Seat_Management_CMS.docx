@@ -1,0 +1,166 @@
+**Minutes of Meeting**
+
+*Workshop — Seat Management **&** B2C Checkout / CMS Configuration*
+
+| **Date** | 21-August-2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Functional Workshop — Seat Management, CMS & B2C Checkout | **Prepared by** | Chitrangi Mestry |
+
+**Primary Objective**
+
+Solution/Product team to walk through the reference seat management and venue map configuration capabilities (manual seat map builder, AI-assisted import, layouts/templates, inventory status, seating rules) and the CMS/B2C checkout journey, using the Platinum List, Coca-Cola Arena and Six Flags Kidiya reference sites, so that Chinmay's team can assess functionality and align on a simplified, low-friction configuration and checkout design for TICVAI.
+
+**Participants**
+
+- TICVAI Team
+
+- Softlabs Team
+
+**Agenda**
+
+- Reference walkthrough — Platinum List seat selection & checkout journey
+
+- Seat map builder — section types (seated, non-seated/zone, standing, suite)
+
+- Best-seat logic, seating rules and social distancing configuration
+
+- AI-assisted seat map import and layout/template management
+
+- Multi-performance assignment, temporary blocking and tiered/early-bird release
+
+- Seat inventory status, holds and automatic release
+
+- Deferred seat assignment model and ticket delivery / turnstile integration
+
+- B2C checkout journey review — Six Flags Kidiya reference walkthrough
+
+- Website builder flexibility — standalone vs. B2C-only configuration
+
+**4. Detailed Discussion**
+
+**4.1 Reference Walkthrough — Platinum List Seat Selection ****&**** Checkout Journey**
+
+- Allam walked through the Platinum List reference site end-to-end using a sample event (Luma Show Circus, Dubai): event page (short video + image + description) → select tickets → calendar (collapsed to a week view, expandable to full month) → time-slot selection → interactive, colour-coded seat map (price tiers shown by colour) → seat selection with live cart hold and countdown timer → checkout via Quick Order / Apple ID / Google ID.
+
+- A second reference (Coca-Cola Arena / Richard Maxart event) showed a capacity-based “best available” flow: the customer selects a section and quantity only — no seat-level selection — and exact seats are assigned internally, with the seat-level ticket/QR code released closer to the event date.
+
+- **Decision: **the reference model confirms three seat-selection scenarios the platform must support: (1) unnumbered/zone-based capacity selling with no seat numbers, (2) system-assigned “best available” seat allocation with deferred disclosure, and (3) full customer seat selection — selectable per section, per event.
+
+**4.2 Seat Map Builder — Section Types (Seated, Non-Seated/Zone, Standing, Suite)**
+
+- Qossai added that non-seated/zone configurations (e.g., the Bahrain Dana Theatre and Dubai Racing Club projects) are priced and sold by zone/capacity rather than individual seat number — customers are told their zone but not an exact seat.
+
+- Allam confirmed a single seat map can mix section types — e.g., 8 of 10 sections seated and 2 standing/non-seated (common for concert “fan pit” areas close to the stage) — and that suites can be sold either as a private bulk-priced suite or as individual seats within the suite.
+
+- **Decision: **section type (seated / non-seated-zone / standing / suite) will be a configurable attribute set at the section level within a single seat map builder screen, rather than requiring separate configuration screens per type as shown in the reference tool.
+
+- **Action: **Chinmay's team to confirm how the seat map builder will consolidate the reference tool's multiple configuration screens (canvas, standing zone, suite, best-seats, entrance/exits) into one unified screen.
+
+**4.3 Best-Seat Logic, Seating Rules ****&**** Social Distancing Configuration**
+
+- Best-seat ranking (e.g., last-row-is-best vs. first-row-is-best, depending on venue sightlines) must be configurable per seat map/event so the system can recommend or auto-assign the best available seat correctly for that venue.
+
+- Chinmay confirmed reservation/holds should be section-wise (choose section → choose/hold seats within it) rather than a freeform polygon selection as shown in the AI-generated reference mockup.
+
+- Seating rules were discussed in depth: consecutive-seat enforcement (preventing a customer from leaving a single empty seat between bookings) and an optional social-distancing rule (auto-blocking adjacent seats after a booking) were both cited as configurations the platform previously supported and should retain.
+
+- **Decision: **seating rules (consecutive-seat enforcement, social-distancing buffer, seat-kill rule, company/held-seat rule) will be configurable per venue/event, defaulting to the venue's operational policy rather than a single fixed platform-wide rule.
+
+**4.4 AI-Assisted Seat Map Import ****&**** Layout/Template Management**
+
+- In addition to manual drag-and-drop seat map building, an AI-assisted import path was reviewed: uploading a PDF or image of a venue layout lets the AI recognise sections, and a companion Excel/CSV file supplies row/seat naming conventions — together the AI generates a draft seat map for validation before publishing.
+
+- Saved seat maps can be reused, copied, or partially copied (a single section's layout and seating can be copied into another seat map) to avoid rebuilding from scratch for similar venues/events. A template library and a layout comparison tool (to diff seat counts/configuration between two saved layouts) were also reviewed.
+
+- **Decision: **the platform will support both manual seat map building and AI-assisted import (PDF/image + Excel/CSV), plus full and partial (section-level) copy-paste between seat maps, and a layout version-comparison view showing seat-count/configuration differences.
+
+**4.5 Multi-Performance Assignment, Temporary Blocking ****&**** Tiered/Early-Bird Release**
+
+- A seat map is configured independently and then associated with one or more events/performances on a separate event-configuration screen, linking seat map, pricing, and event/performance date-time.
+
+- Temporary seat blocking (holding seats off public sale, e.g., for VIP or maintenance reasons) and scheduled seat release (releasing held sections at a later time, e.g., once early sales pick up) were reviewed, along with a tiered/early-bird release pattern (e.g., releasing only 30–40 of 100 seats in a section at a discounted early-bird price, then releasing further tranches progressively).
+
+- **Decision: **the platform must support partial/tranche-based inventory release per section (temporary blocking, scheduled release, and tiered/early-bird sale volumes) rather than exposing full section inventory at go-live.
+
+**4.6 Seat Inventory Status, Holds ****&**** Automatic Release**
+
+- A real-time seat inventory view was reviewed, showing per-event seat status (available, on hold, reserved, sold) along with availability/holder trackers, sales & allocation tracking, and audit/reconciliation reporting.
+
+- **Decision: **seats placed on hold (added to cart) must auto-release after a configurable timeout if checkout is abandoned, and must also auto-release immediately if a payment attempt fails, so inventory is not held indefinitely against an incomplete transaction.
+
+**4.7 Deferred Seat Assignment Model ****&**** Ticket Delivery / Turnstile Integration**
+
+- Chinmay raised how ticket/QR generation would integrate with TICVAI's own turnstile system when a venue uses the deferred (“best available”) assignment model — i.e., how seats get finalised and QR codes issued if the customer isn't shown a seat number at purchase time.
+
+- Allam clarified the operational pattern: the sale is confirmed immediately (section + quantity), but exact seats are assigned internally; closer to the event, the operations/admin team triggers a bulk e-mail to all confirmed bookings for that event, at which point customers receive their QR-coded tickets with final seat assignments — giving the venue flexibility to rearrange seating right up to that point.
+
+- **Decision: **the platform will support a deferred seat-assignment workflow: confirmed section/quantity sale at purchase, internal seat allocation held until an admin-triggered bulk release (e-mail + QR ticket issuance) ahead of the event, in addition to immediate seat assignment for venues that require it.
+
+**4.8 B2C Checkout Journey Review — Six Flags Kidiya Reference Walkthrough**
+
+- The team (Qossai screen-sharing) walked through the Six Flags Kidiya B2C site: fixed header with configurable navigation (logo, Explore/Tickets/Passes, sub-menus — all toggleable via CMS), a clear four-step journey indicator (Ticket Selection → Add-ons → My Cart → Checkout), in-page ticket browsing (no multi-page navigation to view ticket types), short descriptions with an expandable “view more details” control, and configurable hero image/video per product.
+
+- For season-pass/family-type products, the flow requires first and last name capture per individual pass holder (not just the purchaser), reviewed via the “add guest name” step. “View all ticket types” expands additional categories in place, and a family-pass example showed a dynamic-pricing calendar applied at the ticket-type level.
+
+- **Decision: **the TICVAI B2C checkout should mirror this pattern: a visible step indicator, in-page (not multi-page) ticket-type browsing and expansion, an optional/removable add-ons step (skippable in configuration for products with no add-ons, collapsing the flow to Ticket Selection → Cart → Checkout), and per-person name capture for family/season-pass products.
+
+- **Action: **Chinmay's team to refine the guest-app/B2C flow already in progress based on today's Kidiya walkthrough feedback and share the updated flow back with Allam's team.
+
+**4.9 Website Builder Flexibility — Standalone vs. B2C-Only Configuration**
+
+- Qossai raised that the website builder needs to support two distinct client scenarios: (1) clients with no existing website, who need a full landing page plus integrated ticket-sale flow built by TICVAI, and (2) clients with an existing main website, who only need the B2C purchase flow (header, product cards, footer, checkout) embedded or linked from their existing site.
+
+- **Decision: **the CMS/website builder will support both a full landing-page-plus-checkout mode and a B2C-only embedded mode, configurable per client, using the same underlying builder.
+
+**5. Key Decisions ****&**** Agreements**
+
+- The seat map builder must support three seat-selection models (zone/capacity-only, system-assigned best-available, full customer selection) and mixed section types (seated, non-seated, standing, suite) within a single unified configuration screen.
+
+- Best-seat ranking logic and seating rules (consecutive-seat, social distancing) are configurable per venue/event, not fixed platform-wide.
+
+- AI-assisted seat map import (PDF/image + Excel/CSV) will be supported alongside manual building, with full and section-level copy-paste and layout version comparison.
+
+- Inventory release will support temporary blocking, scheduled release, and tiered/early-bird tranches rather than exposing full section capacity immediately.
+
+- Held/cart seats auto-release on checkout timeout or payment failure.
+
+- A deferred seat-assignment workflow (confirm sale → admin-triggered bulk QR release closer to the event) will be supported alongside immediate seat assignment.
+
+- The B2C checkout will use a visible step indicator, in-page ticket browsing, an optional/removable add-ons step, and per-person name capture for family/season-pass products.
+
+- The website/CMS builder will support both a full landing-page-plus-checkout mode and a B2C-only embedded mode, per client.
+
+**6. Open Items / Questions for Follow-Up**
+
+- Technical approach for seat map copy/paste (map-to-map and section-to-section) and layout version comparison — pending confirmation from Chinmay's team.
+
+- Guest-app/B2C flow refinement based on today's Kidiya walkthrough feedback — in progress.
+
+- Dinesh's service specification & deployment discussion — write-up of questions pending; to be shared ahead of Monday's call.
+
+- Ticket type and resource management walkthrough (prepared by Qossai/Allam) — to be covered Monday or Tuesday if time permits.
+
+- F&B, Retail, Procurement & Inventory workshop — not covered in this session (second consecutive session filed under this name without matching content); remains outstanding.
+
+**7. Action Items**
+
+| **Action Item** | **Owner** | **Due** | **Status** |
+| --- | --- | --- | --- |
+| Confirm technical approach for seat map copy/paste (full map & section-level) and layout version comparison | Chinmay Parab | TBC | Open |
+| Refine the guest-app/B2C checkout flow based on the Six Flags Kidiya walkthrough feedback and share back with Allam's team | Chinmay/Aishwarya | In progress | In Progress |
+| Prepare write-up of questions for the service specification & deployment discussion | Dinesh Jadhav | Before Mon call | Open |
+| Send calendar invite for Monday's session (9:30 AM Dubai time) | Chinmay Parab | ASAP | Open |
+| Prepare ticket type and resource management walkthrough materials | Qossai/Allam | Mon/Tue (if time permits) | Open |
+| Schedule and hold the outstanding F&B, Retail, Procurement & Inventory workshop | Chinmay/Allam | TBC | Open |
+
+**8. Next Steps**
+
+- Next session: Monday, 24-August-2026, 9:30 AM Dubai time.
+
+- Primary topic: service specification & deployment discussion requested by Dinesh (approx. 45–60 minutes).
+
+- If time permits: ticket type and resource management walkthrough (prepared by Qossai/Allam).
+
+*--- End of Minutes ---*
+
+	Page 1 of 2

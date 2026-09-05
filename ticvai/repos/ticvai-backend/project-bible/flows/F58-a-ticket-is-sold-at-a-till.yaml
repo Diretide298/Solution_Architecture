@@ -38,7 +38,7 @@ steps:
   - step: 2
     screen: POS-003
     action: The ticket is timed entry, so a slot is taken.
-    operations: [getAvailability, acquireLease, renewLease]
+    operations: [getAvailability, acquireInventoryHold, renewInventoryHold]
     outcome: >
       A lease on the slot. **Contended inventory is leased, not reserved** (CF-115): a slot held
       without a lease is a slot two tills can sell, and the lease expires if the sale stalls.
@@ -97,10 +97,10 @@ branches:
   - at: 2
     condition: The slot sells out while the guest is deciding.
     behaviour: >
-      `acquireLease` fails and the alternatives are offered. **A lease that cannot be acquired is a
+      `acquireInventoryHold` fails and the alternatives are offered. **A lease that cannot be acquired is a
       slot genuinely gone**, which is the difference between leasing and optimistic reservation.
     severity: medium
-    resolvedBy: acquireLease
+    resolvedBy: acquireInventoryHold
 
   - at: 5
     condition: The till is offline when the override is needed.
@@ -114,10 +114,10 @@ branches:
   - at: 6
     condition: The payment fails after the lease was taken.
     behaviour: >
-      `releaseLease` returns the slot immediately rather than waiting for expiry. **A failed payment
+      `releaseInventoryHold` returns the slot immediately rather than waiting for expiry. **A failed payment
       holding inventory for fifteen minutes is a slot the venue could have sold.**
     severity: high
-    resolvedBy: releaseLease
+    resolvedBy: releaseInventoryHold
 
   - at: 8
     condition: The till is offline.

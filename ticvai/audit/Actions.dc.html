@@ -1,0 +1,138 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;family=IBM+Plex+Mono:wght@400;500;600&amp;display=swap" rel="stylesheet">
+<style>
+html, body { margin: 0; padding: 0; background: #EEF1F6; -webkit-font-smoothing: antialiased; }
+* { box-sizing: border-box; }
+a { color: #0D6EFD; text-decoration: none; }
+a:hover { color: #0A55C7; }
+.row { display: grid; grid-template-columns: 34px minmax(0, 1fr) 96px; gap: 16px; align-items: start; border-top: 1px solid #E5E7EB; padding: 15px 0; }
+.num { font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 600; color: #0D6EFD; padding-top: 1px; }
+.q { font-size: 12px; line-height: 1.6; color: #6B7280; margin: 7px 0 0; text-wrap: pretty; }
+.q strong { color: #1F2937; }
+.count { text-align: right; font-family: 'IBM Plex Mono', monospace; font-variant-numeric: tabular-nums; }
+</style>
+</helmet>
+
+<div style="font-family: Manrope, system-ui, sans-serif; color: #1F2937; background: #EEF1F6; padding: 44px 40px 56px">
+  <div style="max-width: 1100px; margin: 0 auto">
+
+    <div style="border-bottom: 1px solid #DCE3ED; padding-bottom: 22px">
+      <div style="font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; letter-spacing: .14em; color: #0D6EFD; text-transform: uppercase">What to do about it</div>
+      <h1 style="font-size: 32px; font-weight: 800; letter-spacing: -.02em; margin: 8px 0 10px; line-height: 1.08">Six decisions, in this order</h1>
+      <p style="font-size: 14px; line-height: 1.65; color: #4B5563; max-width: 82ch; margin: 0; text-wrap: pretty">Each row is a question with an owner, not a refactor. Answering them is what removes the screens; nobody has to merge a YAML file to find out whether two screens are the same. They are ordered by how much they unblock &mdash; the first two decide what a third of the remaining wireframes even look like.</p>
+    </div>
+
+    <div style="margin-top: 20px; background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 8px 26px 22px">
+      <div style="display: grid; grid-template-columns: 34px minmax(0, 1fr) 96px; gap: 16px; padding: 14px 0 4px">
+        <div></div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #6E7681; text-transform: uppercase">Decision</div>
+        <div style="font-family: 'IBM Plex Mono', monospace; font-size: 9.5px; font-weight: 600; letter-spacing: .12em; color: #C02626; text-transform: uppercase; text-align: right">Screens</div>
+      </div>
+
+      <div class="row">
+        <div class="num">01</div>
+        <div>
+          <div style="font-size: 15px; font-weight: 800; line-height: 1.3">Is the guest app a second product or a wrapper?</div>
+          <p class="q">Twenty screens are duplicated between P01 and P02, each pair declaring exactly the same operations. If the app is a shell over the same storefront, <strong>P02 keeps only the three screens that need the device</strong> &mdash; the dynamic QR, plan-my-day, and push &mdash; and everything else is one definition with two breakpoints. If it is genuinely a second product, each of the twenty needs a sentence saying what is different on a phone.</p>
+        </div>
+        <div class="count" style="font-size: 19px; font-weight: 700; color: #C02626">20</div>
+      </div>
+
+      <div class="row">
+        <div class="num">02</div>
+        <div>
+          <div style="font-size: 15px; font-weight: 800; line-height: 1.3">Is there one order workspace, or one per platform?</div>
+          <p class="q">Seven screens across POS, the staff app, the back office and the partner portal declare the identical fourteen order operations. <strong>One screen taking an order id and a role</strong> replaces all seven; what differs between them is which actions the permission allows, which the schema already models on the component. Decide this before BO-051 Purchase Orders and BO-070 Work Orders inherit the same fourteen.</p>
+        </div>
+        <div class="count" style="font-size: 19px; font-weight: 700; color: #C02626">6</div>
+      </div>
+
+      <div class="row">
+        <div class="num">03</div>
+        <div>
+          <div style="font-size: 15px; font-weight: 800; line-height: 1.3">Is P16 Venue Analytics a platform or a report library?</div>
+          <p class="q">Nine of its ten screens call <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">getDashboard</span> or <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">runReport</span> and seven call both, and BO-029 Report Builder already builds them. <strong>If a saved report is a configuration rather than a screen</strong>, P16 becomes two screens &mdash; a library and a viewer &mdash; and BO-058/059/061, POS-008, PTR-018 and SUP-008 Agent Performance &amp; SLA View become entries in it rather than separate definitions.</p>
+        </div>
+        <div class="count" style="font-size: 19px; font-weight: 700; color: #C02626">10</div>
+      </div>
+
+      <div class="row">
+        <div class="num">04</div>
+        <div>
+          <div style="font-size: 15px; font-weight: 800; line-height: 1.3">Which app owns scanning &mdash; the staff app or the scanner?</div>
+          <p class="q">EMP-010, EMP-015 and EMP-017 restate SCN-007, SCN-008 and SCN-014 operation for operation. Both are offline-capable, and <strong>two apps queueing admissions offline against the same gate is a reconciliation problem, not a duplication problem</strong>. This one has a correctness cost, not just a cost in screens: pick the owner, and the other app deep-links into it.</p>
+        </div>
+        <div class="count" style="font-size: 19px; font-weight: 700; color: #C02626">3</div>
+      </div>
+
+      <div class="row">
+        <div class="num">05</div>
+        <div>
+          <div style="font-size: 15px; font-weight: 800; line-height: 1.3">Does the floor need its own stock app, or a food-safety round?</div>
+          <p class="q">Seventy per cent of P06's stock vocabulary is already in P08, and two of its screens carry signatures identical to back-office ones. What P06 has that P08 does not is the HACCP set &mdash; <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">logTemperature</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">logColdChain</span>, <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">signCorrectiveAction</span>. <strong>That is two or three screens done standing up, not ten.</strong></p>
+        </div>
+        <div class="count" style="font-size: 19px; font-weight: 700; color: #C02626">7</div>
+      </div>
+
+      <div class="row">
+        <div class="num">06</div>
+        <div>
+          <div style="font-size: 15px; font-weight: 800; line-height: 1.3">Are navigation landings screens?</div>
+          <p class="q">BO-101 to BO-108 are the back-office section menu, and BO-100 Venue Home is its root. Under the four-states rule each owes a loading, empty-first-run, error and offline state. <strong>Either they are nav and leave the inventory, or the rule does not apply to them</strong> &mdash; but they cannot stay as screens nobody will ever specify. The same question covers the four Command Center landings.</p>
+        </div>
+        <div class="count" style="font-size: 19px; font-weight: 700; color: #C02626">8</div>
+      </div>
+    </div>
+
+    <div style="margin-top: 18px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 14px">
+
+      <div style="background: #0C2340; border-radius: 16px; padding: 22px 26px 24px; color: #E8EFF7">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .1em; color: #00D4C4; text-transform: uppercase">If all six go the consolidating way</div>
+        <div style="display: flex; align-items: baseline; gap: 14px; margin: 16px 0 4px; flex-wrap: wrap">
+          <div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 34px; font-weight: 600; color: #FFFFFF; font-variant-numeric: tabular-nums; line-height: 1">492</div><div style="font-size: 10.5px; color: #A9C2DC; font-weight: 600; margin-top: 3px">defined today</div></div>
+          <div style="font-family: 'IBM Plex Mono', monospace; font-size: 22px; color: #00D4C4; padding-bottom: 14px">&rarr;</div>
+          <div><div style="font-family: 'IBM Plex Mono', monospace; font-size: 34px; font-weight: 600; color: #00D4C4; font-variant-numeric: tabular-nums; line-height: 1">438</div><div style="font-size: 10.5px; color: #A9C2DC; font-weight: 600; margin-top: 3px">after these six</div></div>
+        </div>
+        <div style="height: 8px; border-radius: 999px; background: #14304F; overflow: hidden; display: flex; margin: 16px 0 10px">
+          <div style="width: 89%; background: #00D4C4"></div>
+          <div style="width: 11%; background: #C02626"></div>
+        </div>
+        <p style="font-size: 12.5px; line-height: 1.65; color: #A9C2DC; margin: 0; text-wrap: pretty">Fifty-four fewer screens &mdash; the six rows above, added up. But the count is not the point. <strong>Fifty-four removed is fifty-four sets of loading, empty, error and offline states nobody has to write, and fifty-four fewer wireframes to draw and review</strong> &mdash; on an inventory where 14 screens still declare no operations at all and the states are the part that takes the time.</p>
+      </div>
+
+      <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 22px 24px 24px">
+        <div style="font-size: 11px; font-weight: 800; letter-spacing: .1em; color: #96650A; text-transform: uppercase">Two schema fields would stop it recurring</div>
+        <div style="margin-top: 14px; display: flex; flex-direction: column; gap: 14px">
+          <div>
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #1F2937">sameAs: &lt;screen id&gt;</div>
+            <p style="font-size: 12px; line-height: 1.6; color: #4B5563; margin: 5px 0 0; text-wrap: pretty">Declares that this screen is another screen at a different scope or on a different device, and names what differs. A screen with <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">sameAs</span> inherits states rather than re-declaring them, and one without it that duplicates a signature fails the check &mdash; the way <span style="font-family: 'IBM Plex Mono', monospace; font-size: 11px">check-screens.py</span> already fails an unknown operation id.</p>
+          </div>
+          <div style="border-top: 1px solid #E5E7EB; padding-top: 14px">
+            <div style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 600; color: #1F2937">kind: screen | landing</div>
+            <p style="font-size: 12px; line-height: 1.6; color: #4B5563; margin: 5px 0 0; text-wrap: pretty">A landing is navigation. It keeps an id and a route so links resolve, and it is exempt from the four-states rule &mdash; which is honest about what BO-101 to BO-108 are, instead of leaving nine permanent TODOs in the specified count.</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="margin-top: 14px; background: #FFFFFF; border: 1px solid #E5E7EB; border-left: 3px solid #6E7681; border-radius: 14px; padding: 18px 22px 20px">
+      <div style="font-size: 11px; font-weight: 800; letter-spacing: .08em; color: #6E7681; text-transform: uppercase">One thing this audit cannot tell you</div>
+      <p style="font-size: 12.5px; line-height: 1.65; color: #4B5563; margin: 9px 0 0; max-width: 92ch; text-wrap: pretty">Operations are a good proxy for what a screen does and a poor one for who is standing in front of it. Fourteen screens declare no operations at all &mdash; four of the eight accreditation screens among them &mdash; so they are invisible to this method entirely, and every judgement above about <em>context</em> rather than data is a reading of the purpose lines, not a measurement. The purpose lines are themselves unreliable: 28 screens share one of four sentences. Where a cluster here contradicts what the team knows about the user, the team is right; the value is that the question is now on a specific list of screen ids.</p>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

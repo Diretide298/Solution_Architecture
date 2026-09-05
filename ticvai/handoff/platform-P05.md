@@ -9,38 +9,12 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 21 |
+| Operations with no screen | 0 |
 | Waves | wave2 17 |
 
 ## Gaps
 
-### 21 operations with no screen here
-
-**In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
-
-| Operation | Contract | | |
-|---|---|---|---|
-| `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
-| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
-| `updateTableReservation` | fnb | PATCH | Change or cancel a booking |
-| `createReferral` | marketing-crm | POST | Issue a referral code |
-| `getMyChallenges` | marketing-crm | GET | Active challenges and how far along I am |
-| `getWaiverStatus` | marketing-crm | GET | Whether this guest may be issued a ticket that requires a waiver |
-| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
-| `respondToInvitation` | marketing-crm | POST | Accept or decline |
-| `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `updateGuestPreferences` | marketing-crm | PUT | The things a regular should not have to say twice |
-| `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
-| `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
-| `createCart` | orders | POST | Start a cart |
-| `createResaleListing` | orders | POST | List an entitlement for resale |
-| `getGroupBooking` | orders | GET |  |
-| `listPaymentTokens` | orders | GET | A guest's saved payment methods |
-| `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
-| `shareEntitlement` | orders | POST | Let somebody else use this, without giving it away |
-| `storePaymentToken` | orders | POST | Save a payment method for future use |
-| `transferWalletBalance` | retail | POST | Send balance to another guest |
+**None derivable.** Every operation this platform's contracts expose to its audience reaches a screen, every module spans one wave, everything is drawn, and no flow names a screen that does not exist.
 
 ## Modules
 

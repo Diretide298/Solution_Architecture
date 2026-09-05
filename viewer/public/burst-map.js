@@ -914,11 +914,26 @@ export async function renderDeployMap(host, burst, io) {
     + 'platform.dsar_request, because it carries a legal clock. Both halt and alert — '
     + 'the distinction is whether silent accumulation is acceptable, and for those '
     + 'two it never is. ADR-0033.'));
-  wp.append(el('p', 'bd-risk-n',
-    'synchronous_commit is off on this database. A crash loses the last few '
-    + 'milliseconds of commits, traded for fifty seconds of throughput. ADR-0035 '
-    + 'calls that a decision rather than a setting, and a data-loss bug if it is '
-    + 'copied from a tuning guide.'));
+  // **Read the flag, do not assert it.** This paragraph said "synchronous_commit
+  // is off on this database" unconditionally while `topology()` above parsed the
+  // real setting off the compose command line — so when all four configurations
+  // dropped it from the server on 31 August, the box two panels up correctly
+  // printed nothing and this sentence went on claiming the opposite. A viewer
+  // that reads a file and then narrates a different file is worse than one that
+  // never read it, because the reading is what makes it believable.
+  wp.append(el('p', 'bd-risk-n', t.postgres?.synchronousCommit === 'off'
+    ? 'synchronous_commit is off on this database. A crash loses the last few '
+      + 'milliseconds of commits, traded for fifty seconds of throughput. ADR-0035 '
+      + 'calls that a decision rather than a setting, and a data-loss bug if it is '
+      + 'copied from a tuning guide.'
+    : 'synchronous_commit is on at the server, and the configuration says that '
+      + 'reverses an earlier decision: at a fraction of the statement ceiling it was '
+      + 'buying headroom this environment already had and paying acknowledged-commit '
+      + 'durability on the money path for it. It is turned off per statement instead '
+      + '— SET LOCAL, never SET, because under transaction pooling a session-level '
+      + 'SET leaks onto whichever connection the pooler hands out next. ADR-0035 '
+      + 'still states the server-wide setting as its decision and has not been '
+      + 'amended, so the ADR and the four files it governs disagree.'));
   section.append(wp);
 
   // ── the part expansion does not help ──────────────────────────────────────

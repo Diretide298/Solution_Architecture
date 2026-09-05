@@ -1,11 +1,3 @@
-# P04 — Point of Sale
-#
-# Written against the delivered mockups: Park_POS_dc.html and Park_POS_v1_dc.html.
-# POS-010 is from the 14 August MoM and is not in those designs.
-#
-# Offline-capable, so every screen declares an offline state. Those states are the
-# most important lines in this file: they are where ADR-0013 becomes a behaviour.
-
 platform:
   code: P04
   audience: staff
@@ -68,12 +60,20 @@ screens:
     - name: statusStrip
       ref: statusStrip
       components: []
+      notes: '**Renders from `getCurrentShift`, not from declared components.** The strip shows shift
+        state — open, suspended, awaiting approval — and its content is the state machine''s, not a layout''s.
+        Declaring components here would be declaring the states twice, and the second copy is the one
+        that goes stale.
+
+
+        **Empty on purpose.** `check-screens` reports an empty region that says nothing about being empty;
+        this is the sentence that closes it.'
     - name: contentBody
       components:
       - kind: numberField
         label: Denomination count
-        notes: Per denomination, from the region settings — the mockup shows AED 200 down to coins.
-          Not a hardcoded list
+        notes: Per denomination, from the region settings — the mockup shows AED 200 down to coins. Not
+          a hardcoded list
       - kind: metricTile
         bindsTo: Shift.floatTotal
         notes: Computed, never typed
@@ -89,10 +89,17 @@ screens:
   states:
     loading: Denominations from region settings
     emptyFirstRun: Not applicable
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASH_ADD`, `CASH_LIFT`, `DEVICE_VIEW` and 7 more to use cashs; a person without it sees the
+      reason and who to ask, because an empty table reads as *there is no data* and sends somebody to
+      support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Open failed. Counts are kept on screen
-    offline: Opens locally and syncs. A gate that cannot open a till because the network is down is
-      a gate that does not sell
+    offline: Opens locally and syncs. A gate that cannot open a till because the network is down is a
+      gate that does not sell
   wireframe:
     status: designed
     board: wireframes/TICVAI Boards v2.dc.html#pos-2a
@@ -170,13 +177,13 @@ screens:
     contract: shift
     purpose: listDenominations
     trigger: onLoad
-  notes: 'Design: Park_POS_dc.html. The mockup warns "you will not be able to edit the float amount
-    after the shift has started" — that is correct and deliberate. An editable opening float makes close-out
-    variance meaningless. **Improved 20 August against the client design board**, answering 2 board
-    screen(s): Opening Float Management; Shift Opening & Login. **Owns POS board frame(s) POS-2A, POS-3D**
-    (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three
-    attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table
-    is worse off than one who has none.'
+  notes: 'Design: Park_POS_dc.html. The mockup warns "you will not be able to edit the float amount after
+    the shift has started" — that is correct and deliberate. An editable opening float makes close-out
+    variance meaningless. **Improved 20 August against the client design board**, answering 2 board screen(s):
+    Opening Float Management; Shift Opening & Login. **Owns POS board frame(s) POS-2A, POS-3D** (client
+    pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts
+    at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse
+    off than one who has none.'
   implementation:
     app: venue-pos
     route: /shift/begin-shift
@@ -201,13 +208,14 @@ screens:
       from: session
     - name: shiftId
       from: deepLink
-    coldEntry: '**The deposit box allocated to this workstation for this shift**, resolved at shift
-      open — a cashier does not choose a box.'
+    coldEntry: '**The deposit box allocated to this workstation for this shift**, resolved at shift open
+      — a cashier does not choose a box.'
   provenance: client board, specified
   requiresModule: core
   boardFrames:
-  - POS-2A
-  - POS-3D
+  - POS Board 3.dc.html#pos-3d
+  - TICVAI Boards v2.dc.html#pos-2a
+  statesDerived: true
 - id: POS-002
   name: Sell — Ticket Catalogue
   module: Sell
@@ -220,6 +228,13 @@ screens:
     - name: sideNav
       ref: sideNav
       components: []
+      notes: '**Renders from the catalogue bundle, not from declared components.** Sections come from
+        what the venue published (ADR-0013) — a till that ships a hard-coded nav is a till that cannot
+        show a category added this morning.
+
+
+        **Empty on purpose**, and the alternative is worse: a component list here would be a second definition
+        of the catalogue''s own structure.'
     - name: contentBody
       components:
       - kind: searchField
@@ -232,6 +247,17 @@ screens:
         label: Sort by
       - kind: multiSelect
         label: Filters
+      - kind: confirmDialog
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
+
+
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
     - name: contextPanel
       components:
       - kind: cartPanel
@@ -257,14 +283,27 @@ screens:
   states:
     loading: Tiles from the local bundle. Instant — this screen must not wait on a network
     emptyFirstRun: No products in this category
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**The filter matched nothing, and the data is still there.** The action widens or
+      clears it — distinct from first run, which has nothing to match, and **a screen that shows the same
+      panel for both sends somebody looking for data they already filtered out.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `APPROVAL_REQUEST`, `APPROVAL_VIEW`, `GUEST_VIEW` and 13 more to use approvals; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Bundle stale or missing. The terminal refuses to sell rather than selling at an unknown price
     offline: Served from the local catalogue bundle (ADR-0013). One read path, always local — the terminal
       does not know whether it has a network.
-    catalogueStale: '**The bundle on this till is older than the one published.** Shown, not hidden
-      — a till selling yesterday’s prices is a real exposure, and `maxOfflineHours` bounds how long
-      it can last.'
+    catalogueStale: '**The bundle on this till is older than the one published.** Shown, not hidden —
+      a till selling yesterday’s prices is a real exposure, and `maxOfflineHours` bounds how long it can
+      last.'
   wireframe:
     status: designed
     board: wireframes/Retail Board 3.dc.html#ret-3b
@@ -436,23 +475,22 @@ screens:
     contract: retail
     purpose: Sell merchandise
     trigger: onAction
-  notes: 'Design: Park_POS_dc.html, "Ticket Catalogue / Product Selection". The mockup exposes Hold
-    Order and Discount as first-class buttons — neither existed as an operation until 14 August. Where
-    a foreign note is offered, the tender currency and rate are recorded on the payment. **The sale
-    is still booked in base currency** — 2.9.1: the sale finalises in local currency. **Improved 20
-    August against the client design board**, answering 4 board screen(s): Retail Sales & POS Command
-    Center; Retail POS Selling Workspace; Guest, Membership, Loyalty & Entitlement Interface and 1 more.
-    **`getLatestBundle` wired 24 August.** ADR-0013 makes the POS local-first and **no P04 screen polled
-    for a catalogue** — the till held a bundle and nothing on the platform refreshed it. Found by writing
-    F31, not by auditing the contract. **Retail board operations wired 24 August.** **Cross-platform
-    navigation removed 24 August**: BO-084, GST-026. **A till does not navigate to a back office and
-    a guest app does not navigate to either** — those are device handovers, and a flow declares them
-    with `crossesDevice` rather than a screen pretending there is a link. **Authoring operations removed
-    24 August**: createProduct, createPromotion, endPromotion, pausePromotion, publishPromotion, setAlternativeCodes,
-    setProductAttributes, transitionProductLifecycle, unschedulePromotion, updateProduct, updatePromotion,
-    createStockMovement. **A till sells the catalogue; it does not author it.** These arrived in the
-    18 August bulk attach — the same defect that put 21 of 39 review rows in one bucket — and a flow
-    walking a ticket sale is what surfaced them.'
+  notes: 'Design: Park_POS_dc.html, "Ticket Catalogue / Product Selection". The mockup exposes Hold Order
+    and Discount as first-class buttons — neither existed as an operation until 14 August. Where a foreign
+    note is offered, the tender currency and rate are recorded on the payment. **The sale is still booked
+    in base currency** — 2.9.1: the sale finalises in local currency. **Improved 20 August against the
+    client design board**, answering 4 board screen(s): Retail Sales & POS Command Center; Retail POS
+    Selling Workspace; Guest, Membership, Loyalty & Entitlement Interface and 1 more. **`getLatestBundle`
+    wired 24 August.** ADR-0013 makes the POS local-first and **no P04 screen polled for a catalogue**
+    — the till held a bundle and nothing on the platform refreshed it. Found by writing F31, not by auditing
+    the contract. **Retail board operations wired 24 August.** **Cross-platform navigation removed 24
+    August**: BO-084, GST-026. **A till does not navigate to a back office and a guest app does not navigate
+    to either** — those are device handovers, and a flow declares them with `crossesDevice` rather than
+    a screen pretending there is a link. **Authoring operations removed 24 August**: createProduct, createPromotion,
+    endPromotion, pausePromotion, publishPromotion, setAlternativeCodes, setProductAttributes, transitionProductLifecycle,
+    unschedulePromotion, updateProduct, updatePromotion, createStockMovement. **A till sells the catalogue;
+    it does not author it.** These arrived in the 18 August bulk attach — the same defect that put 21
+    of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced them.'
   implementation:
     app: venue-pos
     route: /sell/sell-ticket-catalogue
@@ -473,7 +511,11 @@ screens:
     - POS-011
     - POS-013
     - POS-020
+    - BO-045
     fromFlows: true
+    notes: '**flow F31 — the till picks up the new catalogue and the manager returns to the menu.** The
+      flow is the authority on the journey and the navigation has to agree with it; marking this block
+      non-inferred is what turned the disagreement from a warning into a failure.'
   density: touchLarge
   entryState:
     params:
@@ -489,14 +531,15 @@ screens:
       from: deepLink
     - name: promotionId
       from: deepLink
-    coldEntry: '**The cart in progress at this till**, held locally. A cold arrival mid-sale resumes
-      it from the journal rather than losing it. An order recalled from the held list or a receipt lookup.'
+    coldEntry: '**The cart in progress at this till**, held locally. A cold arrival mid-sale resumes it
+      from the journal rather than losing it. An order recalled from the held list or a receipt lookup.'
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-3B
-  - RET-3C
-  - RET-3D
+  - Retail Board 3.dc.html#ret-3b
+  - Retail Board 3.dc.html#ret-3c
+  - Retail Board 3.dc.html#ret-3d
+  statesDerived: true
 - id: POS-003
   name: Sell — Timed Entry
   module: Sell
@@ -527,8 +570,21 @@ screens:
   states:
     loading: Slot skeleton
     emptyFirstRun: No sessions on this date, with the next available offered
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ORDER_CREATE`, `PRODUCT_VIEW` to create orders; a person without it sees the reason and who
+      to ask, because an empty table reads as *there is no data* and sends somebody to support with the
+      wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Availability unavailable. Selection blocked — overselling is worse than waiting
     offline: '**Availability is never served from the bundle.** A lease is acquired against the server;
       without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)'
@@ -541,7 +597,7 @@ screens:
     contract: catalogue
     purpose: Per-session remaining
     trigger: onLoad
-  - operationId: acquireLease
+  - operationId: acquireInventoryHold
     contract: catalogue
     purpose: Hold capacity for this terminal
     trigger: onAction
@@ -557,7 +613,7 @@ screens:
     contract: catalogue
     purpose: External identifiers for a product
     trigger: onLoad
-  - operationId: listLeases
+  - operationId: listInventoryHolds
     contract: catalogue
     purpose: List leases
     trigger: onLoad
@@ -565,11 +621,11 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: releaseLease
+  - operationId: releaseInventoryHold
     contract: catalogue
     purpose: Return unsold units
     trigger: onAction
-  - operationId: renewLease
+  - operationId: renewInventoryHold
     contract: catalogue
     purpose: Extend a lease TTL
     trigger: onAction
@@ -579,10 +635,10 @@ screens:
     trigger: onLoad
   notes: 'Design: Park_POS_dc.html, "Aquarium Entry" timed entry. The demand indicator is a presentation
     of remaining capacity, not a separate field. **Authoring operations removed 24 August**: createProduct,
-    forceReleaseLease, setAlternativeCodes, setProductAttributes, transitionProductLifecycle, updateProduct.
-    **A till sells the catalogue; it does not author it.** These arrived in the 18 August bulk attach
-    — the same defect that put 21 of 39 review rows in one bucket — and a flow walking a ticket sale
-    is what surfaced them.'
+    forceReleaseInventoryHold, setAlternativeCodes, setProductAttributes, transitionProductLifecycle,
+    updateProduct. **A till sells the catalogue; it does not author it.** These arrived in the 18 August
+    bulk attach — the same defect that put 21 of 39 review rows in one bucket — and a flow walking a ticket
+    sale is what surfaced them.'
   implementation:
     app: venue-pos
     route: /sell/sell-timed-entry
@@ -600,12 +656,17 @@ screens:
   density: touchLarge
   entryState:
     params:
-    - name: leaseId
+    - name: inventoryHoldId
       from: deepLink
     - name: productId
       from: POS-002
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `inventoryHoldId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: POS-004
   name: Sell — Seat Map
   module: Sell
@@ -635,13 +696,25 @@ screens:
   states:
     loading: Map skeleton at the venue aspect ratio
     emptyFirstRun: No seats in the selected category
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `APPROVAL_VIEW`, `ORDER_CREATE`, `ORDER_VIEW` and 2 more to read approvals; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `seating` is not licensed.** The tenant has not bought this module, which is
+      a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Map unavailable, with best-available offered instead
     offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
       seat is unrecoverable'
   wireframe:
-    status: generated
-    board: wireframes/P04 Venue POS.dc.html#pos-004
+    status: designed
+    board: wireframes/Seat Board 3.dc.html#seat-3a
+    generatedFallback: wireframes/P04 Venue POS.dc.html#pos-004
   permission: ORDER_CREATE
   apis:
   - operationId: getSeatAvailability
@@ -688,13 +761,16 @@ screens:
     contract: approvals
     purpose: Does this need approval, and from whom
     trigger: onAction
-  notes: 'Design: Park_POS_dc.html, "Reserved Seating / Seat Map". Booking fee is a separate line —
-    it is a fee, not part of the seat price, and reporting separates them. Foreign tender: **cash in
-    a currency the venue accepts, converted at the rate on the payment** (4.6.11). Change is given in
-    base currency only, so the till holds one float and one count per currency it takes in. **Removed
-    24 August**: cancelPerformance. **Bulk-attach residue** — the 18 August defect that put identical
-    operation sets on unrelated screens. A till does not cancel a performance, a staff app does not
-    create roles, and **a scanner does not run a cash shift.**'
+  notes: 'Design: Park_POS_dc.html, "Reserved Seating / Seat Map". Booking fee is a separate line — it
+    is a fee, not part of the seat price, and reporting separates them. Foreign tender: **cash in a currency
+    the venue accepts, converted at the rate on the payment** (4.6.11). Change is given in base currency
+    only, so the till holds one float and one count per currency it takes in. **Removed 24 August**: cancelPerformance.
+    **Bulk-attach residue** — the 18 August defect that put identical operation sets on unrelated screens.
+    A till does not cancel a performance, a staff app does not create roles, and **a scanner does not
+    run a cash shift.** **Drawn 26 August** — `Seat Board 3.dc.html` frame `seat-3a`. **The frame names
+    this screen on its own face**, which is the first pack to do that: the earlier F&B, POS and Retail
+    boards had to be hand-assigned by purpose after three derivation attempts produced nonsense. **A board
+    that says what it draws removes the guess entirely.**'
   implementation:
     app: venue-pos
     route: /sell/sell-seat-map
@@ -719,6 +795,9 @@ screens:
     coldEntry: '**A link to a performance that has happened.** Offers the next performance of the same
       event.'
   requiresModule: seating
+  statesDerived: true
+  boardFrames:
+  - Seat Board 3.dc.html#seat-3a
 - id: POS-005
   name: Payment
   module: Payment
@@ -740,6 +819,17 @@ screens:
         notes: Computed live. Quick-tender chips for exact, 250, 300
       - kind: paymentTerminal
         bindsTo: Payment
+      - kind: confirmDialog
+        derived: true
+        label: Confirm
+        notes: '**The consequence goes in the body, not the title.** *Cancel 3 orders worth AED 480* is
+          a confirmation; *are you sure* is not — and a dialog that cannot name what it destroys is a
+          dialog somebody dismisses.
+
+
+          **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
+          **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
+          reads *always requires confirmation*.'
     - name: contextPanel
       components:
       - kind: cartPanel
@@ -761,7 +851,18 @@ screens:
   states:
     loading: Button disabled while processing. Double submission impossible
     emptyFirstRun: Not applicable
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `LOYALTY_REDEEM`, `ORDER_CREATE`, `ORDER_MODIFY` and 2 more to use loyaltys; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Declined, with the reason. Retry reuses the same idempotency key
     offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
       never saw is a sale that vanishes at settlement
@@ -817,16 +918,15 @@ screens:
     purpose: Spend points
     trigger: onAction
   notes: 'Design: Park_POS_dc.html, "Cash Payment". Add Tip appears in the design and had no operation
-    until 14 August. A tip posts to a liability, not to sales. **The one surface that takes foreign
-    cash** (4.6.11). Records `tenderCurrency`, `tenderAmount` and the `fxRate` applied, and **gives
-    change in base currency only** — a till giving change in five currencies needs five floats and the
-    variance becomes unattributable. **Improved 20 August against the client design board**, answering
-    1 board screen(s): Checkout, Payment & Receipt. **Cross-platform navigation removed 24 August**:
-    BO-048. **A till does not navigate to a back office and a guest app does not navigate to either**
-    — those are device handovers, and a flow declares them with `crossesDevice` rather than a screen
-    pretending there is a link. **Reaches the counter screens from 24 August.** **A till has one tender
-    flow, not one per module** — a food order and a ticket both settle here and return to whichever
-    board they came from.'
+    until 14 August. A tip posts to a liability, not to sales. **The one surface that takes foreign cash**
+    (4.6.11). Records `tenderCurrency`, `tenderAmount` and the `fxRate` applied, and **gives change in
+    base currency only** — a till giving change in five currencies needs five floats and the variance
+    becomes unattributable. **Improved 20 August against the client design board**, answering 1 board
+    screen(s): Checkout, Payment & Receipt. **Cross-platform navigation removed 24 August**: BO-048. **A
+    till does not navigate to a back office and a guest app does not navigate to either** — those are
+    device handovers, and a flow declares them with `crossesDevice` rather than a screen pretending there
+    is a link. **Reaches the counter screens from 24 August.** **A till has one tender flow, not one per
+    module** — a food order and a ticket both settle here and return to whichever board they came from.'
   implementation:
     app: venue-pos
     route: /payment/payment
@@ -852,11 +952,16 @@ screens:
       from: deepLink
     - name: saleId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `paymentId`, `saleId`.'
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-3E
+  - Retail Board 3.dc.html#ret-3e
+  statesDerived: true
 - id: POS-006
   name: Held Orders
   module: Sell
@@ -880,8 +985,21 @@ screens:
   states:
     loading: List skeleton
     emptyFirstRun: Nothing held
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ORDER_CREATE`, `ORDER_DISCOUNT`, `ORDER_EXCHANGE` and 6 more to create orders; a person without
+      it sees the reason and who to ask, because an empty table reads as *there is no data* and sends
+      somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: List unavailable. A held order can still be resumed by its number
     offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
       till's sale needs the server
@@ -973,7 +1091,8 @@ screens:
   provenance: client board, specified
   requiresModule: ticketing
   boardFrames:
-  - RET-3F
+  - Retail Board 3.dc.html#ret-3f
+  statesDerived: true
 - id: POS-007
   name: Close Shift
   module: Shift
@@ -1001,11 +1120,20 @@ screens:
   states:
     loading: Denominations
     emptyFirstRun: Not applicable
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `CASH_ADD`, `CASH_LIFT`, `ORDER_REPRINT` and 7 more to use cashs; a person without it sees
+      the reason and who to ask, because an empty table reads as *there is no data* and sends somebody
+      to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Close failed. The count is preserved
-    offline: Cannot close. Closing requires the server total, and a locally computed variance is not
-      a variance
+    offline: Cannot close. Closing requires the server total, and a locally computed variance is not a
+      variance
   wireframe:
     status: designed
     board: wireframes/TICVAI Boards v2.dc.html#pos-2f
@@ -1084,11 +1212,11 @@ screens:
     purpose: Reprint or resend a receipt
     trigger: onAction
   notes: 'The blind count is the whole control. Not in the mockup, which shows only Begin Shift. **Improved
-    20 August against the client design board**, answering 2 board screen(s): Cash Reconciliation &
-    Variance Management; Shift Closing & Settlements. **Owns POS board frame(s) POS-2F, POS-3F** (client
-    pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts
-    at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse
-    off than one who has none.'
+    20 August against the client design board**, answering 2 board screen(s): Cash Reconciliation & Variance
+    Management; Shift Closing & Settlements. **Owns POS board frame(s) POS-2F, POS-3F** (client pack,
+    24 August). **Assigned by board purpose rather than by operation overlap** — three attempts at deriving
+    that mapping produced plausible nonsense, and a reader who trusts a bad table is worse off than one
+    who has none.'
   implementation:
     app: venue-pos
     route: /shift/close-shift
@@ -1116,8 +1244,9 @@ screens:
   provenance: client board, specified
   requiresModule: core
   boardFrames:
-  - POS-2F
-  - POS-3F
+  - POS Board 3.dc.html#pos-3f
+  - TICVAI Boards v2.dc.html#pos-2f
+  statesDerived: true
 - id: POS-008
   name: Reports
   module: Reports
@@ -1144,8 +1273,21 @@ screens:
   states:
     loading: Tile skeletons
     emptyFirstRun: No sales yet today
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `REPORT_MANAGE`, `REPORT_VIEW_VENUE` to manage reports; a person without it sees the reason
+      and who to ask, because an empty table reads as *there is no data* and sends somebody to support
+      with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `analytics` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Reporting unavailable. Selling is unaffected
     offline: '**Not available.** Reporting reads the analytical replica (ADR-0016) and a terminal-local
       figure would disagree with the back office'
@@ -1183,10 +1325,9 @@ screens:
     purpose: Save a natural-language answer as a report definition
     trigger: onAction
   notes: 'Design: Park_POS_dc.html reports view. Read routing is analytical — never the primary, under
-    any load. **Authoring operations removed 24 August**: createReport, updateReport. **A till sells
-    the catalogue; it does not author it.** These arrived in the 18 August bulk attach — the same defect
-    that put 21 of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced
-    them.'
+    any load. **Authoring operations removed 24 August**: createReport, updateReport. **A till sells the
+    catalogue; it does not author it.** These arrived in the 18 August bulk attach — the same defect that
+    put 21 of 39 review rows in one bucket — and a flow walking a ticket sale is what surfaced them.'
   implementation:
     app: venue-pos
     route: /reports/reports
@@ -1208,6 +1349,7 @@ screens:
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
   requiresModule: analytics
+  statesDerived: true
 - id: POS-009
   name: Staff Roster
   module: Shift
@@ -1228,8 +1370,17 @@ screens:
   states:
     loading: Table skeleton
     emptyFirstRun: Nobody on duty
-    emptyNoResults: TODO — the filter matched nothing. The action widens or clears, never creates.
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoResults: '**Nothing matched.** This screen has no filter of its own, so the scope is what narrowed
+      it — the venue, the shift or the date the person arrived with. **Naming the scope is what stops
+      somebody concluding the record does not exist.**'
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `OVERSHORT_ACCEPT`, `REPORT_VIEW_VENUE`, `REPORT_VIEW_WORKSTATION` and 8 more to use overshorts;
+      a person without it sees the reason and who to ask, because an empty table reads as *there is no
+      data* and sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.'
     error: Roster unavailable
     offline: Last known roster, with its age shown
   wireframe:
@@ -1317,14 +1468,14 @@ screens:
     - POS-001
     - POS-002
     - POS-007
-  notes: 'Close counts each foreign currency separately (`foreignHoldings`). **A variance collapsed
-    into a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
+  notes: 'Close counts each foreign currency separately (`foreignHoldings`). **A variance collapsed into
+    a base-currency total cannot be attributed to the currency that caused it.** **createCashMovement
     removed 18 August** — attached by module resemblance, not by what this screen does. A screen that
     does not handle money should not be able to move it (CF-87''s class). **Improved 20 August against
     the client design board**, answering 2 board screen(s): Shift & Operator Dashboard; Operator & Workstation
     Assignment. **Owns POS board frame(s) POS-3A** (client pack, 24 August). **Assigned by board purpose
-    rather than by operation overlap** — three attempts at deriving that mapping produced plausible
-    nonsense, and a reader who trusts a bad table is worse off than one who has none.'
+    rather than by operation overlap** — three attempts at deriving that mapping produced plausible nonsense,
+    and a reader who trusts a bad table is worse off than one who has none.'
   density: touchLarge
   entryState:
     params:
@@ -1334,7 +1485,8 @@ screens:
   provenance: client board, specified
   requiresModule: core
   boardFrames:
-  - POS-3A
+  - POS Board 3.dc.html#pos-3a
+  statesDerived: true
 - id: POS-010
   name: Add to Existing Ticket
   module: Sell
@@ -1385,10 +1537,21 @@ screens:
   states:
     loading: Media lookup. Reads the primary — a stale entitlement set is a wrong one
     emptyFirstRun: Media recognised and carries nothing. Unusual, and worth showing rather than hiding
-    emptyNoAccess: TODO — this person may not see it. Never rendered as empty.
+    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
+      needs `ASSET_LIBRARY_VIEW`, `ORDER_CREATE`, `ORDER_EXCHANGE` and 1 more to read assets; a person
+      without it sees the reason and who to ask, because an empty table reads as *there is no data* and
+      sends somebody to support with the wrong question.
+
+
+      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
+      terminal is the way through.
+
+
+      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
+      is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Media not recognised at this venue
-    offline: '**Not available.** The entitlement set must be read live; appending to a stale picture
-      double-sells a locker'
+    offline: '**Not available.** The entitlement set must be read live; appending to a stale picture double-sells
+      a locker'
   navigation:
     entryFrom:
     - POS-002
@@ -1407,13 +1570,13 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P04 Venue POS.dc.html#pos-010
-  notes: 'CF-58, from the 14 August MoM. Not in the delivered mockups. **9 assets operations removed
-    18 August (CF-114).** The whole media contract was attached to this screen. **A till adding an item
-    to a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same
-    shape as CF-87, one level up: that attached sibling operations, this attached a whole contract.
-    **Wired 24 August from review**: getCart, exchangeOrderLines. **The operations existed and this
-    screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable
-    operation looks like from a wireframe.'
+  notes: 'CF-58, from the 14 August MoM. Not in the delivered mockups. **9 assets operations removed 18
+    August (CF-114).** The whole media contract was attached to this screen. **A till adding an item to
+    a ticket does not manage a media library** — it reads the asset it needs and nothing else. Same shape
+    as CF-87, one level up: that attached sibling operations, this attached a whole contract. **Wired
+    24 August from review**: getCart, exchangeOrderLines. **The operations existed and this screen could
+    not call them** — reviewers reported them as missing APIs, which is what an unreachable operation
+    looks like from a wireframe.'
   density: touchLarge
   entryState:
     params:
@@ -1425,10 +1588,13 @@ screens:
       from: session
     - name: orderId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen. **The cart
-      comes from the session and the order from what the cashier scanned.** A screen adding to an existing
-      ticket must know which ticket, and until 24 August it declared neither.
+    coldEntry: '**A staff link opened cold resolves the thing or says plainly that it is gone.** No silent
+      redirect — a supervisor following a link from an alert needs to know whether the record moved, closed
+      or never existed, because those are three different next actions. **The scope is resolved from the
+      session, never from the link**: a link cannot move somebody to a venue they do not hold. Arrives
+      with `mediaCode`, `mediaId`, `orderId`.'
   requiresModule: ticketing
+  statesDerived: true
 - id: POS-011
   name: Returns, Refunds & Exchanges
   module: Sell
@@ -1474,9 +1640,14 @@ screens:
     trigger: onLoad
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `createRefund`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Returns, Refunds & Exchanges — from
+      the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1525,8 +1696,9 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-2B
-  - RET-3G
+  - POS Frontline Board 2.dc.html#pos-2b
+  - Retail Board 3.dc.html#ret-3g
+  statesDerived: true
 - id: POS-012
   name: Omnichannel Order & Fulfilment Center
   module: Sell
@@ -1564,9 +1736,14 @@ screens:
     trigger: onAction
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `openShift`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Omnichannel Order & Fulfilment Center
+      — from the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1594,7 +1771,12 @@ screens:
   navigation:
     entryFrom:
     - POS-001
-    exitTo: []
+    exitTo:
+    - POS-001
+    inferred: false
+    notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: venue-pos
     route: /sell/omnichannel-order-fulfilment-center
@@ -1610,13 +1792,14 @@ screens:
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it.** **Owns POS board frame(s) POS-2C**
-    (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three
-    attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table
-    is worse off than one who has none.'
+    (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts
+    at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse
+    off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-2C
-  - RET-3H
+  - POS Frontline Board 2.dc.html#pos-2c
+  - Retail Board 3.dc.html#ret-3h
+  statesDerived: true
 - id: POS-013
   name: Mobile POS, Event Sales & Offline Operations
   module: Sell
@@ -1658,9 +1841,14 @@ screens:
     trigger: onAction
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `createCashMovement`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Mobile POS, Event Sales & Offline Operations
+      — from the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1706,12 +1894,13 @@ screens:
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it.** **Owns POS board frame(s) POS-2D,
     POS-2E** (client pack, 24 August). **Assigned by board purpose rather than by operation overlap**
-    — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a
-    bad table is worse off than one who has none.'
+    — three attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad
+    table is worse off than one who has none.'
   requiresModule: ticketing
   boardFrames:
-  - POS-2D
-  - POS-2E
+  - POS Frontline Board 2.dc.html#pos-2d
+  - POS Frontline Board 2.dc.html#pos-2e
+  statesDerived: true
 - id: POS-014
   name: Sales Exceptions, Controls & Operational Actions
   module: Sell
@@ -1733,9 +1922,14 @@ screens:
     trigger: onAction
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `recordNoSale`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Sales Exceptions, Controls & Operational
+      Actions — from the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1761,7 +1955,12 @@ screens:
   navigation:
     entryFrom:
     - POS-001
-    exitTo: []
+    exitTo:
+    - POS-001
+    inferred: false
+    notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: venue-pos
     route: /sell/sales-exceptions-controls-operational-actions
@@ -1774,6 +1973,7 @@ screens:
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them.'
   requiresModule: ticketing
+  statesDerived: true
 - id: POS-015
   name: Cash Operations Dashboard
   module: Sell
@@ -1791,9 +1991,14 @@ screens:
     trigger: onLoad
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Cash Operations Dashboard — from the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1817,7 +2022,12 @@ screens:
   navigation:
     entryFrom:
     - POS-001
-    exitTo: []
+    exitTo:
+    - POS-001
+    inferred: false
+    notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: venue-pos
     route: /sell/cash-operations-dashboard
@@ -1830,6 +2040,7 @@ screens:
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them.'
   requiresModule: core
+  statesDerived: true
 - id: POS-016
   name: Till Configuration
   module: Sell
@@ -1847,9 +2058,14 @@ screens:
     trigger: onAction
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Till Configuration — from the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1871,19 +2087,33 @@ screens:
   navigation:
     entryFrom:
     - POS-001
-    exitTo: []
+    exitTo:
+    - POS-001
+    inferred: false
+    notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: venue-pos
     route: /sell/till-configuration
     component: apps/venue-pos/src/routes/sell/TillConfigurationBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P04 Venue POS.dc.html#pos-016
+    status: designed
+    board: wireframes/POS Frontline Board 2.dc.html#pos-2b
+    generatedFallback: wireframes/P04 Venue POS.dc.html#pos-016
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
-    them. **Named in the board contents and not written up in it.**'
+    them. **Named in the board contents and not written up in it.** **Drawn 31 August** — `POS Frontline
+    Board 2.dc.html` frame `pos-2b`. **Matched on frame title against screen name, constrained to this
+    board’s platforms.** These packs label by board position (`GM-6C`) rather than naming the screen,
+    so the title is the only join — *Till Configuration* matched at 1.0. **A cross-platform title match
+    was refused**: `Outlet Management` scored 0.85 against a partner-portal screen, which is how a mapping
+    goes wrong quietly.'
   requiresModule: core
+  statesDerived: true
+  boardFrames:
+  - POS Frontline Board 2.dc.html#pos-2b
 - id: POS-017
   name: Cash In / Cash Out Operations
   module: Sell
@@ -1897,9 +2127,14 @@ screens:
     trigger: onAction
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `createCashMovement`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Cash In / Cash Out Operations — from
+      the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1923,19 +2158,32 @@ screens:
   navigation:
     entryFrom:
     - POS-001
-    exitTo: []
+    exitTo:
+    - POS-001
+    inferred: false
+    notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: venue-pos
     route: /sell/cash-in-cash-out-operations
     component: apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
-    board: wireframes/P04 Venue POS.dc.html#pos-017
+    status: designed
+    board: wireframes/POS Frontline Board 2.dc.html#pos-2d
+    generatedFallback: wireframes/P04 Venue POS.dc.html#pos-017
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
-    them.'
+    them. **Drawn 31 August** — `POS Frontline Board 2.dc.html` frame `pos-2d`. **Matched on frame title
+    against screen name, constrained to this board’s platforms.** These packs label by board position
+    (`GM-6C`) rather than naming the screen, so the title is the only join — *Cash In / Cash Out Operations*
+    matched at 1.0. **A cross-platform title match was refused**: `Outlet Management` scored 0.85 against
+    a partner-portal screen, which is how a mapping goes wrong quietly.'
   requiresModule: core
+  statesDerived: true
+  boardFrames:
+  - POS Frontline Board 2.dc.html#pos-2d
 - id: POS-018
   name: Safe Drop & Cash Transfer Management
   module: Sell
@@ -1965,9 +2213,14 @@ screens:
     trigger: onLoad
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `createCashMovement`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Safe Drop & Cash Transfer Management
+      — from the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -1993,7 +2246,12 @@ screens:
   navigation:
     entryFrom:
     - POS-001
-    exitTo: []
+    exitTo:
+    - POS-001
+    inferred: false
+    notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: venue-pos
     route: /sell/safe-drop-cash-transfer-management
@@ -2013,7 +2271,8 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-3B
+  - POS Board 3.dc.html#pos-3b
+  statesDerived: true
 - id: POS-019
   name: Shift Templates & Policies
   module: Sell
@@ -2035,9 +2294,14 @@ screens:
     trigger: onLoad
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
+      creates the first one — it is filled by another screen or by a job, and this state names which rather
+      than leaving somebody looking for a button that does not exist.
+
+
+      Shift Templates & Policies — from the client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
@@ -2061,7 +2325,12 @@ screens:
   navigation:
     entryFrom:
     - POS-001
-    exitTo: []
+    exitTo:
+    - POS-001
+    inferred: false
+    notes: '**Returns to POS-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: venue-pos
     route: /sell/shift-templates-policies
@@ -2077,12 +2346,13 @@ screens:
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
     them. **Named in the board contents and not written up in it.** **Owns POS board frame(s) POS-3C**
-    (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three
-    attempts at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table
-    is worse off than one who has none.'
+    (client pack, 24 August). **Assigned by board purpose rather than by operation overlap** — three attempts
+    at deriving that mapping produced plausible nonsense, and a reader who trusts a bad table is worse
+    off than one who has none.'
   requiresModule: core
   boardFrames:
-  - POS-3C
+  - POS Board 3.dc.html#pos-3c
+  statesDerived: true
 - id: POS-020
   name: Shift Exceptions & Alerts
   module: Sell
@@ -2112,13 +2382,21 @@ screens:
     trigger: onAction
   states:
     loading: The list, with the current shift in view.
-    emptyFirstRun: TODO — what a cashier sees at the start of a shift with nothing yet recorded.
-    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is
-      asking about their own till.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `createApprovalRequest`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** Shift Exceptions & Alerts — from the
+      client design board, 20 August.'
+    emptyNoResults: Nothing matches. **The default window is this shift**, not today — a cashier is asking
+      about their own till.
     emptyNoAccess: You do not have permission at this workstation.
     error: Could not load. **Selling is unaffected** — a till that stops selling because a panel failed
       is worse than a stale panel.
-    offline: '**Working from the local journal.** The till keeps taking money; this reconciles on sync.'
+    offline: '**The till keeps taking money; this screen does not keep showing alerts.** `listAlerts`
+      reads the analytical replica (ADR-0016) and there is nothing local to read — the offline trading
+      happens on POS-002 and POS-013, and this monitor goes quiet until the network returns. **Corrected
+      24 August**: the prose claimed continued function the wiring cannot deliver.'
   entryState:
     params:
     - name: workstationId
@@ -2164,7 +2442,8 @@ screens:
     and a reader who trusts a bad table is worse off than one who has none.'
   requiresModule: analytics
   boardFrames:
-  - POS-3E
+  - POS Board 3.dc.html#pos-3e
+  statesDerived: true
 - id: POS-021
   name: Sell — Food & Drink
   module: Sell
@@ -2219,9 +2498,9 @@ screens:
       from: session
     - name: itemId
       from: deepLink
-    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till
-      is signed into, not navigated to — and the outlet is a property of where the till is bolted down,
-      not something a cashier picks.'
+    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
+      signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
+      something a cashier picks.'
   layout:
     template: board
     regions:
@@ -2253,10 +2532,11 @@ screens:
     status: notStarted
   wireframe:
     status: generated
+    board: wireframes/P04 Venue POS.dc.html#pos-021
   provenance: gap found 24 August — no counter-service F&B on any till
-  notes: '**Built 24 August. P04 had no F&B screens at all** — a venue licensing `fnb` and running a
-    coffee counter had a kitchen display that receives tickets, a back office that configures the menu,
-    and **no way to take the order.**
+  notes: '**Built 24 August. P04 had no F&B screens at all** — a venue licensing `fnb` and running a coffee
+    counter had a kitchen display that receives tickets, a back office that configures the menu, and **no
+    way to take the order.**
 
 
     **The client pack has the same gap.** Six F&B boards: board 3 is the kitchen, board 4 is table service,
@@ -2289,13 +2569,18 @@ screens:
     trigger: onAction
   states:
     loading: The order, and what is ahead of it.
-    emptyFirstRun: TODO — what a cashier sees before the first order of the day.
+    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet — the one action is `createFnbOrder`,
+      and it is the only thing on the screen until the first one exists.
+
+
+      **Says what this screen is for, not just that it is empty.** The order goes to the pass and the
+      guest is given a number.'
     emptyNoResults: Nothing outstanding at this counter.
     emptyNoAccess: You do not have permission at this outlet.
     error: Could not send. **The order is journaled and retries** — a counter that loses an order the
       guest has paid for is the failure this prevents.
-    offline: '**Queued locally and sent on reconnect.** The kitchen display is on the same LAN, so a
-      venue-wide outage stops both and a device outage stops neither.'
+    offline: '**Queued locally and sent on reconnect.** The kitchen display is on the same LAN, so a venue-wide
+      outage stops both and a device outage stops neither.'
   entryState:
     params:
     - name: workstationId
@@ -2306,17 +2591,17 @@ screens:
       from: deepLink
     - name: ticketId
       from: deepLink
-    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till
-      is signed into, not navigated to — and the outlet is a property of where the till is bolted down,
-      not something a cashier picks.'
+    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
+      signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
+      something a cashier picks.'
   layout:
     template: board
     regions:
     - name: contentBody
       components:
       - kind: metricTile
-        notes: Orders ahead, and the oldest. **A cashier quoting a wait needs the number the kitchen
-          is actually working to.**
+        notes: Orders ahead, and the oldest. **A cashier quoting a wait needs the number the kitchen is
+          actually working to.**
       - kind: cardList
         bindsTo: KitchenTicket[]
       - kind: primaryButton
@@ -2334,6 +2619,7 @@ screens:
     status: notStarted
   wireframe:
     status: generated
+    board: wireframes/P04 Venue POS.dc.html#pos-022
   provenance: gap found 24 August — no counter-service F&B on any till
   notes: '**The counter half of F29 and F83.** The kitchen ticket already exists and P15 already renders
     it; **nothing put one on the rail from a till.**
@@ -2341,6 +2627,7 @@ screens:
 
     `markOrderCollected` closes the fulfilment clock here — **order to ready is the kitchen’s number,
     ready to collected is the counter’s**, and food under a lamp for nine minutes shows in neither alone.'
+  statesDerived: true
 - id: POS-023
   name: Sell — Merchandise
   module: Sell
@@ -2373,8 +2660,8 @@ screens:
   states:
     loading: The catalogue for this store.
     emptyFirstRun: '**No merchandise published to this outlet.**'
-    emptyNoResults: Nothing matches. **A scan that finds nothing is a barcode not in the catalogue**
-      — said plainly, because the cashier will otherwise scan it four more times.
+    emptyNoResults: Nothing matches. **A scan that finds nothing is a barcode not in the catalogue** —
+      said plainly, because the cashier will otherwise scan it four more times.
     emptyNoAccess: You do not have permission to sell at this store.
     error: Could not load. **The cached catalogue is still sellable.**
     offline: '**Sells from the cached catalogue.** Stock goes negative rather than refusing — a level
@@ -2387,9 +2674,9 @@ screens:
       from: session
     - name: cartId
       from: session
-    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till
-      is signed into, not navigated to — and the outlet is a property of where the till is bolted down,
-      not something a cashier picks.'
+    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
+      signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
+      something a cashier picks.'
   layout:
     template: board
     regions:
@@ -2416,6 +2703,7 @@ screens:
     status: notStarted
   wireframe:
     status: generated
+    board: wireframes/P04 Venue POS.dc.html#pos-023
   provenance: gap found 24 August — no counter-service F&B on any till
   notes: '**Built 24 August.** `RetailService` has 35 operations and F34 walks a retail sale from scan
     to return — **on `POS-002`, which is declared `ticketing`.** A venue licensing retail without ticketing
@@ -2466,9 +2754,9 @@ screens:
       from: session
     - name: itemId
       from: deepLink
-    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till
-      is signed into, not navigated to — and the outlet is a property of where the till is bolted down,
-      not something a cashier picks.'
+    coldEntry: '**Resolves from the session, which carries the workstation and its outlet.** A till is
+      signed into, not navigated to — and the outlet is a property of where the till is bolted down, not
+      something a cashier picks.'
   layout:
     template: list
     regions:
@@ -2479,8 +2767,8 @@ screens:
         label: Floor
       - kind: detailPanel
         label: Combinations
-        notes: '**Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a
-          step, a service run. A host knows which pairs work and a floor plan does not.'
+        notes: '**Declared, not inferred.** Two adjacent tables do not always combine — a pillar, a step,
+          a service run. A host knows which pairs work and a floor plan does not.'
       - kind: multiSelect
         label: 86 an item
       - kind: primaryButton
@@ -2498,10 +2786,11 @@ screens:
     status: notStarted
   wireframe:
     status: generated
+    board: wireframes/P04 Venue POS.dc.html#pos-024
   provenance: gap found 24 August — no counter-service F&B on any till
-  notes: '**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal
-    and Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs
-    into the same till a cashier uses and sees screens the cashier does not.**
+  notes: '**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and
+    Tablet* (`reactNativeTablet`) and ADR-0002 makes authorisation user-driven — **a manager signs into
+    the same till a cashier uses and sees screens the cashier does not.**
 
 
     **A table layout is decided standing in the room.** A manager at a desk cannot see whether two four-tops

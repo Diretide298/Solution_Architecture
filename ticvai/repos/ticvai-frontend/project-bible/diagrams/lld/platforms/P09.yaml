@@ -1,5 +1,5 @@
 id: LLD-P09
-title: P09 TICVAI Web — Platform Console — 37 screens
+title: P09 TICVAI Web — Platform Console — 318 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: platformAdmin
@@ -19,39 +19,49 @@ deployment:
   releaseCadence: weekly
 why: null
 modulesUsed:
+- module: ticketing
+  screens: 150
+- module: marketing
+  screens: 110
+- module: core
+  screens: 36
 - module: membership
   screens: 19
-- module: core
-  screens: 15
 - module: ai
   screens: 2
 - module: analytics
   screens: 1
 servicesCalled:
-- service: ControlService
-  operationCalls: 186
+- service: CatalogueService
+  operationCalls: 211
+- service: PlatformService
+  operationCalls: 197
+- service: OrderService
+  operationCalls: 40
+- service: TenancyService
+  operationCalls: 26
 - service: IdentityService
   operationCalls: 25
 - service: WhiteLabelService
   operationCalls: 20
+- service: MarketingService
+  operationCalls: 10
 - service: AiService
   operationCalls: 5
 - service: ReportingService
   operationCalls: 4
-- service: CrossCellService
+- service: CrossRegionService
   operationCalls: 3
-- service: TenancyService
-  operationCalls: 2
 coverage:
-  screens: 37
+  screens: 318
   inAFlow: 21
-  drawn: 37
+  drawn: 318
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
 - screen: ADM-001
   name: Platform Login / MFA
-  module: TODO
+  module: Access & Identity
   requiresModule: core
   wave: 1
   density: compact
@@ -83,7 +93,7 @@ screens:
   - F104 A platform operator signs in under MFA
 - screen: ADM-002
   name: Platform Dashboard
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 1
   density: compact
@@ -111,12 +121,13 @@ screens:
   - ADM-007
   - ADM-008
   - ADM-012
-  boardFrames: null
-  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-002
+  boardFrames:
+  - Dashboards Board.dc.html#adm-002
+  wireframe: wireframes/Dashboards Board.dc.html#adm-002
   inFlows: null
 - screen: ADM-003
   name: Cross-Tenant Health Dashboard
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 2
   density: compact
@@ -126,9 +137,9 @@ screens:
   - getCell
   - getCellCapacity
   - getCellHealth
-  - getRedemptionRight
+  - getCrossRegionEntitlement
   - listCellJobs
-  - propagateRedemptionRight
+  - propagateCrossRegionEntitlement
   - reconcileRedemptions
   - updateCellTier
   states:
@@ -144,13 +155,14 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-004
-  boardFrames: null
-  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-003
+  boardFrames:
+  - Dashboards Board.dc.html#adm-003
+  wireframe: wireframes/Dashboards Board.dc.html#adm-003
   inFlows:
   - F19 A membership works in another country
 - screen: ADM-004
   name: Platform Audit Log
-  module: TODO
+  module: Overview & Health
   requiresModule: ai
   wave: 2
   density: compact
@@ -175,7 +187,7 @@ screens:
   - F106 A security dashboard surfaces something and it is investigated
 - screen: ADM-005
   name: Tenant Directory
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -216,17 +228,17 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-006
   name: Tenant Hierarchy Explorer
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
   operations:
-  - createScopeNode
+  - createOrgUnit
   - getEntitlementUsage
   - getSsoConfig
   - getTenant
   - getTenantLicences
-  - listScopeNodes
+  - listOrgUnits
   - listTenantCells
   - listTenants
   - updateTenant
@@ -250,7 +262,7 @@ screens:
   - F16 A venue opens for the first time
 - screen: ADM-007
   name: Module & Feature Entitlement
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -267,6 +279,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -283,7 +296,7 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-008
   name: Subscription & Plan Management
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -327,7 +340,7 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-009
   name: Tenant Billing & Invoicing
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 2
   density: compact
@@ -344,6 +357,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -358,7 +372,7 @@ screens:
   inFlows: null
 - screen: ADM-010
   name: Usage Metering
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 2
   density: compact
@@ -373,6 +387,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -387,7 +402,7 @@ screens:
   inFlows: null
 - screen: ADM-011
   name: Licence & Seat Management
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 2
   density: compact
@@ -422,7 +437,7 @@ screens:
   - F96 A tenant is provisioned, licensed and its modules enabled
 - screen: ADM-012
   name: Tenant Isolation & Resource Pool
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 1
   density: compact
@@ -438,6 +453,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -457,7 +473,7 @@ screens:
   - F97 A cell is capacity-checked and a tenant is placed on it
 - screen: ADM-013
   name: Tenant Performance Monitor
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 2
   density: compact
@@ -487,7 +503,7 @@ screens:
   - F97 A cell is capacity-checked and a tenant is placed on it
 - screen: ADM-014
   name: Auto-Scaling Configuration
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 3
   density: compact
@@ -497,6 +513,7 @@ screens:
   - getCell
   - getCellCapacity
   - getCellHealth
+  - getScalingPolicy
   - listCellJobs
   - updateCellTier
   states:
@@ -517,7 +534,7 @@ screens:
   - F97 A cell is capacity-checked and a tenant is placed on it
 - screen: ADM-015
   name: API Rate Limit & Quota Management
-  module: TODO
+  module: Tenants & Licensing
   requiresModule: membership
   wave: 3
   density: compact
@@ -549,7 +566,7 @@ screens:
   - F105 A rate limit is set and a developer hits it
 - screen: ADM-016
   name: White-Label Branding Management
-  module: TODO
+  module: Branding & Localisation
   requiresModule: core
   wave: 2
   density: compact
@@ -587,7 +604,7 @@ screens:
   - F103 A tenant claims a domain and gets a certificate
 - screen: ADM-017
   name: Domain & Certificate Management
-  module: TODO
+  module: Branding & Localisation
   requiresModule: core
   wave: 2
   density: compact
@@ -618,7 +635,7 @@ screens:
   - F103 A tenant claims a domain and gets a certificate
 - screen: ADM-018
   name: Localisation & Language Pack
-  module: TODO
+  module: Branding & Localisation
   requiresModule: core
   wave: 2
   density: compact
@@ -631,6 +648,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -648,7 +666,7 @@ screens:
   inFlows: null
 - screen: ADM-019
   name: Global Configuration & Defaults
-  module: TODO
+  module: Branding & Localisation
   requiresModule: membership
   wave: 2
   density: compact
@@ -674,7 +692,7 @@ screens:
   inFlows: null
 - screen: ADM-020
   name: Platform User Directory
-  module: TODO
+  module: Access & Identity
   requiresModule: core
   wave: 1
   density: compact
@@ -702,7 +720,7 @@ screens:
   - F16 A venue opens for the first time
 - screen: ADM-021
   name: Platform Role Management
-  module: TODO
+  module: Access & Identity
   requiresModule: core
   wave: 1
   density: compact
@@ -725,7 +743,7 @@ screens:
   inFlows: null
 - screen: ADM-022
   name: Release & Version Management
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -744,7 +762,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - releaseId<-deepLink
+  - reinventoryHoldId<-deepLink
   goesTo:
   - ADM-001
   - ADM-002
@@ -756,7 +774,7 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-023
   name: Staging Promotion & Approval
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -775,7 +793,7 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - releaseId<-deepLink
+  - reinventoryHoldId<-deepLink
   goesTo:
   - ADM-001
   - ADM-002
@@ -787,11 +805,12 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-024
   name: Release Notification Composer
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 3
   density: compact
   operations:
+  - listReleases
   - listSupportNotices
   - publishSupportNotice
   states:
@@ -810,7 +829,7 @@ screens:
   inFlows: null
 - screen: ADM-025
   name: Tenant Upgrade Scheduler
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -833,11 +852,12 @@ screens:
   inFlows: null
 - screen: ADM-026
   name: End-of-Support Notice Management
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 3
   density: compact
   operations:
+  - deprecateApiVersion
   - listSupportNotices
   - publishSupportNotice
   states:
@@ -846,7 +866,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - version<-navigation
   goesTo:
   - ADM-001
   - ADM-002
@@ -856,7 +877,7 @@ screens:
   inFlows: null
 - screen: ADM-027
   name: Database Migration Console
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 1
   density: compact
@@ -870,6 +891,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -886,7 +908,7 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-028
   name: Environment Registry
-  module: TODO
+  module: Releases & Environments
   requiresModule: core
   wave: 2
   density: compact
@@ -896,6 +918,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -909,7 +932,7 @@ screens:
   inFlows: null
 - screen: ADM-029
   name: Deployment Monitor
-  module: TODO
+  module: Overview & Health
   requiresModule: membership
   wave: 2
   density: compact
@@ -945,7 +968,7 @@ screens:
   - F04 Platform admin ships a release
 - screen: ADM-030
   name: Infrastructure Sizing & Scaling Policy
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 3
   density: compact
@@ -955,7 +978,9 @@ screens:
   - getCell
   - getCellCapacity
   - getCellHealth
+  - getScalingPolicy
   - listCellJobs
+  - setScalingPolicy
   - updateCellTier
   states:
   - emptyFirstRun
@@ -974,7 +999,7 @@ screens:
   inFlows: null
 - screen: ADM-031
   name: Security & Compliance Dashboard
-  module: TODO
+  module: Security & Compliance
   requiresModule: analytics
   wave: 3
   density: compact
@@ -1001,7 +1026,7 @@ screens:
   - F106 A security dashboard surfaces something and it is investigated
 - screen: ADM-032
   name: WAF & Security Policy View
-  module: TODO
+  module: Security & Compliance
   requiresModule: membership
   wave: 3
   density: compact
@@ -1012,6 +1037,8 @@ screens:
   - getCellCapacity
   - getCellHealth
   - listCellJobs
+  - listWafRules
+  - setWafPolicy
   - updateCellTier
   states:
   - emptyFirstRun
@@ -1030,7 +1057,7 @@ screens:
   inFlows: null
 - screen: ADM-033
   name: Backup & DR Status
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 2
   density: compact
@@ -1040,6 +1067,7 @@ screens:
   - getCell
   - getCellCapacity
   - getCellHealth
+  - listBackupRuns
   - listCellJobs
   - updateCellTier
   states:
@@ -1059,7 +1087,7 @@ screens:
   inFlows: null
 - screen: ADM-034
   name: Archival Job Monitor
-  module: TODO
+  module: Infrastructure & Resilience
   requiresModule: membership
   wave: 3
   density: compact
@@ -1069,6 +1097,7 @@ screens:
   - getCell
   - getCellCapacity
   - getCellHealth
+  - listArchivalJobs
   - listCellJobs
   - updateCellTier
   states:
@@ -1088,7 +1117,7 @@ screens:
   inFlows: null
 - screen: ADM-035
   name: Support & Escalation Console
-  module: TODO
+  module: Support & Communications
   requiresModule: core
   wave: 3
   density: compact
@@ -1098,6 +1127,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1111,12 +1141,14 @@ screens:
   inFlows: null
 - screen: ADM-036
   name: Platform Notification Broadcast
-  module: TODO
+  module: Support & Communications
   requiresModule: core
   wave: 3
   density: compact
   operations:
+  - listAnnouncements
   - listSupportNotices
+  - publishAnnouncement
   - publishSupportNotice
   states:
   - emptyFirstRun
@@ -1146,6 +1178,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1157,3 +1190,6165 @@ screens:
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-037
   inFlows:
   - F100 An AI provider is configured, budgeted and audited
+- screen: ADM-038
+  name: Communication Service Command Center
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCommunicationService
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-039
+  - ADM-040
+  - ADM-041
+  - ADM-042
+  - ADM-043
+  - ADM-044
+  - ADM-045
+  - ADM-046
+  - ADM-047
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-038
+  inFlows: null
+- screen: ADM-039
+  name: Channel & Provider Configuration
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setChannelProvider
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-039
+  inFlows: null
+- screen: ADM-040
+  name: Sender Identity, Domain & Brand Configuration
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setSenderIdentityDomain
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-040
+  inFlows: null
+- screen: ADM-041
+  name: System Transactional Template Registry
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listSystemTransactionalTemplate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-041
+  inFlows: null
+- screen: ADM-042
+  name: Business Event & Notification Trigger Mapping
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBusinessEventNotification
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-042
+  inFlows: null
+- screen: ADM-043
+  name: Routing, Priority, Throttling & Fallback Rules
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRoutingPriorityThrottling
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-043
+  inFlows: null
+- screen: ADM-044
+  name: Consent, Preference & Communication Policy Enforcement
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listConsentPreferenceCommunication
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-044
+  inFlows: null
+- screen: ADM-045
+  name: Delivery Queue, Failure & Retry Management
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDeliveryQueueFailure
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-045
+  inFlows: null
+- screen: ADM-046
+  name: Provider Health, Usage & Cost Monitoring
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listProviderHealthUsage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-046
+  inFlows: null
+- screen: ADM-047
+  name: AI Delivery Optimization & Communication Platform Diagnostics
+  module: Platform
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDeliveryCommunicationPlatform
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-038
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-047
+  inFlows: null
+- screen: ADM-048
+  name: Commercial Pricing Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCommercialPricing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-049
+  - ADM-050
+  - ADM-051
+  - ADM-052
+  - ADM-053
+  - ADM-054
+  - ADM-055
+  - ADM-056
+  - ADM-057
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-048
+  inFlows: null
+- screen: ADM-049
+  name: Price List Master Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setPriceListMaster
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-049
+  inFlows: null
+- screen: ADM-050
+  name: Price Category & Rate Type Library
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPriceCategoryRate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-050
+  inFlows: null
+- screen: ADM-051
+  name: Rate Structure Builder
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setRateStructure
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-051
+  inFlows: null
+- screen: ADM-052
+  name: Product & Service Price Assignment
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setProductServicePrice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-052
+  inFlows: null
+- screen: ADM-053
+  name: Package, Bundle & Add-On Pricing
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPackageBundleAdd
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-053
+  inFlows: null
+- screen: ADM-054
+  name: Market, Venue & Currency Pricing Structure
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listMarketVenueCurrency
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-054
+  inFlows: null
+- screen: ADM-055
+  name: Price Hierarchy & Inheritance Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setPriceHierarchyInheritance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-055
+  inFlows: null
+- screen: ADM-056
+  name: Price List Templates, Clone & Reuse
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPriceListTemplate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-056
+  inFlows: null
+- screen: ADM-057
+  name: Commercial Pricing Structure Validation
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCommercialPricingStructure
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-048
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-057
+  inFlows: null
+- screen: ADM-058
+  name: Pricing Rule Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-059
+  - ADM-060
+  - ADM-061
+  - ADM-062
+  - ADM-063
+  - ADM-064
+  - ADM-065
+  - ADM-066
+  - ADM-067
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-058
+  inFlows: null
+- screen: ADM-059
+  name: Customer Segment & Profile Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerSegmentProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-059
+  inFlows: null
+- screen: ADM-060
+  name: Membership & Loyalty Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listMembershipLoyaltyPricing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-060
+  inFlows: null
+- screen: ADM-061
+  name: Residency, Nationality & Market Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResidencyNationalityMarket
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-061
+  inFlows: null
+- screen: ADM-062
+  name: Channel-Based Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelBasedPricing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-062
+  inFlows: null
+- screen: ADM-063
+  name: Location, Venue & Event Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listLocationVenueEvent
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-063
+  inFlows: null
+- screen: ADM-064
+  name: Quantity, Group & Volume Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listQuantityGroupVolume
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-064
+  inFlows: null
+- screen: ADM-065
+  name: Effective Date, Season & Day-Based Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listEffectiveDateSeason
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-065
+  inFlows: null
+- screen: ADM-066
+  name: Timeslot, Performance & Time-of-Day Pricing Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listTimeslotPerformanceTime
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-066
+  inFlows: null
+- screen: ADM-067
+  name: Pricing Rule Priority, Conflict Resolution & Testing
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingRulePriority
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-058
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-067
+  inFlows: null
+- screen: ADM-068
+  name: Tax, Fee & Calculation Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listTaxFeeCalculation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-069
+  - ADM-070
+  - ADM-071
+  - ADM-072
+  - ADM-073
+  - ADM-074
+  - ADM-075
+  - ADM-076
+  - ADM-077
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-068
+  inFlows: null
+- screen: ADM-069
+  name: Tax Profile & Jurisdiction Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setTaxProfileJurisdiction
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-069
+  inFlows: null
+- screen: ADM-070
+  name: Tax Rule & Treatment Builder
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setTaxRuleTreatment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-070
+  inFlows: null
+- screen: ADM-071
+  name: Fee & Surcharge Library
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listFeeSurcharge
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-071
+  inFlows: null
+- screen: ADM-072
+  name: Fee Applicability & Charging Rule Builder
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setFeeApplicabilityCharging
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-072
+  inFlows: null
+- screen: ADM-073
+  name: Fee Waiver, Tax Exemption & Exception Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listFeeWaiverTax
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-073
+  inFlows: null
+- screen: ADM-074
+  name: Price Calculation Sequence & Formula Engine
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPriceCalculationSequence
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-074
+  inFlows: null
+- screen: ADM-075
+  name: Currency Precision, Rounding & Monetary Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCurrencyPrecisionRounding
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-075
+  inFlows: null
+- screen: ADM-076
+  name: Price Breakdown, Calculation Simulation & Explainability
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - simulatePriceBreakdownCalculation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-076
+  inFlows: null
+- screen: ADM-077
+  name: Calculation Validation, Reconciliation & Service Interface
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCalculationValidationReconciliation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-068
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-077
+  inFlows: null
+- screen: ADM-078
+  name: Pricing Governance Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingGovernance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-079
+  - ADM-080
+  - ADM-081
+  - ADM-082
+  - ADM-083
+  - ADM-084
+  - ADM-085
+  - ADM-086
+  - ADM-087
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-078
+  inFlows: null
+- screen: ADM-079
+  name: Pricing Change Request & Workspace
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setPricingChangeRequest
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-079
+  inFlows: null
+- screen: ADM-080
+  name: Bulk Pricing Update, Import & Mass Maintenance
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listBulkPricingUpdate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-080
+  inFlows: null
+- screen: ADM-081
+  name: Pricing Version & Baseline Management
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingVersionBaseline
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-081
+  inFlows: null
+- screen: ADM-082
+  name: Pricing Change Impact Analysis
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingChangeImpact
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-082
+  inFlows: null
+- screen: ADM-083
+  name: Pricing Approval Workflow & Authority Matrix
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - approvePricingWorkflowAuthority
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-083
+  inFlows: null
+- screen: ADM-084
+  name: Pricing Publication & Effective-Date Scheduler
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - publishPricingEffectiveDate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-084
+  inFlows: null
+- screen: ADM-085
+  name: Pricing Distribution, Synchronization & Publication Monitor
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingDistributionSynchronization
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-085
+  inFlows: null
+- screen: ADM-086
+  name: Pricing Rollback & Emergency Control Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingRollbackEmergency
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-086
+  inFlows: null
+- screen: ADM-087
+  name: Pricing History, Audit & Compliance Explorer
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingCompliance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-078
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-087
+  inFlows: null
+- screen: ADM-088
+  name: Dynamic Pricing Strategy Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicPricingStrategy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-089
+  - ADM-090
+  - ADM-091
+  - ADM-092
+  - ADM-093
+  - ADM-094
+  - ADM-095
+  - ADM-096
+  - ADM-097
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-088
+  inFlows: null
+- screen: ADM-089
+  name: Dynamic Pricing Strategy Builder
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setDynamicPricingStrategy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-089
+  inFlows: null
+- screen: ADM-090
+  name: Demand, Occupancy & Availability Rule Builder
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setDemandOccupancyAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-090
+  inFlows: null
+- screen: ADM-091
+  name: Booking Velocity & Time-to-Event Rule Builder
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setBookingVelocityTime
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-091
+  inFlows: null
+- screen: ADM-092
+  name: Seasonal, Calendar, Day & Timeslot Dynamic Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listSeasonalCalendarDay
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-092
+  inFlows: null
+- screen: ADM-093
+  name: Channel, Customer Segment & Location Dynamic Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelCustomerSegment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-093
+  inFlows: null
+- screen: ADM-094
+  name: Dynamic Price Bands, Ladders & Adjustment Matrix
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicPriceBand
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-094
+  inFlows: null
+- screen: ADM-095
+  name: Dynamic Pricing Guardrails & Commercial Protection
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicPricingGuardrail
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-095
+  inFlows: null
+- screen: ADM-096
+  name: Dynamic Pricing Automation Policy & Control
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicPricingAutomation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-096
+  inFlows: null
+- screen: ADM-097
+  name: Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listRulePriorityConflict
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-088
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-097
+  inFlows: null
+- screen: ADM-098
+  name: AI Pricing Intelligence Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-099
+  - ADM-100
+  - ADM-101
+  - ADM-102
+  - ADM-103
+  - ADM-104
+  - ADM-105
+  - ADM-106
+  - ADM-107
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-098
+  inFlows: null
+- screen: ADM-099
+  name: Internal Demand & Booking Signal Hub
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listInternalDemandBooking
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-099
+  inFlows: null
+- screen: ADM-100
+  name: Weather Intelligence & Demand Impact Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listWeatherDemandImpact
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-100
+  inFlows: null
+- screen: ADM-101
+  name: Nearby Event, Exhibition & Local Demand Intelligence
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listNearbyEventExhibition
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-101
+  inFlows: null
+- screen: ADM-102
+  name: Competitor Pricing & Market Position Intelligence
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCompetitorPricingMarket
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-102
+  inFlows: null
+- screen: ADM-103
+  name: Market, Tourism, Holiday & Contextual Signal Hub
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listMarketTourismHoliday
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-103
+  inFlows: null
+- screen: ADM-104
+  name: AI Demand Forecasting & Booking Curve Studio
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listDemandBookingCurve
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-104
+  inFlows: null
+- screen: ADM-105
+  name: Price Elasticity & Revenue Response Intelligence
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPriceElasticityRevenue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-105
+  inFlows: null
+- screen: ADM-106
+  name: AI Pricing Recommendation & Explainability Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPricingRecommendationExplainability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-106
+  inFlows: null
+- screen: ADM-107
+  name: AI Signal Registry, Data Quality & Model Governance
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listSignalDataQuality
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-098
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-107
+  inFlows: null
+- screen: ADM-108
+  name: Revenue Optimization Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listRevenue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-109
+  - ADM-110
+  - ADM-111
+  - ADM-112
+  - ADM-113
+  - ADM-114
+  - ADM-115
+  - ADM-116
+  - ADM-117
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-108
+  inFlows: null
+- screen: ADM-109
+  name: Pricing Simulation Studio
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setPricing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-109
+  inFlows: null
+- screen: ADM-110
+  name: Scenario Modeling & What-If Analysis
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listScenarioModelingWhat
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-110
+  inFlows: null
+- screen: ADM-111
+  name: A/B Pricing Experiment Studio
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setPricingExperiment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-111
+  inFlows: null
+- screen: ADM-112
+  name: Revenue & Demand Impact Forecasting
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listRevenueDemandImpact
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-112
+  inFlows: null
+- screen: ADM-113
+  name: AI Recommendation Review & Decision Queue
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listRecommendationReviewDecision
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-113
+  inFlows: null
+- screen: ADM-114
+  name: Automation Policy & Autonomous Pricing Orchestrator
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listAutomationPolicyAutonomous
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-114
+  inFlows: null
+- screen: ADM-115
+  name: Live Dynamic Price Execution & Deployment Monitor
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - createLiveDynamicPrice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-115
+  inFlows: null
+- screen: ADM-116
+  name: Dynamic Pricing Performance & Optimization Analytics
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicPricingPerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-116
+  inFlows: null
+- screen: ADM-117
+  name: AI Learning, Model Performance & Optimization Feedback
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listLearningModelPerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-108
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-117
+  inFlows: null
+- screen: ADM-118
+  name: Product Lifecycle Command Center
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductLifecycle
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-119
+  - ADM-120
+  - ADM-121
+  - ADM-122
+  - ADM-123
+  - ADM-124
+  - ADM-125
+  - ADM-126
+  - ADM-127
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-118
+  inFlows: null
+- screen: ADM-119
+  name: Product Creation Workspace
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - createProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-119
+  inFlows: null
+- screen: ADM-120
+  name: Lifecycle Status & Workflow Configuration
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setLifecycleStatuWorkflow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-120
+  inFlows: null
+- screen: ADM-121
+  name: Bulk Product Creation & Catalogue Import
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - createBulkProductCatalogue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-121
+  inFlows: null
+- screen: ADM-122
+  name: Product Import / Export & Environment Transfer
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductImportExport
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-122
+  inFlows: null
+- screen: ADM-123
+  name: Product Context, Ownership & Assignment
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setProductContextOwnership
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-123
+  inFlows: null
+- screen: ADM-124
+  name: Channel Publication & Availability
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - publishChannelAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-124
+  inFlows: null
+- screen: ADM-125
+  name: Publication & Activation Scheduler
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - publishActivationScheduler
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-125
+  inFlows: null
+- screen: ADM-126
+  name: Product Duplication & Template Library
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductDuplicationTemplate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-126
+  inFlows: null
+- screen: ADM-127
+  name: AI Catalogue Builder & Configuration Review
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setCatalogueReview
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-118
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-127
+  inFlows: null
+- screen: ADM-128
+  name: Product Governance Command Center
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductGovernance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-129
+  - ADM-130
+  - ADM-131
+  - ADM-132
+  - ADM-133
+  - ADM-134
+  - ADM-135
+  - ADM-136
+  - ADM-137
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-128
+  inFlows: null
+- screen: ADM-129
+  name: Approval Workflow Designer
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - approveWorkflow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-129
+  inFlows: null
+- screen: ADM-130
+  name: Approval Review & Decision Workspace
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - approveReviewDecision
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-130
+  inFlows: null
+- screen: ADM-131
+  name: Product Version Management
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductVersions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - productId<-navigation
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-131
+  inFlows: null
+- screen: ADM-132
+  name: Rollback & Recovery Management
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listRollbackRecovery
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-132
+  inFlows: null
+- screen: ADM-133
+  name: Change Impact Analysis
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChangeImpactAnalysis
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-133
+  inFlows: null
+- screen: ADM-134
+  name: Change Propagation & Dependency Control
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChangePropagationDependency
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-134
+  inFlows: null
+- screen: ADM-135
+  name: Product Retirement, Suspension & Archive
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductRetirementSuspension
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-135
+  inFlows: null
+- screen: ADM-136
+  name: Product Audit Trail & Change History
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductTrailChange
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-136
+  inFlows: null
+- screen: ADM-137
+  name: Governance Risk, AI Monitoring & Control Center
+  module: Catalogue
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listGovernanceRiskMonitoring
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-128
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-137
+  inFlows: null
+- screen: ADM-138
+  name: Promotion Command Center Dashboard
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - getPromotionUsage
+  - listPromotions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - promotionId<-navigation
+  goesTo:
+  - ADM-002
+  - ADM-139
+  - ADM-140
+  - ADM-141
+  - ADM-142
+  - ADM-143
+  - ADM-144
+  - ADM-145
+  - ADM-146
+  - ADM-147
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-138
+  inFlows: null
+- screen: ADM-139
+  name: Promotion & Campaign Directory
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionCampaign
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-139
+  inFlows: null
+- screen: ADM-140
+  name: Promotion Overview
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-140
+  inFlows: null
+- screen: ADM-141
+  name: Promotion Lifecycle & Status Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionLifecycleStatus
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-141
+  inFlows: null
+- screen: ADM-142
+  name: Campaign Calendar & Timeline
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCampaignCalendarTimeline
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-142
+  inFlows: null
+- screen: ADM-143
+  name: Promotion Channel & Publication Monitor
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-143
+  inFlows: null
+- screen: ADM-144
+  name: Promotion Alerts & Exception Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionAlertException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-144
+  inFlows: null
+- screen: ADM-145
+  name: Promotion Approval Inbox
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - decideApprovalRequest
+  - listApprovalRequests
+  - listPromotions
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - requestId<-navigation
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-145
+  inFlows: null
+- screen: ADM-146
+  name: Promotion Health & Performance Monitor
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionHealthPerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-146
+  inFlows: null
+- screen: ADM-147
+  name: Promotion Audit, Activity & Version History
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionActivityVersion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-138
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-147
+  inFlows: null
+- screen: ADM-148
+  name: Promotion Rule Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setPromotionRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-149
+  - ADM-150
+  - ADM-151
+  - ADM-152
+  - ADM-153
+  - ADM-154
+  - ADM-155
+  - ADM-156
+  - ADM-157
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-148
+  inFlows: null
+- screen: ADM-149
+  name: Percentage & Fixed Discount Configurator
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPercentageFixedDiscount
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-149
+  inFlows: null
+- screen: ADM-150
+  name: Cart & Transaction Threshold Rules
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCartTransactionThreshold
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-150
+  inFlows: null
+- screen: ADM-151
+  name: Volume, Bulk & Tier Discount Configurator
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listVolumeBulkTier
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-151
+  inFlows: null
+- screen: ADM-152
+  name: Time-Based & Seasonal Discount Rules
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listTimeBasedSeasonal
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-152
+  inFlows: null
+- screen: ADM-153
+  name: Customer, Membership & Segment Discount Rules
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerMembershipSegment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-153
+  inFlows: null
+- screen: ADM-154
+  name: Payment Method, Bank & Partner Discount Rules
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPaymentMethodBank
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-154
+  inFlows: null
+- screen: ADM-155
+  name: Special Price & Guest Offer Configurator
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listSpecialPriceGuest
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-155
+  inFlows: null
+- screen: ADM-156
+  name: Discount Limits, Guardrails & Commercial Controls
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDiscountLimitGuardrail
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-156
+  inFlows: null
+- screen: ADM-157
+  name: Rule Test, Simulation & AI Recommendation Workspace
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setRuleTestRecommendation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-148
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-157
+  inFlows: null
+- screen: ADM-158
+  name: Coupon & Promo Code Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCouponCodes
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - campaignId<-navigation
+  goesTo:
+  - ADM-002
+  - ADM-159
+  - ADM-160
+  - ADM-161
+  - ADM-162
+  - ADM-163
+  - ADM-164
+  - ADM-165
+  - ADM-166
+  - ADM-167
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-158
+  inFlows: null
+- screen: ADM-159
+  name: Coupon & Promo Code Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setCouponPromoCode
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-159
+  inFlows: null
+- screen: ADM-160
+  name: Unique Code Generation & Batch Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listUniqueCodeGeneration
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-160
+  inFlows: null
+- screen: ADM-161
+  name: Code Eligibility & Restriction Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCodeEligibilityRestriction
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-161
+  inFlows: null
+- screen: ADM-162
+  name: Usage, Capacity & Frequency Control
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listUsageCapacityFrequency
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-162
+  inFlows: null
+- screen: ADM-163
+  name: Validity, Date & Time Control
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listValidityDateTime
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-163
+  inFlows: null
+- screen: ADM-164
+  name: Code Distribution & Assignment Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setCodeDistributionManager
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-164
+  inFlows: null
+- screen: ADM-165
+  name: Redemption Monitor & Code Lookup
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRedemptionCodeLookup
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-165
+  inFlows: null
+- screen: ADM-166
+  name: Code Security, Fraud & Exception Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCodeSecurityFraud
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-166
+  inFlows: null
+- screen: ADM-167
+  name: Redemption Analytics, Audit & AI Optimization
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRedemption
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-158
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-167
+  inFlows: null
+- screen: ADM-168
+  name: Advanced Offer Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listAdvancedOffer
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-169
+  - ADM-170
+  - ADM-171
+  - ADM-172
+  - ADM-173
+  - ADM-174
+  - ADM-175
+  - ADM-176
+  - ADM-177
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-168
+  inFlows: null
+- screen: ADM-169
+  name: Buy X Get Y / BOGO Rule Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setBuyGetBogo
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-169
+  inFlows: null
+- screen: ADM-170
+  name: Multi-Buy & Quantity Offer Configurator
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listMultiBuyQuantity
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-170
+  inFlows: null
+- screen: ADM-171
+  name: Cheapest / Lowest-Value Item Promotion
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCheapestLowestValue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-171
+  inFlows: null
+- screen: ADM-172
+  name: Fixed-Price & “N for X” Offer Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setFixedPriceOffer
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-172
+  inFlows: null
+- screen: ADM-173
+  name: Gift, Free Product & Added-Value Offer Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setGiftFreeProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-173
+  inFlows: null
+- screen: ADM-174
+  name: Cross-Category Promotion Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setCrossCategoryPromotion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-174
+  inFlows: null
+- screen: ADM-175
+  name: Reward Selection, Substitution & Customer Choice
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRewardSelectionSubstitution
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-175
+  inFlows: null
+- screen: ADM-176
+  name: Advanced Offer Guardrails & Conflict Controls
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listAdvancedOfferGuardrail
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-176
+  inFlows: null
+- screen: ADM-177
+  name: Offer Simulation, Basket Trace & AI Optimization
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listOfferBasketTrace
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-168
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-177
+  inFlows: null
+- screen: ADM-178
+  name: Bundle & Combo Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundleCombo
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-179
+  - ADM-180
+  - ADM-181
+  - ADM-182
+  - ADM-183
+  - ADM-184
+  - ADM-185
+  - ADM-186
+  - ADM-187
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-178
+  inFlows: null
+- screen: ADM-179
+  name: Bundle Definition & Setup
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setBundleDefinition
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-179
+  inFlows: null
+- screen: ADM-180
+  name: Bundle Component Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setBundleComponent
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-180
+  inFlows: null
+- screen: ADM-181
+  name: Guest Choice & Build-Your-Own Bundle Designer
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setGuestChoiceBuild
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-181
+  inFlows: null
+- screen: ADM-182
+  name: Bundle Pricing & Commercial Model
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundlePricingCommercial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-182
+  inFlows: null
+- screen: ADM-183
+  name: Bundle Availability, Capacity & Validation
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundleAvailabilityCapacity
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-183
+  inFlows: null
+- screen: ADM-184
+  name: Bundle Validity, Scheduling & Redemption Rules
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundleValidityScheduling
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-184
+  inFlows: null
+- screen: ADM-185
+  name: Partner & External Product Bundle Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerExternalProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-185
+  inFlows: null
+- screen: ADM-186
+  name: Revenue Allocation, Cost & Settlement Rules
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRevenueAllocationCost
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-186
+  inFlows: null
+- screen: ADM-187
+  name: Bundle Preview, Simulation & AI Recommendation
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - simulateBundlePreviewRecommendation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-178
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-187
+  inFlows: null
+- screen: ADM-188
+  name: Dynamic Bundle Operations Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicBundle
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-189
+  - ADM-190
+  - ADM-191
+  - ADM-192
+  - ADM-193
+  - ADM-194
+  - ADM-195
+  - ADM-196
+  - ADM-197
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-188
+  inFlows: null
+- screen: ADM-189
+  name: Component Inventory & Availability Matrix
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listComponentInventoryAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-189
+  inFlows: null
+- screen: ADM-190
+  name: Bundle Sellability & Dependency Rule Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundleSellabilityDependency
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-190
+  inFlows: null
+- screen: ADM-191
+  name: Capacity Pool & Reservation Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCapacityPoolReservation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-191
+  inFlows: null
+- screen: ADM-192
+  name: Dynamic Component Substitution Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicComponentSubstitution
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-192
+  inFlows: null
+- screen: ADM-193
+  name: Dynamic Bundle Rule & Composition Engine
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicBundleRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-193
+  inFlows: null
+- screen: ADM-194
+  name: Real-Time Availability & Checkout Validation
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRealTimeAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-194
+  inFlows: null
+- screen: ADM-195
+  name: Bundle Availability by Channel, Venue & Partner
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundleAvailabilityChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-195
+  inFlows: null
+- screen: ADM-196
+  name: Bundle Availability Forecast, Alerts & Recovery
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundleAvailabilityForecast
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-196
+  inFlows: null
+- screen: ADM-197
+  name: Dynamic Bundle Simulation & AI Optimization
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDynamicBundle2
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-188
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-197
+  inFlows: null
+- screen: ADM-198
+  name: Targeting & Eligibility Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listTargetingEligibility
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-199
+  - ADM-200
+  - ADM-201
+  - ADM-202
+  - ADM-203
+  - ADM-204
+  - ADM-205
+  - ADM-206
+  - ADM-207
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-198
+  inFlows: null
+- screen: ADM-199
+  name: Eligibility Rule Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setEligibilityRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-199
+  inFlows: null
+- screen: ADM-200
+  name: CRM & Customer Segment Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCrmCustomerSegment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-200
+  inFlows: null
+- screen: ADM-201
+  name: Membership, Loyalty & Guest Eligibility
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listMembershipLoyaltyGuest
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-201
+  inFlows: null
+- screen: ADM-202
+  name: Behavioral & Transaction Targeting
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBehavioralTransactionTargeting
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-202
+  inFlows: null
+- screen: ADM-203
+  name: Context, Location, Channel & Time Targeting
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listContextLocationChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-203
+  inFlows: null
+- screen: ADM-204
+  name: Partner, B2B & Payment Eligibility
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPartnerPaymentEligibility
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-204
+  inFlows: null
+- screen: ADM-205
+  name: Audience Preview, Reach & Eligibility Simulator
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listAudiencePreviewReach
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-205
+  inFlows: null
+- screen: ADM-206
+  name: Targeting Conflict, Frequency & Exclusion Controls
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listTargetingConflictFrequency
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-206
+  inFlows: null
+- screen: ADM-207
+  name: AI Audience Discovery & Targeting Optimization
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listAudienceDiscoveryTargeting
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-198
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-207
+  inFlows: null
+- screen: ADM-208
+  name: Stacking & Conflict Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listStackingConflict
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-209
+  - ADM-210
+  - ADM-211
+  - ADM-212
+  - ADM-213
+  - ADM-214
+  - ADM-215
+  - ADM-216
+  - ADM-217
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-208
+  inFlows: null
+- screen: ADM-209
+  name: Promotion Priority & Hierarchy Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionPriorityHierarchy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-209
+  inFlows: null
+- screen: ADM-210
+  name: Promotion Stacking Rule Builder
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setPromotionStackingRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-210
+  inFlows: null
+- screen: ADM-211
+  name: Promotion Exclusion & Compatibility Matrix
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionExclusionCompatibility
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-211
+  inFlows: null
+- screen: ADM-212
+  name: Discount Calculation & Application Sequence
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDiscountCalculationApplication
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-212
+  inFlows: null
+- screen: ADM-213
+  name: Best Offer & Customer Benefit Resolver
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBestOfferCustomer
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-213
+  inFlows: null
+- screen: ADM-214
+  name: Discount Cap & Maximum Benefit Controller
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDiscountCapMaximum
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-214
+  inFlows: null
+- screen: ADM-215
+  name: Conflict Detection & Resolution Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listConflictDetectionResolution
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-215
+  inFlows: null
+- screen: ADM-216
+  name: Promotion Decision Trace & Transaction Explainer
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionDecisionTrace
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-216
+  inFlows: null
+- screen: ADM-217
+  name: Conflict Simulation & AI Optimization
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listConflict
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-208
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-217
+  inFlows: null
+- screen: ADM-218
+  name: Campaign Governance & Budget Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCampaignGovernanceBudget
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-219
+  - ADM-220
+  - ADM-221
+  - ADM-222
+  - ADM-223
+  - ADM-224
+  - ADM-225
+  - ADM-226
+  - ADM-227
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-218
+  inFlows: null
+- screen: ADM-219
+  name: Campaign Budget & Financial Limit Setup
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - setCampaignBudgetFinancial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-219
+  inFlows: null
+- screen: ADM-220
+  name: Redemption, Discount & Exposure Limit Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRedemptionDiscountExposure
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-220
+  inFlows: null
+- screen: ADM-221
+  name: Budget Consumption & Forecast Monitor
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBudgetConsumptionForecast
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-221
+  inFlows: null
+- screen: ADM-222
+  name: Threshold Actions & Automatic Suspension
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listThresholdActionAutomatic
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-222
+  inFlows: null
+- screen: ADM-223
+  name: Campaign Approval Workflow Designer
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - approveCampaignWorkflow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-223
+  inFlows: null
+- screen: ADM-224
+  name: Approval Inbox & Decision Workspace
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - approveDecision
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-224
+  inFlows: null
+- screen: ADM-225
+  name: Campaign Financial & Commercial Simulator
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCampaignFinancialCommercial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-225
+  inFlows: null
+- screen: ADM-226
+  name: Campaign Experiment & A/B Test Manager
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCampaignExperimentTest
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-226
+  inFlows: null
+- screen: ADM-227
+  name: Governance Audit, AI Risk & Launch Readiness
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listGovernanceRiskLaunch
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-218
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-227
+  inFlows: null
+- screen: ADM-228
+  name: Promotion Performance Command Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listPromotionPerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-229
+  - ADM-230
+  - ADM-231
+  - ADM-232
+  - ADM-233
+  - ADM-234
+  - ADM-235
+  - ADM-236
+  - ADM-237
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-228
+  inFlows: null
+- screen: ADM-229
+  name: Campaign & Promotion Performance Explorer
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCampaignPromotionPerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-229
+  inFlows: null
+- screen: ADM-230
+  name: Redemption, Conversion & Funnel Analytics
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listRedemptionConversionFunnel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-230
+  inFlows: null
+- screen: ADM-231
+  name: Discount, Margin & Profitability Analytics
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listDiscountMarginProfitability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-231
+  inFlows: null
+- screen: ADM-232
+  name: Bundle, BOGO & Advanced Offer Analytics
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listBundleBogoAdvanced
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-232
+  inFlows: null
+- screen: ADM-233
+  name: Upsell, Cross-Sell & Attach-Rate Analytics
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listUpsellCrossSell
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-233
+  inFlows: null
+- screen: ADM-234
+  name: Customer, Segment, Channel & Partner Analytics
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerSegmentChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-234
+  inFlows: null
+- screen: ADM-235
+  name: Incrementality, Attribution & Cannibalization Analysis
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listIncrementalityAttributionCannibalization
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-235
+  inFlows: null
+- screen: ADM-236
+  name: AI Optimization & Next-Best-Action Center
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listNextBestAction
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-236
+  inFlows: null
+- screen: ADM-237
+  name: Executive Promotion Intelligence & Reporting Studio
+  module: Commercial
+  requiresModule: marketing
+  wave: 3
+  density: compact
+  operations:
+  - listExecutivePromotionReporting
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-228
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-237
+  inFlows: null
+- screen: ADM-238
+  name: Rules & Workflow Command Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listRuleWorkflow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-239
+  - ADM-240
+  - ADM-241
+  - ADM-242
+  - ADM-243
+  - ADM-244
+  - ADM-245
+  - ADM-246
+  - ADM-247
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-238
+  inFlows: null
+- screen: ADM-239
+  name: Visual Business Rule Builder
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setVisualBusinessRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-239
+  inFlows: null
+- screen: ADM-240
+  name: Conditions, Decision Logic & Decision Tables
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listConditionDecisionLogic
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-240
+  inFlows: null
+- screen: ADM-241
+  name: Visual Workflow Designer
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setVisualWorkflow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-241
+  inFlows: null
+- screen: ADM-242
+  name: Approval Matrix & Multi-Level Approval Configuration
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - approveMatrixMultiLevel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-242
+  inFlows: null
+- screen: ADM-243
+  name: Roles, Authority, Delegation & Approval Limits
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - approveRoleAuthorityDelegation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-243
+  inFlows: null
+- screen: ADM-244
+  name: SLA, Escalation, Reminder & Timeout Rules
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listSlaEscalationReminder
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-244
+  inFlows: null
+- screen: ADM-245
+  name: Trigger, Action & Cross-Module Orchestration Configuration
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - setTriggerActionCross
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-245
+  inFlows: null
+- screen: ADM-246
+  name: Workflow Testing, Simulation & Impact Analysis
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - simulateWorkflowTestingImpact
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-246
+  inFlows: null
+- screen: ADM-247
+  name: Versioning, Governance, Approval & Publication
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - approveVersioningGovernance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-238
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-247
+  inFlows: null
+- screen: ADM-248
+  name: Workflow Operations Command Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWorkflow
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-249
+  - ADM-250
+  - ADM-251
+  - ADM-252
+  - ADM-253
+  - ADM-254
+  - ADM-255
+  - ADM-256
+  - ADM-257
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-248
+  inFlows: null
+- screen: ADM-249
+  name: Unified Approval Inbox & Decision Workspace
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - approveUnifiedDecision
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-249
+  inFlows: null
+- screen: ADM-250
+  name: Workflow Instance Monitor & Process Timeline
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWorkflowInstanceProcess
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-250
+  inFlows: null
+- screen: ADM-251
+  name: Workflow Exception, Failure & Recovery Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWorkflowExceptionFailure
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-251
+  inFlows: null
+- screen: ADM-252
+  name: SLA, Escalation & Bottleneck Monitor
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listSlaEscalationBottleneck
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-252
+  inFlows: null
+- screen: ADM-253
+  name: Automation Execution & Autonomous Action Monitor
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - createAutomationAutonomouAction
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-253
+  inFlows: null
+- screen: ADM-254
+  name: Cross-Module Orchestration Monitor
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listCrossModuleOrchestration
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-254
+  inFlows: null
+- screen: ADM-255
+  name: Workflow Analytics & Process Performance
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWorkflowProcessPerformance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-255
+  inFlows: null
+- screen: ADM-256
+  name: Process Optimization & Automation Opportunity Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listProcessAutomationOpportunity
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-256
+  inFlows: null
+- screen: ADM-257
+  name: AI Workflow Intelligence & Autonomous Governance Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listWorkflowAutonomouGovernance
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-248
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-257
+  inFlows: null
+- screen: ADM-258
+  name: Sales Channel Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listSaleChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-259
+  - ADM-260
+  - ADM-261
+  - ADM-262
+  - ADM-263
+  - ADM-264
+  - ADM-265
+  - ADM-266
+  - ADM-267
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-258
+  inFlows: null
+- screen: ADM-259
+  name: Channel Creation & Profile Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - createChannelProfile
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-259
+  inFlows: null
+- screen: ADM-260
+  name: Product & Catalogue Assignment
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setProductCatalogue
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-260
+  inFlows: null
+- screen: ADM-261
+  name: Channel Pricing & Commercial Profile Assignment
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setChannelPricingCommercial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-261
+  inFlows: null
+- screen: ADM-262
+  name: Inventory, Capacity & Channel Allocation
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listInventoryCapacityChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-262
+  inFlows: null
+- screen: ADM-263
+  name: Channel Sales Schedule & Availability Windows
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelSaleSchedule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-263
+  inFlows: null
+- screen: ADM-264
+  name: Customer & Eligibility Rules by Channel
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCustomerEligibilityRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-264
+  inFlows: null
+- screen: ADM-265
+  name: Channel Sales Rules, Limits & Restrictions
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelSaleRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-265
+  inFlows: null
+- screen: ADM-266
+  name: Channel Fees, Payment & Fulfillment Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setChannelFeePayment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-266
+  inFlows: null
+- screen: ADM-267
+  name: Channel Publication, Readiness & AI Validation
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - publishChannelReadinessValidation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-258
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-267
+  inFlows: null
+- screen: ADM-268
+  name: Channel Operations Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-269
+  - ADM-270
+  - ADM-271
+  - ADM-272
+  - ADM-273
+  - ADM-274
+  - ADM-275
+  - ADM-276
+  - ADM-277
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-268
+  inFlows: null
+- screen: ADM-269
+  name: Channel Connection & Integration Manager
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelConnectionIntegration
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-269
+  inFlows: null
+- screen: ADM-270
+  name: Product, Price & Availability Synchronization
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listProductPriceAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-270
+  inFlows: null
+- screen: ADM-271
+  name: Real-Time Channel Availability & Inventory Monitor
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listRealTimeChannel
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-271
+  inFlows: null
+- screen: ADM-272
+  name: Channel Allocation & Rebalancing Operations
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelAllocationRebalancing
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-272
+  inFlows: null
+- screen: ADM-273
+  name: Channel Exceptions, Incidents & Recovery
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelExceptionIncident
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-273
+  inFlows: null
+- screen: ADM-274
+  name: Channel Performance & Commercial Analytics
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelPerformanceCommercial
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-274
+  inFlows: null
+- screen: ADM-275
+  name: Channel Audit, Logs & Transaction Traceability
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelLogTransaction
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-275
+  inFlows: null
+- screen: ADM-276
+  name: Channel Governance, SLA & Partner Control
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannelGovernanceSla
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-276
+  inFlows: null
+- screen: ADM-277
+  name: AI Channel Optimization & Intelligence Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listChannel2
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-268
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-277
+  inFlows: null
+- screen: ADM-278
+  name: Resale Marketplace Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleMarketplace
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-279
+  - ADM-280
+  - ADM-281
+  - ADM-282
+  - ADM-283
+  - ADM-284
+  - ADM-285
+  - ADM-286
+  - ADM-287
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-278
+  inFlows: null
+- screen: ADM-279
+  name: Resale Eligibility Rule Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setResaleEligibilityRule
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-279
+  inFlows: null
+- screen: ADM-280
+  name: Resale Policy & Marketplace Settings
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResalePolicyMarketplace
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-280
+  inFlows: null
+- screen: ADM-281
+  name: Listing Creation & Seller Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - createListingSeller
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-281
+  inFlows: null
+- screen: ADM-282
+  name: Resale Pricing & Price Guardrails
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResalePricingPrice
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-282
+  inFlows: null
+- screen: ADM-283
+  name: Resale Fees, Commission & Seller Proceeds
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleFeeCommission
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-283
+  inFlows: null
+- screen: ADM-284
+  name: Listing Approval & Moderation
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - approveListingModeration
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-284
+  inFlows: null
+- screen: ADM-285
+  name: Resale Inventory & Availability Management
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleInventoryAvailability
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-285
+  inFlows: null
+- screen: ADM-286
+  name: Listing Lifecycle, Expiry & Cancellation
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listListingLifecycleExpiry
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-286
+  inFlows: null
+- screen: ADM-287
+  name: AI Resale Configuration & Marketplace Recommendations
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setResaleMarketplaceRecommendation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-278
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-287
+  inFlows: null
+- screen: ADM-288
+  name: Resale Operations Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResale
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-289
+  - ADM-290
+  - ADM-291
+  - ADM-292
+  - ADM-293
+  - ADM-294
+  - ADM-295
+  - ADM-296
+  - ADM-297
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-288
+  inFlows: null
+- screen: ADM-289
+  name: Buyer Purchase & Resale Order Management
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listBuyerPurchaseResale
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-289
+  inFlows: null
+- screen: ADM-290
+  name: Ticket Ownership Transfer Management
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listTicketOwnershipTransfer
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-290
+  inFlows: null
+- screen: ADM-291
+  name: Credential Revocation & Regeneration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCredentialRevocationRegeneration
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-291
+  inFlows: null
+- screen: ADM-292
+  name: Resale Fraud & Duplicate Sale Protection
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleFraudDuplicate
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-292
+  inFlows: null
+- screen: ADM-293
+  name: Capacity & Inventory Reconciliation
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCapacityInventoryReconciliation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-293
+  inFlows: null
+- screen: ADM-294
+  name: Seller Settlement & Payout Management
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listSellerSettlementPayout
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-294
+  inFlows: null
+- screen: ADM-295
+  name: Refunds, Disputes & Resale Exceptions
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listRefundDisputeResale
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-295
+  inFlows: null
+- screen: ADM-296
+  name: Resale Audit & Ownership History
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleOwnership
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-296
+  inFlows: null
+- screen: ADM-297
+  name: Resale Analytics & AI Intelligence
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResale2
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-288
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-297
+  inFlows: null
+- screen: ADM-298
+  name: My Tickets & Resale Marketplace Entry
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listTicketResaleMarketplace
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-299
+  - ADM-300
+  - ADM-301
+  - ADM-302
+  - ADM-303
+  - ADM-304
+  - ADM-305
+  - ADM-306
+  - ADM-307
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-298
+  inFlows: null
+- screen: ADM-299
+  name: Resale Eligibility & Ticket Selection
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleEligibilityTicket
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-299
+  inFlows: null
+- screen: ADM-300
+  name: Create Listing & Resale Price Selection
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listCreateListingResale
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-300
+  inFlows: null
+- screen: ADM-301
+  name: Fees, Seller Proceeds & Listing Confirmation
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listFeeSellerProceed
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-301
+  inFlows: null
+- screen: ADM-302
+  name: My Resale Listings & Seller Dashboard
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleListingSeller
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-302
+  inFlows: null
+- screen: ADM-303
+  name: Official Resale Marketplace & Buyer Discovery
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listOfficialResaleMarketplace
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-303
+  inFlows: null
+- screen: ADM-304
+  name: Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleTicketDetail
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-304
+  inFlows: null
+- screen: ADM-305
+  name: Buyer Checkout, Inventory Hold & Secure Payment
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listBuyerCheckoutInventory
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-305
+  inFlows: null
+- screen: ADM-306
+  name: Resale Confirmation, Ownership Transfer & Ticket Delivery
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listResaleConfirmationOwnership
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-306
+  inFlows: null
+- screen: ADM-307
+  name: White-Label Marketplace Deployment & Experience Architecture
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listWhiteLabelMarketplace
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-298
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-307
+  inFlows: null
+- screen: ADM-308
+  name: Upgrade & Conversion Command Center
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listUpgradeConversion
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-309
+  - ADM-310
+  - ADM-311
+  - ADM-312
+  - ADM-313
+  - ADM-314
+  - ADM-315
+  - ADM-316
+  - ADM-317
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-308
+  inFlows: null
+- screen: ADM-309
+  name: Upgrade & Conversion Path Builder
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setUpgradeConversionPath
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-309
+  inFlows: null
+- screen: ADM-310
+  name: Upgrade Eligibility & Qualification Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listUpgradeEligibilityQualification
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-310
+  inFlows: null
+- screen: ADM-311
+  name: Upgrade Timing, Usage & Ticket Status Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listUpgradeTimingUsage
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-311
+  inFlows: null
+- screen: ADM-312
+  name: Upgrade Financial Treatment & Price Difference Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listUpgradeFinancialTreatment
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-312
+  inFlows: null
+- screen: ADM-313
+  name: Pro-Rata, Residual Value & Entitlement Credit Configuration
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - setProRataResidual
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-313
+  inFlows: null
+- screen: ADM-314
+  name: Person-Type, Product & Entitlement Conversion Rules
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listPersonTypeProduct
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-314
+  inFlows: null
+- screen: ADM-315
+  name: Bulk, Group & Assisted Upgrade Operations
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listBulkGroupAssisted
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-315
+  inFlows: null
+- screen: ADM-316
+  name: Upgrade Execution, Credential Regeneration & Channel Controls
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - createUpgradeCredentialRegeneration
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-316
+  inFlows: null
+- screen: ADM-317
+  name: Upgrade History, Exception Management & Audit Explorer
+  module: Commercial
+  requiresModule: ticketing
+  wave: 3
+  density: compact
+  operations:
+  - listUpgradeException
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-308
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-317
+  inFlows: null
+- screen: ADM-318
+  name: Dead Letters
+  module: Platform Ops
+  requiresModule: core
+  wave: 1
+  density: compact
+  operations:
+  - listDeadLetters
+  - replayDeadLetter
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams:
+  - deadLetterId<-deepLink
+  goesTo:
+  - ADM-001
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-318
+  inFlows: null

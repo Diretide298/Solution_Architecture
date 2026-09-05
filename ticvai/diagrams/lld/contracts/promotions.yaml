@@ -1,5 +1,5 @@
 id: LLD-promotions
-title: promotions — 35 operations
+title: promotions — 131 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -16,6 +16,26 @@ operations:
   offline: false
   reads:
   - promotions.promotion
+  writes: []
+- operation: approveCampaignWorkflow
+  verb: PUT
+  path: /campaign-workflow
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveDecision
+  verb: PUT
+  path: /decision
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: assignCoupon
   verb: POST
@@ -223,7 +243,6 @@ operations:
   permission: PRODUCT_VIEW
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - catalogue.channel_capacity
@@ -247,6 +266,26 @@ operations:
   - promotions.upsell_rule
   writes:
   - cache:idempotency
+- operation: listAdvancedOffer
+  verb: GET
+  path: /advanced-offer
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAdvancedOfferGuardrail
+  verb: GET
+  path: /advanced-offer-guardrail
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listAllocationSplits
   verb: GET
   path: /allocation-splits
@@ -259,6 +298,136 @@ operations:
   - promotions.allocation_component
   - promotions.allocation_split
   writes: []
+- operation: listAudienceDiscoveryTargeting
+  verb: GET
+  path: /audience-discovery-targeting
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listAudiencePreviewReach
+  verb: GET
+  path: /audience-preview-reach
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBehavioralTransactionTargeting
+  verb: GET
+  path: /behavioral-transaction-targeting
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBestOfferCustomer
+  verb: GET
+  path: /best-offer-customer
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBudgetConsumptionForecast
+  verb: GET
+  path: /budget-consumption-forecast
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundleAvailabilityCapacity
+  verb: GET
+  path: /bundle-availability-capacity
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundleAvailabilityChannel
+  verb: GET
+  path: /bundle-availability-channel
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundleAvailabilityForecast
+  verb: GET
+  path: /bundle-availability-forecast
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundleBogoAdvanced
+  verb: GET
+  path: /bundle-bogo-advanced
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundleCombo
+  verb: GET
+  path: /bundle-combo
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundlePricingCommercial
+  verb: GET
+  path: /bundle-pricing-commercial
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundleSellabilityDependency
+  verb: GET
+  path: /bundle-sellability-dependency
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listBundleValidityScheduling
+  verb: GET
+  path: /bundle-validity-scheduling
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listBundles
   verb: GET
   path: /bundles
@@ -269,6 +438,146 @@ operations:
   offline: false
   reads:
   - promotions.bundle
+  writes: []
+- operation: listCampaignCalendarTimeline
+  verb: GET
+  path: /campaign-calendar-timeline
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCampaignExperimentTest
+  verb: GET
+  path: /campaign-experiment-test
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCampaignFinancialCommercial
+  verb: GET
+  path: /campaign-financial-commercial
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCampaignGovernanceBudget
+  verb: GET
+  path: /campaign-governance-budget
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCampaignPromotionPerformance
+  verb: GET
+  path: /campaign-promotion-performance
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCapacityPoolReservation
+  verb: GET
+  path: /capacity-pool-reservation
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCartTransactionThreshold
+  verb: GET
+  path: /cart-transaction-threshold
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCheapestLowestValue
+  verb: GET
+  path: /cheapest-lowest-value
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCodeEligibilityRestriction
+  verb: GET
+  path: /code-eligibility-restriction
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCodeSecurityFraud
+  verb: GET
+  path: /code-security-fraud
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listComponentInventoryAvailability
+  verb: GET
+  path: /component-inventory-availability
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listConflict
+  verb: GET
+  path: /conflict
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listConflictDetectionResolution
+  verb: GET
+  path: /conflict-detection-resolution
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listContextLocationChannel
+  verb: GET
+  path: /context-location-channel
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listCouponCampaigns
   verb: GET
@@ -292,6 +601,326 @@ operations:
   reads:
   - promotions.coupon_code
   writes: []
+- operation: listCrmCustomerSegment
+  verb: GET
+  path: /crm-customer-segment
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerMembershipSegment
+  verb: GET
+  path: /customer-membership-segment
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCustomerSegmentChannel
+  verb: GET
+  path: /customer-segment-channel
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDiscountCalculationApplication
+  verb: GET
+  path: /discount-calculation-application
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDiscountCapMaximum
+  verb: GET
+  path: /discount-cap-maximum
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDiscountLimitGuardrail
+  verb: GET
+  path: /discount-limit-guardrail
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDiscountMarginProfitability
+  verb: GET
+  path: /discount-margin-profitability
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicBundle
+  verb: GET
+  path: /dynamic-bundle
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicBundle2
+  verb: GET
+  path: /dynamic-bundle
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicBundleRule
+  verb: GET
+  path: /dynamic-bundle-rule
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listDynamicComponentSubstitution
+  verb: GET
+  path: /dynamic-component-substitution
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listExecutivePromotionReporting
+  verb: GET
+  path: /executive-promotion-reporting
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listGovernanceRiskLaunch
+  verb: GET
+  path: /governance-risk-launch
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listIncrementalityAttributionCannibalization
+  verb: GET
+  path: /incrementality-attribution-cannibalization
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMembershipLoyaltyGuest
+  verb: GET
+  path: /membership-loyalty-guest
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listMultiBuyQuantity
+  verb: GET
+  path: /multi-buy-quantity
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listNextBestAction
+  verb: GET
+  path: /next-best-action
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listOfferBasketTrace
+  verb: GET
+  path: /offer-basket-trace
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerExternalProduct
+  verb: GET
+  path: /partner-external-product
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPartnerPaymentEligibility
+  verb: GET
+  path: /partner-payment-eligibility
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPaymentMethodBank
+  verb: GET
+  path: /payment-method-bank
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPercentageFixedDiscount
+  verb: GET
+  path: /percentage-fixed-discount
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionActivityVersion
+  verb: GET
+  path: /promotion-activity-version
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionAlertException
+  verb: GET
+  path: /promotion-alert-exception
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionCampaign
+  verb: GET
+  path: /promotion-campaign
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionChannel
+  verb: GET
+  path: /promotion-channel
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionDecisionTrace
+  verb: GET
+  path: /promotion-decision-trace
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionExclusionCompatibility
+  verb: GET
+  path: /promotion-exclusion-compatibility
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionHealthPerformance
+  verb: GET
+  path: /promotion-health-performance
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionLifecycleStatus
+  verb: GET
+  path: /promotion-lifecycle-statu
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionPerformance
+  verb: GET
+  path: /promotion-performance
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listPromotionPriorityHierarchy
+  verb: GET
+  path: /promotion-priority-hierarchy
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listPromotions
   verb: GET
   path: /promotions
@@ -305,6 +934,156 @@ operations:
   reads:
   - promotions.promotion
   writes: []
+- operation: listRealTimeAvailability
+  verb: GET
+  path: /real-time-availability
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRedemption
+  verb: GET
+  path: /redemption
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRedemptionCodeLookup
+  verb: GET
+  path: /redemption-code-lookup
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRedemptionConversionFunnel
+  verb: GET
+  path: /redemption-conversion-funnel
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRedemptionDiscountExposure
+  verb: GET
+  path: /redemption-discount-exposure
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRevenueAllocationCost
+  verb: GET
+  path: /revenue-allocation-cost
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRewardSelectionSubstitution
+  verb: GET
+  path: /reward-selection-substitution
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSpecialPriceGuest
+  verb: GET
+  path: /special-price-guest
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listStackingConflict
+  verb: GET
+  path: /stacking-conflict
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTargetingConflictFrequency
+  verb: GET
+  path: /targeting-conflict-frequency
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTargetingEligibility
+  verb: GET
+  path: /targeting-eligibility
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listThresholdActionAutomatic
+  verb: GET
+  path: /threshold-action-automatic
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listTimeBasedSeasonal
+  verb: GET
+  path: /time-based-seasonal
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUniqueCodeGeneration
+  verb: GET
+  path: /unique-code-generation
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listUpsellCrossSell
+  verb: GET
+  path: /upsell-cross-sell
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: listUpsellRules
   verb: GET
   path: /upsell-rules
@@ -315,6 +1094,36 @@ operations:
   offline: false
   reads:
   - promotions.upsell_rule
+  writes: []
+- operation: listUsageCapacityFrequency
+  verb: GET
+  path: /usage-capacity-frequency
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listValidityDateTime
+  verb: GET
+  path: /validity-date-time
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listVolumeBulkTier
+  verb: GET
+  path: /volume-bulk-tier
+  scope: venue
+  permission: PRICE_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: listVoucherBatches
   verb: GET
@@ -385,6 +1194,136 @@ operations:
   writes:
   - cache:idempotency
   - promotions.voucher
+- operation: setBundleComponent
+  verb: PUT
+  path: /bundle-component
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setBundleDefinition
+  verb: PUT
+  path: /bundle-definition
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setBuyGetBogo
+  verb: PUT
+  path: /buy-get-bogo
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCampaignBudgetFinancial
+  verb: PUT
+  path: /campaign-budget-financial
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCodeDistributionManager
+  verb: PUT
+  path: /code-distribution-manager
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCouponPromoCode
+  verb: PUT
+  path: /coupon-promo-code
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setCrossCategoryPromotion
+  verb: PUT
+  path: /cross-category-promotion
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setEligibilityRule
+  verb: PUT
+  path: /eligibility-rule
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setFixedPriceOffer
+  verb: PUT
+  path: /fixed-price-offer
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGiftFreeProduct
+  verb: PUT
+  path: /gift-free-product
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setGuestChoiceBuild
+  verb: PUT
+  path: /guest-choice-build
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPromotionRule
+  verb: PUT
+  path: /promotion-rule
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setPromotionStackingRule
+  verb: PUT
+  path: /promotion-stacking-rule
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: setPromotionVariants
   verb: PUT
   path: /promotions/{promotionId}/variants
@@ -399,6 +1338,26 @@ operations:
   writes:
   - cache:idempotency
   - promotions.promotion
+- operation: setRuleTestRecommendation
+  verb: PUT
+  path: /rule-test-recommendation
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulateBundlePreviewRecommendation
+  verb: PUT
+  path: /bundle-preview-recommendation
+  scope: venue
+  permission: PRICE_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: simulatePromotion
   verb: POST
   path: /promotions/{promotionId}/simulate

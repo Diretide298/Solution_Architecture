@@ -1920,7 +1920,7 @@
    "service": "CrossRegionService",
    "tier": "platform",
    "contracts": [
-    "cross-cell"
+    "cross-region"
    ],
    "schemas": [
     "sync"

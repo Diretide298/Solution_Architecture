@@ -1,0 +1,1223 @@
+{
+ "generatedBy": "tools/derive-burst-scope.py",
+ "basis": "flows F43, F58, F59 plus the discovery path",
+ "note": "**What a flash-sale environment runs, derived rather than chosen.** Weighted by how many times a single buyer calls each operation — two services carry most of the load and everything else is on the path without being the load.\n\n**Services with `deployed: false` are shown deliberately.** A viewer that shows what is absent is more useful than one showing only what is present, and the absence is the point: six services see no part of a ticket sale.",
+ "totals": {
+  "services": 16,
+  "deployed": 3,
+  "operations": 34,
+  "ofTotalOperations": 1626,
+  "tables": 42,
+  "ofTotalTables": 386
+ },
+ "routing": {
+  "note": "**Normal traffic and sale traffic are separate systems running concurrently.** The burst environment carries the on-sale and nothing else; everything a venue does that day continues in the shared cell. **They meet once, afterwards, at reconciliation.**",
+  "paths": [
+   {
+    "name": "normal",
+    "target": "shared cell",
+    "services": 16,
+    "operations": 1592,
+    "tables": 386,
+    "exampleLoad": "stadium, routine Saturday: 60,000 guests x 14 requests = 48.5 RPS",
+    "description": "**Everything except the sale.** Admission, food, retail, stock, staff back-office, reporting. Runs whether or not a sale is happening."
+   },
+   {
+    "name": "sale",
+    "target": "burst environment",
+    "services": 3,
+    "operations": 34,
+    "tables": 42,
+    "exampleLoad": "same stadium on-sale: 1.25M requests in 2h = 1,045 RPS at a 6x burst; compressed to 20 minutes, 6,270",
+    "description": "**The on-sale only.** Provisioned before it opens, torn down after, and **its orders reconcile back into the shared cell** (ADR-0035) — which is the single point the two paths touch."
+   }
+  ],
+  "meetingPoint": {
+   "operation": "reconcileBurstEnvironment",
+   "mechanism": "environment id, monotonic sequence, idempotent replay, sync.rejection",
+   "note": "**The same three properties as `syncOrders` one layer up.** A till's offline journal and a burst environment's order log are the same problem at different scale."
+  }
+ },
+ "services": [
+  {
+   "name": "CatalogueService",
+   "tier": "commerce",
+   "onBurstPath": true,
+   "weightedShare": 63.6,
+   "deployed": true,
+   "replicas": {
+    "min": 8,
+    "max": null,
+    "maxNote": "**No ceiling, deliberately.** A cap is a cap on absorbing a peak nobody predicted, and the peak is the whole reason this environment exists. 60,000 seats over two hours is 1,045 RPS; the same sale in twenty minutes is 6,270.",
+    "floorIsPeak": true,
+    "derivedFrom": "63.6% of 5000 RPS at 400 RPS per replica",
+    "absoluteMin": 2,
+    "connectionsAtFloor": 320,
+    "poolerCapacity": 5000,
+    "realConstraint": "Lease contention on acquireInventoryHold, not replica count. Measure it with tools/bench.py --pattern hot-venue."
+   },
+   "reason": "carries the burst — replicates on RPS"
+  },
+  {
+   "name": "OrderService",
+   "tier": "commerce",
+   "onBurstPath": true,
+   "weightedShare": 21.8,
+   "deployed": true,
+   "replicas": {
+    "min": 5,
+    "max": null,
+    "maxNote": "**No ceiling, deliberately.** A cap is a cap on absorbing a peak nobody predicted, and the peak is the whole reason this environment exists. 60,000 seats over two hours is 1,045 RPS; the same sale in twenty minutes is 6,270.",
+    "floorIsPeak": true,
+    "derivedFrom": "21.8% of 5000 RPS at 250 RPS per replica",
+    "absoluteMin": 2,
+    "connectionsAtFloor": 200,
+    "poolerCapacity": 5000,
+    "realConstraint": "Lease contention on acquireInventoryHold, not replica count. Measure it with tools/bench.py --pattern hot-venue."
+   },
+   "reason": "carries the burst — replicates on RPS"
+  },
+  {
+   "name": "TenancyService",
+   "tier": "foundation",
+   "onBurstPath": true,
+   "weightedShare": 3.6,
+   "deployed": false,
+   "replicas": null,
+   "reason": "on the path but not the load — served from the shared cell"
+  },
+  {
+   "name": "RetailService",
+   "tier": "operations",
+   "onBurstPath": true,
+   "weightedShare": 3.6,
+   "deployed": false,
+   "replicas": null,
+   "reason": "on the path but not the load — served from the shared cell"
+  },
+  {
+   "name": "MarketingService",
+   "tier": "engagement",
+   "onBurstPath": true,
+   "weightedShare": 3.6,
+   "deployed": false,
+   "replicas": null,
+   "reason": "on the path but not the load — served from the shared cell"
+  },
+  {
+   "name": "IdentityService",
+   "tier": "foundation",
+   "onBurstPath": true,
+   "weightedShare": 1.8,
+   "deployed": true,
+   "replicas": {
+    "min": 2,
+    "max": null,
+    "maxNote": "**No ceiling, deliberately.** A cap is a cap on absorbing a peak nobody predicted, and the peak is the whole reason this environment exists. 60,000 seats over two hours is 1,045 RPS; the same sale in twenty minutes is 6,270.",
+    "floorIsPeak": true,
+    "derivedFrom": "1.8% of 5000 RPS at 600 RPS per replica",
+    "absoluteMin": 2,
+    "connectionsAtFloor": 80,
+    "poolerCapacity": 5000,
+    "realConstraint": "Lease contention on acquireInventoryHold, not replica count. Measure it with tools/bench.py --pattern hot-venue."
+   },
+   "reason": "required for every purchase, small but not optional"
+  },
+  {
+   "name": "AccessService",
+   "tier": "commerce",
+   "onBurstPath": true,
+   "weightedShare": 1.8,
+   "deployed": false,
+   "replicas": null,
+   "reason": "on the path but not the load — served from the shared cell"
+  },
+  {
+   "name": "LedgerService",
+   "tier": "commerce",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "InventoryService",
+   "tier": "operations",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "FnbService",
+   "tier": "operations",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "AiService",
+   "tier": "engagement",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "VenueOpsService",
+   "tier": "operations",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "PlatformService",
+   "tier": "platform",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "WhiteLabelService",
+   "tier": "platform",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "ReportingService",
+   "tier": "platform",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  },
+  {
+   "name": "CrossRegionService",
+   "tier": "platform",
+   "onBurstPath": false,
+   "weightedShare": 0.0,
+   "deployed": false,
+   "replicas": null,
+   "reason": "no part of a ticket sale — not deployed"
+  }
+ ],
+ "tables": [
+  {
+   "table": "orders.sales_order",
+   "schema": "orders",
+   "columns": 18,
+   "burstOperations": 6,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**The sale.** What was bought, by whom, through which channel, at what scope. Every payment, refund, entitlement and ledger posting reaches back to a row here"
+  },
+  {
+   "table": "catalogue.inventory_hold",
+   "schema": "catalogue",
+   "columns": 15,
+   "burstOperations": 5,
+   "written": true,
+   "contention": {
+    "modes": [
+     "single_row"
+    ],
+    "ceilingSource": "pinned",
+    "note": "One counter per (performance, ticket type). Every buyer hits the same row."
+   },
+   "contended": true,
+   "contentionIndeterminate": false,
+   "note": "**A short-lived claim on contended stock** while somebody decides. A seat in a basket is held, not sold — CF-115 settled that contended inventory is leased rather than reserved, and the hold expires on its own. Renamed f"
+  },
+  {
+   "table": "orders.payment",
+   "schema": "orders",
+   "columns": 16,
+   "burstOperations": 5,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A tender against an order**, with the rate it converted at fixed on the row (CF-37). A payment reconciled next month is reconciled at the rate of the day it was taken"
+  },
+  {
+   "table": "access.entitlement",
+   "schema": "access",
+   "columns": 24,
+   "burstOperations": 4,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**What a guest actually holds** — found missing 18 August. The package sold products, defined EntitlementTemplate, recorded ScanEvent.ticketId, transferred ticket_ids and issued wallet passes against entitlementId: **fiv"
+  },
+  {
+   "table": "catalogue.channel_capacity",
+   "schema": "catalogue",
+   "columns": 12,
+   "burstOperations": 4,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**How much of a performance each sales channel may sell.** Two hundred seats with eighty to the web, eighty to the box office and forty held back. Renamed from `envelope`, which was unguessable"
+  },
+  {
+   "table": "catalogue.performance",
+   "schema": "catalogue",
+   "columns": 10,
+   "burstOperations": 4,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**When a product happens** — a session, a showing, a timed entry slot. Capacity lives here and in `catalogue.channel_capacity`, never on the product"
+  },
+  {
+   "table": "catalogue.product",
+   "schema": "catalogue",
+   "columns": 21,
+   "burstOperations": 4,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**What a venue sells** — admission, a session, a bundle, a membership, a locker. Not the instance: a product is the offer and `catalogue.performance` is the occasion"
+  },
+  {
+   "table": "seating.seat_hold",
+   "schema": "seating",
+   "columns": 12,
+   "burstOperations": 4,
+   "written": true,
+   "contention": {
+    "modes": [
+     "per_entity",
+     "allocator_serialised"
+    ],
+    "ceilingSource": "worst_case_unless_pinned",
+    "pinnedBy": "catalogue.performance.seatingRules",
+    "note": "Guest picks a seat: per_entity, 43,693 rows, structurally not contended. System picks best available: allocator_serialised, effectively one row and worse than single_row because losers retry."
+   },
+   "contended": true,
+   "contentionIndeterminate": true,
+   "note": "**A temporary claim on a seat.** Expires, which is what stops two channels selling it"
+  },
+  {
+   "table": "catalogue.event",
+   "schema": "catalogue",
+   "columns": 8,
+   "burstOperations": 3,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A named thing on at a venue**, grouping performances. A concert is an event; each showing is a performance"
+  },
+  {
+   "table": "orders.order_line",
+   "schema": "orders",
+   "columns": 18,
+   "burstOperations": 3,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One thing bought on one order**, priced at the moment of sale. A price list changing afterwards does not change what somebody paid"
+  },
+  {
+   "table": "promotions.promotion",
+   "schema": "promotions",
+   "columns": 20,
+   "burstOperations": 3,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A rule that changes a price**, with eligibility and a budget. Evaluated at the basket rather than stored on a product"
+  },
+  {
+   "table": "approvals.delegation",
+   "schema": "approvals",
+   "columns": 9,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Standing in for an approver. Always time-bounded — an open-ended delegation is one nobody remembers **Hangs off**: reaches `approvals.request` through its keys; references `identity.principal`. **Reached by**: 4 operatio"
+  },
+  {
+   "table": "approvals.matrix",
+   "schema": "approvals",
+   "columns": 6,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "What requires approval where. Versioned, because a request must be decided by the rules it was raised under **Hangs off**: reaches `approvals.request` through its keys. **Reached by**: 4 operations read it and 1 write it"
+  },
+  {
+   "table": "approvals.rule",
+   "schema": "approvals",
+   "columns": 17,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "Ordered within a matrix. First match wins, so adding a rule cannot silently change another **Hangs off**: reaches `approvals.request` through its keys; references `approvals.matrix`. **Reached by**: 5 operations read it "
+  },
+  {
+   "table": "catalogue.entitlement_template",
+   "schema": "catalogue",
+   "columns": 34,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**The rules a ticket carries before anybody buys one** — validity, entries allowed, transferability, what a gate does with it. `access.entitlement` is the issued instance"
+  },
+  {
+   "table": "catalogue.variant",
+   "schema": "catalogue",
+   "columns": 5,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One sellable configuration of a product** — a size, a colour, a tier. Varies along the dimensions in `catalogue.variant_dimension`"
+  },
+  {
+   "table": "identity.delegated_access",
+   "schema": "identity",
+   "columns": 19,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One person acting for another, or for a scope they do not own.** A parent managing a child's membership, a manager covering another venue for a week. Renamed from `grant`, which is a verb, a subsidy and a permission de"
+  },
+  {
+   "table": "ledger.journal_entry",
+   "schema": "ledger",
+   "columns": 16,
+   "burstOperations": 2,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A balanced set of postings.** Append-only: a correction is another entry, never an edit, which is what makes a period closeable"
+  },
+  {
+   "table": "ledger.posting",
+   "schema": "ledger",
+   "columns": 12,
+   "burstOperations": 2,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One side of a double-entry movement.** Renamed from `entry`, which sat beside `journal_entry` and `journal_line` — **three things called entry in one schema is a schema nobody reads twice.** **Hangs off**: reaches `led"
+  },
+  {
+   "table": "orders.cart",
+   "schema": "orders",
+   "columns": 17,
+   "burstOperations": 2,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "A cart holds leases; an order holds money. Retained after expiry so a recovery link lands on something **Hangs off**: reaches `orders.sales_order` through its keys; references `pii.subject`, `platform.org_unit`. **Reache"
+  },
+  {
+   "table": "orders.cart_line",
+   "schema": "orders",
+   "columns": 16,
+   "burstOperations": 2,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "One line, with the lease that holds its capacity. Null lease for a product with no capacity **Hangs off**: a child of `orders.cart`; reaches `orders.sales_order` through its keys; references `catalogue.inventory_hold`, `"
+  },
+  {
+   "table": "pii.subject",
+   "schema": "pii",
+   "columns": 13,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A guest, and the only table holding who they are.** Name, and through its children the contacts, documents and biometrics. **Isolated deliberately** — erasure is a delete here and a pseudonym everywhere else, which is "
+  },
+  {
+   "table": "platform.outbox",
+   "schema": "platform",
+   "columns": 11,
+   "burstOperations": 2,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Written in the same transaction as the state change, by the platform, not by an operation.** That is what makes it exactly-once **Hangs off**: reaches `platform.org_unit` through its keys. **Reached by**: 2 operations "
+  },
+  {
+   "table": "seating.seat",
+   "schema": "seating",
+   "columns": 11,
+   "burstOperations": 2,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One seat, addressable and holdable.** 396 rows in the sample manifest is one amphitheatre"
+  },
+  {
+   "table": "access.blacklist",
+   "schema": "access",
+   "columns": 7,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Who may not be admitted**, and by whose authority"
+  },
+  {
+   "table": "access.scan_event",
+   "schema": "access",
+   "columns": 15,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Every presentation of a credential, admitted or not.** The highest-volume table in the platform"
+  },
+  {
+   "table": "approvals.request",
+   "schema": "approvals",
+   "columns": 26,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "One request per action needing authorisation. The subject is a reference, never a copy **Hangs off**: **a root** — nothing above it in its schema; references `identity.principal`, `pii.subject`. **Reached by**: 6 operati"
+  },
+  {
+   "table": "catalogue.price_list",
+   "schema": "catalogue",
+   "columns": 7,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A named set of prices for a region and channel.** Region-scoped, because currency is (ADR-0018)"
+  },
+  {
+   "table": "identity.principal",
+   "schema": "identity",
+   "columns": 9,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A person who can be authorised** — staff, partner, platform operator. The most referenced table in the package at 122 incoming columns, because almost everything records who did it. **Not a guest**: a guest is a `pii.s"
+  },
+  {
+   "table": "identity.session",
+   "schema": "identity",
+   "columns": 2,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Redis, not Postgres.** `ActiveSession` and `Session` both declare `persistence: none — Redis session registry`, and ADR-0004 makes a session a token with a validity window rather than a row. The schema reference had it"
+  },
+  {
+   "table": "ledger.fx_rate",
+   "schema": "ledger",
+   "columns": 12,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "configured rates with effective windows. A rate change is a new row; the old is never edited **Hangs off**: reaches `ledger.account` through its keys; references `identity.principal`, `platform.org_unit`. **Reached by**:"
+  },
+  {
+   "table": "marketing.guest_profile",
+   "schema": "marketing",
+   "columns": 22,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**What a venue knows about a guest that is not their identity** — preferences, lifetime value, segments, consent. Twenty operations touch it and it references `pii.subject` rather than duplicating it"
+  },
+  {
+   "table": "marketing.loyalty_position",
+   "schema": "marketing",
+   "columns": 10,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Where a guest stands** — points, tier, progress. A balance, not a history"
+  },
+  {
+   "table": "marketing.loyalty_programme",
+   "schema": "marketing",
+   "columns": 7,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**The rules of earning and burning.** Tiers are children"
+  },
+  {
+   "table": "orders.refund",
+   "schema": "orders",
+   "columns": 17,
+   "burstOperations": 1,
+   "written": true,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**Money going back**, always against a payment and never editing it. The ledger posts both"
+  },
+  {
+   "table": "platform.org_unit",
+   "schema": "platform",
+   "columns": 8,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**One unit of the venue structure** — a tenant, a brand, a region, a venue, a department, a sub-department, a workstation or an outlet. Every row has a level, a parent and a materialised `path`, and **configuration resol"
+  },
+  {
+   "table": "platform.workstation",
+   "schema": "platform",
+   "columns": 18,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A till, a scanner, a kiosk — a place work happens.** The lowest organisational level. **Authority is the person’s, not the workstation’s** (ADR-0002), which is what makes a shared handheld safe"
+  },
+  {
+   "table": "retail.return_policy",
+   "schema": "retail",
+   "columns": 9,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**When goods may come back and in what state.** Outlet-scoped"
+  },
+  {
+   "table": "retail.sale",
+   "schema": "retail",
+   "columns": 13,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A retail transaction**, distinct from an admission sale because it moves stock"
+  },
+  {
+   "table": "seating.seat_category",
+   "schema": "seating",
+   "columns": 7,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A price band or a physical class** — restricted view, accessible, premium"
+  },
+  {
+   "table": "seating.seat_map",
+   "schema": "seating",
+   "columns": 12,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**The plan of a room** — sections, rows, seats, and what may combine with what. Versioned, so `diffSeatMapVersions` can answer what changed between two layouts"
+  },
+  {
+   "table": "seating.section",
+   "schema": "seating",
+   "columns": 6,
+   "burstOperations": 1,
+   "written": false,
+   "contention": null,
+   "contended": false,
+   "contentionIndeterminate": false,
+   "note": "**A named part of a room**, holding rows"
+  }
+ ],
+ "operations": [
+  {
+   "operationId": "getAvailability",
+   "verb": "GET",
+   "path": "/availability",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 6,
+   "reads": [
+    "catalogue.channel_capacity",
+    "catalogue.inventory_hold",
+    "catalogue.performance"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getCart",
+   "verb": "GET",
+   "path": "/carts/{cartId}",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 4,
+   "reads": [
+    "catalogue.channel_capacity",
+    "catalogue.inventory_hold",
+    "orders.cart",
+    "orders.cart_line",
+    "promotions.promotion"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getProduct",
+   "verb": "GET",
+   "path": "/products/{productId}",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 4,
+   "reads": [
+    "catalogue.product"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "acquireInventoryHold",
+   "verb": "POST",
+   "path": "/inventory-holds",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 3,
+   "reads": [
+    "catalogue.channel_capacity",
+    "catalogue.inventory_hold",
+    "platform.workstation"
+   ],
+   "writes": [
+    "catalogue.inventory_hold"
+   ],
+   "lock": "FOR UPDATE SKIP LOCKED"
+  },
+  {
+   "operationId": "listProducts",
+   "verb": "GET",
+   "path": "/products",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 3,
+   "reads": [
+    "catalogue.product"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "addCartLine",
+   "verb": "POST",
+   "path": "/carts/{cartId}/lines",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 2,
+   "reads": [
+    "catalogue.channel_capacity",
+    "catalogue.performance",
+    "catalogue.variant"
+   ],
+   "writes": [
+    "catalogue.inventory_hold",
+    "orders.cart",
+    "orders.cart_line"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "createSeatHold",
+   "verb": "POST",
+   "path": "/seat-holds",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "callsPerBuyer": 2,
+   "reads": [
+    "seating.seat_hold"
+   ],
+   "writes": [
+    "seating.seat_hold"
+   ],
+   "lock": "FOR UPDATE"
+  },
+  {
+   "operationId": "evaluatePromotions",
+   "verb": "POST",
+   "path": "/promotions/evaluate",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "callsPerBuyer": 2,
+   "reads": [
+    "catalogue.price_list",
+    "promotions.promotion"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getSeatMap",
+   "verb": "GET",
+   "path": "/seat-maps/{seatMapId}",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "callsPerBuyer": 2,
+   "reads": [
+    "seating.seat_map",
+    "seating.section"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "listPerformances",
+   "verb": "GET",
+   "path": "/events/{eventId}/performances",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 2,
+   "reads": [
+    "catalogue.performance"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "listSeats",
+   "verb": "GET",
+   "path": "/seat-maps/{seatMapId}/seats",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "callsPerBuyer": 2,
+   "reads": [
+    "seating.seat"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "analysePromotionConflicts",
+   "verb": "GET",
+   "path": "/promotions/{promotionId}/conflicts",
+   "service": "CatalogueService",
+   "contract": "promotions",
+   "callsPerBuyer": 1,
+   "reads": [
+    "promotions.promotion"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "appendEntitlementToMedia",
+   "verb": "POST",
+   "path": "/media/{mediaCode}/entitlements",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 1,
+   "reads": [
+    "access.entitlement",
+    "orders.order_line",
+    "orders.payment",
+    "orders.sales_order"
+   ],
+   "writes": [
+    "access.entitlement",
+    "orders.order_line",
+    "orders.payment",
+    "orders.sales_order"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "applyManualDiscount",
+   "verb": "POST",
+   "path": "/orders/{orderId}/discounts",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 1,
+   "reads": [
+    "orders.order_line",
+    "orders.payment",
+    "orders.sales_order"
+   ],
+   "writes": [
+    "orders.order_line",
+    "orders.payment",
+    "orders.sales_order"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "createApprovalRequest",
+   "verb": "POST",
+   "path": "/approval-requests",
+   "service": "TenancyService",
+   "contract": "approvals",
+   "callsPerBuyer": 1,
+   "reads": [
+    "approvals.delegation",
+    "approvals.matrix",
+    "approvals.rule",
+    "identity.principal"
+   ],
+   "writes": [
+    "approvals.request"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "createOrder",
+   "verb": "POST",
+   "path": "/orders",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 1,
+   "reads": [
+    "orders.order_line",
+    "orders.payment",
+    "orders.sales_order"
+   ],
+   "writes": [
+    "orders.order_line",
+    "orders.payment",
+    "orders.sales_order"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "createPayment",
+   "verb": "POST",
+   "path": "/payments",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 1,
+   "reads": [
+    "ledger.fx_rate",
+    "orders.payment",
+    "orders.sales_order"
+   ],
+   "writes": [
+    "ledger.journal_entry",
+    "ledger.posting",
+    "orders.payment",
+    "platform.outbox"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "createRefund",
+   "verb": "POST",
+   "path": "/orders/{orderId}/refunds",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 1,
+   "reads": [
+    "orders.payment",
+    "orders.refund",
+    "orders.sales_order"
+   ],
+   "writes": [
+    "ledger.journal_entry",
+    "ledger.posting",
+    "orders.refund",
+    "platform.outbox"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "evaluateApprovalRequirement",
+   "verb": "POST",
+   "path": "/approval-requests/evaluate",
+   "service": "TenancyService",
+   "contract": "approvals",
+   "callsPerBuyer": 1,
+   "reads": [
+    "approvals.delegation",
+    "approvals.matrix",
+    "approvals.rule",
+    "identity.delegated_access",
+    "platform.org_unit"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "extendSeatHold",
+   "verb": "POST",
+   "path": "/seat-holds/{holdId}/extend",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "callsPerBuyer": 1,
+   "reads": [
+    "seating.seat_hold"
+   ],
+   "writes": [
+    "seating.seat_hold"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "getEvent",
+   "verb": "GET",
+   "path": "/events/{eventId}",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 1,
+   "reads": [
+    "catalogue.event"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getLoyaltyPosition",
+   "verb": "GET",
+   "path": "/loyalty/position",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "callsPerBuyer": 1,
+   "reads": [
+    "marketing.loyalty_programme"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getMediaEntitlements",
+   "verb": "GET",
+   "path": "/media/{mediaCode}/entitlements",
+   "service": "OrderService",
+   "contract": "orders",
+   "callsPerBuyer": 1,
+   "reads": [
+    "access.entitlement",
+    "access.scan_event",
+    "catalogue.entitlement_template",
+    "orders.sales_order",
+    "pii.subject"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getPerformance",
+   "verb": "GET",
+   "path": "/performances/{performanceId}",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 1,
+   "reads": [
+    "catalogue.performance"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getReturnPolicy",
+   "verb": "GET",
+   "path": "/outlets/{outletId}/return-policy",
+   "service": "RetailService",
+   "contract": "retail",
+   "callsPerBuyer": 1,
+   "reads": [
+    "retail.return_policy"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getSeatAvailability",
+   "verb": "GET",
+   "path": "/performances/{performanceId}/seat-availability",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "callsPerBuyer": 1,
+   "reads": [
+    "seating.seat",
+    "seating.seat_category",
+    "seating.seat_hold"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "getSeatHold",
+   "verb": "GET",
+   "path": "/seat-holds/{holdId}",
+   "service": "CatalogueService",
+   "contract": "seating",
+   "callsPerBuyer": 1,
+   "reads": [
+    "seating.seat_hold"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "identifyGuest",
+   "verb": "POST",
+   "path": "/guests/identify",
+   "service": "MarketingService",
+   "contract": "marketing-crm",
+   "callsPerBuyer": 1,
+   "reads": [
+    "access.blacklist",
+    "access.entitlement",
+    "marketing.guest_profile",
+    "marketing.loyalty_position",
+    "pii.subject"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "listEvents",
+   "verb": "GET",
+   "path": "/events",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 1,
+   "reads": [
+    "catalogue.event"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "listMyEntitlements",
+   "verb": "GET",
+   "path": "/guests/me/entitlements",
+   "service": "AccessService",
+   "contract": "access",
+   "callsPerBuyer": 1,
+   "reads": [
+    "access.entitlement",
+    "catalogue.entitlement_template",
+    "catalogue.product",
+    "identity.delegated_access"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "lookupRetailSale",
+   "verb": "GET",
+   "path": "/retail-sales/lookup",
+   "service": "RetailService",
+   "contract": "retail",
+   "callsPerBuyer": 1,
+   "reads": [
+    "retail.sale"
+   ],
+   "writes": [],
+   "lock": null
+  },
+  {
+   "operationId": "refreshToken",
+   "verb": "POST",
+   "path": "/auth/refresh",
+   "service": "IdentityService",
+   "contract": "identity",
+   "callsPerBuyer": 1,
+   "reads": [
+    "identity.session"
+   ],
+   "writes": [
+    "identity.session"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "renewInventoryHold",
+   "verb": "POST",
+   "path": "/inventory-holds/{inventoryHoldId}/renew",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 1,
+   "reads": [
+    "catalogue.inventory_hold"
+   ],
+   "writes": [
+    "catalogue.inventory_hold"
+   ],
+   "lock": null
+  },
+  {
+   "operationId": "searchCatalogue",
+   "verb": "GET",
+   "path": "/search",
+   "service": "CatalogueService",
+   "contract": "catalogue",
+   "callsPerBuyer": 1,
+   "reads": [
+    "catalogue.event",
+    "catalogue.product",
+    "catalogue.variant"
+   ],
+   "writes": [],
+   "lock": null
+  }
+ ]
+}

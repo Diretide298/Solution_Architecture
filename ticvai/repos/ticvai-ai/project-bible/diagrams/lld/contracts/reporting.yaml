@@ -12,7 +12,7 @@ operations:
   permission: REPORT_VIEW_VENUE
   audience:
   - staff
-  offline: true
+  offline: false
   reads:
   - cache:idempotency
   - identity.principal
@@ -25,7 +25,9 @@ operations:
   path: /reports/ask
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - ai.policy
@@ -43,7 +45,8 @@ operations:
   path: /report-executions/{executionId}
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -56,7 +59,8 @@ operations:
   path: /dashboards
   scope: tenant
   permission: REPORT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -71,7 +75,9 @@ operations:
   path: /reports
   scope: venue
   permission: REPORT_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -90,7 +96,8 @@ operations:
   path: /report-schedules
   scope: venue
   permission: REPORT_SCHEDULE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -105,7 +112,9 @@ operations:
   path: /reports/{reportId}
   scope: venue
   permission: REPORT_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -118,7 +127,8 @@ operations:
   path: /report-schedules/{scheduleId}
   scope: venue
   permission: REPORT_SCHEDULE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -131,7 +141,8 @@ operations:
   path: /report-executions/{executionId}/export
   scope: venue
   permission: REPORT_EXPORT
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -144,7 +155,8 @@ operations:
   path: /dashboards/{dashboardId}
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.dashboard
@@ -155,7 +167,9 @@ operations:
   path: /reports/{reportId}
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - reporting.report_column
@@ -168,7 +182,8 @@ operations:
   path: /report-executions/{executionId}
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.execution
@@ -178,7 +193,8 @@ operations:
   path: /report-exports/{exportId}
   scope: venue
   permission: REPORT_EXPORT
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.export
@@ -188,7 +204,8 @@ operations:
   path: /report-executions/{executionId}/result
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.execution
@@ -235,7 +252,8 @@ operations:
   path: /dashboards
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.dashboard
@@ -246,7 +264,8 @@ operations:
   path: /report-executions
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.execution
@@ -256,7 +275,8 @@ operations:
   path: /report-fields
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.report_field
@@ -266,7 +286,8 @@ operations:
   path: /report-schedules
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - reporting.schedule
@@ -276,7 +297,9 @@ operations:
   path: /reports
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - reporting.report_definition
@@ -297,7 +320,9 @@ operations:
   path: /reports/{reportId}/run
   scope: venue
   permission: REPORT_VIEW_VENUE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -312,7 +337,9 @@ operations:
   path: /reports/ask/{conversationId}/save
   scope: venue
   permission: REPORT_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - ai.policy
@@ -349,7 +376,8 @@ operations:
   path: /dashboards/{dashboardId}
   scope: tenant
   permission: REPORT_MANAGE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -364,7 +392,9 @@ operations:
   path: /reports/{reportId}
   scope: venue
   permission: REPORT_MANAGE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -383,7 +413,8 @@ operations:
   path: /report-schedules/{scheduleId}
   scope: venue
   permission: REPORT_SCHEDULE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

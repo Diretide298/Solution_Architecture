@@ -19,6 +19,7 @@ operations:
   writes:
   - cache:idempotency
   - orders.shift
+  - platform.outbox
 - operation: adjustDepositBoxFloat
   verb: POST
   path: /deposit-boxes/{boxId}/adjust-float

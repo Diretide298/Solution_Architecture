@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 1016
+  operations: 1626
   contracts: 28
-  tables: 374
+  tables: 390
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -23,15 +23,15 @@ scale:
   - cache:idempotency
   - cache:resolution
   - qdrant:knowledge
-  schemas: 26
+  schemas: 27
   services: 16
   platforms: 15
   apps: 12
-  screens: 481
+  screens: 1091
   flows: 94
-  stateModels: 113
+  stateModels: 124
   events: 29
-  decisions: 30
+  decisions: 40
   requirements: 3184
   buildPercent: 0
 actors:
@@ -40,7 +40,7 @@ actors:
   - P01
   - P02
   - P05
-  operations: 48
+  operations: 146
   note: Buys, arrives, is admitted, spends. **Never sees a staff surface** — `check-screens` refuses
     a guest screen declaring a staff permission.
 - actor: venue staff
@@ -51,13 +51,13 @@ actors:
   - P08
   - P15
   - P16
-  operations: 220
+  operations: 1504
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
   reaches:
   - P10
-  operations: 19
+  operations: 162
   note: Resellers and agents, with their own credit and settlement.
 - actor: platform operator
   reaches:
@@ -68,13 +68,13 @@ actors:
 - actor: developer
   reaches:
   - P14
-  operations: 6
+  operations: 2
   note: Third parties against the public API, rate-limited and quota'd.
 - actor: device
   reaches:
   - P07
   - P15
-  operations: 5
+  operations: 12
   note: Turnstiles, scanners, kitchen displays. **A device authenticates and does not authorise.**
 surfaces:
 - platform: P01
@@ -84,10 +84,12 @@ surfaces:
   app: guest-web
   formFactor: web
   offlineCapable: false
-  screens: 35
+  screens: 46
   modules:
   - access
+  - ai
   - core
+  - fnb
   - marketing
   - queue
   - retail
@@ -95,7 +97,9 @@ surfaces:
   - ticketing
   callsServices:
   - AccessService
+  - AiService
   - CatalogueService
+  - FnbService
   - IdentityService
   - LedgerService
   - MarketingService
@@ -111,7 +115,7 @@ surfaces:
   app: guest-app
   formFactor: mobileApp
   offlineCapable: true
-  screens: 63
+  screens: 71
   modules:
   - access
   - ai
@@ -127,7 +131,6 @@ surfaces:
   - AccessService
   - AiService
   - CatalogueService
-  - CrossCellService
   - FnbService
   - IdentityService
   - LedgerService
@@ -235,7 +238,7 @@ surfaces:
   - core
   callsServices:
   - AccessService
-  - CrossCellService
+  - CrossRegionService
   - IdentityService
   - OrderService
   ref: diagrams/lld/platforms/P07.yaml
@@ -246,7 +249,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 143
+  screens: 363
   modules:
   - access
   - ai
@@ -256,6 +259,7 @@ surfaces:
   - inventory
   - maintenance
   - marketing
+  - membership
   - queue
   - resources
   - retail
@@ -265,17 +269,18 @@ surfaces:
   - AccessService
   - AiService
   - CatalogueService
-  - ControlService
   - FnbService
   - IdentityService
   - InventoryService
   - LedgerService
   - MarketingService
   - OrderService
+  - PlatformService
   - ReportingService
   - RetailService
   - TenancyService
   - VenueOpsService
+  - WhiteLabelService
   ref: diagrams/lld/platforms/P08.yaml
 - platform: P09
   name: TICVAI Web — Platform Console
@@ -284,17 +289,22 @@ surfaces:
   app: ticvai-web
   formFactor: web
   offlineCapable: false
-  screens: 37
+  screens: 318
   modules:
   - ai
   - analytics
   - core
+  - marketing
   - membership
+  - ticketing
   callsServices:
   - AiService
-  - ControlService
-  - CrossCellService
+  - CatalogueService
+  - CrossRegionService
   - IdentityService
+  - MarketingService
+  - OrderService
+  - PlatformService
   - ReportingService
   - TenancyService
   - WhiteLabelService
@@ -306,16 +316,17 @@ surfaces:
   app: partner-web
   formFactor: web
   offlineCapable: false
-  screens: 21
+  screens: 51
   modules:
+  - developerApi
   - partner
   callsServices:
   - CatalogueService
-  - ControlService
   - IdentityService
   - LedgerService
   - MarketingService
   - OrderService
+  - PlatformService
   - ReportingService
   ref: diagrams/lld/platforms/P10.yaml
 - platform: P11
@@ -339,16 +350,19 @@ surfaces:
   app: venue-support-web
   formFactor: web
   offlineCapable: false
-  screens: 8
+  screens: 28
   modules:
   - analytics
   - core
   - marketing
   callsServices:
+  - AiService
   - IdentityService
   - LedgerService
   - MarketingService
   - ReportingService
+  - VenueOpsService
+  - WhiteLabelService
   ref: diagrams/lld/platforms/P12.yaml
 - platform: P13
   name: Venue CMS — White Label
@@ -357,7 +371,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 20
+  screens: 60
   modules:
   - core
   - fnb
@@ -366,11 +380,11 @@ surfaces:
   - membership
   - ticketing
   callsServices:
-  - ControlService
   - FnbService
   - IdentityService
   - MarketingService
   - OrderService
+  - PlatformService
   - VenueOpsService
   - WhiteLabelService
   ref: diagrams/lld/platforms/P13.yaml
@@ -385,7 +399,7 @@ surfaces:
   modules:
   - developerApi
   callsServices:
-  - ControlService
+  - PlatformService
   ref: diagrams/lld/platforms/P14.yaml
 - platform: P15
   name: Kitchen Display — Pass and Stations
@@ -446,30 +460,32 @@ services:
     - AiService
     - MarketingService
     platform:
-    - ControlService
-    - CrossCellService
+    - CrossRegionService
+    - PlatformService
     - ReportingService
     - WhiteLabelService
 stores:
 - store: postgres
-  operations: 1002
+  operations: 1612
   usedBy:
   - service: CatalogueService
-    operations: 132
-  - service: ControlService
-    operations: 102
+    operations: 340
+  - service: OrderService
+    operations: 186
+  - service: AccessService
+    operations: 177
+  - service: PlatformService
+    operations: 167
+  - service: MarketingService
+    operations: 166
   - service: VenueOpsService
     operations: 102
-  - service: OrderService
-    operations: 97
-  - service: MarketingService
-    operations: 96
   - service: FnbService
-    operations: 93
-  - service: LedgerService
-    operations: 54
+    operations: 96
   - service: TenancyService
-    operations: 52
+    operations: 76
+  - service: LedgerService
+    operations: 56
   - service: InventoryService
     operations: 50
   - service: WhiteLabelService
@@ -477,34 +493,34 @@ stores:
   - service: IdentityService
     operations: 39
   - service: RetailService
-    operations: 35
-  - service: AccessService
-    operations: 31
+    operations: 37
   - service: ReportingService
     operations: 28
   - service: AiService
-    operations: 25
-  - service: CrossCellService
+    operations: 26
+  - service: CrossRegionService
     operations: 16
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 672
+  operations: 1268
   usedBy:
   - service: CatalogueService
-    operations: 81
-  - service: FnbService
-    operations: 72
+    operations: 285
+  - service: AccessService
+    operations: 163
   - service: OrderService
-    operations: 70
+    operations: 159
+  - service: MarketingService
+    operations: 134
+  - service: PlatformService
+    operations: 120
+  - service: FnbService
+    operations: 75
   - service: VenueOpsService
     operations: 66
-  - service: MarketingService
-    operations: 64
-  - service: ControlService
-    operations: 62
   - service: TenancyService
-    operations: 37
+    operations: 61
   - service: WhiteLabelService
     operations: 37
   - service: IdentityService
@@ -514,24 +530,22 @@ stores:
   - service: InventoryService
     operations: 30
   - service: RetailService
-    operations: 24
+    operations: 26
   - service: AiService
     operations: 21
-  - service: AccessService
-    operations: 17
   - service: ReportingService
     operations: 15
-  - service: CrossCellService
+  - service: CrossRegionService
     operations: 11
   note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
     cache entry as a source of truth.
 - store: postgres-analytical
-  operations: 20
+  operations: 72
   usedBy:
+  - service: PlatformService
+    operations: 54
   - service: AiService
     operations: 15
-  - service: ControlService
-    operations: 2
   - service: ReportingService
     operations: 2
   - service: FnbService
@@ -558,6 +572,7 @@ external:
 - system: Payment gateway
   via:
   - OrderService
+  - PlatformService
   reachedThrough: orders.payment
   note: '**Tenant as merchant of record for phase 1**; PayFac deferred. The highest-consequence unresolved
     payment assumption.'
@@ -566,11 +581,11 @@ external:
   note: A guest arrives verified in a way an email never is.
 - system: Messaging — SMS, WhatsApp, push, email
   via:
-  - ControlService
   - FnbService
   - IdentityService
   - MarketingService
   - OrderService
+  - PlatformService
   - TenancyService
   reachedThrough: marketing.message_dispatch
   note: '**One dispatch table, six services.** A payment link from Order, a booking confirmation from
@@ -595,7 +610,7 @@ external:
     which is why `reporting` may write `ai.interaction` and nothing else outside AiService may.'
 - system: Webhooks out
   via:
-  - ControlService
+  - PlatformService
   reachedThrough: control.webhook_subscription
   note: Third parties subscribe; replay is available.
 regions:
@@ -604,7 +619,7 @@ regions:
     and DESC review shapes it.
 
 
-    **Only CrossCellService reaches another region**, and it moves a pseudonymous guest link rather
+    **Only CrossRegionService reaches another region**, and it moves a pseudonymous guest link rather
     than a guest (ADR-0010) — which is what makes a membership work in another country without moving
     anybody''s personal data.'
   unresolved: CF-64 — the cloud provider is undecided, and every concrete infrastructure artefact depends
@@ -613,9 +628,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 1016 operations across 28 contracts — the join
+  holds: 1626 operations across 28 contracts — the join
 - layer: backend
-  holds: 374 tables in 26 schemas, 910 relationships
+  holds: 390 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

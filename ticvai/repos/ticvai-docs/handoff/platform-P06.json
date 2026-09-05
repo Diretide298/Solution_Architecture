@@ -7,15 +7,15 @@
  "audience": "staff",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 66,
-  "operations": 180,
+  "operations": 182,
   "contracts": 17,
   "modules": 3,
   "undrawn": 0,
-  "operationsWithNoScreen": 151
+  "operationsWithNoScreen": 126
  },
  "waves": {
   "wave1": 25,
@@ -74,7 +74,7 @@
   },
   {
    "contract": "workforce",
-   "operations": 9
+   "operations": 11
   },
   {
    "contract": "marketing-crm",
@@ -85,11 +85,11 @@
    "operations": 8
   },
   {
-   "contract": "access",
+   "contract": "queue",
    "operations": 7
   },
   {
-   "contract": "queue",
+   "contract": "access",
    "operations": 7
   },
   {
@@ -97,11 +97,11 @@
    "operations": 4
   },
   {
-   "contract": "retail",
+   "contract": "reporting",
    "operations": 2
   },
   {
-   "contract": "reporting",
+   "contract": "venue-map",
    "operations": 2
   },
   {
@@ -109,7 +109,7 @@
    "operations": 2
   },
   {
-   "contract": "venue-map",
+   "contract": "retail",
    "operations": 2
   },
   {
@@ -277,7 +277,7 @@
    "module": "Operations",
    "wave": 1,
    "route": "/operations/my-rota",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -286,7 +286,7 @@
    "module": "Operations",
    "wave": 2,
    "route": "/operations/swap-request",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -448,7 +448,7 @@
    "module": "Operations",
    "wave": 3,
    "route": "/operations/training",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -716,24 +716,6 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "enrolFacePass",
-    "contract": "access",
-    "verb": "POST",
-    "summary": "Register a facial profile against an entitlement"
-   },
-   {
-    "operation": "getFacePassEnrolment",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Whether a pass has a face registered, and when"
-   },
-   {
-    "operation": "revokeFacePass",
-    "contract": "access",
-    "verb": "DELETE",
-    "summary": "Remove a facial profile"
-   },
-   {
     "operation": "createKnowledgeCollection",
     "contract": "ai",
     "verb": "POST",
@@ -756,12 +738,6 @@
     "contract": "ai",
     "verb": "GET",
     "summary": "What is indexed, and how current it is"
-   },
-   {
-    "operation": "listKnowledgeCollections",
-    "contract": "ai",
-    "verb": "GET",
-    "summary": "Collections available to this tenant"
    },
    {
     "operation": "proposeTranslations",
@@ -836,34 +812,10 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
-   },
-   {
     "operation": "listDonationCampaigns",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Campaigns a guest can give to"
-   },
-   {
-    "operation": "listGuestMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listProductVersions",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "What this product used to be"
    },
    {
     "operation": "listWaitlistEntries",
@@ -914,6 +866,12 @@
     "summary": "Mark a table cleared and free"
    },
    {
+    "operation": "closeCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Close a signed finding"
+   },
+   {
     "operation": "createCombo",
     "contract": "fnb",
     "verb": "POST",
@@ -932,6 +890,12 @@
     "summary": "A table as a thing, not an inference"
    },
    {
+    "operation": "escalateCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Escalate a finding"
+   },
+   {
     "operation": "getTableVisit",
     "contract": "fnb",
     "verb": "GET",
@@ -942,6 +906,12 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Move work between stations mid-service"
+   },
+   {
+    "operation": "recordCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Record what was done about a finding"
    },
    {
     "operation": "requestBill",
@@ -990,30 +960,6 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Change what a table is"
-   },
-   {
-    "operation": "updateTableReservation",
-    "contract": "fnb",
-    "verb": "PATCH",
-    "summary": "Change or cancel a booking"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "deleteGuestAccount",
-    "contract": "identity",
-    "verb": "DELETE",
-    "summary": "Self-service account deletion"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
    },
    {
     "operation": "setPasswordPolicy",
@@ -1082,12 +1028,6 @@
     "summary": "Create a loyalty programme"
    },
    {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
     "operation": "createUrlRedirect",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -1106,22 +1046,10 @@
     "summary": "Candidate matches, scored"
    },
    {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
    },
    {
     "operation": "listMessageTriggers",
@@ -1184,22 +1112,10 @@
     "summary": "Why the conversation ended, and any callback"
    },
    {
-    "operation": "setConsentPurposes",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Configure consent purposes"
-   },
-   {
     "operation": "setMessageTrigger",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Fire a message from a platform event"
-   },
-   {
-    "operation": "setSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Titles, descriptions, canonicals and hreflang"
    },
    {
     "operation": "startKioskAssist",
@@ -1212,18 +1128,6 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "captureStoredValue",
@@ -1256,12 +1160,6 @@
     "summary": "Send a guest a link to pay later"
    },
    {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -1272,12 +1170,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "issueInvitation",
@@ -1314,12 +1206,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Gateways configured for this scope"
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -1376,22 +1262,10 @@
     "summary": "Configure a gateway and its routing"
    },
    {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
    },
    {
     "operation": "voidPayment",
@@ -1400,34 +1274,16 @@
     "summary": "Release an authorisation before it is captured"
    },
    {
-    "operation": "getSignageQueueBoard",
-    "contract": "queue",
-    "verb": "GET",
-    "summary": "Wait-time board for a display"
-   },
-   {
-    "operation": "getSignageQueueCalls",
-    "contract": "queue",
-    "verb": "GET",
-    "summary": "Currently called party numbers"
-   },
-   {
-    "operation": "overrideQueueEntry",
+    "operation": "overrideWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit against a failed redemption"
    },
    {
-    "operation": "redeemQueueEntry",
+    "operation": "redeemWaitingGuest",
     "contract": "queue",
     "verb": "POST",
     "summary": "Admit a party at the ride"
-   },
-   {
-    "operation": "submitQueueReading",
-    "contract": "queue",
-    "verb": "POST",
-    "summary": "Inbound sensor reading"
    },
    {
     "operation": "cancelReportExecution",
@@ -1590,12 +1446,6 @@
     "contract": "retail",
     "verb": "POST",
     "summary": "Add value to a wallet"
-   },
-   {
-    "operation": "transferWalletBalance",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Send balance to another guest"
    },
    {
     "operation": "getRegionSettings",

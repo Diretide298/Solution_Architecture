@@ -34,7 +34,7 @@ info:
     **Contracts are split into two tiers.**
 
     - **Spine** — the eight contexts everything else depends on: tenancy, identity,
-      catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here
+      catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here
       requires a formal change request, because every satellite has pinned against it.
     - **Satellite** — a domain that builds on the spine and can move independently.
       Cheaper to change.
@@ -165,7 +165,10 @@ paths:
       tags: [asset]
       x-ticvai-permission: ASSET_LIBRARY_VIEW
       x-ticvai-scope-level: venue
-      x-ticvai-offline-capable: false
+      x-ticvai-offline-capable: true
+      x-ticvai-offline-note: >
+        24 August: The asset is on the device before the shift; a media issue with no artwork is a
+         blank card.
       x-ticvai-conflict-policy: serverWins
       responses:
         '200':

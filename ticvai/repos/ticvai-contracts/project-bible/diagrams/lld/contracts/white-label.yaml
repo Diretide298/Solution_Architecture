@@ -25,7 +25,8 @@ operations:
   path: /tenant-config/banners
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -52,7 +53,8 @@ operations:
   path: /tenant-config/pages
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -65,7 +67,8 @@ operations:
   path: /tenant-config/preview
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -78,7 +81,8 @@ operations:
   path: /tenant-config/promo-blocks
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -91,7 +95,8 @@ operations:
   path: /tenant-config/banners/{bannerId}
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -104,7 +109,8 @@ operations:
   path: /tenant-config/pages/{pageId}
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -117,7 +123,8 @@ operations:
   path: /tenant-config/promo-blocks/{promoBlockId}
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -130,7 +137,8 @@ operations:
   path: /tenant-config/versions/{version}/diff
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.tenant_config
@@ -140,7 +148,8 @@ operations:
   path: /tenant-config/app-icons
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.tenant_config
@@ -150,7 +159,8 @@ operations:
   path: /tenant-config/brand
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.tenant_config
@@ -160,7 +170,8 @@ operations:
   path: /tenant-config/features
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:resolution
@@ -172,7 +183,8 @@ operations:
   path: /tenant-config/fonts
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.tenant_config
@@ -182,7 +194,8 @@ operations:
   path: /tenant-config/homepage
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.homepage_section
@@ -192,7 +205,8 @@ operations:
   path: /tenant-config/modules
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:resolution
@@ -204,7 +218,8 @@ operations:
   path: /tenant-config/navigation
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:resolution
@@ -216,7 +231,9 @@ operations:
   path: /tenant-config/status
   scope: tenant
   permission: null
-  audience: null
+  audience:
+  - device
+  - guest
   offline: true
   reads:
   - whitelabel.config_version
@@ -227,7 +244,9 @@ operations:
   path: /tenant-config
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - cache:resolution
@@ -243,7 +262,8 @@ operations:
   path: /tenant-config/theme
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:resolution
@@ -255,7 +275,8 @@ operations:
   path: /tenant-config/banners
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.banner
@@ -265,7 +286,8 @@ operations:
   path: /tenant-config/versions
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.config_version
@@ -275,8 +297,10 @@ operations:
   path: /tenant-config/pages
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
-  offline: false
+  audience:
+  - staff
+  - guest
+  offline: true
   reads:
   - whitelabel.content_page
   writes: []
@@ -296,8 +320,10 @@ operations:
   path: /tenant-config/faqs
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
-  offline: false
+  audience:
+  - staff
+  - guest
+  offline: true
   reads:
   - whitelabel.faq_category
   writes: []
@@ -306,7 +332,8 @@ operations:
   path: /tenant-config/policies
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.policy
@@ -316,7 +343,8 @@ operations:
   path: /tenant-config/promo-blocks
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - whitelabel.promo_block
@@ -342,7 +370,8 @@ operations:
   path: /tenant-config/publish
   scope: tenant
   permission: TENANT_PUBLISH
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -350,6 +379,7 @@ operations:
   writes:
   - cache:idempotency
   - cache:resolution
+  - platform.outbox
   - whitelabel.config_version
 - operation: releaseCustomDomain
   verb: DELETE
@@ -372,7 +402,8 @@ operations:
   path: /tenant-config/versions/{version}/restore
   scope: tenant
   permission: TENANT_PUBLISH
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -394,7 +425,8 @@ operations:
   path: /tenant-config/app-icons
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -407,7 +439,8 @@ operations:
   path: /tenant-config/brand
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -420,7 +453,8 @@ operations:
   path: /tenant-config/faqs
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -433,7 +467,8 @@ operations:
   path: /tenant-config/features
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -447,7 +482,8 @@ operations:
   path: /tenant-config/fonts
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -475,7 +511,8 @@ operations:
   path: /tenant-config/header
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -488,7 +525,8 @@ operations:
   path: /tenant-config/homepage
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -501,7 +539,8 @@ operations:
   path: /tenant-config/languages
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -514,7 +553,8 @@ operations:
   path: /tenant-config/status
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -527,7 +567,8 @@ operations:
   path: /tenant-config/modules
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -541,7 +582,8 @@ operations:
   path: /tenant-config/navigation
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -555,7 +597,8 @@ operations:
   path: /tenant-config/policies/{policyKind}
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -568,7 +611,8 @@ operations:
   path: /tenant-config/theme
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -582,7 +626,8 @@ operations:
   path: /tenant-config/banners/{bannerId}
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -595,7 +640,8 @@ operations:
   path: /tenant-config/pages/{pageId}
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -608,7 +654,8 @@ operations:
   path: /tenant-config/promo-blocks/{promoBlockId}
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -621,7 +668,8 @@ operations:
   path: /tenant-config/validate
   scope: tenant
   permission: TENANT_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

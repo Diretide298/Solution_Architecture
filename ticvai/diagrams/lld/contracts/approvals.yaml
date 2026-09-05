@@ -1,10 +1,50 @@
 id: LLD-approvals
-title: approvals — 13 operations
+title: approvals — 35 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
 service: TenancyService
 operations:
+- operation: approveMatrixMultiLevel
+  verb: PUT
+  path: /matrix-multi-level
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveRoleAuthorityDelegation
+  verb: PUT
+  path: /role-authority-delegation
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveUnifiedDecision
+  verb: PUT
+  path: /unified-decision
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: approveVersioningGovernance
+  verb: PUT
+  path: /versioning-governance
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: createApprovalDelegation
   verb: POST
   path: /delegations
@@ -37,6 +77,16 @@ operations:
   writes:
   - approvals.request
   - cache:idempotency
+- operation: createAutomationAutonomouAction
+  verb: POST
+  path: /automation-autonomou-action
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: decideApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/decide
@@ -44,7 +94,6 @@ operations:
   permission: APPROVAL_DECIDE
   audience:
   - staff
-  - public
   offline: false
   reads:
   - approvals.request
@@ -55,6 +104,7 @@ operations:
   - approvals.decision
   - approvals.request
   - cache:idempotency
+  - platform.outbox
 - operation: escalateApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/escalate
@@ -101,6 +151,29 @@ operations:
   - approvals.escalation
   - approvals.request
   writes: []
+- operation: issueAccreditationBadge
+  verb: POST
+  path: /accreditation-badges
+  scope: venue
+  permission: APPROVAL_ACT
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.accreditation_badge
+  writes:
+  - approvals.accreditation_badge
+- operation: listAccreditationBadges
+  verb: GET
+  path: /accreditation-badges
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.accreditation_badge
+  writes: []
 - operation: listApprovalDelegations
   verb: GET
   path: /delegations
@@ -132,11 +205,120 @@ operations:
   permission: APPROVAL_VIEW
   audience:
   - staff
-  - public
   offline: false
   reads:
   - approvals.decision
   - approvals.request
+  writes: []
+- operation: listConditionDecisionLogic
+  verb: GET
+  path: /condition-decision-logic
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listCrossModuleOrchestration
+  verb: GET
+  path: /cross-module-orchestration
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listProcessAutomationOpportunity
+  verb: GET
+  path: /process-automation-opportunity
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listRuleWorkflow
+  verb: GET
+  path: /rule-workflow
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSlaEscalationBottleneck
+  verb: GET
+  path: /sla-escalation-bottleneck
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listSlaEscalationReminder
+  verb: GET
+  path: /sla-escalation-reminder
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWorkflow
+  verb: GET
+  path: /workflow
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWorkflowAutonomouGovernance
+  verb: GET
+  path: /workflow-autonomou-governance
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWorkflowExceptionFailure
+  verb: GET
+  path: /workflow-exception-failure
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWorkflowInstanceProcess
+  verb: GET
+  path: /workflow-instance-process
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: listWorkflowProcessPerformance
+  verb: GET
+  path: /workflow-process-performance
+  scope: venue
+  permission: APPROVAL_VIEW
+  audience:
+  - staff
+  offline: false
+  reads: []
   writes: []
 - operation: resubmitApprovalRequest
   verb: POST
@@ -181,6 +363,46 @@ operations:
   - approvals.matrix
   - approvals.rule
   - cache:idempotency
+- operation: setTriggerActionCross
+  verb: PUT
+  path: /trigger-action-cross
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setVisualBusinessRule
+  verb: PUT
+  path: /visual-business-rule
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: setVisualWorkflow
+  verb: PUT
+  path: /visual-workflow
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
+- operation: simulateWorkflowTestingImpact
+  verb: PUT
+  path: /workflow-testing-impact
+  scope: venue
+  permission: APPROVAL_REQUEST
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: withdrawApprovalRequest
   verb: POST
   path: /approval-requests/{requestId}/withdraw

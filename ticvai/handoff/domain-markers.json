@@ -107,6 +107,9 @@
  "document:docs/active/deep-audit-24-august.md": [
   "ai:names it"
  ],
+ "document:docs/active/deployment-configs-costed.md": [
+  "ai:names it"
+ ],
  "document:docs/active/full-layer-audit-20aug.md": [
   "ai:names it"
  ],
@@ -135,6 +138,12 @@
   "ai:names it"
  ],
  "document:docs/adr/0028-service-decomposition.md": [
+  "ai:names it"
+ ],
+ "document:docs/adr/0033-outbox-and-dead-letters.md": [
+  "ai:names it"
+ ],
+ "document:docs/adr/0034-ai-retrieval-and-cost.md": [
   "ai:names it"
  ],
  "document:docs/architecture/README.md": [
@@ -381,6 +390,9 @@
   "ai:calls 2"
  ],
  "screen:GST-059": [
+  "ai:calls 1"
+ ],
+ "screen:GST-068": [
   "ai:calls 1"
  ],
  "screen:KIT-010": [

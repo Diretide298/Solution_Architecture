@@ -10,7 +10,8 @@ operations:
   path: /shifts/{shiftId}/accept-variance
   scope: venue
   permission: OVERSHORT_ACCEPT
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -18,12 +19,14 @@ operations:
   writes:
   - cache:idempotency
   - orders.shift
+  - platform.outbox
 - operation: adjustDepositBoxFloat
   verb: POST
   path: /deposit-boxes/{boxId}/adjust-float
   scope: venue
   permission: CASH_ADD
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -37,7 +40,8 @@ operations:
   path: /deposit-boxes
   scope: venue
   permission: SHIFT_OPEN
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -52,7 +56,8 @@ operations:
   path: /shifts/{shiftId}/approve-open
   scope: venue
   permission: SHIFT_APPROVE_OPEN
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -65,7 +70,8 @@ operations:
   path: /deposit-boxes/close
   scope: venue
   permission: SHIFT_CLOSE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -74,14 +80,15 @@ operations:
   - orders.deposit_box
   writes:
   - cache:idempotency
-  - ledger.entry
+  - ledger.posting
   - orders.deposit_box
 - operation: closeShift
   verb: POST
   path: /shifts/{shiftId}/close
   scope: workstation
   permission: SHIFT_CLOSE
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -101,7 +108,8 @@ operations:
   path: /shifts/{shiftId}/cash-movements
   scope: venue
   permission: CASH_LIFT
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -116,7 +124,8 @@ operations:
   path: /shifts/current
   scope: workstation
   permission: SHIFT_OPEN
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - orders.shift
@@ -126,7 +135,8 @@ operations:
   path: /shifts/{shiftId}
   scope: venue
   permission: REPORT_VIEW_WORKSTATION
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - orders.shift
@@ -136,7 +146,8 @@ operations:
   path: /shifts/{shiftId}/cash-movements
   scope: venue
   permission: REPORT_VIEW_WORKSTATION
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - orders.cash_count_line
@@ -159,7 +170,8 @@ operations:
   path: /deposit-boxes
   scope: venue
   permission: SHIFT_OPEN
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - identity.principal
@@ -170,7 +182,8 @@ operations:
   path: /shifts
   scope: venue
   permission: REPORT_VIEW_WORKSTATION
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - orders.shift
@@ -180,7 +193,8 @@ operations:
   path: /shifts
   scope: workstation
   permission: SHIFT_OPEN
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -198,7 +212,8 @@ operations:
   path: /shifts/{shiftId}/no-sale
   scope: workstation
   permission: SHIFT_SUSPEND
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -211,7 +226,8 @@ operations:
   path: /shifts/{shiftId}/reopen
   scope: venue
   permission: SHIFT_REOPEN
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -224,7 +240,8 @@ operations:
   path: /shifts/{shiftId}/resume
   scope: workstation
   permission: SHIFT_OPEN
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -237,7 +254,8 @@ operations:
   path: /shifts/{shiftId}/suspend
   scope: workstation
   permission: SHIFT_SUSPEND
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency
@@ -250,7 +268,8 @@ operations:
   path: /deposit-boxes/{boxId}/withdraw
   scope: venue
   permission: CASH_LIFT
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - cache:idempotency

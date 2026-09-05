@@ -27,7 +27,7 @@ info:
     \ truth for one bounded context: server code, client code and mock servers are generated from it,\
     \ never the other way round. If a field is not here, it does not exist.\n**Contracts are split into\
     \ two tiers.**\n- **Spine** — the eight contexts everything else depends on: tenancy, identity,\n\
-    \  catalogue, orders, shift, access, finance, cross-cell. Frozen first. A change here\n  requires\
+    \  catalogue, orders, shift, access, finance, cross-region. Frozen first. A change here\n  requires\
     \ a formal change request, because every satellite has pinned against it.\n- **Satellite** — a domain\
     \ that builds on the spine and can move independently.\n  Cheaper to change.\n\n**`paths` are operations.**\
     \ Each one declares four TICVAI extensions, and Redocly rejects any that does not:\n| Extension |\
@@ -1707,6 +1707,12 @@ paths:
       - ledger
       x-ticvai-permission: LEDGER_APPROVE
       x-ticvai-scope-level: region
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'ADR-0031. **With three replicas, three instances wake up.** A Postgres
+        advisory lock rather  than Redis: the work is transactional against the same database, so the
+        lock belongs there.  **A Redis lock that expires mid-transaction leaves two writers and no error.**
+
+        '
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       parameters:
@@ -1959,6 +1965,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-025 Chargebacks & Disputes"
         - "P08 BO-043 Daily Reconciliation"
+        - "P08 BO-101 Orders & Money"
         - "P10 PTR-014 Settlement & Payment History"
       x-ticvai-audience:
       - staff
@@ -2566,6 +2573,12 @@ paths:
       - staff
       - service
       x-ticvai-scope-level: region
+      x-ticvai-singleton: true
+      x-ticvai-singleton-note: 'ADR-0031. **With three replicas, three instances wake up.** A Postgres
+        advisory lock rather  than Redis: the work is transactional against the same database, so the
+        lock belongs there.  **A Redis lock that expires mid-transaction leaves two writers and no error.**
+
+        '
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: append
       parameters:
@@ -4004,6 +4017,18 @@ components:
           type: string
           format: date-time
           nullable: true
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `region` scope.**'
     SettlementException:
       x-ticvai-persistence: ledger.settlement_exception
       type: object
@@ -4093,6 +4118,18 @@ components:
             format: uuid
         isActive:
           type: boolean
+        scopePath:
+          type: string
+          description: '**The partition key** (ADR-0005). Added 31 August: the operations that write this
+            table declare a scope and the table carried no column for it — **49 tables were in that state**,
+            so a row could be written at venue scope and then read by anything that could reach the table.
+
+
+            **`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains
+            `uae.dubai.marina`, and one index answers every level of the walk.
+
+
+            **Operations write it at `tenant` scope.**'
     PeriodStatus:
       type: string
       enum:

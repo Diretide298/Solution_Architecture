@@ -1,17 +1,20 @@
 {
  "scope": "platform",
- "generated": "2026-09-01",
+ "generated": "2026-09-04",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 1025,
+  "operations": 1626,
   "contracts": 28,
-  "tables": 380,
-  "relationships": 932,
-  "states": 122,
+  "tables": 386,
+  "stores": 9,
+  "foreignKeys": 0,
+  "indexes": 0,
+  "relationships": 975,
+  "states": 124,
   "events": 29,
   "flows": 94,
-  "adrs": 30,
-  "screens": 492,
+  "adrs": 39,
+  "screens": 1091,
   "platforms": 15,
   "apps": 12
  },
@@ -19,22 +22,22 @@
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 1025,
-    "total": 1025,
-    "percent": 100,
+    "done": 1047,
+    "total": 1626,
+    "percent": 64,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 1025,
-    "total": 1025,
+    "done": 1626,
+    "total": 1626,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 492,
-    "total": 492,
+    "done": 1091,
+    "total": 1091,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -61,23 +64,23 @@
    },
    {
     "name": "State models",
-    "done": 122,
-    "total": 122,
-    "percent": 100,
+    "done": 124,
+    "total": 131,
+    "percent": 95,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 357,
-    "total": 380,
-    "percent": 94,
+    "done": 374,
+    "total": 395,
+    "percent": 95,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
     "name": "Screens with operations",
-    "done": 478,
-    "total": 492,
-    "percent": 97,
+    "done": 1082,
+    "total": 1091,
+    "percent": 99,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
    {
@@ -96,9 +99,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 758,
-    "total": 1025,
-    "percent": 74,
+    "done": 1379,
+    "total": 1626,
+    "percent": 85,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
    {
@@ -120,7 +123,7 @@
    {
     "name": "Tables written",
     "done": 0,
-    "total": 380,
+    "total": 386,
     "percent": 0,
     "note": "DDL is generated when the design stops moving (ADR-0024)."
    },
@@ -165,13 +168,13 @@
   }
  },
  "headline": {
-  "design": 93,
+  "design": 90,
   "build": 0
  },
  "waves": {
-  "wave1": 169,
-  "wave2": 253,
-  "wave3": 70
+  "wave1": 170,
+  "wave2": 261,
+  "wave3": 660
  },
  "platformBreakdown": [
   {
@@ -186,7 +189,7 @@
    "name": "Guest App",
    "app": "guest-app",
    "operator": "guest",
-   "screens": 63
+   "screens": 71
   },
   {
    "code": "P04",
@@ -221,21 +224,21 @@
    "name": "Venue Management",
    "app": "venue-management-web",
    "operator": "venue",
-   "screens": 143
+   "screens": 363
   },
   {
    "code": "P09",
    "name": "TICVAI Web",
    "app": "ticvai-web",
    "operator": "ticvai",
-   "screens": 37
+   "screens": 318
   },
   {
    "code": "P10",
    "name": "Partner Web",
    "app": "partner-web",
    "operator": "partner",
-   "screens": 21
+   "screens": 51
   },
   {
    "code": "P11",
@@ -249,14 +252,14 @@
    "name": "Venue Support",
    "app": "venue-support-web",
    "operator": "venue",
-   "screens": 8
+   "screens": 28
   },
   {
    "code": "P13",
    "name": "Venue CMS",
    "app": "venue-management-web",
    "operator": "venue",
-   "screens": 20
+   "screens": 60
   },
   {
    "code": "P14",
@@ -282,11 +285,11 @@
  ],
  "conflicts": {
   "open": 12,
-  "closed": 148,
+  "closed": 149,
   "withdrawn": 6,
   "blocking": 0,
   "byOwner": {
-   "Dinesh + Chinmay": 1,
+   "Chinmay + Dinesh": 1,
    "Dinesh": 1,
    "Chinmay": 1,
    "Chinmay + Allam": 1,
@@ -305,12 +308,12 @@
    "CF-127",
    "CF-133",
    "CF-140",
-   "CF-161",
    "CF-162",
    "CF-163",
    "CF-164",
    "CF-165",
-   "CF-166"
+   "CF-166",
+   "CF-167"
   ]
  },
  "stores": [

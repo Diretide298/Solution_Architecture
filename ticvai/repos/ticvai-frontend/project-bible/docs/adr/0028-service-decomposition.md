@@ -1,8 +1,32 @@
 # ADR-0028: Sixteen services, and the data boundary decides where they split
 
-**Status:** Accepted
+**Status:** Accepted. **The data topology reopened by CF-161 on 24 August is settled by
+[ADR-0038](0038-cell-is-a-region-database-per-tenant.md):** the decomposition below is unchanged —
+no service spans a schema it does not own — and the 26 schemas now live once per tenant database
+rather than once per cell.
 **Date:** 24 August 2026
 **Related:** [ADR-0016](0016-read-write-separation.md) · [ADR-0020](0020-ai-isolation-boundary.md) · [ADR-0013](0013-local-first-point-of-sale.md) · [ADR-0010](0010-cross-jurisdiction-entitlements.md)
+
+---
+
+## 🔴 Reopened 24 August — the deployment shape, not the service split
+
+**The 24 August infrastructure workshop decided the opposite of what this ADR assumes.** Dinesh
+recommended **segregating databases per service from the start**, on the grounds that splitting a
+centralized database after two or three years in production is significantly harder than starting
+isolated and merging later.
+
+**This ADR says one Postgres per cell with 26 schemas inside it.** Both were written the same day
+and neither knew about the other.
+
+**The service boundaries below are unaffected.** Sixteen services, five tiers, the rule that the
+owner defines a row and a foreign writer may only append — none of that depends on whether those
+schemas share a database. **What is reopened is the deployment of the data, not the decomposition
+of the code**, and this ADR should be read as a service decomposition with an open question about
+where its schemas live.
+
+Tracked as **CF-161**. Do not generate DDL against either answer until it closes — writing it
+against an undecided topology is writing it twice.
 
 ---
 
@@ -32,7 +56,7 @@ the split safe.
 else writes them except by appending through a path the owner published.
 
 **22 tables have two writing contracts and all are correct.** A till closing posts to
-`ledger.entry` because settling a shift *is* a ledger act. `orders` writes `access.entitlement`
+`ledger.posting` because settling a shift *is* a ledger act. `orders` writes `access.entitlement`
 because a sale issues a ticket. **The owner defines the row; a foreign writer may only append to
 it.**
 
@@ -44,7 +68,7 @@ it.**
 | **Commerce** | Catalogue, Order, Access, Ledger | The sale path. Highest availability and write rate. |
 | **Operations** | Inventory, F&B, Retail, VenueOps | What a venue does with what it sold. Licensed per module. |
 | **Engagement** | Marketing, AI | **Nothing that takes money depends on these.** |
-| **Platform** | Control, WhiteLabel, Reporting, CrossCell | Provisioning, publishing, reporting, and the one cross-region path. |
+| **Platform** | Control, WhiteLabel, Reporting, CrossRegion | Provisioning, publishing, reporting, and the one cross-region path. |
 
 ---
 
@@ -57,7 +81,7 @@ it.**
 
 **A service with no data is not a service; it is a set of operations**, and they belong with the
 scope they resolve against. Folded into TenancyService alongside `workforce` and `approvals`, all
-three of which read `platform.scope_node` constantly and write it rarely — **splitting them means
+three of which read `platform.org_unit` constantly and write it rarely — **splitting them means
 four services doing the same joins.**
 
 ### Subscription, platform-ops and public-api are one service
@@ -98,7 +122,7 @@ first month of production traffic rather than for a design document.
 **Deploy order is the tier order.** Foundation first and alone — **a restart of Identity is an
 outage everywhere**, and twelve contracts read it.
 
-**Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossCell. That is
+**Four services can be down without stopping a sale**: Marketing, AI, Reporting, CrossRegion. That is
 a deliberate property and it should be tested rather than assumed.
 
 **Order autoscales and nothing else needs to.** A Saturday evening is ten times a Tuesday morning

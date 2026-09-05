@@ -1,17 +1,3 @@
-# P14 — Developer Portal
-#
-# **The surface `public-api` needed and did not have.** 22 operations were contracted on 18 August
-# and 21 of them reached no screen — the audit's largest single gap in one contract.
-#
-# 13.1.1 to 13.1.5 ask for an interactive documentation portal. ADR-0024 makes the contract the
-# deliverable and the 28 OpenAPI files *are* the schema documentation, so **this platform renders
-# artefacts that already exist** rather than generating new ones.
-#
-# Audience is `partner` throughout, not `staff`. A developer is not an employee, and every screen
-# here is one somebody outside Softlabs will judge the platform by.
-#
-# Validated against _schema.yaml; component kinds from _components.yaml.
-
 platform:
   code: P14
   formFactor: web
@@ -72,14 +58,14 @@ screens:
     trigger: onLoad
   states:
     loading: The operation list; the current version renders first.
-    emptyFirstRun: '**Never empty in practice** — the contracts are the documentation and they ship
-      with the platform. An empty reference means the artefacts did not load, which is an error rather
-      than a first run.
+    emptyFirstRun: '**Never empty in practice** — the contracts are the documentation and they ship with
+      the platform. An empty reference means the artefacts did not load, which is an error rather than
+      a first run.
 
       '
     emptyNoResults: 'No operation matches this search. **Search covers the summary and the description**,
-      not just the operationId, because a developer looking for *"how do I refund"* does not know it
-      is called `createRefund`.
+      not just the operationId, because a developer looking for *"how do I refund"* does not know it is
+      called `createRefund`.
 
       '
     error: 'Could not load the reference. **Names which contract failed** — 28 files load independently
@@ -132,11 +118,11 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P14 Developer.dc.html#dev-001
-  notes: CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope
-    rather than a contract gap — the twelve domain-13 rows left open after the contract landed are all
-    this screen and its siblings. **The API reference.** A developer arrives at the documentation, not
-    at a sign-up form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint`
-    existed in the schema and five platforms used none, so every screen in them read as unreachable.
+  notes: CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather
+    than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen
+    and its siblings. **The API reference.** A developer arrives at the documentation, not at a sign-up
+    form — registration is what they do after reading. **Declared 20 August** — `isEntryPoint` existed
+    in the schema and five platforms used none, so every screen in them read as unreachable.
   requiresModule: developerApi
 - id: DEV-002
   name: Register & Organisation
@@ -155,9 +141,9 @@ screens:
     trigger: onAction
   states:
     loading: The organisation and its members.
-    emptyFirstRun: '**You are the first member and you are the owner.** An integration outlives the
-      engineer who built it, so this is an organisation rather than a personal account — and the invite
-      action is the point of the state.
+    emptyFirstRun: '**You are the first member and you are the owner.** An integration outlives the engineer
+      who built it, so this is an organisation rather than a personal account — and the invite action
+      is the point of the state.
 
       '
     emptyNoResults: No member matches.
@@ -193,15 +179,17 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P14 Developer.dc.html#dev-002
-  notes: '13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining
-    every integrator''s staff list is Softlabs doing their HR.
+  notes: '13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every
+    integrator''s staff list is Softlabs doing their HR.
 
     '
   entryState:
     params:
     - name: developerId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `developerId`.'
   requiresModule: developerApi
 - id: DEV-003
   name: Clients & Credentials
@@ -250,8 +238,8 @@ screens:
       - kind: primaryButton
         label: Create client
       - kind: banner
-        notes: '**The secret is shown once.** The banner says so before it is generated, not after —
-          a system that can show you a secret later is a system that stores one.
+        notes: '**The secret is shown once.** The banner says so before it is generated, not after — a
+          system that can show you a secret later is a system that stores one.
 
           '
   navigation:
@@ -268,16 +256,18 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P14 Developer.dc.html#dev-003
-  notes: 'CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own.
-    **Rotation carries an overlap window and revocation does not**: one is hygiene, the other is what
-    you reach for when a secret has leaked, and a grace period defeats it.
+  notes: 'CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation
+    carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for
+    when a secret has leaked, and a grace period defeats it.
 
     '
   entryState:
     params:
     - name: clientId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `clientId`.'
   requiresModule: developerApi
 - id: DEV-004
   name: Sandbox
@@ -308,8 +298,8 @@ screens:
     emptyNoResults: No sandbox matches.
     emptyNoAccess: You do not have DEVELOPER_MANAGE.
     error: Could not load. A running sandbox is unaffected.
-    partial: 'Provisioning. **The credentials exist before the data does**, so a developer can start
-      wiring auth while the dataset generates.
+    partial: 'Provisioning. **The credentials exist before the data does**, so a developer can start wiring
+      auth while the dataset generates.
 
       '
   layout:
@@ -325,13 +315,13 @@ screens:
       - kind: secondaryButton
         label: Reset
         notes: 'Confirms by naming what goes. **"Reset — 5,000 guests and 12 months of orders will be
-          regenerated"** rather than "are you sure", because a developer mid-test needs to know what
-          they are about to lose.
+          regenerated"** rather than "are you sure", because a developer mid-test needs to know what they
+          are about to lose.
 
           '
       - kind: banner
-        notes: '**Expiry, counted in days.** A sandbox that vanishes with no warning is a developer
-          who thinks the platform broke.
+        notes: '**Expiry, counted in days.** A sandbox that vanishes with no warning is a developer who
+          thinks the platform broke.
 
           '
   navigation:
@@ -348,15 +338,17 @@ screens:
   wireframe:
     status: generated
     board: wireframes/P14 Developer.dc.html#dev-004
-  notes: 'Decisions D2 and D3. **One shared sandbox, synthetic data only** — which removes the PDPL
-    and DESC exposure entirely. Tenant-specific validation runs on per-customer staging.
+  notes: 'Decisions D2 and D3. **One shared sandbox, synthetic data only** — which removes the PDPL and
+    DESC exposure entirely. Tenant-specific validation runs on per-customer staging.
 
     '
   entryState:
     params:
     - name: sandboxId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `sandboxId`.'
   requiresModule: developerApi
 - id: DEV-005
   name: Webhooks
@@ -383,8 +375,8 @@ screens:
     trigger: onAction
   states:
     loading: Subscriptions; failing ones first.
-    emptyFirstRun: '**No subscriptions. Twenty-nine business events are available** — and the state
-      names a few, because a developer who does not know what exists cannot subscribe to it.
+    emptyFirstRun: '**No subscriptions. Twenty-nine business events are available** — and the state names
+      a few, because a developer who does not know what exists cannot subscribe to it.
 
       '
     emptyNoResults: No delivery matches this window or status.
@@ -442,7 +434,9 @@ screens:
     params:
     - name: subscriptionId
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A partner link resolves within that partner''s own scope and refuses outside it.** A
+      forwarded link between partners must not open another partner''s record. If the target is gone the
+      screen says so and offers the partner''s own list. Arrives with `subscriptionId`.'
   requiresModule: developerApi
 - id: DEV-006
   name: Usage & Limits
@@ -457,8 +451,8 @@ screens:
     trigger: onLoad
   states:
     loading: Call volume; the current window renders first.
-    emptyFirstRun: '**No calls yet.** The state links to the reference rather than sitting blank — a
-      developer who has registered and not called anything is a developer who needs a first request.
+    emptyFirstRun: '**No calls yet.** The state links to the reference rather than sitting blank — a developer
+      who has registered and not called anything is a developer who needs a first request.
 
       '
     emptyNoResults: No calls in this window.
@@ -539,6 +533,12 @@ screens:
   navigation:
     entryFrom:
     - DEV-006
+    exitTo:
+    - DEV-006
+    inferred: false
+    notes: '**Returns to DEV-006.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: developer-portal-web
     route: /developer/marketplace
@@ -581,8 +581,7 @@ screens:
     emptyFirstRun: Nothing awaiting review.
     emptyNoResults: No client or listing matches.
     emptyNoAccess: '**This is a Softlabs screen and you are a developer.** Said plainly — a blank administration
-      page shown to a partner is worse than a refusal, because they will file a support ticket about
-      it.
+      page shown to a partner is worse than a refusal, because they will file a support ticket about it.
 
       '
     error: Could not load.
@@ -610,6 +609,12 @@ screens:
   navigation:
     entryFrom:
     - DEV-001
+    exitTo:
+    - DEV-001
+    inferred: false
+    notes: '**Returns to DEV-001.** Stated on 4 September: this screen declared where it is reached from
+      and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
+      the other way, not a guess about the product.'
   implementation:
     app: developer-portal-web
     route: /developer/admin
@@ -620,13 +625,22 @@ screens:
     board: wireframes/P14 Developer.dc.html#dev-008
   notes: '**`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial
     model configuration rather than code — this is the surface, and the rates themselves remain CF-135c.
+    **Staff audience on a partner platform, and deliberately.** Every operation here — `setApiQuota`,
+    `certifyIntegration`, `setApiLicensing`, `deprecateApiVersion` — is **Softlabs administering the programme,
+    not a developer self-serving.** A developer who could set their own quota has no quota.
 
-    '
+
+    **Declared on the screen rather than the platform** because P14 is a partner surface with one staff
+    screen on it, and moving the screen to P09 would separate the console from the catalogue it governs.
+    `check-screens` reads `screen.audience` before the platform’s.'
   entryState:
     params:
     - name: listingId
       from: deepLink
     - name: version
       from: deepLink
-    coldEntry: TODO — what this screen shows when somebody arrives with no upstream screen.
+    coldEntry: '**A version link is expected to point at something superseded — that is what versions
+      are for.** The screen opens the requested version read-only, says it is not current, and links to
+      the one that is. **An old version is history, not an error.** Arrives with `listingId`, `version`.'
   requiresModule: developerApi
+  audience: staff

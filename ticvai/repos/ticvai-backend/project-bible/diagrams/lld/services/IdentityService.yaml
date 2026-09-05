@@ -20,7 +20,7 @@ schemas:
   stores:
   - postgres
   - redis
-  largestTable: identity.grant
+  largestTable: identity.delegated_access
 - schema: pii
   tables: 4
   stores:
@@ -38,9 +38,9 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 2
-  - operation: createGrant
+  - operation: createDelegatedAccess
     verb: POST
-    path: /grants
+    path: /delegated-access
     scope: venue
     permission: PERMISSION_GRANT
     offline: false
@@ -70,9 +70,9 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
-  - operation: deleteGrant
+  - operation: deleteDelegatedAccess
     verb: DELETE
-    path: /grants/{grantId}
+    path: /delegated-access/{delegatedAccessId}
     scope: venue
     permission: PERMISSION_GRANT
     offline: false
@@ -190,6 +190,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 0
+  - operation: listDelegatedAccess
+    verb: GET
+    path: /delegated-access
+    scope: venue
+    permission: PERMISSION_VIEW
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listDelegations
     verb: GET
     path: /guests/{subjectId}/delegations
@@ -197,14 +205,6 @@ operationsByContract:
     permission: GUEST_VIEW
     offline: false
     reads: 3
-    writes: 0
-  - operation: listGrants
-    verb: GET
-    path: /grants
-    scope: venue
-    permission: PERMISSION_VIEW
-    offline: false
-    reads: 1
     writes: 0
   - operation: listMfaMethods
     verb: GET
@@ -227,7 +227,7 @@ operationsByContract:
     path: /roles
     scope: venue
     permission: ROLE_MANAGE
-    offline: false
+    offline: true
     reads: 1
     writes: 0
   - operation: listSsoProviders
@@ -383,13 +383,27 @@ operationsByContract:
     reads: 2
     writes: 2
 tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: identity.authz_audit
-  columns: 2
+  columns: 3
   store: postgres
   parent: null
   writtenBy: []
   foreignWriters: null
-- table: identity.grant
+- table: identity.delegated_access
   columns: 19
   store: postgres
   parent: null
@@ -401,16 +415,16 @@ tables:
   - orders
   - public-api
 - table: identity.guest_session
-  columns: 1
+  columns: 2
   store: redis
-  parent: pii.subject
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.mfa_challenge
-  columns: 1
+  columns: 2
   store: postgres
-  parent: identity.principal
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
@@ -422,16 +436,16 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.mfa_recovery_code
-  columns: 1
+  columns: 2
   store: postgres
-  parent: identity.principal
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.otp_challenge
-  columns: 1
+  columns: 2
   store: postgres
-  parent: pii.subject
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
@@ -450,7 +464,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.principal_credential
-  columns: 1
+  columns: 2
   store: postgres
   parent: identity.principal
   writtenBy: []
@@ -463,7 +477,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.role_permission
-  columns: 5
+  columns: 6
   store: postgres
   parent: identity.role
   writtenBy:
@@ -471,16 +485,16 @@ tables:
   foreignWriters:
   - tenancy
 - table: identity.segregation_rule
-  columns: 7
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
   - identity
   foreignWriters: null
 - table: identity.session
-  columns: 1
+  columns: 2
   store: redis
-  parent: identity.principal
+  parent: null
   writtenBy:
   - identity
   foreignWriters: null
@@ -492,7 +506,7 @@ tables:
   - identity
   foreignWriters: null
 - table: identity.sso_provider
-  columns: 11
+  columns: 12
   store: postgres
   parent: null
   writtenBy:
@@ -553,6 +567,8 @@ screens:
 - P01:WEB-020 Profile & Preferences
 - P02:GST-015 Memberships
 - P02:GST-042 Simple Registration & OTP
+- P02:GST-066 Privacy & My Data
+- P02:GST-073 Security & Sign-in
 - P04:POS-001 Begin Shift
 - P04:POS-018 Safe Drop & Cash Transfer Management
 - P06:EMP-001 Sign in
@@ -564,6 +580,7 @@ screens:
 - P08:BO-054 Role Assignment
 - P08:BO-057 Training & Certification
 - P08:BO-068 Audit Log
+- P08:BO-106 People & Access Rights
 - P08:BO-142 Store Rules, Controls & Permissions
 - P09:ADM-001 Platform Login / MFA
 - P09:ADM-002 Platform Dashboard

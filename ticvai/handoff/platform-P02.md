@@ -4,50 +4,15 @@
 
 | | |
 |---|---|
-| Screens | 63 |
-| Operations | 101 |
-| Contracts | 15 |
+| Screens | 71 |
+| Operations | 132 |
+| Contracts | 16 |
 | Modules | 16 |
 | Undrawn | 0 |
-| Operations with no screen | 28 |
-| Waves | wave1 20 · wave2 27 · wave3 16 |
+| Operations with no screen | 0 |
+| Waves | wave1 20 · wave2 35 · wave3 16 |
 
 ## Gaps
-
-### 28 operations with no screen here
-
-**In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
-
-| Operation | Contract | | |
-|---|---|---|---|
-| `enrolFacePass` | access | POST | Register a facial profile against an entitlement |
-| `getFacePassEnrolment` | access | GET | Whether a pass has a face registered, and when |
-| `revokeFacePass` | access | DELETE | Remove a facial profile |
-| `freezeEntitlement` | catalogue | POST | Pause a membership at the guest's request |
-| `joinWaitlist` | catalogue | POST | Ask to be told if capacity frees up |
-| `leaveWaitlist` | catalogue | DELETE | Stop waiting |
-| `updateTableReservation` | fnb | PATCH | Change or cancel a booking |
-| `createMfaChallenge` | identity | POST | Step-up authentication for a sensitive action |
-| `deleteGuestAccount` | identity | DELETE | Self-service account deletion |
-| `exportSubjectData` | identity | POST | Everything the platform holds about one guest |
-| `createReferral` | marketing-crm | POST | Issue a referral code |
-| `getMyChallenges` | marketing-crm | GET | Active challenges and how far along I am |
-| `getWaiverStatus` | marketing-crm | GET | Whether this guest may be issued a ticket that requires a waiver |
-| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
-| `respondToInvitation` | marketing-crm | POST | Accept or decline |
-| `submitForm` | marketing-crm | POST | Sign a waiver, answer a survey, capture details |
-| `updateGuestPreferences` | marketing-crm | PUT | The things a regular should not have to say twice |
-| `uploadGuestDocument` | marketing-crm | POST | Store a guest photo, ID or signed document |
-| `convertToTermProduct` | orders | POST | Turn a visit into a membership or season pass |
-| `createCart` | orders | POST | Start a cart |
-| `createResaleListing` | orders | POST | List an entitlement for resale |
-| `getGroupBooking` | orders | GET |  |
-| `listPaymentTokens` | orders | GET | A guest's saved payment methods |
-| `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
-| `shareEntitlement` | orders | POST | Let somebody else use this, without giving it away |
-| `storePaymentToken` | orders | POST | Save a payment method for future use |
-| `transferWalletBalance` | retail | POST | Send balance to another guest |
-| `assignSeats` | seating | POST | Pick and hold the best available seats |
 
 ### 6 modules split across waves
 
@@ -64,11 +29,11 @@
 
 | Module | Screens | Waves |
 |---|---|---|
-| Engagement & Support | 11 | 2, 3 |
-| Account & Self-Service | 9 | 1, 2, 3 |
-| In-venue Services | 9 | 2, 3 |
+| Account & Self-Service | 14 | 1, 2, 3 |
+| Engagement & Support | 12 | 2, 3 |
+| In-venue Services | 10 | 2, 3 |
+| Booking & Selection | 8 | 1, 2, 3 |
 | Discovery & Browse | 7 | 1, 2 |
-| Booking & Selection | 7 | 1, 2, 3 |
 | Ticketing | 4 | 2 |
 | Cart & Checkout | 3 | 1 |
 | Membership, Loyalty & Value | 3 | 2 |
@@ -148,4 +113,12 @@
 | `GST-062` | Shop & Drop Collection | In-Venue Experience | 3 | 1 | yes |
 | `GST-063` | Search | Discovery | 1 | 1 | yes |
 | `GST-065` | Newsletter & Preferences | Marketing | 3 | 2 | yes |
+| `GST-066` | Privacy & My Data | Account & Self-Service | 2 | 5 | yes |
+| `GST-067` | Refunds & Resale | Account & Self-Service | 2 | 3 | yes |
+| `GST-068` | Help & My Cases | Engagement & Support | 2 | 3 | yes |
+| `GST-069` | Face Pass | Account & Self-Service | 2 | 3 | yes |
+| `GST-070` | Reserve a Table or Cabana | In-venue Services | 2 | 7 | yes |
+| `GST-071` | Payment Methods | Account & Self-Service | 2 | 4 | yes |
+| `GST-072` | Share & Group Booking | Booking & Selection | 2 | 5 | yes |
+| `GST-073` | Security & Sign-in | Account & Self-Service | 2 | 1 | yes |
 

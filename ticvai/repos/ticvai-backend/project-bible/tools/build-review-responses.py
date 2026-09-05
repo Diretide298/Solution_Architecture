@@ -76,7 +76,7 @@ RESPONSES = {
         "are a genuine gap — raising as a scope question rather than building against a guess."),
     ("WEB-006", "Potential Missing API -"): (
         "Wired, not shown",
-        "`acquireLease` exists and **is not on WEB-006**. Correct call: a session selection that "
+        "`acquireInventoryHold` exists and **is not on WEB-006**. Correct call: a session selection that "
         "does not lease is a slot two channels can sell. **Contended inventory is leased, not "
         "reserved** (CF-115)."),
     ("WEB-007", "Validation Required"): (
@@ -134,7 +134,7 @@ RESPONSES = {
     ("WEB-015", "clarification needed"): (
         "Agreed",
         "**`joinQueue` on a waiting room with no join action.** A virtual waiting room is entered, "
-        "not joined — the guest is already in it. Removing; `getQueueEntry` is what the screen "
+        "not joined — the guest is already in it. Removing; `getWaitingGuest` is what the screen "
         "needs."),
     ("WEB-017", "Get Account Summary is needed"): (
         "Agreed",

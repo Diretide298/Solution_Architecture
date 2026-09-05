@@ -12,7 +12,7 @@ Ordered by what a reviewer would notice first.
 
 **Read this one even if you read nothing else.** The ER diagram takes its edges from this file, and
 until 20 August it was hand-maintained: **515 rows against the relationship graph's 854**, and it
-marked `identity.grant.principal_id` as `ambient`.
+marked `identity.delegated_access.principal_id` as `ambient`.
 
 The viewer hides ambient edges by default. **A declared foreign key was being drawn as nothing** —
 which a reviewer spotted by looking at the picture and asking why `grant` had no connector to
@@ -43,7 +43,7 @@ New top-level key, one entry per table:
 "orders.order_line": {
   "schemaRoot": "orders.sales_order",
   "isSchemaRoot": false,
-  "anchors": ["access.admission_profile", "identity.role", "pii.subject", "platform.scope_node"],
+  "anchors": ["access.admission_rules", "identity.role", "pii.subject", "platform.org_unit"],
   "isAnchor": false,
   "parent": "orders.sales_order",
   "depth": 1,
@@ -52,10 +52,10 @@ New top-level key, one entry per table:
 ```
 
 **`anchors` is where a table's own outbound keys stop**, following them across schemas. The
-distribution is the honest shape of the package: **`platform.scope_node` is reached by 289 of 353
+distribution is the honest shape of the package: **`platform.org_unit` is reached by 289 of 353
 tables** — the tenancy spine — and `identity.role` by 207.
 
-**Worth surfacing as a filter**: *show me everything anchored only on `scope_node`* is *show me
+**Worth surfacing as a filter**: *show me everything anchored only on `org_unit`* is *show me
 everything that is purely tenancy-scoped*, and that is a question the ER diagram cannot currently
 answer.
 

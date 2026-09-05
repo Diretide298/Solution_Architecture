@@ -1,10 +1,3 @@
-# F09 — Event is cancelled and refunded
-#
-# The flow that touches the most modules at once — orders, entitlements, seating,
-# ledger, marketing and cross-cell. Written first among the remaining flows for that reason.
-#
-# Validated by tools/check-flows.py.
-
 id: F09
 name: Event is cancelled and refunded
 actor: venueManager
@@ -38,12 +31,15 @@ steps:
   - cancelPerformance
   outcome: Sales stop immediately. Nothing new can be sold
 - step: 3
-  screen: BO-003
+  screen: BO-023
   action: Reviews the refund exposure
   operations:
   - listOrders
   - getRefundPolicy
   outcome: How many orders, how much money, how many across other venues
+  note: '**Repointed 24 August.** This step ran through `BO-003 Queue Integration Setup`, which carried
+    17 order operations from the bulk attach and has four queue ones. **A refund is worked on the refunds
+    screen** — `BO-023` — and it needed `getRefundPolicy` wiring, because it had none.'
 - step: 4
   screen: BO-004
   action: Authorises the bulk refund

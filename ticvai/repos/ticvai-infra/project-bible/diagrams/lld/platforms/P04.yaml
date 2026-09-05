@@ -59,7 +59,7 @@ servicesCalled:
 coverage:
   screens: 24
   inAFlow: 19
-  drawn: 20
+  drawn: 24
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -107,8 +107,8 @@ screens:
   - POS-023
   - POS-024
   boardFrames:
-  - POS-2A
-  - POS-3D
+  - POS Board 3.dc.html#pos-3d
+  - TICVAI Boards v2.dc.html#pos-2a
   wireframe: wireframes/TICVAI Boards v2.dc.html#pos-2a
   inFlows:
   - F32 A till opens, trades and settles
@@ -177,6 +177,7 @@ screens:
   - productId<-deepLink
   - promotionId<-deepLink
   goesTo:
+  - BO-045
   - POS-001
   - POS-003
   - POS-004
@@ -188,9 +189,9 @@ screens:
   - POS-013
   - POS-020
   boardFrames:
-  - RET-3B
-  - RET-3C
-  - RET-3D
+  - Retail Board 3.dc.html#ret-3b
+  - Retail Board 3.dc.html#ret-3c
+  - Retail Board 3.dc.html#ret-3d
   wireframe: wireframes/Retail Board 3.dc.html#ret-3b
   inFlows:
   - F14 A discount needs a manager
@@ -209,15 +210,15 @@ screens:
   wave: 1
   density: touchLarge
   operations:
-  - acquireLease
+  - acquireInventoryHold
   - getAvailability
   - getProduct
   - listAlternativeCodes
-  - listLeases
+  - listInventoryHolds
   - listProductVariants
   - listProducts
-  - releaseLease
-  - renewLease
+  - releaseInventoryHold
+  - renewInventoryHold
   - resolveProductByCode
   states:
   - emptyFirstRun
@@ -228,7 +229,7 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - leaseId<-deepLink
+  - inventoryHoldId<-deepLink
   - productId<-POS-002
   goesTo:
   - POS-001
@@ -274,8 +275,9 @@ screens:
   - POS-003
   - POS-005
   - POS-006
-  boardFrames: null
-  wireframe: wireframes/P04 Venue POS.dc.html#pos-004
+  boardFrames:
+  - Seat Board 3.dc.html#seat-3a
+  wireframe: wireframes/Seat Board 3.dc.html#seat-3a
   inFlows:
   - F59 A seat is picked, held and sold at a window
 - screen: POS-005
@@ -314,7 +316,7 @@ screens:
   - POS-022
   - POS-023
   boardFrames:
-  - RET-3E
+  - Retail Board 3.dc.html#ret-3e
   wireframe: wireframes/Retail Board 3.dc.html#ret-3e
   inFlows:
   - F108 A guest orders food at a counter and collects it
@@ -361,7 +363,7 @@ screens:
   - POS-003
   - POS-004
   boardFrames:
-  - RET-3F
+  - Retail Board 3.dc.html#ret-3f
   wireframe: wireframes/Retail Board 3.dc.html#ret-3f
   inFlows: null
 - screen: POS-007
@@ -405,8 +407,8 @@ screens:
   - POS-002
   - POS-009
   boardFrames:
-  - POS-2F
-  - POS-3F
+  - POS Board 3.dc.html#pos-3f
+  - TICVAI Boards v2.dc.html#pos-2f
   wireframe: wireframes/TICVAI Boards v2.dc.html#pos-2f
   inFlows:
   - F32 A till opens, trades and settles
@@ -482,7 +484,7 @@ screens:
   - POS-002
   - POS-007
   boardFrames:
-  - POS-3A
+  - POS Board 3.dc.html#pos-3a
   wireframe: wireframes/POS Board 3.dc.html#pos-3a
   inFlows:
   - F74 A shift closes and the day is reported
@@ -553,8 +555,8 @@ screens:
   goesTo:
   - POS-002
   boardFrames:
-  - POS-2B
-  - RET-3G
+  - POS Frontline Board 2.dc.html#pos-2b
+  - Retail Board 3.dc.html#ret-3g
   wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2b
   inFlows:
   - F34 A retail sale, from scan to return
@@ -587,10 +589,11 @@ screens:
   - orderId<-deepLink
   - outletId<-deepLink
   - boxId<-session
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
-  - POS-2C
-  - RET-3H
+  - POS Frontline Board 2.dc.html#pos-2c
+  - Retail Board 3.dc.html#ret-3h
   wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2c
   inFlows:
   - F60 An online order is collected at the counter
@@ -626,8 +629,8 @@ screens:
   - POS-002
   - POS-020
   boardFrames:
-  - POS-2D
-  - POS-2E
+  - POS Frontline Board 2.dc.html#pos-2d
+  - POS Frontline Board 2.dc.html#pos-2e
   wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2d
   inFlows:
   - F32 A till opens, trades and settles
@@ -654,7 +657,8 @@ screens:
   - workstationId<-session
   - orderId<-deepLink
   - shiftId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-014
   inFlows: null
@@ -678,7 +682,8 @@ screens:
   entryParams:
   - workstationId<-session
   - shiftId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-015
   inFlows:
@@ -702,9 +707,11 @@ screens:
   offlineState: true
   entryParams:
   - workstationId<-session
-  goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P04 Venue POS.dc.html#pos-016
+  goesTo:
+  - POS-001
+  boardFrames:
+  - POS Frontline Board 2.dc.html#pos-2b
+  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2b
   inFlows:
   - F73 A till is configured and its cash rules set
 - screen: POS-017
@@ -726,9 +733,11 @@ screens:
   entryParams:
   - workstationId<-session
   - shiftId<-deepLink
-  goesTo: []
-  boardFrames: null
-  wireframe: wireframes/P04 Venue POS.dc.html#pos-017
+  goesTo:
+  - POS-001
+  boardFrames:
+  - POS Frontline Board 2.dc.html#pos-2d
+  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2d
   inFlows: null
 - screen: POS-018
   name: Safe Drop & Cash Transfer Management
@@ -754,9 +763,10 @@ screens:
   - workstationId<-session
   - boxId<-deepLink
   - shiftId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
-  - POS-3B
+  - POS Board 3.dc.html#pos-3b
   wireframe: wireframes/POS Board 3.dc.html#pos-3b
   inFlows:
   - F73 A till is configured and its cash rules set
@@ -781,9 +791,10 @@ screens:
   entryParams:
   - workstationId<-session
   - venueId<-deepLink
-  goesTo: []
+  goesTo:
+  - POS-001
   boardFrames:
-  - POS-3C
+  - POS Board 3.dc.html#pos-3c
   wireframe: wireframes/POS Board 3.dc.html#pos-3c
   inFlows:
   - F73 A till is configured and its cash rules set
@@ -816,7 +827,7 @@ screens:
   - POS-002
   - POS-007
   boardFrames:
-  - POS-3E
+  - POS Board 3.dc.html#pos-3e
   wireframe: wireframes/POS Board 3.dc.html#pos-3e
   inFlows:
   - F32 A till opens, trades and settles
@@ -850,7 +861,7 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-021
   inFlows:
   - F108 A guest orders food at a counter and collects it
 - screen: POS-022
@@ -881,7 +892,7 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-022
   inFlows:
   - F108 A guest orders food at a counter and collects it
 - screen: POS-023
@@ -912,7 +923,7 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-023
   inFlows: null
 - screen: POS-024
   name: Outlet Setup
@@ -942,5 +953,5 @@ screens:
   - POS-002
   - POS-005
   boardFrames: null
-  wireframe: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-024
   inFlows: null

@@ -8,6 +8,7 @@
 what makes it defensible is why `shift` is not one of them and why AI is one at thirty operations.
 """
 import json
+import sys
 from collections import Counter, defaultdict
 from pathlib import Path
 
@@ -15,8 +16,22 @@ import openpyxl
 from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
 
-ROOT = Path("/home/claude/ticvai-pkg")
-OUT = Path("/mnt/user-data/outputs/TICVAI_Services_and_Data_Segregation.xlsx")
+# Windows consoles are cp1252 and this tool closes by printing a unicode arrow. **The write
+# has already happened by then**, so the traceback reported a failure on a run that succeeded
+# — the most misleading shape an error can take.
+try:
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+except Exception:
+    pass
+
+# **This was hard-coded to `/home/claude/ticvai-pkg`**, a path that exists on no machine this
+# package has ever been checked out on, so every run raised FileNotFoundError before writing
+# a byte. `build-schema-workbook.py` carried the same line and silently globbed nothing
+# instead — the loud failure was the better of the two.
+ROOT = Path(__file__).resolve().parents[1]
+# Beside the schema workbook, which is where somebody looks for it — the previous target was
+# a sandbox upload directory that does not exist outside the session that wrote it.
+OUT = ROOT / "handoff" / "TICVAI_Services_and_Data_Segregation.xlsx"
 
 HEAD = PatternFill("solid", fgColor="0B1324")
 BAND = PatternFill("solid", fgColor="F2F5F9")
@@ -63,7 +78,7 @@ SCHEMA_WHY = {
     "pii": ("Names, phones, emails, documents. **Separate from `identity` deliberately** (ADR-0023): "
             "a principal is who may act, a subject is who they are. **One writer only** — which is "
             "what makes a subject-access export and a deletion request answerable at all."),
-    "platform": ("Tenants, venues, workstations, devices, scope nodes. **`platform.scope_node` is "
+    "platform": ("Tenants, venues, workstations, devices, scope nodes. **`platform.org_unit` is "
                  "reached by 289 of 379 tables** — the tenancy spine, and the terminal anchor for "
                  "almost everything in the package."),
     "catalogue": ("Products, variants, prices, performances, inventory leases. **What is for sale.** "
@@ -105,7 +120,7 @@ SCHEMA_WHY = {
                   "and writes only its own definitions** — the schema that must never touch the "
                   "transactional primary."),
     "workforce": ("Rotas, attendance, announcements, incidents. Small, venue-scoped, and folded "
-                  "into TenancyService because it reads `scope_node` constantly."),
+                  "into TenancyService because it reads `org_unit` constantly."),
     "approvals": ("Approval requests and decisions. **One mechanism, not one per thing approved** — "
                   "a write-off, a scenario and a price change are all requests with a subject."),
     "queue": ("Queues, entries, wait readings. Adaptor-first (ADR-0012) — the schema holds what a "
@@ -222,7 +237,7 @@ def main() -> int:
          [34, 20, 30, 6, 84], row=4)
 
     WHY = {
-        "ledger.entry": "**A till closing is a ledger act.** Settling a shift posts to the ledger, and a "
+        "ledger.posting": "**A till closing is a ledger act.** Settling a shift posts to the ledger, and a "
                         "payment writes its own entry — appending, never redefining.",
         "ledger.journal_entry": "As above. The journal is written by whatever caused the money to move.",
         "access.entitlement": "**A sale issues a ticket.** `orders` appends the entitlement, `catalogue` "
@@ -232,7 +247,7 @@ def main() -> int:
         "orders.sales_order": "`identity` links a guest checkout to an existing order. One field, on claim.",
         "pii.subject": "**`identity` is the only real writer.** `marketing-crm` updates a profile field "
                        "the subject owns — and consent never merges permissively (CF-160).",
-        "identity.grant": "A share and a developer membership are both delegated authority (CF-132) — "
+        "identity.delegated_access": "A share and a developer membership are both delegated authority (CF-132) — "
                           "one mechanism, three callers.",
         "inventory.movement": "**Every stock change is a movement.** Waste from F&B and adjustment from "
                               "inventory are the same act with a different reason.",
@@ -262,7 +277,7 @@ def main() -> int:
     seq = [
         (1, "foundation", "IdentityService, TenancyService",
          "**First and alone.** Twelve contracts read identity and 289 tables anchor on "
-         "`platform.scope_node` — a restart here is an outage everywhere."),
+         "`platform.org_unit` — a restart here is an outage everywhere."),
         (2, "commerce", "CatalogueService, LedgerService, AccessService, OrderService",
          "**Catalogue before Order**, because a till pulls a bundle before it sells. **Access last "
          "of the four** — it runs at the edge with a local cache and can lag the others safely."),
@@ -271,9 +286,9 @@ def main() -> int:
          "whole point of `requiresModule`."),
         (4, "engagement", "MarketingService, AiService",
          "**Nothing that takes money depends on these.** They can ship late and be down."),
-        (5, "platform", "ControlService, WhiteLabelService, ReportingService, CrossCellService",
+        (5, "platform", "PlatformService, WhiteLabelService, ReportingService, CrossRegionService",
          "**Control is needed to provision a tenant and not to serve one.** Reporting reads the "
-         "replica. CrossCell only matters once a second region exists."),
+         "replica. CrossRegion only matters once a second region exists."),
     ]
     for i, row in enumerate(seq, 4):
         for j, val in enumerate(row, 1):
@@ -281,7 +296,7 @@ def main() -> int:
         ws4.cell(i, 2).fill = TIER[row[1]]
 
     ws4.cell(11, 1, "Can be down without stopping a sale").font = Font(name="Arial", size=11, bold=True)
-    ws4.cell(12, 1, "MarketingService · AiService · ReportingService · CrossCellService").font = \
+    ws4.cell(12, 1, "MarketingService · AiService · ReportingService · CrossRegionService").font = \
         Font(name="Arial", size=10)
     ws4.cell(13, 1, "A deliberate property, and one that should be tested rather than assumed.").font = \
         Font(name="Arial", size=9, italic=True, color="5A6577")
@@ -290,7 +305,7 @@ def main() -> int:
     ws5 = wb.create_sheet("Scope hierarchy")
     ws5["A1"] = "Eight levels, and why each one exists"
     ws5["A1"].font = Font(name="Arial", size=13, bold=True, color="0B1324")
-    ws5["A2"] = ("platform.scope_node is reached by 289 of 379 tables — the tenancy spine. "
+    ws5["A2"] = ("platform.org_unit is reached by 289 of 379 tables — the tenancy spine. "
                  "Configuration resolves by walking the path upward until something answers.")
     ws5["A2"].font = Font(name="Arial", size=10, italic=True, color="5A6577")
     head(ws5, ["Level", "Branch", "Ops", "Configs", "What it owns", "Why it exists at this height"],

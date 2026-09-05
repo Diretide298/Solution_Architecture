@@ -1,14 +1,14 @@
 # DSAR request — state model
-# Contract: cross-cell.DsarRequest.status
+# Contract: cross-region.DsarRequest.status
 # Checked by tools/check-states.py.
 
 entity: DSAR request
-contract: cross-cell
+contract: cross-region
 enum: DsarRequest.status
 enumKind: inline
 enumSchema: DsarRequest
 enumProperty: status
-owner: cross-cell
+owner: cross-region
 initial:
 - pending
 terminal:

@@ -1,0 +1,51 @@
+id: LLD-SubBill
+title: SubBill — 2 transitions
+generatedBy: tools/derive-diagrams.py
+index: diagrams/hld/04-lifecycles.yaml
+source: states/sub-bill.yaml
+entity: SubBill
+contract: fnb
+enum: SubBill.status
+enumKind: inline
+enumSchema: SubBill
+enumProperty: status
+owner: FnbService
+description: 'A split portion of a table''s bill, between a server splitting it and somebody paying
+  it.
+
+
+  **Built for F29** — a table seated, coursed and split. A party of six paying separately is the ordinary
+  case and the bill has to hold six answers at once.'
+initial:
+- open
+terminal:
+- paid
+- voided
+states:
+- name: open
+  description: Created and unpaid. **Several can be open on one table at once**, which is the whole
+    reason this exists rather than a single bill with a paid flag.
+- name: paid
+  description: Settled. **The table is not closed until every sub-bill is** — a table with five of six
+    paid is a table nobody may seat.
+- name: voided
+  description: Cancelled before payment. **Its lines return to the parent bill** rather than vanishing,
+    because a server who split wrongly needs the food back on the table, not gone.
+transitions:
+- from: open
+  to: paid
+  trigger: pay
+  operation: createPayment
+  guard: '**A payment covering the full sub-bill amount.** Partial payment against a split is a second
+    split, not a part-paid one — allowing it makes the table total unreconcilable.'
+- from: open
+  to: voided
+  trigger: void
+  operation: splitBill
+  guard: '**Lines move back to the parent.** The guard is that the parent bill is still open: voiding
+    a split against a closed table is money already taken.'
+openQuestions: '**Can a paid sub-bill be voided?** A guest who paid and then disputes needs a refund
+  path, and refunding a split is not the same as voiding it. No transition exists and probably one should
+  — `createRefund` against the sub-bill rather than a state change.'
+notes: '**A sub-bill is not a small order.** It has no lines of its own — it references the parent''s
+  — which is why voiding returns them rather than deleting them.'

@@ -46,9 +46,9 @@ absent policy.** Default partitions inherit their parent's policy and need none 
 nothing checked.
 
     venue_level platform.scope_level GENERATED ALWAYS AS ('venue') STORED,
-    FOREIGN KEY (venue_id, venue_level) REFERENCES platform.scope_node (id, level)
+    FOREIGN KEY (venue_id, venue_level) REFERENCES platform.org_unit (id, level)
 
-`scope_node` carries `UNIQUE (id, level)` — redundant against its own primary key, and there
+`org_unit` carries `UNIQUE (id, level)` — redundant against its own primary key, and there
 solely so this composite key is possible. Postgres then refuses a reference to anything that is
 not a venue. No trigger, no application check.
 

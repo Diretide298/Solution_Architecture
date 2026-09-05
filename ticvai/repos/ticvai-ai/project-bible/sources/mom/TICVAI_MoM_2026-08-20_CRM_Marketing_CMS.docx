@@ -1,0 +1,193 @@
+**Minutes of Meeting**
+
+*Workshop — CRM, Marketing Automation, Loyalty **&** CMS / White-Label Configuration*
+
+| **Date** | 20-August-2026 | **Project** | TICVAI |
+| --- | --- | --- | --- |
+| **Meeting Type** | Functional Workshop — CRM, Marketing Automation & CMS | **Prepared by** | Chitrangi Mestry |
+
+***Note: ****This recording is filed under “F**&**B, Retail, Procurement **&** Inventory,” but the session actually covered CRM, marketing automation, loyalty/wallet, RBAC and CMS/white-label configuration — no F**&**B, retail, procurement or inventory content was discussed. This MoM reflects the content actually covered; the F**&**B/Retail/Procurement/Inventory workshop remains outstanding (see Open Items).*
+
+**Primary Objective**
+
+Solution/Product team to continue the functional walkthrough of the TICVAI reference platform — covering CRM and customer profile management, identity resolution and duplicate handling, consent and data privacy, audience segmentation, loyalty/membership/wallet mechanics, marketing automation, role-based access control, AI chat/case management, and CMS/white-label website and mobile app configuration — for review, validation and alignment on functional scope and simplification opportunities.
+
+**Participants**
+
+- TICVAI Team
+
+- Softlabs Team
+
+**Agenda**
+
+- Walkthrough of CRM — customer profiles, unique/mandatory fields, family & guardian linking
+
+- Duplicate profile detection, identity resolution and merge rules
+
+- Consent policy, data privacy and retention/archival
+
+- Audience segmentation, behavioural analytics and data migration
+
+- Loyalty, membership tiers and wallet functionality
+
+- Marketing automation — campaigns, offers and the Visual Journey Builder
+
+- Role-based access control (RBAC) for CRM and configuration modules
+
+- AI chat box, routing/queue management and case management
+
+- Surveys and gamification
+
+- CMS and white-label website / mobile app configuration, with reference-site walkthroughs
+
+**4. Detailed Discussion**
+
+**4.1 CRM — Customer Profiles, Unique Fields ****&**** Family/Guardian Linking**
+
+- Allam walked through the reference CRM's guest dashboard (active/inactive/duplicate profile counts, lifetime value), guest directory/search, and customer segmentation by source (individual, corporate, group, travel agent, OTA).
+
+- Profile fields must be fully configurable/user-defined (e.g., nationality vs. country of residence), with per-field unique and required flags; group profiles (group name, description, contact person) mirror individual fields but are independently configurable.
+
+- **Decision: **at least one of e-mail address or mobile number will be enforced as mandatory (not both), since some customers decline to share e-mail; the system supports conditional “either/or” mandatory-field rules.
+
+- Family/guardian linking confirmed as a core requirement (e.g., father, spouse, daughter linked as one family unit), consistent with family-ticket and family-membership configurations; Chinmay confirmed the same linking model should extend to operations-team entitlement relationships.
+
+- Wallet balances are shared across a linked family — a parent's top-up can be drawn down by a linked child's wristband without a separate top-up.
+
+- Corporate/B2B profiles support a self-service onboarding flow: company profile creation (name, address, trade licence, VAT certificate), admin approval/rejection, rate/product setup, and credential issuance.
+
+**4.2 Duplicate Detection, Identity Resolution ****&**** Merge Rules**
+
+- Guest checkout creates a new profile on every purchase unless matched to an existing one. Matching rules (fuzzy name similarity, exact mobile match, exact e-mail match) flag likely duplicates for merge, as demonstrated on the sample “duplicate review and merge” screen (500 profiles, ~100 matched by mobile number).
+
+- Extended discussion (Qossai, Chinmay) covered edge cases: two accounts with different e-mails but matching name/mobile; a customer intentionally maintaining separate accounts (e.g., personal vs. corporate); and which e-mail becomes the login of record after a merge.
+
+- **Decision: **profiles cannot be merged automatically without customer consent. The system will identify likely-duplicate profiles algorithmically and notify the customer (push notification or e-mail); the merge proceeds only on customer confirmation. An admin-side review queue will also track flagged duplicates independent of customer response.
+
+**4.3 Consent, Data Privacy ****&**** Retention**
+
+- Consent policy configuration governs marketing/newsletter/survey communications; customers who do not opt in must not receive promotional communications.
+
+- A data-subject-request module manages privacy inquiries (access, correction, deletion) with status tracking (submitted → in progress → completed).
+
+- **Decision: **data retention/archival periods (e.g., 3–5 years of “live” data before archival) will be configurable per tenant/venue at setup time, with a system default that administrators can override.
+
+**4.4 Audience Segmentation, Behavioural Analytics ****&**** Data Migration**
+
+- A dynamic segment builder supports rule-based segments (e.g., purchase value bands, product-specific purchases, recency of purchase) for sales/marketing reporting.
+
+- Static list import (CSV/Excel) supports migrating historical customer/segment data during onboarding.
+
+- **Action: **hold a dedicated data-migration workshop to define import formats and validation rules.
+
+- Google Analytics will be integrated to capture full on-site behavioural tracking (browsing, cart abandonment, checkout drop-off) natively into the platform's own reporting, feeding behavioural segments (cart-abandon, app session, campaign-open, survey-completed, etc.) directly into marketing automation.
+
+**4.5 Loyalty, Membership ****&**** Wallet**
+
+- Loyalty rules support point accrual by product/spend tier (e.g., bronze/silver/gold thresholds with corresponding point values) and tier-based benefit unlocks (e.g., platinum-tier discounts on F&B and ticketing).
+
+- Loyalty and wallet are both modelled as customer-linked entities, consistent with the family-wallet-sharing behaviour in 4.1.
+
+- **Action: **hold a dedicated follow-up session to define the full loyalty programme configuration (tiers, point rules, redemption, expiry) — today's material was high-level only.
+
+**4.6 Marketing Automation — Campaigns, Offers ****&**** Visual Journey Builder**
+
+- Campaign tracking covers click-through, conversion and revenue attribution per campaign, with configurable success criteria (e.g., 80% conversion target).
+
+- The Visual Journey Builder triggers automated, rule-based touchpoints (e.g., abandoned-cart recovery) based on configurable wait periods (same-day, one week, one month), audience segment, and optional incentive (e.g., coupon code).
+
+- Chinmay raised implementation questions on how journey “offer” blocks would be parameterised in the builder UI; Allam clarified offers/discounts are pre-configured in a separate Offers module (coupon code, dynamic discount, or auto-discount URL) and only referenced — not freely defined — within the journey builder.
+
+- **Decision: **offer blocks in the Visual Journey Builder will pull only from pre-configured, system-validated offers (product/ticket-type scoped); ad-hoc discount values cannot be entered directly in the builder.
+
+- Cart-abandonment triggers support minimum cart-value and product-type filters (e.g., trigger only for membership-ticket abandonment, not general admission). Additional journeys reviewed: birthday rewards, anniversary reminders, cross-sell/upsell, and reservation/survey requests — all gated by customer consent.
+
+**4.7 Role-Based Access Control (RBAC)**
+
+- Chinmay proposed a three-tier permission model per module: edit & view, view-only, and hidden (no access) — e.g., a marketing officer should not see the Finance module at all, while a “CRM Officer” vs. “CRM Admin” distinction determines visibility of configuration screens within an accessible module.
+
+- **Decision: **RBAC will be configured per role, per module, with three access levels (edit/view, view-only, hidden), and further sub-permissions within a module (e.g., a CRM role could access Campaigns and Communications but not Journeys). Default role templates will be provided, customisable by admins.
+
+**4.8 AI Chat Box, Routing/Queue ****&**** Case Management**
+
+- The AI chat box responds to guided/predefined queries (booking status, rescheduling) and logs guest-conversation history across channels (WhatsApp, web, Instagram, Facebook) with per-channel conversion attribution.
+
+- Chinmay confirmed the routing/queue configuration (reservation, general, membership & billing, technical support queues with priority and SLA policy) applies specifically to AI-agent conversation routing based on detected query intent.
+
+- **Decision: **conversation retention for chat/case history will be configurable (e.g., default of one month, extendable), consistent with the broader data-retention approach.
+
+- Case management supports logging from both the customer-facing app/website and the call-centre/admin side, with category, priority, channel, and SLA-based escalation rules.
+
+**4.9 Surveys ****&**** Gamification**
+
+- Surveys can be triggered at multiple points (post-purchase, post-visit, post-ticket-scan, membership renewal, case closure), fully configurable by business rule.
+
+- Gamification includes badges/status tiers (e.g., Explorer, Adventurer, Legend) driven by spend or engagement thresholds, feeding into the loyalty tier structure in 4.5.
+
+**4.10 CMS ****&**** White-Label Website / Mobile App Configuration**
+
+- The CMS supports multi-site/multi-venue management (branding, colour palette incl. custom hex codes, fonts, Google Analytics site IDs, production/staging environments) and a drag-and-drop page builder; page layout is standardised (header, footer, hero/card components) but adapts contextually to product type (seat map for seated products, standard flow for general admission).
+
+- Chinmay requested documentation of reusable page components per venue type (e.g., seat-map component for stadiums/amphitheatres, park-map component for attraction-style venues) so the same layout can be reused across venues with only imagery/data swapped.
+
+- **Action: **finalise the component-count logic for the experiences/dining section on the guest-app landing page (fixed 2–3-card layout vs. a scalable N-count layout) and confirm with Allam's team.
+
+- Allam distinguished the main venue website (fully managed by the venue/client) from the white-labelled B2C purchase flow that TICVAI powers once a guest clicks “Book Now” — the white-label flow retains the venue's header/footer branding but product-selection, cart and checkout screens are TICVAI-managed; header/footer links to non-checkout pages redirect back to the main venue site.
+
+- Two reference sites were walked through end-to-end to illustrate target checkout simplicity: a Six Flags–style attraction site (product selection → quantity/name capture → cart summary → login/guest checkout with dual OTP validation) and Platinum List (event → date → interactive seat map with colour-coded pricing → seat selection → one-page checkout via Quick Order/Apple/Google, completing in as few as four clicks, with an optional post-purchase profile-completion prompt).
+
+- **Decision: **the TICVAI B2C checkout journey should target a minimal, low-friction flow (in the range of 3–4 steps) modelled on the PlatinumList example, deferring full profile capture to an optional post-purchase step rather than gating checkout on it.
+
+**5. Key Decisions ****&**** Agreements**
+
+- At least one of e-mail or mobile number is mandatory at profile creation; both cannot be optional simultaneously.
+
+- Profile merges require customer confirmation; algorithmic matches are notified to the customer, with an admin review queue in parallel.
+
+- Data and conversation retention periods will be configurable per tenant/venue, with system defaults.
+
+- Visual Journey Builder offer blocks reference pre-configured, system-validated offers only — no freeform discount entry.
+
+- RBAC follows a three-tier model (edit/view, view-only, hidden) configured per role and per module, with default role templates.
+
+- The B2C checkout journey targets a minimal 3–4 step flow, modelled on the Platinum List reference, with profile completion deferred to post-purchase.
+
+**6. Open Items / Questions for Follow-Up**
+
+- Full loyalty programme configuration (tiers, points, redemption, expiry) — pending dedicated workshop.
+
+- Data migration formats and validation rules for customer/segment import — pending dedicated workshop.
+
+- RBAC / role-permission matrix documentation, including default role templates — pending from Chinmay.
+
+- Reusable CMS page-component documentation per venue type (seat map, park map, etc.) — pending from Allam.
+
+- Experiences/dining component-count logic (fixed vs. scalable) for the guest-app landing page — pending confirmation.
+
+- F&B, Retail, Procurement & Inventory workshop — not covered in this session; remains outstanding.
+
+**7. Action Items**
+
+| **Action Item** | **Owner** | **Due** | **Status** |
+| --- | --- | --- | --- |
+| Share the CRM/marketing reference document (with slide-by-slide descriptions) and the sales & marketing sheet by e-mail | Allam | EOD 20-Aug | Open |
+| Review the shared CRM/marketing reference document and flag areas for simplification | Chinmay/Softlabs | Next session | Open |
+| Schedule a dedicated workshop to define the full loyalty programme configuration | Allam/Chinmay | TBC | Open |
+| Schedule a dedicated data-migration workshop covering customer/segment import formats | Allam/Chinmay | TBC | Open |
+| Document the RBAC / role-permission matrix (edit / view-only / hidden) per module, including default role templates | Chinmay Parab | TBC | In Progress |
+| Provide documentation of reusable CMS page components per venue type (seat map, park map, etc.) | Allam | TBC | Open |
+| Finalise the experiences/dining component-count logic for the guest-app landing page | Aishwarya More | TBC | Open |
+| Incorporate PlatinumList / Qiddiya reference-site checkout patterns into the guest-app design | Aishwarya More | In progress | In Progress |
+| Schedule and hold the outstanding F&B, Retail, Procurement & Inventory workshop | Chinmay/Allam | TBC | Open |
+
+**8. Next Steps**
+
+- Seat management walkthrough session — 21-August-2026, 10:00–11:00 AM Dubai time (slides already prepared by Allam's team).
+
+- Continue daily 1–2 hour sessions to cover remaining topics, consistent with the broader workshop cadence.
+
+- Follow up on loyalty configuration, data migration, and RBAC documentation as separate dedicated sessions.
+
+*--- End of Minutes ---*
+
+	Page 1 of 2

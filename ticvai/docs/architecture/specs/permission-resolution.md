@@ -352,7 +352,7 @@ inverted, and recorded as such. Checked against the table:
 | R5 workstation not a source | Yes | No workstation input exists |
 | R6 selected role only | Yes | Caller supplies the role's grants |
 | R7 resolve once at login | Yes | Pure function; caching is the caller's job |
-| R8 cross-cell unresolvable | By construction | Another cell is another database |
+| R8 cross-region unresolvable | By construction | Another cell is another database |
 | **R9 inactive scope node** | **No** | No `is_active` input. **Gap** |
 | **R10 expired grant** | **No** | No `valid_to` input. **Gap** |
 

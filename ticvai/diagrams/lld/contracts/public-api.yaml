@@ -125,7 +125,6 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - public
   - partner
   offline: false
   reads:
@@ -137,7 +136,6 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - public
   - staff
   - partner
   offline: false
@@ -186,7 +184,7 @@ operations:
   scope: tenant
   permission: DEVELOPER_VIEW
   audience:
-  - public
+  - staff
   offline: false
   reads:
   - cache:idempotency

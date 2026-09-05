@@ -1,14 +1,14 @@
 # Cross-cell wallet authorisation — state model
-# Contract: cross-cell.WalletAuthorisation.status
+# Contract: cross-region.WalletAuthorisation.status
 # Checked by tools/check-states.py.
 
 entity: Cross-cell wallet authorisation
-contract: cross-cell
+contract: cross-region
 enum: WalletAuthorisation.status
 enumKind: inline
 enumSchema: WalletAuthorisation
 enumProperty: status
-owner: cross-cell
+owner: cross-region
 initial:
 - held
 terminal:

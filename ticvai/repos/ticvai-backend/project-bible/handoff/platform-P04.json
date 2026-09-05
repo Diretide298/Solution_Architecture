@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-08-24",
+ "generated": "2026-09-04",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 24,
@@ -15,7 +15,7 @@
   "contracts": 18,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 185
+  "operationsWithNoScreen": 170
  },
  "waves": {
   "wave1": 21,
@@ -99,7 +99,7 @@
    "operations": 3
   },
   {
-   "contract": "workforce",
+   "contract": "games",
    "operations": 2
   },
   {
@@ -111,7 +111,7 @@
    "operations": 2
   },
   {
-   "contract": "games",
+   "contract": "workforce",
    "operations": 2
   },
   {
@@ -348,22 +348,10 @@
  "gaps": {
   "operationsWithNoScreen": [
    {
-    "operation": "enrolFacePass",
-    "contract": "access",
+    "operation": "issueAccreditationBadge",
+    "contract": "approvals",
     "verb": "POST",
-    "summary": "Register a facial profile against an entitlement"
-   },
-   {
-    "operation": "getFacePassEnrolment",
-    "contract": "access",
-    "verb": "GET",
-    "summary": "Whether a pass has a face registered, and when"
-   },
-   {
-    "operation": "revokeFacePass",
-    "contract": "access",
-    "verb": "DELETE",
-    "summary": "Remove a facial profile"
+    "summary": "Issue a badge"
    },
    {
     "operation": "assessProductChange",
@@ -402,34 +390,10 @@
     "summary": "Pause a membership at the guest's request"
    },
    {
-    "operation": "joinWaitlist",
-    "contract": "catalogue",
-    "verb": "POST",
-    "summary": "Ask to be told if capacity frees up"
-   },
-   {
-    "operation": "leaveWaitlist",
-    "contract": "catalogue",
-    "verb": "DELETE",
-    "summary": "Stop waiting"
-   },
-   {
     "operation": "listDonationCampaigns",
     "contract": "catalogue",
     "verb": "GET",
     "summary": "Campaigns a guest can give to"
-   },
-   {
-    "operation": "listGuestMemberships",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "A guest's memberships, benefits and history"
-   },
-   {
-    "operation": "listProductVersions",
-    "contract": "catalogue",
-    "verb": "GET",
-    "summary": "What this product used to be"
    },
    {
     "operation": "listWaitlistEntries",
@@ -492,6 +456,12 @@
     "summary": "Every money source against the ledger, in one view"
    },
    {
+    "operation": "ingestFxRates",
+    "contract": "finance",
+    "verb": "POST",
+    "summary": "Pull rates from the configured provider"
+   },
+   {
     "operation": "listInterEntityObligations",
     "contract": "finance",
     "verb": "GET",
@@ -528,6 +498,12 @@
     "summary": "Revalue monetary balances at close"
    },
    {
+    "operation": "setFxProvider",
+    "contract": "finance",
+    "verb": "PUT",
+    "summary": "Which provider serves which purpose"
+   },
+   {
     "operation": "validateRecognitionSchedules",
     "contract": "finance",
     "verb": "POST",
@@ -544,6 +520,12 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Mark a table cleared and free"
+   },
+   {
+    "operation": "closeCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Close a signed finding"
    },
    {
     "operation": "createCombo",
@@ -564,6 +546,12 @@
     "summary": "A table as a thing, not an inference"
    },
    {
+    "operation": "escalateCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Escalate a finding"
+   },
+   {
     "operation": "getTableVisit",
     "contract": "fnb",
     "verb": "GET",
@@ -574,6 +562,12 @@
     "contract": "fnb",
     "verb": "POST",
     "summary": "Move work between stations mid-service"
+   },
+   {
+    "operation": "recordCorrectiveAction",
+    "contract": "fnb",
+    "verb": "POST",
+    "summary": "Record what was done about a finding"
    },
    {
     "operation": "requestBill",
@@ -624,12 +618,6 @@
     "summary": "Change what a table is"
    },
    {
-    "operation": "updateTableReservation",
-    "contract": "fnb",
-    "verb": "PATCH",
-    "summary": "Change or cancel a booking"
-   },
-   {
     "operation": "adjustGameCard",
     "contract": "games",
     "verb": "POST",
@@ -670,24 +658,6 @@
     "contract": "games",
     "verb": "POST",
     "summary": "Move balances to another card"
-   },
-   {
-    "operation": "createMfaChallenge",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Step-up authentication for a sensitive action"
-   },
-   {
-    "operation": "deleteGuestAccount",
-    "contract": "identity",
-    "verb": "DELETE",
-    "summary": "Self-service account deletion"
-   },
-   {
-    "operation": "exportSubjectData",
-    "contract": "identity",
-    "verb": "POST",
-    "summary": "Everything the platform holds about one guest"
    },
    {
     "operation": "setPasswordPolicy",
@@ -750,12 +720,6 @@
     "summary": "Create a loyalty programme"
    },
    {
-    "operation": "createReferral",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Issue a referral code"
-   },
-   {
     "operation": "createUrlRedirect",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -774,22 +738,10 @@
     "summary": "Candidate matches, scored"
    },
    {
-    "operation": "getMyChallenges",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Active challenges and how far along I am"
-   },
-   {
     "operation": "getSuppressionList",
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "Addresses suppressed from all sending"
-   },
-   {
-    "operation": "getWaiverStatus",
-    "contract": "marketing-crm",
-    "verb": "GET",
-    "summary": "Whether this guest may be issued a ticket that requires a waiver"
    },
    {
     "operation": "listMessageTriggers",
@@ -852,22 +804,10 @@
     "summary": "Why the conversation ended, and any callback"
    },
    {
-    "operation": "setConsentPurposes",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Configure consent purposes"
-   },
-   {
     "operation": "setMessageTrigger",
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Fire a message from a platform event"
-   },
-   {
-    "operation": "setSeoMetadata",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "Titles, descriptions, canonicals and hreflang"
    },
    {
     "operation": "startKioskAssist",
@@ -880,18 +820,6 @@
     "contract": "marketing-crm",
     "verb": "POST",
     "summary": "Sign a waiver, answer a survey, capture details"
-   },
-   {
-    "operation": "updateGuestPreferences",
-    "contract": "marketing-crm",
-    "verb": "PUT",
-    "summary": "The things a regular should not have to say twice"
-   },
-   {
-    "operation": "uploadGuestDocument",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Store a guest photo, ID or signed document"
    },
    {
     "operation": "captureStoredValue",
@@ -924,12 +852,6 @@
     "summary": "Send a guest a link to pay later"
    },
    {
-    "operation": "createResaleListing",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "List an entitlement for resale"
-   },
-   {
     "operation": "createReservation",
     "contract": "orders",
     "verb": "POST",
@@ -940,12 +862,6 @@
     "contract": "orders",
     "verb": "POST",
     "summary": "Extend a reservation"
-   },
-   {
-    "operation": "getGroupBooking",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": ""
    },
    {
     "operation": "issueInvitation",
@@ -982,12 +898,6 @@
     "contract": "orders",
     "verb": "GET",
     "summary": "Gateways configured for this scope"
-   },
-   {
-    "operation": "listPaymentTokens",
-    "contract": "orders",
-    "verb": "GET",
-    "summary": "A guest's saved payment methods"
    },
    {
     "operation": "openGuestCreditAccount",
@@ -1044,22 +954,10 @@
     "summary": "Configure a gateway and its routing"
    },
    {
-    "operation": "shareEntitlement",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Let somebody else use this, without giving it away"
-   },
-   {
     "operation": "splitOrder",
     "contract": "orders",
     "verb": "POST",
     "summary": "Break one order into independent orders"
-   },
-   {
-    "operation": "storePaymentToken",
-    "contract": "orders",
-    "verb": "POST",
-    "summary": "Save a payment method for future use"
    },
    {
     "operation": "voidPayment",
@@ -1102,12 +1000,6 @@
     "contract": "promotions",
     "verb": "GET",
     "summary": "List bundles"
-   },
-   {
-    "operation": "listUpsellRules",
-    "contract": "promotions",
-    "verb": "GET",
-    "summary": "List upsell and cross-sell rules"
    },
    {
     "operation": "listVoucherBatches",
@@ -1308,12 +1200,6 @@
     "summary": "Add value to a wallet"
    },
    {
-    "operation": "transferWalletBalance",
-    "contract": "retail",
-    "verb": "POST",
-    "summary": "Send balance to another guest"
-   },
-   {
     "operation": "assignSeats",
     "contract": "seating",
     "verb": "POST",
@@ -1330,6 +1216,12 @@
     "contract": "seating",
     "verb": "POST",
     "summary": "Apply a parsed import"
+   },
+   {
+    "operation": "copySeatMapSection",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Copy one section into another map"
    },
    {
     "operation": "createSeatCategory",
@@ -1350,6 +1242,12 @@
     "summary": "Save a map as a reusable template"
    },
    {
+    "operation": "diffSeatMapVersions",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "Compare two versions of a layout"
+   },
+   {
     "operation": "getImportJob",
     "contract": "seating",
     "verb": "GET",
@@ -1360,6 +1258,12 @@
     "contract": "seating",
     "verb": "GET",
     "summary": "Read a seat map with its structure"
+   },
+   {
+    "operation": "getSeatMapImport",
+    "contract": "seating",
+    "verb": "GET",
+    "summary": "How the import went"
    },
    {
     "operation": "getSeatingRules",
@@ -1378,6 +1282,12 @@
     "contract": "seating",
     "verb": "POST",
     "summary": "Import the logical seat structure"
+   },
+   {
+    "operation": "importSeatMap",
+    "contract": "seating",
+    "verb": "POST",
+    "summary": "Import a seat map from a plan or a manifest"
    },
    {
     "operation": "listSeatCategories",

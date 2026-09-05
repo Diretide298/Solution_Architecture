@@ -238,7 +238,7 @@
     "settled"
    ],
    "contracts": [
-    "cross-cell",
+    "cross-region",
     "identity",
     "marketing-crm"
    ]

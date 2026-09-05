@@ -1,0 +1,92 @@
+entity: PaymentLink
+contract: orders
+enum: PaymentLink.status
+enumKind: inline
+enumSchema: PaymentLink
+enumProperty: status
+owner: OrderService
+description: 'A link that lets somebody pay for an order they are not standing in front of — a phone
+  booking, a corporate invoice, a guest who left their card at home.
+
+
+  **The link is a bearer instrument.** Whoever holds it can pay, which is why it expires and why superseding
+  one has to invalidate it rather than leave two live.'
+initial:
+- issued
+terminal:
+- paid
+- expired
+- cancelled
+- superseded
+states:
+- name: issued
+  description: Sent and unopened. **The clock starts here, not on first view** — a link nobody opened
+    is still a link that exists.
+- name: viewed
+  description: 'Somebody opened it. **Worth a state of its own**: a link viewed and unpaid is a different
+    follow-up from one never opened, and the two look identical without it.'
+- name: paid
+  description: Settled. **The order proceeds exactly as a counter sale would** — there is one tender
+    flow, not one per channel.
+- name: expired
+  description: The window closed. **Not cancelled** — nobody decided this, time did, and a guest reading
+    *expired* understands it differently from *cancelled*.
+- name: cancelled
+  description: Withdrawn by the venue. **A reason is recorded**, because the guest holding it will ask.
+- name: superseded
+  description: A new link was issued for the same order. **The old one stops working immediately** —
+    two live links against one order is one order paid twice.
+transitions:
+- from: issued
+  to: viewed
+  trigger: view
+  operation: getPaymentLink
+  guard: '**No operation a person calls.** Opening the link is the trigger; recording it is a side effect.'
+- from: issued
+  to: paid
+  trigger: pay
+  operation: createPayment
+  guard: '**Paid without ever being marked viewed** is legitimate — a link opened and paid in one action
+    may never record the intermediate state, and forcing it would invent an event.'
+- from: viewed
+  to: paid
+  trigger: pay
+  operation: createPayment
+  guard: The ordinary path.
+- from: issued
+  to: expired
+  trigger: expire
+  operation: getPaymentLink
+  guard: '**Time, not a person.** The expiry window is venue configuration.'
+- from: viewed
+  to: expired
+  trigger: expire
+  operation: getPaymentLink
+  guard: As above. **A viewed link expires on the same clock** — looking at it does not extend it.
+- from: issued
+  to: cancelled
+  trigger: cancel
+  operation: resendPaymentLink
+  guard: Withdrawn before payment.
+- from: viewed
+  to: cancelled
+  trigger: cancel
+  operation: resendPaymentLink
+  guard: As above.
+- from: issued
+  to: superseded
+  trigger: supersede
+  operation: resendPaymentLink
+  guard: '**Resending issues a new link and supersedes this one in the same act.** Leaving the first
+    live is the defect this transition exists to prevent.'
+- from: viewed
+  to: superseded
+  trigger: supersede
+  operation: resendPaymentLink
+  guard: As above.
+openQuestions: '**Can a paid link be refunded through the link, or only through the order?** The guest
+  holding it has no account and no order reference — refunding to the card is possible and showing them
+  anything about it is not. Undecided.'
+notes: '**Four terminal states and they are not interchangeable.** Expired is time, cancelled is the
+  venue, superseded is a replacement, paid is done — and a venue chasing unpaid bookings needs to tell
+  the first three apart.'

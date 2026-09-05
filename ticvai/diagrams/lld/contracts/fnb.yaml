@@ -1182,6 +1182,7 @@ operations:
   writes:
   - cache:idempotency
   - fnb.kitchen_ticket
+  - platform.outbox
 - operation: setMenuSections
   verb: PUT
   path: /menus/{menuId}/sections

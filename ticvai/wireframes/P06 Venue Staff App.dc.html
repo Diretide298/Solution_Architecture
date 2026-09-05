@@ -925,7 +925,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; listRotaAssignments · requestShiftSwap</div>
+          <div><b>OPERATIONS</b> &middot; listRotaAssignments · requestShiftSwap · getCurrentShift</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; assignmentId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; EMP-001 · EMP-002 · EMP-003</div>
@@ -953,7 +953,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; requestShiftSwap · listRotaAssignments</div>
+          <div><b>OPERATIONS</b> &middot; requestShiftSwap · listRotaAssignments · listShiftSwapRequests</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline · emptyNoResults</span></div>
           <div><b>ARRIVES WITH</b> &middot; assignmentId&larr;deepLink</div>
           <div><b>GOES TO</b> &middot; EMP-001 · EMP-002 · EMP-003</div>
@@ -1233,7 +1233,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           </div>
         </div>
         <div class="foot">
-          <div><b>OPERATIONS</b> &middot; semanticSearch</div>
+          <div><b>OPERATIONS</b> &middot; semanticSearch · listTrainingRecords</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoAccess · error · offline</span></div>
           
           <div><b>GOES TO</b> &middot; EMP-001 · EMP-002 · EMP-003</div>
@@ -1432,7 +1432,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getTableMap · listTableReservations · listFnbOrders</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-052" class="scr">
@@ -1460,7 +1460,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getTableMap · setTableLayout</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-053" class="scr">
@@ -1488,7 +1488,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; setTableLayout</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-054" class="scr">
@@ -1516,7 +1516,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listTableReservations</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-055" class="scr">
@@ -1544,7 +1544,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createTableReservation</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-056" class="scr">
@@ -1572,7 +1572,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; joinRestaurantWaitlist</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-057" class="scr">
@@ -1600,7 +1600,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getGuestProfile · listOrders</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, subjectId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-058" class="scr">
@@ -1684,7 +1684,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listTableReservations · getTableMap</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div></div><div class="grp">03 — Stock on the Floor · 10 screens</div><div class="stack">
       <div id="emp-061" class="scr">
@@ -1712,7 +1712,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getStockPositions · listStockMovements</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-062" class="scr">
@@ -1768,7 +1768,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createRequisition · listRequisitions</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-064" class="scr">
@@ -1796,7 +1796,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createStockTransfer · listStockLocations</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-065" class="scr">
@@ -1824,7 +1824,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; createGoodsReceipt · rejectReceivedGoods · logColdChain · getStockTransfer</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, receiptId&larr;EMP-003, transferId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-066" class="scr">
@@ -1852,7 +1852,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; startStockCount · postStockCount · getCountVariance · enterCountLine +2</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, countId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-067" class="scr">
@@ -1880,7 +1880,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; recordWaste · createStockMovement · logTemperature · signCorrectiveAction</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003, actionId&larr;deepLink</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-068" class="scr">
@@ -1908,7 +1908,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; getStockPositions · reserveMerchandise</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, outletId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-069" class="scr">
@@ -1936,7 +1936,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listSerialisedItems · lookupMerchandise</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div>
       <div id="emp-070" class="scr">
@@ -1964,7 +1964,7 @@ display:flex;justify-content:space-between;font-size:10.5px;color:var(--dim)}
           <div><b>OPERATIONS</b> &middot; listAlerts · acknowledgeAlert · createRequisition</div>
           <div><b>STATES</b> &middot; <span class="warn">loading · emptyFirstRun · emptyNoResults · emptyNoAccess · error · offline</span></div>
           <div><b>ARRIVES WITH</b> &middot; venueId&larr;session, alertId&larr;EMP-003</div>
-          <div><b>GOES TO</b> &middot; nothing declared</div>
+          <div><b>GOES TO</b> &middot; EMP-003</div>
         </div>
       </div></div>
   <div class="bottom">

@@ -17,7 +17,7 @@
    "verb": "POST",
    "summary": "Open a conversation",
    "permission": "AI_USE",
-   "guestCallable": false,
+   "guestCallable": true,
    "scopeLevel": "venue"
   },
   "createKnowledgeCollection": {
@@ -81,7 +81,7 @@
    "verb": "GET",
    "summary": "A principal's conversation history",
    "permission": "AI_USE",
-   "guestCallable": false,
+   "guestCallable": true,
    "scopeLevel": "venue"
   },
   "listAiInteractions": {
@@ -516,22 +516,21 @@
    "cache:answer",
    "cache:embedding",
    "cache:idempotency",
-   "catalogue.attribute_axis",
+   "catalogue.channel_capacity",
    "catalogue.entitlement_template",
-   "catalogue.envelope",
    "catalogue.event",
    "catalogue.performance",
    "catalogue.price",
    "catalogue.price_list",
    "catalogue.product",
+   "catalogue.variant_dimension",
    "control.content_block",
    "fnb.menu_item",
    "maintenance.inspection_template",
    "marketing.case",
-   "marketing.conversation_message",
    "marketing.loyalty_programme",
+   "platform.org_unit",
    "platform.region_settings",
-   "platform.scope_node",
    "promotions.promotion",
    "qdrant:knowledge",
    "reporting.report_definition",
@@ -582,22 +581,21 @@
     "ai.proposed_action",
     "ai.provider",
     "assets.media_asset",
-    "catalogue.attribute_axis",
+    "catalogue.channel_capacity",
     "catalogue.entitlement_template",
-    "catalogue.envelope",
     "catalogue.event",
     "catalogue.performance",
     "catalogue.price",
     "catalogue.price_list",
     "catalogue.product",
+    "catalogue.variant_dimension",
     "control.content_block",
     "fnb.menu_item",
     "maintenance.inspection_template",
     "marketing.case",
-    "marketing.conversation_message",
     "marketing.loyalty_programme",
+    "platform.org_unit",
     "platform.region_settings",
-    "platform.scope_node",
     "promotions.promotion",
     "reporting.report_definition",
     "retail.merchandise",
@@ -630,15 +628,21 @@
     "qdrant:knowledge"
    ]
   },
-  "inboundKeys": [
-   {
-    "from": "marketing.conversation_message",
-    "column": "ai_interaction_id",
-    "to": "ai.interaction"
-   }
-  ]
+  "inboundKeys": []
  },
  "screens": [
+  {
+   "id": "WEB-044",
+   "name": "AI Concierge \u2013 Home",
+   "platform": "P01",
+   "platformName": "Guest Web",
+   "wave": 2,
+   "operations": [
+    "createAiConversation",
+    "requestSuggestion",
+    "sendAiMessage"
+   ]
+  },
   {
    "id": "GST-031",
    "name": "AI Concierge \u2013 Home",
@@ -646,6 +650,8 @@
    "platformName": "Guest App",
    "wave": 2,
    "operations": [
+    "createAiConversation",
+    "requestSuggestion",
     "sendAiMessage"
    ]
   },
@@ -698,6 +704,16 @@
    "wave": 3,
    "operations": [
     "requestSuggestion"
+   ]
+  },
+  {
+   "id": "GST-068",
+   "name": "Help & My Cases",
+   "platform": "P02",
+   "platformName": "Guest App",
+   "wave": 2,
+   "operations": [
+    "listAiConversations"
    ]
   },
   {
@@ -1082,6 +1098,18 @@
    "mentions": 1
   },
   {
+   "file": "docs/active/deep-audit-24-august.md",
+   "title": "Deep audit \u2014 ten invariants, run adversarially",
+   "status": "",
+   "mentions": 4
+  },
+  {
+   "file": "docs/active/deployment-configs-costed.md",
+   "title": "Deployment architecture \u2014 four configurations, costed on AWS and GCP",
+   "status": "",
+   "mentions": 6
+  },
+  {
    "file": "docs/active/full-layer-audit-20aug.md",
    "title": "Full-layer audit \u2014 20 August",
    "status": "",
@@ -1138,8 +1166,20 @@
   {
    "file": "docs/adr/0028-service-decomposition.md",
    "title": "ADR-0028: Sixteen services, and the data boundary decides where they split",
-   "status": "Accepted",
+   "status": "Accepted \u2014 the data topology is reopened (CF-161, 24 August)",
    "mentions": 1
+  },
+  {
+   "file": "docs/adr/0033-outbox-and-dead-letters.md",
+   "title": "ADR-0033: Every asynchronous handoff has an outbox and a place to fail",
+   "status": "Accepted",
+   "mentions": 2
+  },
+  {
+   "file": "docs/adr/0034-ai-retrieval-and-cost.md",
+   "title": "ADR-0034: The cheapest AI call is the one that never reaches a provider",
+   "status": "Accepted",
+   "mentions": 7
   },
   {
    "file": "docs/architecture/README.md",
@@ -1155,6 +1195,11 @@
   }
  ],
  "conflicts": [
+  {
+   "id": "CF-166",
+   "open": true,
+   "section": "Open \u2014 needs a client decision"
+  },
   {
    "id": "CF-160",
    "open": false,
@@ -1326,10 +1371,10 @@
   "schemas": 22,
   "states": 11,
   "events": 11,
-  "tables": 51,
-  "screens": 31,
+  "tables": 50,
+  "screens": 33,
   "flows": 11,
-  "documents": 13,
-  "openConflicts": 0
+  "documents": 17,
+  "openConflicts": 1
  }
 }

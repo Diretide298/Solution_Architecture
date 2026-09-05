@@ -1,5 +1,5 @@
 id: LLD-seating
-title: seating — 31 operations
+title: seating — 35 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -10,7 +10,9 @@ operations:
   path: /seat-blocks/{blockId}/allocate
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -25,7 +27,6 @@ operations:
   permission: ORDER_CREATE
   audience:
   - staff
-  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -42,7 +43,8 @@ operations:
   path: /seat-maps/{seatMapId}/clone
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -57,7 +59,8 @@ operations:
   path: /seat-maps/{seatMapId}/import/{jobId}
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -65,12 +68,28 @@ operations:
   writes:
   - cache:idempotency
   - seating.import_job
+- operation: copySeatMapSection
+  verb: POST
+  path: /seat-maps/{seatMapId}/sections/copy
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
+  - seating.section
+  writes:
+  - cache:idempotency
+  - seating.section
 - operation: createSeatBlock
   verb: POST
   path: /seat-blocks
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -83,7 +102,8 @@ operations:
   path: /seat-categories
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -96,7 +116,9 @@ operations:
   path: /seat-holds
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - cache:idempotency
@@ -109,7 +131,8 @@ operations:
   path: /seat-maps
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -124,7 +147,8 @@ operations:
   path: /seat-map-templates
   scope: region
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -132,12 +156,25 @@ operations:
   writes:
   - cache:idempotency
   - seating.seat_map_template
+- operation: diffSeatMapVersions
+  verb: GET
+  path: /seat-maps/{seatMapId}/diff
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
+  - seating.section
+  writes: []
 - operation: extendSeatHold
   verb: POST
   path: /seat-holds/{holdId}/extend
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -150,7 +187,8 @@ operations:
   path: /seat-maps/{seatMapId}/import/{jobId}
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - seating.import_job
@@ -160,7 +198,9 @@ operations:
   path: /performances/{performanceId}/seat-availability
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - seating.seat
@@ -172,7 +212,8 @@ operations:
   path: /seat-holds/{holdId}
   scope: venue
   permission: ORDER_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - seating.seat_hold
@@ -182,18 +223,31 @@ operations:
   path: /seat-maps/{seatMapId}
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - seating.seat_map
   - seating.section
+  writes: []
+- operation: getSeatMapImport
+  verb: GET
+  path: /seat-map-imports/{importId}
+  scope: venue
+  permission: PRODUCT_VIEW
+  audience:
+  - staff
+  offline: false
+  reads:
+  - seating.seat_map
   writes: []
 - operation: getSeatingRules
   verb: GET
   path: /seat-maps/{seatMapId}/rules
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - seating.seating_rules
@@ -203,7 +257,8 @@ operations:
   path: /seat-maps/{seatMapId}/import/geometry
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -216,7 +271,8 @@ operations:
   path: /seat-maps/{seatMapId}/import/manifest
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -224,12 +280,29 @@ operations:
   writes:
   - cache:idempotency
   - seating.import_job
+- operation: importSeatMap
+  verb: POST
+  path: /seat-map-imports
+  scope: venue
+  permission: CAPACITY_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - assets.media_asset
+  - seating.seat_map_template
+  writes:
+  - cache:idempotency
+  - seating.seat_map
+  - seating.section
 - operation: listSeatBlocks
   verb: GET
   path: /seat-blocks
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - seating.seat_block
@@ -239,7 +312,8 @@ operations:
   path: /seat-categories
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: true
   reads:
   - seating.seat_category
@@ -249,7 +323,8 @@ operations:
   path: /seat-map-templates
   scope: region
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - seating.seat_map_template
@@ -259,7 +334,8 @@ operations:
   path: /seat-maps
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - seating.seat_map
@@ -269,7 +345,8 @@ operations:
   path: /seat-maps/{seatMapId}/seats
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - seating.seat
@@ -279,7 +356,8 @@ operations:
   path: /seat-maps/{seatMapId}/publish
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -294,7 +372,9 @@ operations:
   path: /performances/{performanceId}/seat-recommendations
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
+  - guest
   offline: false
   reads:
   - catalogue.performance
@@ -304,7 +384,9 @@ operations:
   path: /seat-blocks/{blockId}
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
+  - partner
   offline: false
   reads:
   - cache:idempotency
@@ -317,7 +399,8 @@ operations:
   path: /seat-holds/{holdId}
   scope: venue
   permission: ORDER_CREATE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -345,7 +428,8 @@ operations:
   path: /seat-maps/{seatMapId}/rules
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -358,7 +442,8 @@ operations:
   path: /seat-maps/{seatMapId}
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -373,7 +458,8 @@ operations:
   path: /seat-maps/{seatMapId}/seats
   scope: venue
   permission: CAPACITY_CONFIGURE
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency
@@ -386,7 +472,8 @@ operations:
   path: /seat-maps/{seatMapId}/validate
   scope: venue
   permission: PRODUCT_VIEW
-  audience: null
+  audience:
+  - staff
   offline: false
   reads:
   - cache:idempotency

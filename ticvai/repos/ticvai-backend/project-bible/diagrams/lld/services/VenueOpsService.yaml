@@ -89,7 +89,7 @@ operationsByContract:
     permission: WORK_ORDER_MANAGE
     offline: true
     reads: 2
-    writes: 2
+    writes: 3
   - operation: createAsset
     verb: POST
     path: /assets
@@ -337,7 +337,7 @@ operationsByContract:
     permission: WORK_ORDER_VERIFY
     offline: false
     reads: 2
-    writes: 2
+    writes: 3
 - contract: queue
   count: 21
   operations:
@@ -373,14 +373,6 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: getQueueEntry
-    verb: GET
-    path: /queue-entries/{entryId}
-    scope: venue
-    permission: null
-    offline: false
-    reads: 1
-    writes: 0
   - operation: getQueueFeedHealth
     verb: GET
     path: /queue-feeds/{feedId}/health
@@ -413,9 +405,17 @@ operationsByContract:
     offline: true
     reads: 3
     writes: 0
+  - operation: getWaitingGuest
+    verb: GET
+    path: /waiting-guests/{entryId}
+    scope: venue
+    permission: null
+    offline: false
+    reads: 1
+    writes: 0
   - operation: joinQueue
     verb: POST
-    path: /queue-entries
+    path: /waiting-guests
     scope: venue
     permission: null
     offline: false
@@ -423,7 +423,7 @@ operationsByContract:
     writes: 2
   - operation: leaveQueue
     verb: DELETE
-    path: /queue-entries/{entryId}
+    path: /waiting-guests/{entryId}
     scope: venue
     permission: null
     offline: false
@@ -453,17 +453,17 @@ operationsByContract:
     offline: true
     reads: 1
     writes: 0
-  - operation: overrideQueueEntry
+  - operation: overrideWaitingGuest
     verb: POST
-    path: /queue-entries/{entryId}/override
+    path: /waiting-guests/{entryId}/override
     scope: venue
     permission: QUEUE_OVERRIDE
     offline: true
     reads: 2
     writes: 2
-  - operation: redeemQueueEntry
+  - operation: redeemWaitingGuest
     verb: POST
-    path: /queue-entries/{entryId}/redeem
+    path: /waiting-guests/{entryId}/redeem
     scope: workstation
     permission: QUEUE_REDEEM
     offline: true
@@ -771,7 +771,7 @@ operationsByContract:
     path: /media/{mediaId}
     scope: venue
     permission: ASSET_LIBRARY_VIEW
-    offline: false
+    offline: true
     reads: 2
     writes: 0
   - operation: listCollections
@@ -882,6 +882,20 @@ operationsByContract:
     reads: 3
     writes: 2
 tables:
+- store: cache:idempotency
+  kind: cache
+  columns: 5
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
+- store: cache:resolution
+  kind: cache
+  columns: 4
+  backing: redis
+  owned: false
+  why: '**Not a table and not owned by a service.** Derived from something already read, invalidated
+    by an event already consumed, losable without consequence — no migration, no backup, no owner.'
 - table: assets.media_asset
   columns: 23
   store: postgres
@@ -918,9 +932,9 @@ tables:
   - games
   foreignWriters: null
 - table: games.credit_ledger
-  columns: 1
+  columns: 2
   store: postgres
-  parent: games.card
+  parent: null
   writtenBy:
   - games
   foreignWriters: null
@@ -946,7 +960,7 @@ tables:
   - games
   foreignWriters: null
 - table: games.reader_profile
-  columns: 6
+  columns: 7
   store: postgres
   parent: null
   writtenBy:
@@ -960,20 +974,20 @@ tables:
   - games
   foreignWriters: null
 - table: games.redemption_line
-  columns: 5
+  columns: 6
   store: postgres
   parent: games.redemption
   writtenBy: []
   foreignWriters: null
 - table: maintenance.asset
-  columns: 24
+  columns: 30
   store: postgres
   parent: null
   writtenBy:
   - maintenance
   foreignWriters: null
 - table: maintenance.incident
-  columns: 18
+  columns: 26
   store: postgres
   parent: null
   writtenBy:
@@ -994,7 +1008,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.inspection_template_item
-  columns: 10
+  columns: 11
   store: postgres
   parent: maintenance.inspection_template
   writtenBy: []
@@ -1007,7 +1021,7 @@ tables:
   - maintenance
   foreignWriters: null
 - table: maintenance.work_order
-  columns: 28
+  columns: 36
   store: postgres
   parent: null
   writtenBy:
@@ -1020,13 +1034,6 @@ tables:
   writtenBy:
   - maintenance
   foreignWriters: null
-- table: queue.entry
-  columns: 18
-  store: postgres
-  parent: null
-  writtenBy:
-  - queue
-  foreignWriters: null
 - table: queue.feed
   columns: 7
   store: postgres
@@ -1035,7 +1042,7 @@ tables:
   - queue
   foreignWriters: null
 - table: queue.queue
-  columns: 21
+  columns: 31
   store: postgres
   parent: null
   writtenBy:
@@ -1043,6 +1050,13 @@ tables:
   foreignWriters: null
 - table: queue.reading
   columns: 6
+  store: postgres
+  parent: null
+  writtenBy:
+  - queue
+  foreignWriters: null
+- table: queue.waiting_guest
+  columns: 18
   store: postgres
   parent: null
   writtenBy:
@@ -1056,7 +1070,7 @@ tables:
   - resources
   foreignWriters: null
 - table: resources.qualification
-  columns: 6
+  columns: 8
   store: postgres
   parent: null
   writtenBy:
@@ -1121,19 +1135,23 @@ writesOutside:
 - service: OrderService
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
-- service: CrossCellService
+- service: CrossRegionService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 - service: InventoryService
   operations: 1
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
-- P01:WEB-015 Virtual Waiting Room
-- P02:GST-003 Attractions List
+- P01:WEB-002 Event & Attraction Listing
+- P01:WEB-004 Attraction Details
+- P01:WEB-015 Branded Queue / Waiting Room
+- P01:WEB-039 Venue Map & Wait Times
+- P01:WEB-040 Virtual Queue
+- P02:GST-003 Event & Attraction Listing
 - P02:GST-004 Attraction Details
 - P02:GST-021 Interactive Map
 - P02:GST-022 Attraction Wait Times
-- P02:GST-023 Virtual Queue / Join Queue
+- P02:GST-023 Virtual Queue
 - P02:GST-026 Retail / Merchandise
 - P02:GST-038 Digital Companion Mode
 - P02:GST-046 Branded Queue / Waiting Room
@@ -1141,6 +1159,7 @@ screens:
 - P02:GST-053 Build Your Own Itinerary
 - P02:GST-054 AI Optimized Itinerary
 - P02:GST-059 Plan My Day – In Progress
+- P02:GST-070 Reserve a Table or Cabana
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-010 Add to Existing Ticket
 - P06:EMP-003 Home — on duty
@@ -1161,6 +1180,7 @@ screens:
 - P08:BO-003 Queue Integration Setup
 - P08:BO-004 Manual Wait Time Entry
 - P08:BO-005 Queue Monitor
+- P08:BO-019 Closures & Blackouts
 - P08:BO-027 Reissue & Media Replacement
 - P08:BO-030 Work Order Verification
 - P08:BO-031 Asset Register
@@ -1176,8 +1196,10 @@ screens:
 - P08:BO-097 Check Out & Check In
 - P08:BO-098 Qualifications
 - P08:BO-099 Session Manifest
+- P08:BO-108 Venue Operations
 - P08:BO-125 Product & Category Button Configuration
 - P11:ACC-006 Reviewer Queue
+- P12:SUP-020 Queue Configuration & Management
 - P13:CMS-002 Brand Kit
 - P13:CMS-004 Logo & Assets
 - P13:CMS-010 Media Library

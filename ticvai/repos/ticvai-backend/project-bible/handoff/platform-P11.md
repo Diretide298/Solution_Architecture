@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 8 |
-| Operations | 3 |
+| Operations | 4 |
 | Contracts | 2 |
 | Modules | 2 |
 | Undrawn | 0 |
@@ -31,7 +31,7 @@
 | `ACC-002` | Registration Form | Applicant Journey | 3 | 1 | yes |
 | `ACC-003` | Application Review & Submit | Applicant Journey | 3 | 0 | yes |
 | `ACC-004` | Application Status Tracking | Applicant Journey | 3 | 0 | yes |
-| `ACC-005` | Accreditation Badge | Applicant Journey | 3 | 1 | yes |
+| `ACC-005` | Accreditation Badge | Applicant Journey | 3 | 2 | yes |
 | `ACC-006` | Reviewer Queue | Reviewer (Internal) | 3 | 1 | yes |
 | `ACC-007` | Reviewer Application Detail | Reviewer (Internal) | 3 | 2 | yes |
 | `ACC-008` | Credential Register | Reviewer (Internal) | 3 | 0 | yes |
