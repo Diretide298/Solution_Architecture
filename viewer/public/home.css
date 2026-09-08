@@ -22,10 +22,11 @@
  */
 
 .home-page {
-  /* Day. Lit from the middle and darkening outward, the same shape as night —
-     the centre is the palest part, so it is where the scene's ink reads
-     strongest, which keeps the middle the focus in both cuts. */
-  --field: radial-gradient(130% 100% at 50% 46%, #ffffff, #f7fafa 34%, #edf3f3 68%, #e2ebeb 100%);
+  /* Day. Flat white. The radial field was lit from the middle and darkened
+     outward, which put a soft vignette behind a scene that is already drawn as
+     light on a ground — two gradients arguing about where the centre is. The
+     scene carries the focus on its own. */
+  --field: #ffffff;
   --ink: #12211f;
   --body: #4a5f5e;
   --support: #52706e;
@@ -37,7 +38,7 @@
   --accent: #229799;
   --accent-deep: #1c7e80;
   --amber: #b07a24;
-  --veil: #f4f8f8;
+  --veil: #ffffff;
   --scrim: rgba(247, 250, 250, 0.86);
   --panel: rgba(255, 255, 255, 0.86);
   --chip-line: #cde2e1;
@@ -60,7 +61,10 @@
 /* Night. LANDING.md's values, exactly as they were — the day set above is the
    mirror of this one, not the other way round. */
 :root[data-theme="dark"] .home-page {
-  --field: radial-gradient(130% 100% at 50% 46%, #16262c, #111a1f 34%, #0c1013 68%, #080a0b 100%);
+  /* Flat black, for the reason the day cut is flat white — and one more: every
+     stop of the old field was a green-cyan near-black, tinted toward an accent
+     that is not the brand's. The ground had a hue and it fought the scene. */
+  --field: #000000;
   --ink: #edf4f3;
   --body: #9cafae;
   --support: #93a6a5;
@@ -72,7 +76,7 @@
   --accent: #48cfcb;
   --accent-deep: #2bb3b0;
   --amber: #e0ae52;
-  --veil: #0c1013;
+  --veil: #000000;
   --scrim: rgba(8, 10, 11, 0.82);
   --panel: rgba(12, 18, 21, 0.82);
   --chip-line: #1e3238;

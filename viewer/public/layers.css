@@ -68,8 +68,7 @@ body[data-layer="decisions"] { --layer: var(--accent); --layer-soft: color-mix(i
 
 /* Night. The original field. */
 :root[data-theme="dark"] .galaxy-field {
-  background: radial-gradient(120% 92% at 50% 46%,
-    #16262C 0%, #111A1F 38%, #0D1113 72%, #0A0C0E 100%);
+  background: #000000;
   background-attachment: fixed;
 }
 

@@ -39,8 +39,7 @@
    background in layers.css — can be checked against a name rather than against
    a second copy of four hex values. */
 :root {
-  --field: radial-gradient(120% 92% at 50% 46%,
-    #16262C 0%, #111A1F 38%, #0D1113 72%, #0A0C0E 100%);
+  --field: #000000;
   /* The day ground for the same surfaces. Warm rather than the neutral
      --bg-canvas the chrome sits on: this is paper the picture is printed on,
      and the graphite lanes and jewel bodies in galaxy.js are mixed for it. A
@@ -78,7 +77,7 @@
 
      If you are tempted to simplify this back to `#ffffff`: don't. That is the
      bug. */
-  --field-day: linear-gradient(#ffffff, #ffffff);
+  --field-day: #ffffff;
 }
 
 :root {
@@ -2530,13 +2529,11 @@ html[data-entry] .adam-loader { display: none !important; }
    the galaxy field. Matching where it lands beats matching where it left. */
 html[data-entry],
 html[data-entry] body {
-  background: radial-gradient(120% 92% at 50% 46%,
-    #FCFCFC 0%, #F5F5F5 38%, #EFEFEF 72%, #E6E6E6 100%) fixed;
+  background: #FFFFFF fixed;
 }
 html[data-theme="dark"][data-entry],
 html[data-theme="dark"][data-entry] body {
-  background: radial-gradient(120% 92% at 50% 46%,
-    #16262C 0%, #111A1F 38%, #0D1113 72%, #0A0C0E 100%) fixed;
+  background: #000000 fixed;
 }
 
 html[data-entry] #main {
