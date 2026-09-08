@@ -27,7 +27,8 @@
 #
 # **No maximum.** tools/derive-sizing.py holds the arithmetic.
 #
-# **The database topology, and it is the same in all seven configs** (ADR-0038, ADR-0039):
+# **The database topology, and it is the same in all seven configs** (ADR-0038 — amended by
+# ADR-0040, which lets a region hold more than one instance — and ADR-0039):
 #
 #     postgres instance  =  region  =  the cell
 #       |

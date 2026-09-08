@@ -1684,7 +1684,7 @@ paths:
     get:
       operationId: listVirtualTicket
       x-ticvai-consumed-by:
-        - P08 BO-334 Virtual Ticket Command Center
+        - "P08 BO-334 Virtual Ticket Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1772,7 +1772,7 @@ paths:
     put:
       operationId: setVirtualTicketIdentity
       x-ticvai-consumed-by:
-        - P08 BO-335 Virtual Ticket Identity & Master Record Configuration
+        - "P08 BO-335 Virtual Ticket Identity & Master Record Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1815,7 +1815,7 @@ paths:
     get:
       operationId: listVirtualTicketStatus
       x-ticvai-consumed-by:
-        - P08 BO-336 Virtual Ticket Status & Lifecycle Model
+        - "P08 BO-336 Virtual Ticket Status & Lifecycle Model"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1853,7 +1853,7 @@ paths:
     get:
       operationId: listMediaTypeCredential
       x-ticvai-consumed-by:
-        - P08 BO-337 Media Type & Credential Technology Registry
+        - "P08 BO-337 Media Type & Credential Technology Registry"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1892,7 +1892,7 @@ paths:
     get:
       operationId: listMultiMediaBinding
       x-ticvai-consumed-by:
-        - P08 BO-338 Multi-Media Binding & Association Rules
+        - "P08 BO-338 Multi-Media Binding & Association Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1931,7 +1931,7 @@ paths:
     get:
       operationId: listCredentialIdentityToken
       x-ticvai-consumed-by:
-        - P08 BO-339 Credential Identity, Token & Reference Mapping
+        - "P08 BO-339 Credential Identity, Token & Reference Mapping"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1969,7 +1969,7 @@ paths:
     get:
       operationId: listEntitlementCrossMedia
       x-ticvai-consumed-by:
-        - P08 BO-340 Entitlement & Cross-Media Synchronization Rules
+        - "P08 BO-340 Entitlement & Cross-Media Synchronization Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2007,7 +2007,7 @@ paths:
     get:
       operationId: listMediaActivationPriority
       x-ticvai-consumed-by:
-        - P08 BO-341 Media Activation, Priority & Fallback Rules
+        - "P08 BO-341 Media Activation, Priority & Fallback Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2045,7 +2045,7 @@ paths:
     get:
       operationId: listMediaReplacementRevocation
       x-ticvai-consumed-by:
-        - P08 BO-342 Media Replacement, Revocation & Rebinding Rules
+        - "P08 BO-342 Media Replacement, Revocation & Rebinding Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2083,7 +2083,7 @@ paths:
     get:
       operationId: listVirtualTicketArchitecture
       x-ticvai-consumed-by:
-        - P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit
+        - "P08 BO-343 Virtual Ticket Architecture Testing, Governance & Audit"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2121,7 +2121,7 @@ paths:
     get:
       operationId: listMediaDesign
       x-ticvai-consumed-by:
-        - P08 BO-344 Media Design Studio Command Center
+        - "P08 BO-344 Media Design Studio Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2160,7 +2160,7 @@ paths:
     put:
       operationId: setDigitalBarcodeTicket
       x-ticvai-consumed-by:
-        - P08 BO-345 Digital QR & Barcode Ticket Designer
+        - "P08 BO-345 Digital QR & Barcode Ticket Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2202,7 +2202,7 @@ paths:
     put:
       operationId: setPdfPrintablePos
       x-ticvai-consumed-by:
-        - P08 BO-346 PDF, Printable & POS Ticket Designer
+        - "P08 BO-346 PDF, Printable & POS Ticket Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2244,7 +2244,7 @@ paths:
     put:
       operationId: setAppleWalletPass
       x-ticvai-consumed-by:
-        - P08 BO-347 Apple Wallet Pass Designer
+        - "P08 BO-347 Apple Wallet Pass Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2287,7 +2287,7 @@ paths:
     put:
       operationId: setGoogleWalletPass
       x-ticvai-consumed-by:
-        - P08 BO-348 Google Wallet Pass Designer
+        - "P08 BO-348 Google Wallet Pass Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2329,7 +2329,7 @@ paths:
     put:
       operationId: setRfidNfcCard
       x-ticvai-consumed-by:
-        - P08 BO-349 RFID, NFC, Card & Wristband Media Designer
+        - "P08 BO-349 RFID, NFC, Card & Wristband Media Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2372,7 +2372,7 @@ paths:
     put:
       operationId: setDigitalCardMembership
       x-ticvai-consumed-by:
-        - P08 BO-350 Digital Card, Membership & Wearable Designer
+        - "P08 BO-350 Digital Card, Membership & Wearable Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2415,7 +2415,7 @@ paths:
     put:
       operationId: setDynamicFieldData
       x-ticvai-consumed-by:
-        - P08 BO-351 Dynamic Fields, Data Mapping & Content Builder
+        - "P08 BO-351 Dynamic Fields, Data Mapping & Content Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2458,7 +2458,7 @@ paths:
     get:
       operationId: listBrandingLocalizationTemplate
       x-ticvai-consumed-by:
-        - P08 BO-352 Branding, Localization & Template Inheritance
+        - "P08 BO-352 Branding, Localization & Template Inheritance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2496,7 +2496,7 @@ paths:
     put:
       operationId: approveMultiMediaPreview
       x-ticvai-consumed-by:
-        - P08 BO-353 Multi-Media Preview, Testing, Approval & Publication
+        - "P08 BO-353 Multi-Media Preview, Testing, Approval & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2539,7 +2539,7 @@ paths:
     get:
       operationId: listCredential
       x-ticvai-consumed-by:
-        - P08 BO-354 Credential Operations Command Center
+        - "P08 BO-354 Credential Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2621,7 +2621,7 @@ paths:
     put:
       operationId: setVirtualTicketCredential
       x-ticvai-consumed-by:
-        - P08 BO-355 Virtual Ticket & Credential 360° Workspace
+        - "P08 BO-355 Virtual Ticket & Credential 360° Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2664,7 +2664,7 @@ paths:
     get:
       operationId: listCredentialGenerationIssuance
       x-ticvai-consumed-by:
-        - P08 BO-356 Credential Generation & Issuance Monitor
+        - "P08 BO-356 Credential Generation & Issuance Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2702,7 +2702,7 @@ paths:
     get:
       operationId: listCredentialDeliveryDistribution
       x-ticvai-consumed-by:
-        - P08 BO-357 Credential Delivery & Distribution Operations
+        - "P08 BO-357 Credential Delivery & Distribution Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2740,7 +2740,7 @@ paths:
     put:
       operationId: setMediaBindingActivation
       x-ticvai-consumed-by:
-        - P08 BO-358 Media Binding, Activation & Assignment Operations
+        - "P08 BO-358 Media Binding, Activation & Assignment Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2782,7 +2782,7 @@ paths:
     get:
       operationId: listCredentialReplacementReissue
       x-ticvai-consumed-by:
-        - P08 BO-359 Credential Replacement, Reissue, Revocation & Recovery
+        - "P08 BO-359 Credential Replacement, Reissue, Revocation & Recovery"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2820,7 +2820,7 @@ paths:
     get:
       operationId: listFailedGenerationDelivery
       x-ticvai-consumed-by:
-        - P08 BO-360 Failed Generation, Delivery & Credential Exception Management
+        - "P08 BO-360 Failed Generation, Delivery & Credential Exception Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2858,7 +2858,7 @@ paths:
     get:
       operationId: listCredentialUsageCross
       x-ticvai-consumed-by:
-        - P08 BO-361 Credential Usage & Cross-Media Traceability
+        - "P08 BO-361 Credential Usage & Cross-Media Traceability"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2898,7 +2898,7 @@ paths:
     get:
       operationId: listCredentialSecurityOperational
       x-ticvai-consumed-by:
-        - P08 BO-362 Credential Security, Audit & Operational Evidence
+        - "P08 BO-362 Credential Security, Audit & Operational Evidence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2936,7 +2936,7 @@ paths:
     get:
       operationId: listTicketMedia
       x-ticvai-consumed-by:
-        - P08 BO-363 Ticket Media Analytics & AI Operations Intelligence
+        - "P08 BO-363 Ticket Media Analytics & AI Operations Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3024,7 +3024,7 @@ paths:
     get:
       operationId: listAccess
       x-ticvai-consumed-by:
-        - P08 BO-144 Access Control Command Center
+        - "P08 BO-144 Access Control Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3062,7 +3062,7 @@ paths:
     get:
       operationId: listVenueParkAccess
       x-ticvai-consumed-by:
-        - P08 BO-145 Venue & Park Access Structure
+        - "P08 BO-145 Venue & Park Access Structure"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3099,7 +3099,7 @@ paths:
     put:
       operationId: setAccessAreaZone
       x-ticvai-consumed-by:
-        - P08 BO-146 Access Area & Zone Builder
+        - "P08 BO-146 Access Area & Zone Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3140,7 +3140,7 @@ paths:
     put:
       operationId: setAttractionAccess
       x-ticvai-consumed-by:
-        - P08 BO-147 Attraction Access Configuration
+        - "P08 BO-147 Attraction Access Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3181,7 +3181,7 @@ paths:
     put:
       operationId: setGateLane
       x-ticvai-consumed-by:
-        - P08 BO-149 Gate & Lane Configuration
+        - "P08 BO-149 Gate & Lane Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3222,7 +3222,7 @@ paths:
     put:
       operationId: setAccessGraphicalMap
       x-ticvai-consumed-by:
-        - P08 BO-150 Access Control Graphical Map Designer
+        - "P08 BO-150 Access Control Graphical Map Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3264,7 +3264,7 @@ paths:
     get:
       operationId: listAccessLocationGrouping
       x-ticvai-consumed-by:
-        - P08 BO-151 Access Location Grouping
+        - "P08 BO-151 Access Location Grouping"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3302,7 +3302,7 @@ paths:
     get:
       operationId: listOperatingCalendarSpecial
       x-ticvai-consumed-by:
-        - P08 BO-152 Operating Calendar & Special Access Days
+        - "P08 BO-152 Operating Calendar & Special Access Days"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3340,7 +3340,7 @@ paths:
     put:
       operationId: publishTopologyValidation
       x-ticvai-consumed-by:
-        - P08 BO-153 Topology Validation & Publication
+        - "P08 BO-153 Topology Validation & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3385,7 +3385,7 @@ paths:
     get:
       operationId: listAccessRule
       x-ticvai-consumed-by:
-        - P08 BO-154 Access Rule Command Center
+        - "P08 BO-154 Access Rule Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3423,7 +3423,7 @@ paths:
     put:
       operationId: setVisualAccessRule
       x-ticvai-consumed-by:
-        - P08 BO-155 Visual Access Rule Builder
+        - "P08 BO-155 Visual Access Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3466,7 +3466,7 @@ paths:
     get:
       operationId: listEntryExitRule
       x-ticvai-consumed-by:
-        - P08 BO-156 Entry, Exit & Re-entry Rules
+        - "P08 BO-156 Entry, Exit & Re-entry Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3505,7 +3505,7 @@ paths:
     get:
       operationId: listAntiPassbackJourney
       x-ticvai-consumed-by:
-        - P08 BO-157 Anti-Passback & Journey Sequence
+        - "P08 BO-157 Anti-Passback & Journey Sequence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3543,7 +3543,7 @@ paths:
     get:
       operationId: listAccessValidityTime
       x-ticvai-consumed-by:
-        - P08 BO-158 Access Validity & Time Rules
+        - "P08 BO-158 Access Validity & Time Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3580,7 +3580,7 @@ paths:
     get:
       operationId: listEntitlementConsumption
       x-ticvai-consumed-by:
-        - P08 BO-159 Entitlement Consumption Engine
+        - "P08 BO-159 Entitlement Consumption Engine"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3620,7 +3620,7 @@ paths:
     get:
       operationId: listMultiParkCrossover
       x-ticvai-consumed-by:
-        - P08 BO-160 Multi-Park & Crossover Rules
+        - "P08 BO-160 Multi-Park & Crossover Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3659,7 +3659,7 @@ paths:
     get:
       operationId: listGuestCompanionEligibility
       x-ticvai-consumed-by:
-        - P08 BO-161 Guest, Companion & Eligibility Rules
+        - "P08 BO-161 Guest, Companion & Eligibility Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3697,7 +3697,7 @@ paths:
     get:
       operationId: listGroupAdmissionQuantity
       x-ticvai-consumed-by:
-        - P08 BO-162 Group Admission & Quantity Validation
+        - "P08 BO-162 Group Admission & Quantity Validation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3736,7 +3736,7 @@ paths:
     put:
       operationId: publishRuleConflictCheck
       x-ticvai-consumed-by:
-        - P08 BO-163 Rule Simulation, Conflict Check & Publication
+        - "P08 BO-163 Rule Simulation, Conflict Check & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3779,7 +3779,7 @@ paths:
     get:
       operationId: listDigitalCredentialSecurity
       x-ticvai-consumed-by:
-        - P08 BO-164 Digital Credential Security Command Center
+        - "P08 BO-164 Digital Credential Security Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3817,7 +3817,7 @@ paths:
     put:
       operationId: setDynamicSecurityProfile
       x-ticvai-consumed-by:
-        - P08 BO-165 Dynamic QR Security Profile Builder
+        - "P08 BO-165 Dynamic QR Security Profile Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3860,7 +3860,7 @@ paths:
     get:
       operationId: listCredentialActivationDisplay
       x-ticvai-consumed-by:
-        - P08 BO-166 Credential Activation & Display Rules
+        - "P08 BO-166 Credential Activation & Display Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3899,7 +3899,7 @@ paths:
     get:
       operationId: listDeviceBindingSession
       x-ticvai-consumed-by:
-        - P08 BO-167 Device Binding & Session Security
+        - "P08 BO-167 Device Binding & Session Security"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3938,7 +3938,7 @@ paths:
     put:
       operationId: setBleBeaconGeofence
       x-ticvai-consumed-by:
-        - P08 BO-168 BLE Beacon & Geofence Configuration
+        - "P08 BO-168 BLE Beacon & Geofence Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3981,7 +3981,7 @@ paths:
     get:
       operationId: listCredentialTransferRebinding
       x-ticvai-consumed-by:
-        - P08 BO-169 Credential Transfer & Rebinding
+        - "P08 BO-169 Credential Transfer & Rebinding"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4020,7 +4020,7 @@ paths:
     get:
       operationId: listCredentialRevocationLifecycle
       x-ticvai-consumed-by:
-        - P08 BO-170 Credential Revocation & Lifecycle Events
+        - "P08 BO-170 Credential Revocation & Lifecycle Events"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4059,7 +4059,7 @@ paths:
     get:
       operationId: listOfflineCryptographicValidation
       x-ticvai-consumed-by:
-        - P08 BO-171 Offline Cryptographic Validation Profile
+        - "P08 BO-171 Offline Cryptographic Validation Profile"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4098,7 +4098,7 @@ paths:
     put:
       operationId: setEmbeddedEntitlementPayload
       x-ticvai-consumed-by:
-        - P08 BO-172 Embedded Entitlement Payload Designer
+        - "P08 BO-172 Embedded Entitlement Payload Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4142,7 +4142,7 @@ paths:
     get:
       operationId: listCredentialSecurity
       x-ticvai-consumed-by:
-        - P08 BO-173 Credential Security Simulation, Audit & Publication
+        - "P08 BO-173 Credential Security Simulation, Audit & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4180,7 +4180,7 @@ paths:
     get:
       operationId: listMediaCredential
       x-ticvai-consumed-by:
-        - P08 BO-174 Media & Credential Command Center
+        - "P08 BO-174 Media & Credential Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4218,7 +4218,7 @@ paths:
     get:
       operationId: listMediaTypeTechnology
       x-ticvai-consumed-by:
-        - P08 BO-175 Media Type & Technology Library
+        - "P08 BO-175 Media Type & Technology Library"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4257,7 +4257,7 @@ paths:
     get:
       operationId: listVirtualCredentialMedia
       x-ticvai-consumed-by:
-        - P08 BO-176 Virtual Credential & Media Association
+        - "P08 BO-176 Virtual Credential & Media Association"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4295,7 +4295,7 @@ paths:
     get:
       operationId: listVerificationMethodSelection
       x-ticvai-consumed-by:
-        - P08 BO-177 Verification Method Selection & Locking
+        - "P08 BO-177 Verification Method Selection & Locking"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4336,7 +4336,7 @@ paths:
     get:
       operationId: listMediaIssuanceEncoding
       x-ticvai-consumed-by:
-        - P08 BO-178 Media Issuance & Encoding Profile
+        - "P08 BO-178 Media Issuance & Encoding Profile"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4375,7 +4375,7 @@ paths:
     get:
       operationId: listMediaSwapReplacement
       x-ticvai-consumed-by:
-        - P08 BO-179 Media Swap & Replacement
+        - "P08 BO-179 Media Swap & Replacement"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4414,7 +4414,7 @@ paths:
     put:
       operationId: setRfidNfc
       x-ticvai-consumed-by:
-        - P08 BO-180 RFID & NFC Configuration
+        - "P08 BO-180 RFID & NFC Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4457,7 +4457,7 @@ paths:
     get:
       operationId: listExternalPartnerCredential
       x-ticvai-consumed-by:
-        - P08 BO-181 External & Partner Credential Mapping
+        - "P08 BO-181 External & Partner Credential Mapping"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4496,7 +4496,7 @@ paths:
     get:
       operationId: listHotelWalletExternal
       x-ticvai-consumed-by:
-        - P08 BO-182 Hotel, Wallet & External Media Integration
+        - "P08 BO-182 Hotel, Wallet & External Media Integration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4535,7 +4535,7 @@ paths:
     put:
       operationId: publishMediaCompatibilityTesting
       x-ticvai-consumed-by:
-        - P08 BO-183 Media Compatibility, Testing & Publication
+        - "P08 BO-183 Media Compatibility, Testing & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4579,7 +4579,7 @@ paths:
     get:
       operationId: listBiometricAccess
       x-ticvai-consumed-by:
-        - P08 BO-184 Biometric Access Command Center
+        - "P08 BO-184 Biometric Access Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4617,7 +4617,7 @@ paths:
     put:
       operationId: setBiometricVerificationProfile
       x-ticvai-consumed-by:
-        - P08 BO-185 Biometric Verification Profile Builder
+        - "P08 BO-185 Biometric Verification Profile Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4660,7 +4660,7 @@ paths:
     put:
       operationId: setFacePassEnrollment
       x-ticvai-consumed-by:
-        - P08 BO-186 Face Pass Enrollment Configuration
+        - "P08 BO-186 Face Pass Enrollment Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4703,7 +4703,7 @@ paths:
     get:
       operationId: listBiometricConsentGuardian
       x-ticvai-consumed-by:
-        - P08 BO-187 Biometric Consent & Guardian Management
+        - "P08 BO-187 Biometric Consent & Guardian Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4743,7 +4743,7 @@ paths:
     get:
       operationId: listFaceTagTemporary
       x-ticvai-consumed-by:
-        - P08 BO-188 Face Tag Temporary Enrollment
+        - "P08 BO-188 Face Tag Temporary Enrollment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4783,7 +4783,7 @@ paths:
     get:
       operationId: listFaceMatchingVerification
       x-ticvai-consumed-by:
-        - P08 BO-189 Face Matching & Verification Thresholds
+        - "P08 BO-189 Face Matching & Verification Thresholds"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4821,7 +4821,7 @@ paths:
     get:
       operationId: listFaceChangeEnrollment
       x-ticvai-consumed-by:
-        - P08 BO-190 Face Change, Re-enrollment & Identity Protection
+        - "P08 BO-190 Face Change, Re-enrollment & Identity Protection"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4861,7 +4861,7 @@ paths:
     get:
       operationId: listBiometricValidationGate
       x-ticvai-consumed-by:
-        - P08 BO-191 Biometric Validation at Gate
+        - "P08 BO-191 Biometric Validation at Gate"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4899,7 +4899,7 @@ paths:
     get:
       operationId: listBiometricLifecycleRetention
       x-ticvai-consumed-by:
-        - P08 BO-192 Biometric Lifecycle, Retention & Deletion
+        - "P08 BO-192 Biometric Lifecycle, Retention & Deletion"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4937,7 +4937,7 @@ paths:
     get:
       operationId: listBiometric
       x-ticvai-consumed-by:
-        - P08 BO-193 Biometric Simulation, Audit & Publication
+        - "P08 BO-193 Biometric Simulation, Audit & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5023,7 +5023,7 @@ paths:
     get:
       operationId: listDeviceGate
       x-ticvai-consumed-by:
-        - P08 BO-194 Device & Gate Command Center
+        - "P08 BO-194 Device & Gate Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5061,7 +5061,7 @@ paths:
     get:
       operationId: listDeviceTypeHardware
       x-ticvai-consumed-by:
-        - P08 BO-195 Device Type & Hardware Library
+        - "P08 BO-195 Device Type & Hardware Library"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5099,7 +5099,7 @@ paths:
     get:
       operationId: listPhysicalDeviceRegistration
       x-ticvai-consumed-by:
-        - P08 BO-196 Physical Device Registration & Provisioning
+        - "P08 BO-196 Physical Device Registration & Provisioning"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5137,7 +5137,7 @@ paths:
     put:
       operationId: setTurnstileLaneBehavior
       x-ticvai-consumed-by:
-        - P08 BO-197 Turnstile & Lane Behavior Configuration
+        - "P08 BO-197 Turnstile & Lane Behavior Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5180,7 +5180,7 @@ paths:
     put:
       operationId: setValidationOutcomeGuest
       x-ticvai-consumed-by:
-        - P08 BO-198 Validation Outcome & Guest Feedback Designer
+        - "P08 BO-198 Validation Outcome & Guest Feedback Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5223,7 +5223,7 @@ paths:
     put:
       operationId: setReaderScannerPeripheral
       x-ticvai-consumed-by:
-        - P08 BO-199 Reader, Scanner & Peripheral Configuration
+        - "P08 BO-199 Reader, Scanner & Peripheral Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5264,7 +5264,7 @@ paths:
     put:
       operationId: setHandheldMobileAccess
       x-ticvai-consumed-by:
-        - P08 BO-200 Handheld & Mobile Access Device Configuration
+        - "P08 BO-200 Handheld & Mobile Access Device Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5306,7 +5306,7 @@ paths:
     get:
       operationId: listGateModeFree
       x-ticvai-consumed-by:
-        - P08 BO-201 Gate Modes, Free Spin & Emergency Controls
+        - "P08 BO-201 Gate Modes, Free Spin & Emergency Controls"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5344,7 +5344,7 @@ paths:
     put:
       operationId: setDeviceSoftwareContent
       x-ticvai-consumed-by:
-        - P08 BO-202 Device Software, Content & Remote Configuration
+        - "P08 BO-202 Device Software, Content & Remote Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5388,7 +5388,7 @@ paths:
     get:
       operationId: listHardwareCompatibilityHealth
       x-ticvai-consumed-by:
-        - P08 BO-203 Hardware Compatibility, Health, Testing & Deployment
+        - "P08 BO-203 Hardware Compatibility, Health, Testing & Deployment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5427,7 +5427,7 @@ paths:
     get:
       operationId: listOfflineEdge
       x-ticvai-consumed-by:
-        - P08 BO-204 Offline & Edge Operations Command Center
+        - "P08 BO-204 Offline & Edge Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5465,7 +5465,7 @@ paths:
     put:
       operationId: setEdgeNodeLocal
       x-ticvai-consumed-by:
-        - P08 BO-205 Edge Node & Local Processing Configuration
+        - "P08 BO-205 Edge Node & Local Processing Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5507,7 +5507,7 @@ paths:
     get:
       operationId: listEdgePackageData
       x-ticvai-consumed-by:
-        - P08 BO-207 Edge Package & Data Distribution
+        - "P08 BO-207 Edge Package & Data Distribution"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5545,7 +5545,7 @@ paths:
     get:
       operationId: listOfflineCredentialRevocation
       x-ticvai-consumed-by:
-        - P08 BO-208 Offline Credential & Revocation Cache
+        - "P08 BO-208 Offline Credential & Revocation Cache"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5584,7 +5584,7 @@ paths:
     get:
       operationId: listOfflineEntitlementUsage
       x-ticvai-consumed-by:
-        - P08 BO-209 Offline Entitlement & Usage Ledger
+        - "P08 BO-209 Offline Entitlement & Usage Ledger"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5623,7 +5623,7 @@ paths:
     get:
       operationId: listConnectivityFailureDegraded
       x-ticvai-consumed-by:
-        - P08 BO-210 Connectivity Failure & Degraded Mode Policy
+        - "P08 BO-210 Connectivity Failure & Degraded Mode Policy"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5661,7 +5661,7 @@ paths:
     get:
       operationId: listReconnectionSynchronizationConflict
       x-ticvai-consumed-by:
-        - P08 BO-211 Reconnection, Synchronization & Conflict Resolution
+        - "P08 BO-211 Reconnection, Synchronization & Conflict Resolution"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5699,7 +5699,7 @@ paths:
     put:
       operationId: simulateOfflineResilienceTesting
       x-ticvai-consumed-by:
-        - P08 BO-212 Offline Simulation & Resilience Testing
+        - "P08 BO-212 Offline Simulation & Resilience Testing"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5741,7 +5741,7 @@ paths:
     get:
       operationId: listEdgeSecurityDeployment
       x-ticvai-consumed-by:
-        - P08 BO-213 Edge Security, Audit & Deployment
+        - "P08 BO-213 Edge Security, Audit & Deployment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5778,7 +5778,7 @@ paths:
     get:
       operationId: listGuestJourney
       x-ticvai-consumed-by:
-        - P08 BO-214 Guest Journey Command Center
+        - "P08 BO-214 Guest Journey Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5816,7 +5816,7 @@ paths:
     put:
       operationId: setGroupAdmissionProfile
       x-ticvai-consumed-by:
-        - P08 BO-215 Group & B2B Admission Profile Builder
+        - "P08 BO-215 Group & B2B Admission Profile Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5857,7 +5857,7 @@ paths:
     get:
       operationId: listGroupLeaderFast
       x-ticvai-consumed-by:
-        - P08 BO-216 Group Leader & Fast B2B Validation
+        - "P08 BO-216 Group Leader & Fast B2B Validation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5895,7 +5895,7 @@ paths:
     get:
       operationId: listGroupAttendancePartial
       x-ticvai-consumed-by:
-        - P08 BO-217 Group Attendance & Partial Entry Manager
+        - "P08 BO-217 Group Attendance & Partial Entry Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5934,7 +5934,7 @@ paths:
     get:
       operationId: listFamilyChildPod
       x-ticvai-consumed-by:
-        - P08 BO-218 Family, Child, POD & Companion Journey
+        - "P08 BO-218 Family, Child, POD & Companion Journey"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5974,7 +5974,7 @@ paths:
     get:
       operationId: listEntryTemporaryExit
       x-ticvai-consumed-by:
-        - P08 BO-219 Re-entry & Temporary Exit Journey
+        - "P08 BO-219 Re-entry & Temporary Exit Journey"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6013,7 +6013,7 @@ paths:
     get:
       operationId: listMultiParkCrossover2
       x-ticvai-consumed-by:
-        - P08 BO-220 Multi-Park & Crossover Journey Orchestrator
+        - "P08 BO-220 Multi-Park & Crossover Journey Orchestrator"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6052,7 +6052,7 @@ paths:
     get:
       operationId: listFastPassAttraction
       x-ticvai-consumed-by:
-        - P08 BO-221 Fast Pass & Attraction Access Journey
+        - "P08 BO-221 Fast Pass & Attraction Access Journey"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6091,7 +6091,7 @@ paths:
     get:
       operationId: listSpecialEventFree
       x-ticvai-consumed-by:
-        - P08 BO-222 Special Event, Free View & Alternative Admission
+        - "P08 BO-222 Special Event, Free View & Alternative Admission"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6131,7 +6131,7 @@ paths:
     get:
       operationId: listLiveAccess
       x-ticvai-consumed-by:
-        - P08 BO-224 Live Access Operations Command Center
+        - "P08 BO-224 Live Access Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6169,7 +6169,7 @@ paths:
     get:
       operationId: listPodiumConsole
       x-ticvai-consumed-by:
-        - P08 BO-225 Podium Operations Console
+        - "P08 BO-225 Podium Operations Console"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6207,7 +6207,7 @@ paths:
     get:
       operationId: listTicketCredentialInvestigation
       x-ticvai-consumed-by:
-        - P08 BO-226 Ticket & Credential Investigation Console
+        - "P08 BO-226 Ticket & Credential Investigation Console"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6294,7 +6294,7 @@ paths:
     get:
       operationId: listValidationExceptionReason
       x-ticvai-consumed-by:
-        - P08 BO-227 Validation Exception & Reason Code Manager
+        - "P08 BO-227 Validation Exception & Reason Code Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6333,7 +6333,7 @@ paths:
     put:
       operationId: approveManualOverrideSupervisor
       x-ticvai-consumed-by:
-        - P08 BO-228 Manual Override & Supervisor Approval
+        - "P08 BO-228 Manual Override & Supervisor Approval"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6376,7 +6376,7 @@ paths:
     get:
       operationId: listCredentialDisableBlacklist
       x-ticvai-consumed-by:
-        - P08 BO-229 Credential Disable, Blacklist & Whitelist Operations
+        - "P08 BO-229 Credential Disable, Blacklist & Whitelist Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6414,7 +6414,7 @@ paths:
     get:
       operationId: listLiveGateMode
       x-ticvai-consumed-by:
-        - P08 BO-230 Live Gate Mode & Lane Control
+        - "P08 BO-230 Live Gate Mode & Lane Control"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6453,7 +6453,7 @@ paths:
     get:
       operationId: listQueueThroughputLane
       x-ticvai-consumed-by:
-        - P08 BO-231 Queue, Throughput & Lane Optimization
+        - "P08 BO-231 Queue, Throughput & Lane Optimization"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6491,7 +6491,7 @@ paths:
     put:
       operationId: setOperationalIncidentException
       x-ticvai-consumed-by:
-        - P08 BO-232 Operational Incident & Exception Workspace
+        - "P08 BO-232 Operational Incident & Exception Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6533,7 +6533,7 @@ paths:
     get:
       operationId: listShiftHandoverSummary
       x-ticvai-consumed-by:
-        - P08 BO-233 Operations Audit, Shift Handover & Control Summary
+        - "P08 BO-233 Operations Audit, Shift Handover & Control Summary"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6571,7 +6571,7 @@ paths:
     get:
       operationId: listDynamicAccessPolicy
       x-ticvai-consumed-by:
-        - P08 BO-234 Dynamic Access Policy Command Center
+        - "P08 BO-234 Dynamic Access Policy Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6609,7 +6609,7 @@ paths:
     get:
       operationId: listAccessAttributeCatalog
       x-ticvai-consumed-by:
-        - P08 BO-235 Access Attribute Catalog
+        - "P08 BO-235 Access Attribute Catalog"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6647,7 +6647,7 @@ paths:
     put:
       operationId: setVisualDynamicPolicy
       x-ticvai-consumed-by:
-        - P08 BO-236 Visual Dynamic Policy Builder
+        - "P08 BO-236 Visual Dynamic Policy Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6690,7 +6690,7 @@ paths:
     put:
       operationId: setContextTimeEvent
       x-ticvai-consumed-by:
-        - P08 BO-237 Context, Time, Event & Capacity Policy Builder
+        - "P08 BO-237 Context, Time, Event & Capacity Policy Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6732,7 +6732,7 @@ paths:
     get:
       operationId: listIdentityMembershipAccreditation
       x-ticvai-consumed-by:
-        - P08 BO-238 Identity, Membership & Accreditation Policies
+        - "P08 BO-238 Identity, Membership & Accreditation Policies"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6770,7 +6770,7 @@ paths:
     get:
       operationId: listPolicyScopeHierarchy
       x-ticvai-consumed-by:
-        - P08 BO-239 Policy Scope, Hierarchy & Inheritance
+        - "P08 BO-239 Policy Scope, Hierarchy & Inheritance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6808,7 +6808,7 @@ paths:
     get:
       operationId: listAuthorizationGovernanceTemporary
       x-ticvai-consumed-by:
-        - P08 BO-240 Authorization Governance & Temporary Access
+        - "P08 BO-240 Authorization Governance & Temporary Access"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6846,7 +6846,7 @@ paths:
     get:
       operationId: listPolicyEvaluationArchitecture
       x-ticvai-consumed-by:
-        - P08 BO-241 Policy Evaluation Architecture & Offline Distribution
+        - "P08 BO-241 Policy Evaluation Architecture & Offline Distribution"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6884,7 +6884,7 @@ paths:
     put:
       operationId: simulatePolicyConflictImpact
       x-ticvai-consumed-by:
-        - P08 BO-242 Policy Simulation, Conflict & Impact Analysis
+        - "P08 BO-242 Policy Simulation, Conflict & Impact Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6926,7 +6926,7 @@ paths:
     get:
       operationId: listAccessSecurityFraud
       x-ticvai-consumed-by:
-        - P08 BO-244 Access Security & Fraud Command Center
+        - "P08 BO-244 Access Security & Fraud Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6964,7 +6964,7 @@ paths:
     get:
       operationId: listFraudDetectionRule
       x-ticvai-consumed-by:
-        - P08 BO-245 Fraud Detection Rule & Signal Library
+        - "P08 BO-245 Fraud Detection Rule & Signal Library"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7002,7 +7002,7 @@ paths:
     get:
       operationId: listCredentialSharingConcurrent
       x-ticvai-consumed-by:
-        - P08 BO-246 Credential Sharing & Concurrent Usage Detection
+        - "P08 BO-246 Credential Sharing & Concurrent Usage Detection"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7040,7 +7040,7 @@ paths:
     get:
       operationId: listUnifiedIdentityCredential
       x-ticvai-consumed-by:
-        - P08 BO-247 Unified Identity & Credential Lock Manager
+        - "P08 BO-247 Unified Identity & Credential Lock Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7078,7 +7078,7 @@ paths:
     get:
       operationId: listBiometricIdentityIntegrity
       x-ticvai-consumed-by:
-        - P08 BO-248 Biometric & Identity Integrity Monitoring
+        - "P08 BO-248 Biometric & Identity Integrity Monitoring"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7117,7 +7117,7 @@ paths:
     get:
       operationId: listRelationshipCompanionFraud
       x-ticvai-consumed-by:
-        - P08 BO-249 Relationship & Companion Fraud Monitoring
+        - "P08 BO-249 Relationship & Companion Fraud Monitoring"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7155,7 +7155,7 @@ paths:
     get:
       operationId: listAccessRiskScoring
       x-ticvai-consumed-by:
-        - P08 BO-250 Access Risk Scoring & Decision Engine
+        - "P08 BO-250 Access Risk Scoring & Decision Engine"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7193,7 +7193,7 @@ paths:
     put:
       operationId: setRealTimeSecurity
       x-ticvai-consumed-by:
-        - P08 BO-251 Real-Time Security Response & Playbook Builder
+        - "P08 BO-251 Real-Time Security Response & Playbook Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7235,7 +7235,7 @@ paths:
     put:
       operationId: setSecurityInvestigationEvidence
       x-ticvai-consumed-by:
-        - P08 BO-252 Security Investigation & Evidence Workspace
+        - "P08 BO-252 Security Investigation & Evidence Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7277,7 +7277,7 @@ paths:
     get:
       operationId: listSecurityDetectionGovernance
       x-ticvai-consumed-by:
-        - P08 BO-253 Security Analytics, AI Detection & Governance
+        - "P08 BO-253 Security Analytics, AI Detection & Governance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7364,7 +7364,7 @@ paths:
     get:
       operationId: listAccessMonitoring
       x-ticvai-consumed-by:
-        - P08 BO-254 Access Monitoring & Analytics Command Center
+        - "P08 BO-254 Access Monitoring & Analytics Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7402,7 +7402,7 @@ paths:
     get:
       operationId: listLiveVenueOccupancy
       x-ticvai-consumed-by:
-        - P08 BO-255 Live Venue Occupancy & People Counting
+        - "P08 BO-255 Live Venue Occupancy & People Counting"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7440,7 +7440,7 @@ paths:
     get:
       operationId: listGraphicalAccessMap
       x-ticvai-consumed-by:
-        - P08 BO-256 Graphical Access Map & Live Gate Performance
+        - "P08 BO-256 Graphical Access Map & Live Gate Performance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7478,7 +7478,7 @@ paths:
     get:
       operationId: listAttendanceAdmission
       x-ticvai-consumed-by:
-        - P08 BO-257 Attendance & Admission Analytics
+        - "P08 BO-257 Attendance & Admission Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7560,7 +7560,7 @@ paths:
     get:
       operationId: listEntryExitCrossover
       x-ticvai-consumed-by:
-        - P08 BO-258 Entry, Exit, Re-entry & Crossover Analytics
+        - "P08 BO-258 Entry, Exit, Re-entry & Crossover Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7598,7 +7598,7 @@ paths:
     get:
       operationId: listThroughputQueueValidation
       x-ticvai-consumed-by:
-        - P08 BO-259 Throughput, Queue & Validation Performance Analytics
+        - "P08 BO-259 Throughput, Queue & Validation Performance Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7636,7 +7636,7 @@ paths:
     get:
       operationId: listValidationOutcomeRejection
       x-ticvai-consumed-by:
-        - P08 BO-260 Validation Outcome & Rejection Analytics
+        - "P08 BO-260 Validation Outcome & Rejection Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7723,7 +7723,7 @@ paths:
     get:
       operationId: listGuestDwellTime
       x-ticvai-consumed-by:
-        - P08 BO-261 Guest Dwell Time, Length of Stay & Attraction Flow
+        - "P08 BO-261 Guest Dwell Time, Length of Stay & Attraction Flow"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7761,7 +7761,7 @@ paths:
     get:
       operationId: listAccessReportScheduled
       x-ticvai-consumed-by:
-        - P08 BO-262 Access Reports, Scheduled Reporting & Data Export
+        - "P08 BO-262 Access Reports, Scheduled Reporting & Data Export"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7799,7 +7799,7 @@ paths:
     get:
       operationId: listAccessExecutiveInsight
       x-ticvai-consumed-by:
-        - P08 BO-263 AI Access Intelligence, Forecasting & Executive Insights
+        - "P08 BO-263 AI Access Intelligence, Forecasting & Executive Insights"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true

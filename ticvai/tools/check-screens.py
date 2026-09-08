@@ -53,6 +53,73 @@ def load_vocabulary() -> tuple[set[str], set[str]]:
             {r["id"] for r in doc.get("regions", [])})
 
 
+# **A screen whose only operation was read off its own title declares nothing.** 423 screens
+# hold exactly one operation, it begins `list`, and every word after `list` comes from the
+# screen's own name — `BO-233 Operations Audit, Shift Handover & Summary` declaring only
+# `listShiftHandoverSummary`. The title promises a handover; the declaration can only fetch rows.
+#
+# **The stamp is a property of five files, not of the package.** P08, P09, P10, P12 and P13 carry
+# all 423 of them and the other ten platforms carry none — measured 8 September, and the same
+# split Claude Design measured independently at a stricter threshold (360). So this ships
+# *enforcing* where the count is zero and *warning* where the re-signature work is outstanding.
+# **A check that can only warn everywhere is a check nobody fixes.**
+STAMP_WARN_ONLY = {"P08", "P09", "P10", "P12", "P13"}
+
+# The publish family, as ADR-less vocabulary: what `publishGate.requiredWhen` actually means.
+PUBLISHES = re.compile(r"^(publish|deploy|promote|activate)[A-Z]")
+_JOINING = {"and", "or", "the", "a", "an", "of", "for", "to", "with", "in", "on", "by"}
+
+
+def _singular(word: str) -> str:
+    return word[:-1] if len(word) > 3 and word.endswith("s") and not word.endswith("ss") else word
+
+
+def title_stamped(name: str, ops: list[str]) -> bool:
+    """True when the screen's one operation is its own title with `list` in front."""
+    if len(ops) != 1 or not ops[0].startswith("list"):
+        return False
+    stem = {_singular(w.lower())
+            for w in re.findall(r"[A-Z]?[a-z0-9]+|[A-Z]+(?![a-z])", ops[0][4:])}
+    title = {_singular(w.lower()) for w in re.split(r"[^A-Za-z0-9]+", name)
+             if w and w.lower() not in _JOINING}
+    return bool(stem) and stem <= title
+
+
+def load_wireframe_schema() -> tuple[set[str], dict[str, set[str]]]:
+    """Allowed keys and enums for the `wireframe` block, read from `_schema.yaml`.
+
+    **`_schema.yaml` was documentation and nothing read it.** The wireframe block declared four
+    fields, carried seven, and every one of the 1,091 `status` values was outside its own enum —
+    which is a block nothing validates, so the schema drifted from the files for as long as
+    anybody had been writing to it. Reading the schema here is the point: a rule with its own
+    hardcoded copy of the vocabulary drifts the same way.
+    """
+    doc = yaml.safe_load((SCREENS / "_schema.yaml").read_text(encoding="utf-8"))
+    node = doc
+    for step in ("properties", "screens", "items", "properties", "wireframe"):
+        node = (node or {}).get(step) or {}
+    props = node.get("properties") or {}
+    enums = {k: set(v["enum"]) for k, v in props.items() if isinstance(v, dict) and v.get("enum")}
+    closed = node.get("additionalProperties") is False
+    return (set(props) if closed else set()), enums
+
+
+def load_id_pattern() -> "re.Pattern | None":
+    """The screen `id` pattern, read from `_schema.yaml`.
+
+    **The second unenforced rule in the same file.** It read `^[A-Z]{3}-[0-9]{3}$` until
+    8 September, and all 363 `BO-` screens failed it — on the field `board-data.js`, the
+    traceability map and every board anchor join on. Nobody noticed because nothing read the
+    schema.
+    """
+    doc = yaml.safe_load((SCREENS / "_schema.yaml").read_text(encoding="utf-8"))
+    node = doc
+    for step in ("properties", "screens", "items", "properties", "id"):
+        node = (node or {}).get(step) or {}
+    pat = node.get("pattern") if isinstance(node, dict) else None
+    return re.compile(pat) if pat else None
+
+
 OP_PATHS: dict = {}
 OP_CONTRACT: dict = {}
 CONTRACT_MODULE = {
@@ -164,7 +231,8 @@ def check_platform(name: str, p: dict) -> None:
         WARNINGS.append(f"{name}: a web surface declaring offlineCapable is unusual — confirm")
 
 
-def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids: set[str]) -> None:
+def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids: set[str],
+          wf_keys: set[str], wf_enums: dict[str, set[str]], id_pat) -> None:
     name = path.name
     doc = yaml.safe_load(path.read_text(encoding="utf-8"))
     check_platform(name, doc["platform"])
@@ -177,6 +245,53 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
         if sid in seen:
             ERRORS.append(f"{name}: duplicate screen id {sid}")
         seen.add(sid)
+
+        if id_pat and not id_pat.match(sid):
+            ERRORS.append(f"{name}: screen id {sid!r} does not match the schema's own pattern "
+                          f"{id_pat.pattern!r} — the id is what every other artefact joins on")
+
+        # **The wireframe block, against its own schema.** Nothing validated this until
+        # 8 September, and by then every screen in the package held an illegal `status`.
+        wf = s.get("wireframe") or {}
+        if wf_keys:
+            for k in sorted(set(wf) - wf_keys):
+                ERRORS.append(f"{name}: {sid} wireframe declares '{k}', which _schema.yaml "
+                              f"does not — a field nothing declares is a field nothing reads")
+        for k, allowed in wf_enums.items():
+            if k in wf and wf[k] not in allowed:
+                ERRORS.append(f"{name}: {sid} wireframe.{k} is '{wf[k]}', not one of "
+                              f"{', '.join(sorted(allowed))}")
+        if title_stamped(s["name"], [a.get("operationId") for a in (s.get("apis") or [])]):
+            msg = (f"{name}: {sid} declares one operation and it is its own title with 'list' "
+                   f"in front — the declaration was read off the name, so it is evidence of "
+                   f"nothing about what the screen does")
+            (WARNINGS if doc["platform"]["code"] in STAMP_WARN_ONLY else ERRORS).append(msg)
+
+        # **A screen that publishes declares the gate.** `publishGate`'s `requiredWhen` keys off
+        # the declared operation, not the screen's subject, which is what makes it checkable at
+        # all — and it needs no `release*` exclusion since the seven hold-releasing operations
+        # became `relinquish*` on 8 September. 35 screens declare a publish-family operation.
+        #
+        # **Enforcing since 8 September, and it took removing a screen's operations to get there.**
+        # The last holdout was `PTR-010 Cart & Quote`, which declared `publishPromotion` and five
+        # other promotion authoring verbs on a partner cart screen — the only P10 screen with any,
+        # against a platform median of one operation per screen. **That was operation residue, not
+        # a missing gate**, so the six `onAction` verbs were removed rather than the component
+        # added: a reseller building a quote evaluates promotions, it does not author them. The
+        # reads stayed. Every screen that publishes now declares the gate.
+        gate_ops = [a.get("operationId") for a in (s.get("apis") or [])]
+        if any(o and (PUBLISHES.match(o) or o == "releaseProductionPlan") for o in gate_ops):
+            kinds_here = [c.get("kind")
+                          for r in ((s.get("layout") or {}).get("regions") or [])
+                          for c in (r.get("components") or [])]
+            if "publishGate" not in kinds_here:
+                ERRORS.append(f"{name}: {sid} declares an operation that publishes and has no "
+                              f"publishGate — a publish with no stated consequence is one "
+                              f"somebody presses meaning to save")
+
+        if wf.get("status") in ("inProgress", "review", "approved") and not wf.get("board"):
+            WARNINGS.append(f"{name}: {sid} claims design status '{wf['status']}' with no board "
+                            f"— intent without a frame is a claim nothing backs")
 
         for region in (s.get("layout") or {}).get("regions", []):
             if (ref := region.get("ref")) and ref not in regions:
@@ -196,9 +311,19 @@ def check(path: Path, kinds: set[str], regions: set[str], ops: set[str], all_ids
         # "your filter matched nothing" and "you may not see this", and they are three different
         # screens with three different actions. The permission case is the one that mattered —
         # **an empty list where the truth is a permission is a lie a person will act on.**
+        #
+        # **`emptyNoEvents` satisfies the same obligation, added 8 September.** The rule asked
+        # for `emptyFirstRun` by name, so eleven audit trails declared *"the action is to create
+        # the first entry"* — a screen offering to author its own evidence. The obligation is
+        # that a screen says what an empty one means, not that it invites a first row.
         states = s.get("states") or {}
+        empty_first = {"emptyFirstRun", "emptyNoEvents"}
         for required in ("loading", "emptyFirstRun", "error"):
-            if required not in states:
+            if required == "emptyFirstRun":
+                if not (empty_first & set(states)):
+                    ERRORS.append(f"{name}: {sid} declares neither emptyFirstRun nor "
+                                  f"emptyNoEvents — an empty screen has to say which it is")
+            elif required not in states:
                 ERRORS.append(f"{name}: {sid} is missing the '{required}' state")
         if "empty" in states:
             ERRORS.append(f"{name}: {sid} still declares 'empty' — split it into emptyFirstRun, "
@@ -387,6 +512,8 @@ def main() -> int:
         return 1
 
     kinds, regions = load_vocabulary()
+    wf_keys, wf_enums = load_wireframe_schema()
+    id_pat = load_id_pattern()
     ops = load_operation_ids()
     lin_path = ROOT / "handoff" / "api-data-lineage.json"
     if lin_path.exists():
@@ -406,7 +533,7 @@ def main() -> int:
     for f in files:
         doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         total += len(doc["screens"])
-        check(f, kinds, regions, ops, all_ids)
+        check(f, kinds, regions, ops, all_ids, wf_keys, wf_enums, id_pat)
         print(f"  {doc['platform']['code']}  {doc['platform']['name']:30} {len(doc['screens']):>3} screens")
 
     print(f"\n  {'':36} {total:>3} total\n")

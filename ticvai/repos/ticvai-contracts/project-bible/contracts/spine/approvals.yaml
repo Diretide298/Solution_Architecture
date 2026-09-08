@@ -778,7 +778,7 @@ paths:
     get:
       operationId: listRuleWorkflow
       x-ticvai-consumed-by:
-        - P09 ADM-238 Rules & Workflow Command Center
+        - "P09 ADM-238 Rules & Workflow Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -817,7 +817,7 @@ paths:
     put:
       operationId: setVisualBusinessRule
       x-ticvai-consumed-by:
-        - P09 ADM-239 Visual Business Rule Builder
+        - "P09 ADM-239 Visual Business Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -860,7 +860,7 @@ paths:
     get:
       operationId: listConditionDecisionLogic
       x-ticvai-consumed-by:
-        - P09 ADM-240 Conditions, Decision Logic & Decision Tables
+        - "P09 ADM-240 Conditions, Decision Logic & Decision Tables"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -898,7 +898,7 @@ paths:
     put:
       operationId: setVisualWorkflow
       x-ticvai-consumed-by:
-        - P09 ADM-241 Visual Workflow Designer
+        - "P09 ADM-241 Visual Workflow Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -940,7 +940,7 @@ paths:
     put:
       operationId: approveMatrixMultiLevel
       x-ticvai-consumed-by:
-        - P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration
+        - "P09 ADM-242 Approval Matrix & Multi-Level Approval Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -982,7 +982,7 @@ paths:
     put:
       operationId: approveRoleAuthorityDelegation
       x-ticvai-consumed-by:
-        - P09 ADM-243 Roles, Authority, Delegation & Approval Limits
+        - "P09 ADM-243 Roles, Authority, Delegation & Approval Limits"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1025,7 +1025,7 @@ paths:
     get:
       operationId: listSlaEscalationReminder
       x-ticvai-consumed-by:
-        - P09 ADM-244 SLA, Escalation, Reminder & Timeout Rules
+        - "P09 ADM-244 SLA, Escalation, Reminder & Timeout Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1063,7 +1063,7 @@ paths:
     put:
       operationId: setTriggerActionCross
       x-ticvai-consumed-by:
-        - P09 ADM-245 Trigger, Action & Cross-Module Orchestration Configuration
+        - "P09 ADM-245 Trigger, Action & Cross-Module Orchestration Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1105,7 +1105,7 @@ paths:
     put:
       operationId: simulateWorkflowTestingImpact
       x-ticvai-consumed-by:
-        - P09 ADM-246 Workflow Testing, Simulation & Impact Analysis
+        - "P09 ADM-246 Workflow Testing, Simulation & Impact Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1147,7 +1147,7 @@ paths:
     put:
       operationId: approveVersioningGovernance
       x-ticvai-consumed-by:
-        - P09 ADM-247 Versioning, Governance, Approval & Publication
+        - "P09 ADM-247 Versioning, Governance, Approval & Publication"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1189,7 +1189,7 @@ paths:
     get:
       operationId: listWorkflow
       x-ticvai-consumed-by:
-        - P09 ADM-248 Workflow Operations Command Center
+        - "P09 ADM-248 Workflow Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1227,7 +1227,7 @@ paths:
     put:
       operationId: approveUnifiedDecision
       x-ticvai-consumed-by:
-        - P09 ADM-249 Unified Approval Inbox & Decision Workspace
+        - "P09 ADM-249 Unified Approval Inbox & Decision Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1271,7 +1271,7 @@ paths:
     get:
       operationId: listWorkflowInstanceProcess
       x-ticvai-consumed-by:
-        - P09 ADM-250 Workflow Instance Monitor & Process Timeline
+        - "P09 ADM-250 Workflow Instance Monitor & Process Timeline"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1309,7 +1309,7 @@ paths:
     get:
       operationId: listWorkflowExceptionFailure
       x-ticvai-consumed-by:
-        - P09 ADM-251 Workflow Exception, Failure & Recovery Center
+        - "P09 ADM-251 Workflow Exception, Failure & Recovery Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1347,7 +1347,7 @@ paths:
     get:
       operationId: listSlaEscalationBottleneck
       x-ticvai-consumed-by:
-        - P09 ADM-252 SLA, Escalation & Bottleneck Monitor
+        - "P09 ADM-252 SLA, Escalation & Bottleneck Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1385,7 +1385,7 @@ paths:
     post:
       operationId: createAutomationAutonomouAction
       x-ticvai-consumed-by:
-        - P09 ADM-253 Automation Execution & Autonomous Action Monitor
+        - "P09 ADM-253 Automation Execution & Autonomous Action Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1428,7 +1428,7 @@ paths:
     get:
       operationId: listCrossModuleOrchestration
       x-ticvai-consumed-by:
-        - P09 ADM-254 Cross-Module Orchestration Monitor
+        - "P09 ADM-254 Cross-Module Orchestration Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1466,7 +1466,7 @@ paths:
     get:
       operationId: listWorkflowProcessPerformance
       x-ticvai-consumed-by:
-        - P09 ADM-255 Workflow Analytics & Process Performance
+        - "P09 ADM-255 Workflow Analytics & Process Performance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1553,7 +1553,7 @@ paths:
     get:
       operationId: listProcessAutomationOpportunity
       x-ticvai-consumed-by:
-        - P09 ADM-256 Process Optimization & Automation Opportunity Center
+        - "P09 ADM-256 Process Optimization & Automation Opportunity Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -1592,7 +1592,7 @@ paths:
     get:
       operationId: listWorkflowAutonomouGovernance
       x-ticvai-consumed-by:
-        - P09 ADM-257 AI Workflow Intelligence & Autonomous Governance Center
+        - "P09 ADM-257 AI Workflow Intelligence & Autonomous Governance Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true

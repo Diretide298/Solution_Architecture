@@ -67,7 +67,8 @@ screens:
     inferred: true
     isEntryPoint: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-001
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-001
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -112,7 +113,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-002
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-002
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -177,7 +179,8 @@ screens:
     - KSK-004
     inferred: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-003
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-003
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -240,7 +243,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-004
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-004
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -313,7 +317,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-005
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-005
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -381,7 +386,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-006
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-006
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -462,7 +468,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-007
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-007
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
@@ -533,7 +540,8 @@ screens:
     notes: '**Reached from KSK-007** — the payment screen is the one that fails. Stated on 4 September:
       this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-008
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-008
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -603,7 +611,8 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 1.dc.html#KSK-009
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-009
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -673,7 +682,8 @@ screens:
     notes: '**Reached from KSK-009** — printing fails after the ticket is issued. Stated on 4 September:
       this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-010
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-010
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -744,7 +754,8 @@ screens:
       on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-011
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-011
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -813,7 +824,8 @@ screens:
       4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-012
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-012
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -872,7 +884,8 @@ screens:
     - KSK-003
     inferred: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-013
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-013
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -930,7 +943,8 @@ screens:
       on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-014
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-014
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -1020,7 +1034,8 @@ screens:
     component: apps/guest-app/src/routes/Assistant.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-015
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-015
   notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no
@@ -1091,7 +1106,8 @@ screens:
     component: apps/guest-app/src/routes/sell/OrderFoodList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-016
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-016
   notes: BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
@@ -1169,7 +1185,8 @@ screens:
     component: apps/guest-app/src/routes/sell/ShopList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Kiosk Board 2.dc.html#KSK-017
     generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-017
   notes: 'BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops

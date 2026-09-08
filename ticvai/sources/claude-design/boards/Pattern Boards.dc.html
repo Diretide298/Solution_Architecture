@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="page">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F2F5F9}
+  *{box-sizing:border-box;font-family:'Manrope',system-ui,sans-serif}
+  a{color:#0A4FB8;text-decoration:none;border-bottom:1px solid rgba(10,79,184,.28)}
+  a:hover{color:#083B8A;border-bottom-color:#083B8A}
+</style>
+</helmet>
+
+<div style="max-width:1400px;margin:0 auto;padding:34px 26px 90px;color:#0B1324">
+
+  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#8494A8">pattern boards &middot; 7 september 2026</div>
+  <h1 style="font-size:32px;font-weight:800;letter-spacing:-.028em;margin:7px 0 0">Eight frames that carry 629 of the 816 undrawn screens</h1>
+  <p style="font-size:12.5px;color:#5A6577;max-width:88ch;margin:14px 0 0;line-height:1.65;text-wrap:pretty">The 816 unboarded screens were written by a generator applying a short layout vocabulary, so they collapse into 43 patterns — and a pattern drawn once serves every screen that declares it. Eight frames are drawn here: the three largest patterns in the package, the three largest that had no frame anywhere, a seventh split out of BP-006 because two opposite jobs were sharing one signature, and an eighth for the three screens that declare no template at all. Each is drawn at pack fidelity against a real screen from its biggest group, with the roster underneath naming every screen it serves.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:24px;align-items:end;padding:18px 20px;margin-top:18px;background:#0B1324;border-radius:12px;color:#DCE8F7">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">drawn here</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#fff">629</span><span style="font-size:12px;color:#9FB6CF">screens · 8 frames</span></div>
+      <div style="height:7px;border-radius:4px;background:rgba(255,255,255,.12)"><div style="width:77%;height:7px;border-radius:4px;background:#0E9F6E"></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">frame elsewhere</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#8FE3FF">170</span><span style="font-size:12px;color:#9FB6CF">across 20 patterns</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">Already drawn in the packs. Indexing, not design.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">no frame anywhere</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#E0A03A">17</span><span style="font-size:12px;color:#9FB6CF">across 15 patterns</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">Fourteen are a single screen each. These need a decision before a frame.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;padding:14px 16px;margin-top:16px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+    <div><b>Drawing them was worth more as an audit than as coverage.</b> <a href="#bp-003">BP-003</a> is 115 screens and <b>96 of them are called a Command Center</b> — one per module boundary, five platforms, all declaring the same two components. <a href="#bp-006">BP-006</a> is three jobs under one signature — <b>eleven read-only audit trails, seven publish screens</b> now split to <a href="#bp-006-p">BP-006-P</a>, and five that are neither &mdash; and on inspection <b>all 23 carry the same generated block</b>, so the eleven are right by accident of their titles (<a href="Vocabulary%20Corrections.dc.html#d4">corrections</a>). <a href="#bp-010">BP-010</a> declares a <span style="font-family:'IBM Plex Mono',monospace">list</span> template and then asks for a detail panel, which is a <span style="font-family:'IBM Plex Mono',monospace">split</span> — correcting it folds seventeen screens into <a href="#bp-001">BP-001</a> and takes the pattern count from 44 to 43. And <b>three venue-map screens declare no template at all</b> (<a href="#no-template">BP-037–039</a>), the only three in 1,091 that do. <b>None of the four is a drawing problem.</b> A generator applying a vocabulary faithfully will reproduce whatever the vocabulary got wrong.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div id="bp-002" data-screen-label="BP-002" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-002</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Split — configuration workspace</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">137 screens &middot; 5 platforms</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">detailPanel &middot; selectField &middot; toggle</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Drawn against <b>ADM-049 Price List Master Configuration</b>, the largest group's first screen. A roster on the left, a form on the right, and the two things the pattern always needs: a scope selector that says what the setting applies to, and a toggle that says whether it is on.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Commercial &middot; Price lists</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">ADM-049 &middot; platform scope</span></div>
+          <div style="flex:1;display:flex;min-height:0">
+
+            <div style="flex:none;width:330px;border-right:1px solid #E8ECF3;display:flex;flex-direction:column;min-height:0;background:#FAFBFD">
+              <div style="flex:none;padding:14px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:1px solid #E8ECF3">
+                <div style="height:34px;border-radius:9px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;padding:0 11px;font-size:12px;color:#8494A8">Search price lists</div>
+                <div style="display:flex;gap:7px">
+                  <div style="flex:1;height:30px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:700">All 24</div>
+                  <div style="flex:1;height:30px;border-radius:8px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:#5A6577">Live 18</div>
+                  <div style="flex:1;height:30px;border-radius:8px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11.5px;font-weight:600;color:#5A6577">Draft 6</div>
+                </div>
+              </div>
+              <div style="flex:1;overflow:hidden;display:flex;flex-direction:column">
+                <div style="padding:11px 16px;background:#EAF4FF;border-left:3px solid #0D6EFD;display:flex;flex-direction:column;gap:3px"><div style="font-size:12.5px;font-weight:800">Gate — standard rack</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577">PL-0004 &middot; AED &middot; 412 rows</div></div>
+                <div style="padding:11px 16px;border-bottom:1px solid #F1F4F8;display:flex;flex-direction:column;gap:3px"><div style="font-size:12.5px;font-weight:700;color:#26303F">Online — dynamic base</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">PL-0005 &middot; AED &middot; 388 rows</div></div>
+                <div style="padding:11px 16px;border-bottom:1px solid #F1F4F8;display:flex;flex-direction:column;gap:3px"><div style="font-size:12.5px;font-weight:700;color:#26303F">Trade — net partner</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">PL-0011 &middot; AED &middot; 204 rows</div></div>
+                <div style="padding:11px 16px;border-bottom:1px solid #F1F4F8;display:flex;flex-direction:column;gap:3px"><div style="font-size:12.5px;font-weight:700;color:#26303F">Groups — 15+ pax</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">PL-0014 &middot; AED &middot; 96 rows</div></div>
+                <div style="padding:11px 16px;border-bottom:1px solid #F1F4F8;display:flex;flex-direction:column;gap:3px"><div style="font-size:12.5px;font-weight:700;color:#26303F">Staff &amp; comp</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">PL-0019 &middot; AED &middot; 41 rows</div></div>
+                <div style="padding:11px 16px;display:flex;flex-direction:column;gap:3px;opacity:.6"><div style="font-size:12.5px;font-weight:700;color:#26303F">Ramadan 2027 <span style="font-size:9px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:4px;background:#FFF7E6;color:#8A6D00;margin-left:4px">draft</span></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">PL-0024 &middot; AED &middot; 0 rows</div></div>
+              </div>
+              <div style="flex:none;padding:12px 16px;border-top:1px solid #E8ECF3"><div style="height:34px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800">New price list</div></div>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0">
+              <div style="flex:none;padding:16px 22px 14px;border-bottom:1px solid #E8ECF3;display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+                <div style="min-width:0"><div style="font-size:17px;font-weight:800;letter-spacing:-.018em">Gate — standard rack</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8;margin-top:3px">PL-0004 &middot; last changed 2 Sep by C. Mehta &middot; version 7</div></div>
+                <div style="display:flex;gap:8px;flex:none"><div style="height:32px;padding:0 14px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:12px;font-weight:700;color:#5A6577">History</div><div style="height:32px;padding:0 14px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;font-size:12px;font-weight:800">Save</div></div>
+              </div>
+              <div style="flex:1;padding:18px 22px;display:flex;flex-direction:column;gap:16px;min-height:0;overflow:hidden">
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+                  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:700;color:#5A6577">Applies at</div><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:12.5px;font-weight:600"><span>Tenant &middot; all venues</span><span style="color:#8494A8">&#9662;</span></div><div style="font-size:10.5px;color:#8494A8;line-height:1.5">One of six configuration levels. 321 of 321 are decided; this screen is where the decision is entered.</div></div>
+                  <div style="display:flex;flex-direction:column;gap:6px"><div style="font-size:11px;font-weight:700;color:#5A6577">Currency</div><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:12.5px;font-weight:600"><span>AED — dirham</span><span style="color:#8494A8">&#9662;</span></div><div style="font-size:10.5px;color:#8494A8;line-height:1.5">Presentation currency is a payment concern on every surface that takes money, not a display setting here.</div></div>
+                </div>
+
+                <div style="flex:none;border:1px solid #E8ECF3;border-radius:12px;overflow:hidden">
+                  <div style="padding:11px 14px;background:#FAFBFD;border-bottom:1px solid #E8ECF3;font-size:12px;font-weight:800">Behaviour</div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-bottom:1px solid #F1F4F8"><div style="min-width:0"><div style="font-size:12.5px;font-weight:700">Inherit from parent hierarchy</div><div style="font-size:10.5px;color:#8494A8;margin-top:2px">Unset rows fall through to the platform master rather than failing the sale.</div></div><div style="flex:none;width:40px;height:22px;border-radius:12px;background:#0D6EFD;padding:2px;display:flex;justify-content:flex-end"><div style="width:18px;height:18px;border-radius:9px;background:#fff"></div></div></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px;border-bottom:1px solid #F1F4F8"><div style="min-width:0"><div style="font-size:12.5px;font-weight:700">Allow override at the till</div><div style="font-size:10.5px;color:#8494A8;margin-top:2px">Requires <span style="font-family:'IBM Plex Mono',monospace">PRICE_OVERRIDE</span> and writes a variance record every time.</div></div><div style="flex:none;width:40px;height:22px;border-radius:12px;background:#DCE3ED;padding:2px;display:flex"><div style="width:18px;height:18px;border-radius:9px;background:#fff"></div></div></div>
+                  <div style="display:flex;align-items:center;justify-content:space-between;gap:14px;padding:12px 14px"><div style="min-width:0"><div style="font-size:12.5px;font-weight:700">Tax inclusive</div><div style="font-size:10.5px;color:#8494A8;margin-top:2px">UAE VAT. Flipping this on a live list re-prices 412 rows and needs an approval.</div></div><div style="flex:none;width:40px;height:22px;border-radius:12px;background:#0D6EFD;padding:2px;display:flex;justify-content:flex-end"><div style="width:18px;height:18px;border-radius:9px;background:#fff"></div></div></div>
+                </div>
+
+                <div style="margin-top:auto;padding:12px 14px;border-radius:11px;background:#FFF7E6;border:1px solid #F0DFB8;font-size:11.5px;color:#5A4A20;line-height:1.6">Saving publishes to 18 live channels. <b>412 rows re-price</b>, and <span style="font-family:'IBM Plex Mono',monospace">pricing.priceListPublished</span> is the event four consumers wait on — the confirmation names them rather than counting them.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">137 screens, one layout, and 41 of them in one module</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">P09 Commercial alone contributes 41 — price list, rate structure, hierarchy, tax profile, fee, rounding, each its own screen declaring <span style="font-family:'IBM Plex Mono',monospace">detailPanel &middot; selectField &middot; toggle</span>. Drawn once, the pattern is obviously right; drawn 41 times, it is a navigation problem. The frame above holds six settings that four of those screens each hold one of.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">raise &middot; merge candidates in P09 Commercial<br>reuse &middot; this frame for all 137</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The selector is the screen</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Every screen in this pattern configures something at a level — tenant, venue, outlet, channel, partner, till. <b>Applies at</b> is the only control that cannot be omitted, and it is the one the generator left as a bare select.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">levels &middot; 6<br>decided &middot; 321 of 321</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A toggle with a blast radius</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Two of the three switches here re-price live inventory. The pattern needs a save confirmation that names consequences, not a count — so it is drawn into the frame rather than left to each of the 137.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">approval &middot; on tax inclusive<br>event &middot; priceListPublished</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; split &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; detailPanel &middot; selectField &middot; toggle</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">dirty</b> &middot; saving &middot; emptyNoSelection &middot; conflict &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; 137 screens across P08 &middot; P09 &middot; P10 &middot; P12 &middot; P13</div>
+        <div><b style="color:#4A5566;font-weight:600">PAIRS WITH</b> &middot; <a href="#bp-003">BP-003</a> <span style="color:#9AA5B6">— every module in the roster has one of each</span></div>
+      </div>
+
+      <div style="margin-top:6px;background:#fff;border:1px solid #E8ECF3;border-radius:14px;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF1F6"><div style="font-size:13px;font-weight:800">Roster — every screen this frame serves</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ bp2.count }} screens &middot; {{ bp2.groupCount }} modules</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;margin-top:14px">
+          <sc-for list="{{ bp2.groups }}" as="g" hint-placeholder-count="9">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid #F1F4F8"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5A6577">{{ g.key }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ g.count }}</div></div>
+              <sc-for list="{{ g.screens }}" as="s" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:66px 1fr;gap:8px;align-items:baseline;padding:3px 0;font-size:11.5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.id }}</span><span style="color:#26303F">{{ s.name }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="bp-003" data-screen-label="BP-003" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-003</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Dashboard — module command centre</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">115 screens &middot; 5 platforms</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">dataTable &middot; metricTile</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">96 named &ldquo;command center&rdquo;</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Drawn against <b>ADM-048 Commercial Pricing Command Center</b>. Four tiles and a table is the whole pattern, and the question the frame has to answer is the one the generator never asked: what does the reader <i>do</i> from here.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Commercial &middot; pricing</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">ADM-048 &middot; 24 tenants &middot; live</span></div>
+
+          <div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:18px 20px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <div style="border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:5px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8494A8">price lists live</div><div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;line-height:1">18</span><span style="font-size:11px;color:#8494A8">of 24</span></div><div style="font-size:10.5px;color:#5A6577;line-height:1.45">6 draft, none expiring inside 30 days</div></div>
+              <div style="border:1px solid #F0DFB8;background:#FFFDF7;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:5px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8A6D00">awaiting approval</div><div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;line-height:1;color:#8A6D00">4</span><span style="font-size:11px;color:#8A6D00">oldest 6 days</span></div><div style="font-size:10.5px;color:#5A4A20;line-height:1.45">Two breach the 72-hour policy</div></div>
+              <div style="border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:5px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8494A8">override rate</div><div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;line-height:1">2.1%</span><span style="font-size:11px;color:#0E9F6E">&minus;0.4</span></div><div style="font-size:10.5px;color:#5A6577;line-height:1.45">of 41,208 lines sold this week</div></div>
+              <div style="border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:5px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8494A8">rows with no price</div><div style="display:flex;align-items:baseline;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;line-height:1">37</span><span style="font-size:11px;color:#B98900">3 sellable</span></div><div style="font-size:10.5px;color:#5A6577;line-height:1.45">Inheritance covers 34; three fail the sale</div></div>
+            </div>
+
+            <div style="flex:1;border:1px solid #E8ECF3;border-radius:12px;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+              <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 15px;border-bottom:1px solid #E8ECF3;background:#FAFBFD"><div style="font-size:12.5px;font-weight:800">Needs a decision today</div><div style="display:flex;gap:7px"><div style="height:28px;padding:0 11px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">Blocking 3</div><div style="height:28px;padding:0 11px;border-radius:8px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">All 41</div></div></div>
+              <div style="flex:none;display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:9px 15px;border-bottom:1px solid #E8ECF3;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8494A8"><div>ref</div><div>what</div><div>scope</div><div>waiting on</div><div style="text-align:right">age</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+                <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:11px 15px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFDF7"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">PL-0011</span><span style="font-weight:700">Trade net pricing — 3 rows sellable with no price</span><span style="color:#5A6577">Partner &middot; all</span><span style="color:#8A6D00;font-weight:700">you</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#8A6D00">6d</span></div>
+                <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:11px 15px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFDF7"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">PL-0024</span><span style="font-weight:700">Ramadan 2027 — publish before on-sale opens</span><span style="color:#5A6577">Tenant &middot; all</span><span style="color:#8A6D00;font-weight:700">you</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#8A6D00">4d</span></div>
+                <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:11px 15px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFDF7"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">TX-0007</span><span style="font-weight:700">Tax profile — jurisdiction unset on two outlets</span><span style="color:#5A6577">Outlet &middot; 2</span><span style="color:#8A6D00;font-weight:700">you</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#8A6D00">2d</span></div>
+                <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:11px 15px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">PL-0005</span><span style="color:#26303F">Dynamic base — rule change awaiting sign-off</span><span style="color:#5A6577">Channel &middot; online</span><span style="color:#5A6577">Q. Rahman</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#8494A8">1d</span></div>
+                <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:11px 15px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">FE-0002</span><span style="color:#26303F">Booking fee — rounding disagrees with the till</span><span style="color:#5A6577">Tenant &middot; all</span><span style="color:#5A6577">finance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#8494A8">1d</span></div>
+                <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:11px 15px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">PL-0014</span><span style="color:#26303F">Groups 15+ — expires 30 Sep, no successor</span><span style="color:#5A6577">Tenant &middot; all</span><span style="color:#5A6577">C. Mehta</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#8494A8">15h</span></div>
+                <div style="display:grid;grid-template-columns:78px 1.7fr 1fr 1fr 96px;gap:10px;padding:11px 15px;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">PL-0019</span><span style="color:#26303F">Staff &amp; comp — VAT treatment unconfirmed</span><span style="color:#5A6577">Tenant &middot; all</span><span style="color:#5A6577">finance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;text-align:right;color:#8494A8">9h</span></div>
+              </div>
+              <div style="flex:none;padding:10px 15px;border-top:1px solid #E8ECF3;background:#FAFBFD;font-size:11px;color:#5A6577">Sorted by whether it stops a sale, then by age. <b>Not</b> by recency — a dashboard sorted by recency is a log.</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">96 command centres is a generator counting modules</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">Of the 115 screens on this pattern, <b>96 carry &ldquo;Command Center&rdquo;, &ldquo;Monitor&rdquo; or &ldquo;Control Center&rdquo; in the name</b> — one per module, five platforms, all declaring <span style="font-family:'IBM Plex Mono',monospace">dataTable &middot; metricTile</span> and nothing else. P09 Commercial has 47 of them. A module boundary is not a reason for a dashboard, and the honest count of dashboards a platform console needs is closer to one per <i>role</i>.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">raise &middot; consolidate 96 &rarr; per-role dashboards<br>reuse &middot; this frame for whatever survives</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Four tiles, and one of them is amber</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A tile that never changes colour is decoration. Three here are counts; the fourth is a policy breach with an age on it, which is the only one that would make someone act.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">tiles &middot; 4<br>thresholded &middot; 2</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">No alert exists to feed this</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><b>CF-134</b> is open: nothing in the platform raises an alert, and five sections of the matrix ask for one. Every amber cell on this frame is drawn against a capability that has no contract behind it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">blocked by &middot; CF-134<br>drawn as &middot; intent</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; dashboard &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; dataTable &middot; metricTile</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyNothingToDecide</b> &middot; stale &middot; partialFailure &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; 115 screens across P08 &middot; P09 &middot; P10 &middot; P12 &middot; P13</div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">96 of 115 are per-module dashboards &mdash; consolidation candidate</span></div>
+      </div>
+
+      <div style="margin-top:6px;background:#fff;border:1px solid #E8ECF3;border-radius:14px;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF1F6"><div style="font-size:13px;font-weight:800">Roster — every screen this frame serves</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ bp3.count }} screens &middot; {{ bp3.groupCount }} modules</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;margin-top:14px">
+          <sc-for list="{{ bp3.groups }}" as="g" hint-placeholder-count="9">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid #F1F4F8"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5A6577">{{ g.key }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ g.count }}</div></div>
+              <sc-for list="{{ g.screens }}" as="s" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:66px 1fr;gap:8px;align-items:baseline;padding:3px 0;font-size:11.5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.id }}</span><span style="color:#26303F">{{ s.name }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="bp-001" data-screen-label="BP-001" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-001</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Split — directory and record</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">314 screens &middot; 5 platforms</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">dataTable &middot; detailPanel &middot; searchField</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">had one reference frame</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The largest pattern in the package by a factor of two, and until this board it rested on a single openable example — <span style="font-family:'IBM Plex Mono',monospace">ADM-041</span> on Dashboards Board 2. Drawn here against <b>BO-148 Access Point Directory</b>, the first screen of its largest group.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Access &amp; venue &middot; access points</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-148 &middot; Marina Park &middot; 214 points</span></div>
+          <div style="flex:1;display:flex;min-height:0">
+
+            <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;border-right:1px solid #E8ECF3">
+              <div style="flex:none;display:flex;align-items:center;gap:10px;padding:12px 16px;border-bottom:1px solid #E8ECF3">
+                <div style="flex:1;height:34px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12px;color:#26303F">turnstile <span style="color:#8494A8;margin-left:6px">&middot; 41 of 214</span></div>
+                <div style="flex:none;height:34px;padding:0 12px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:12px;font-weight:600;color:#5A6577">Zone &#9662;</div>
+                <div style="flex:none;height:34px;padding:0 12px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:12px;font-weight:600;color:#5A6577">Status &#9662;</div>
+              </div>
+              <div style="flex:none;display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:9px 16px;border-bottom:1px solid #E8ECF3;background:#FAFBFD;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8494A8"><div>code</div><div>name</div><div>zone</div><div>direction</div><div style="text-align:right">state</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#EAF4FF;border-left:3px solid #0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">AP-0112</span><span style="font-weight:800">North gate &middot; turnstile 3</span><span style="color:#5A6577">Main entry</span><span style="color:#5A6577">in</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E">live</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0113</span><span style="font-weight:700;color:#26303F">North gate &middot; turnstile 4</span><span style="color:#5A6577">Main entry</span><span style="color:#5A6577">in</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E">live</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0114</span><span style="font-weight:700;color:#26303F">North gate &middot; accessible lane</span><span style="color:#5A6577">Main entry</span><span style="color:#5A6577">both</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E">live</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFDF7"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0121</span><span style="font-weight:700;color:#26303F">East gate &middot; turnstile 1</span><span style="color:#5A6577">Beach side</span><span style="color:#5A6577">in</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#B98900">no reader</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0122</span><span style="font-weight:700;color:#26303F">East gate &middot; turnstile 2</span><span style="color:#5A6577">Beach side</span><span style="color:#5A6577">in</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E">live</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0140</span><span style="font-weight:700;color:#26303F">Splash zone &middot; height check</span><span style="color:#5A6577">Waterpark</span><span style="color:#5A6577">in</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E">live</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0155</span><span style="font-weight:700;color:#26303F">Staff door &middot; back of house</span><span style="color:#5A6577">Service</span><span style="color:#5A6577">both</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E">live</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;opacity:.6"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0161</span><span style="font-weight:700;color:#26303F">Marina jetty &middot; seasonal</span><span style="color:#5A6577">Marina</span><span style="color:#5A6577">both</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#8494A8">closed</span></div>
+                <div style="display:grid;grid-template-columns:86px 1.6fr 1fr 88px 74px;gap:10px;padding:11px 16px;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0170</span><span style="font-weight:700;color:#26303F">VIP entrance</span><span style="color:#5A6577">Main entry</span><span style="color:#5A6577">both</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E">live</span></div>
+              </div>
+              <div style="flex:none;padding:10px 16px;border-top:1px solid #E8ECF3;background:#FAFBFD;display:flex;align-items:center;justify-content:space-between;font-size:11px;color:#5A6577"><span>41 matching &middot; 214 total &middot; 1 without a reader</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">page 1 of 5</span></div>
+            </div>
+
+            <div style="flex:none;width:404px;display:flex;flex-direction:column;min-height:0;background:#FAFBFD">
+              <div style="flex:none;padding:16px 18px 14px;border-bottom:1px solid #E8ECF3">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-0112</div>
+                <div style="font-size:16px;font-weight:800;letter-spacing:-.018em;margin-top:3px">North gate &middot; turnstile 3</div>
+                <div style="display:flex;gap:7px;margin-top:11px"><div style="flex:1;height:32px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800">Edit</div><div style="flex:1;height:32px;border-radius:8px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#5A6577">Close point</div></div>
+              </div>
+              <div style="flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow:hidden">
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Zone</span><span style="font-weight:700">Main entry</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Direction</span><span style="font-weight:700">In only</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Reader</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">RD-2211 &middot; QR + NFC</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Anti-passback</span><span style="font-weight:700">On &middot; 90s</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Offline behaviour</span><span style="font-weight:700">Queue and admit</span></div>
+                </div>
+                <div style="border:1px solid #E8ECF3;background:#fff;border-radius:11px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12px;font-weight:800">Today</div>
+                  <div style="display:flex;gap:16px"><div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;line-height:1">8,412</div><div style="font-size:10.5px;color:#8494A8;margin-top:2px">admitted</div></div><div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;line-height:1;color:#B98900">37</div><div style="font-size:10.5px;color:#8494A8;margin-top:2px">refused</div></div><div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;line-height:1">2</div><div style="font-size:10.5px;color:#8494A8;margin-top:2px">offline spells</div></div></div>
+                </div>
+                <div style="padding:11px 13px;border-radius:11px;background:#fff;border:1px solid #E8ECF3;font-size:11px;color:#5A6577;line-height:1.55"><b style="color:#26303F">Why the detail panel and not a page.</b> An access point is read against its siblings — this turnstile's refusal rate only means something beside turnstile 4's. Nine of the 314 screens in this pattern open the record as a full page instead, and those are the ones worth changing.</div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">writes &middot; access.access_point<br>owned by &middot; tenancy</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">314 screens on one example</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">This is 38% of the whole gap and, before this frame, its only openable reference was <span style="font-family:'IBM Plex Mono',monospace">ADM-041</span> — a template registry on a two-screen board. A pattern carrying 314 screens needs more than one worked example, because the thing that varies is not the layout but <i>what the detail panel is for</i>: a record to read, a record to edit, or a record to approve.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">was &middot; 1 reference frame<br>now &middot; 2, and this one is a directory</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Search is the navigation</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">214 access points, 3,911 columns across the schema, and no tree that would hold them. The search field is the only route into the table, so it shows its match count inline rather than clearing the list and hoping.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">rows &middot; 214<br>filters &middot; zone, status</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">One amber row, named</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">AP-0121 has no reader. The footer says so in words next to the count, because a directory that can hold a gate nobody can scan at should say which gate rather than how many.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">device gap &middot; workshop-blocked<br>see &middot; CF-136</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; split &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; dataTable &middot; detailPanel &middot; searchField</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyNoMatch</b> &middot; emptyNoSelection &middot; partialFailure &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; 314 screens across P08 &middot; P09 &middot; P10 &middot; P12 &middot; P13</div>
+        <div><b style="color:#4A5566;font-weight:600">OTHER FRAME</b> &middot; <a href="Dashboards%20Board%202.dc.html#adm-041">ADM-041 System Transactional Template Registry</a></div>
+      </div>
+
+      <div style="margin-top:6px;background:#fff;border:1px solid #E8ECF3;border-radius:14px;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF1F6"><div style="font-size:13px;font-weight:800">Roster — every screen this frame serves</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ bp1.count }} screens &middot; {{ bp1.groupCount }} modules</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;margin-top:14px">
+          <sc-for list="{{ bp1.groups }}" as="g" hint-placeholder-count="9">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid #F1F4F8"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5A6577">{{ g.key }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ g.count }}</div></div>
+              <sc-for list="{{ g.screens }}" as="s" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:66px 1fr;gap:8px;align-items:baseline;padding:3px 0;font-size:11.5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.id }}</span><span style="color:#26303F">{{ s.name }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="bp-006" data-screen-label="BP-006" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-006</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Dashboard — audit trail</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">11 screens &middot; 4 platforms</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">searchField &middot; timeline</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">all 23 re-signatured</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Drawn against <b>ADM-136 Product Audit Trail &amp; Change History</b>. The largest pattern with no frame anywhere, and the only one in the set whose component list is two items long.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Catalogue &middot; audit trail</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">ADM-136 &middot; PRD-4471 &middot; 63 events</span></div>
+
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;padding:18px 20px;gap:14px">
+            <div style="flex:none;display:flex;align-items:center;gap:10px">
+              <div style="flex:1;height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 12px;font-size:12px;color:#26303F">price <span style="color:#8494A8;margin-left:6px">&middot; 11 of 63 events</span></div>
+              <div style="flex:none;height:36px;padding:0 12px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:12px;font-weight:600;color:#5A6577">Last 90 days &#9662;</div>
+              <div style="flex:none;height:36px;padding:0 12px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:12px;font-weight:600;color:#5A6577">Any actor &#9662;</div>
+              <div style="flex:none;height:36px;padding:0 13px;border-radius:9px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;font-size:12px;font-weight:700;color:#5A6577">Export</div>
+            </div>
+
+            <div style="flex:1;display:flex;gap:16px;min-height:0">
+              <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;border:1px solid #E8ECF3;border-radius:12px;overflow:hidden">
+                <div style="flex:none;padding:11px 15px;background:#FAFBFD;border-bottom:1px solid #E8ECF3;display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:12.5px;font-weight:800">Change history</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">newest first</div></div>
+                <div style="flex:1;padding:14px 16px;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+                  <div style="display:flex;gap:13px;padding-bottom:14px"><div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:0"><div style="width:9px;height:9px;border-radius:5px;background:#0D6EFD;margin-top:4px"></div><div style="flex:1;width:1px;background:#E3E8F0;margin-top:4px"></div></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:12.5px;font-weight:800">Price changed &middot; AED 240 &rarr; 265</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">2 Sep 14:06</div></div><div style="font-size:11.5px;color:#5A6577;margin-top:3px;line-height:1.5">C. Mehta &middot; via <span style="font-family:'IBM Plex Mono',monospace">ADM-049</span> &middot; approved by Q. Rahman. Published to 18 channels; 412 rows re-priced.</div></div></div>
+                  <div style="display:flex;gap:13px;padding-bottom:14px"><div style="flex:none;display:flex;flex-direction:column;align-items:center"><div style="width:9px;height:9px;border-radius:5px;background:#B98900;margin-top:4px"></div><div style="flex:1;width:1px;background:#E3E8F0;margin-top:4px"></div></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:12.5px;font-weight:800;color:#8A6D00">Publication rolled back</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">2 Sep 11:41</div></div><div style="font-size:11.5px;color:#5A6577;margin-top:3px;line-height:1.5">Automated &middot; <span style="font-family:'IBM Plex Mono',monospace">ADM-132</span> &middot; tax profile unset on two outlets. The rollback is an event here and a screen there — see the note beside this frame.</div></div></div>
+                  <div style="display:flex;gap:13px;padding-bottom:14px"><div style="flex:none;display:flex;flex-direction:column;align-items:center"><div style="width:9px;height:9px;border-radius:5px;background:#C6CFDA;margin-top:4px"></div><div style="flex:1;width:1px;background:#E3E8F0;margin-top:4px"></div></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:12.5px;font-weight:700">Channel availability edited</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">30 Aug 09:12</div></div><div style="font-size:11.5px;color:#5A6577;margin-top:3px;line-height:1.5">A. Farouk &middot; kiosk removed, partner web added</div></div></div>
+                  <div style="display:flex;gap:13px;padding-bottom:14px"><div style="flex:none;display:flex;flex-direction:column;align-items:center"><div style="width:9px;height:9px;border-radius:5px;background:#C6CFDA;margin-top:4px"></div><div style="flex:1;width:1px;background:#E3E8F0;margin-top:4px"></div></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:12.5px;font-weight:700">Version 6 published</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">28 Aug 16:30</div></div><div style="font-size:11.5px;color:#5A6577;margin-top:3px;line-height:1.5">C. Mehta &middot; 4 consumers notified</div></div></div>
+                  <div style="display:flex;gap:13px"><div style="flex:none;display:flex;flex-direction:column;align-items:center"><div style="width:9px;height:9px;border-radius:5px;background:#C6CFDA;margin-top:4px"></div></div><div style="flex:1;min-width:0"><div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:12.5px;font-weight:700">Created</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">14 Jul 10:02</div></div><div style="font-size:11.5px;color:#5A6577;margin-top:3px;line-height:1.5">Imported &middot; <span style="font-family:'IBM Plex Mono',monospace">ADM-121</span> bulk catalogue import, batch 44</div></div></div>
+                  <div style="margin-top:auto;padding-top:12px;font-size:11px;color:#8494A8">58 older events &middot; retention unset</div>
+                </div>
+              </div>
+
+              <div style="flex:none;width:352px;display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12px;font-weight:800">This record</div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Product</span><span style="font-weight:700">Day pass &middot; adult</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Version</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">7 &middot; live</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Events</span><span style="font-weight:700">63</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Actors</span><span style="font-weight:700">4 people, 2 automated</span></div>
+                </div>
+                <div style="border:1px solid #F0DFB8;background:#FFFDF7;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:8px">
+                  <div style="font-size:12px;font-weight:800;color:#8A6D00">Retention is unset</div>
+                  <div style="font-size:11px;color:#5A4A20;line-height:1.55">89 retention requirements exist and two stated periods. Neither covers an audit trail, so this timeline has no defined end and the export button is the only way anything leaves it. <b>CF-64</b>, open, with Dinesh and Qossai.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">events shown &middot; 5 of 63<br>defined retention &middot; none</div>
+                </div>
+                <div style="flex:1;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:8px;min-height:0">
+                  <div style="font-size:12px;font-weight:800">Filters that matter here</div>
+                  <div style="font-size:11px;color:#5A6577;line-height:1.55">An audit trail is read to answer a question — who changed the price, and did anyone approve it. Actor, date and change kind are the three filters that answer it; the search box is for everything else.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">reads &middot; audit.change_event<br>writes &middot; nothing</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">One pattern doing two opposite jobs</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">Eleven of the 23 are audit trails — read the past, write nothing. <b>Seven are simulation and publication</b> screens: <span style="font-family:'IBM Plex Mono',monospace">BO-153 Topology Validation &amp; Publication</span>, <span style="font-family:'IBM Plex Mono',monospace">BO-193 Biometric Simulation</span>, <span style="font-family:'IBM Plex Mono',monospace">BO-223 Journey Simulation</span> — which model a change and then <i>make</i> it. Same two components, opposite consequences, so they are drawn separately at <a href="#bp-006-p">BP-006-P</a>. The last five are neither: a catalogue, an import, decision tables, an assignment and a field builder, all filed under a pattern whose components are a search box and a timeline.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">this frame serves &middot; 11 audit trails<br>split out &middot; 7 publish &middot; 5 miscellaneous</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The timeline is the record</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Every event names its actor, its route and what it touched downstream. An audit line that says "updated" and nothing else is the reason audit trails get exported to a spreadsheet and read there.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">events &middot; 63<br>automated &middot; 2 of 6 actors</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A trail with no end date</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Drawn with the retention gap stated on the frame rather than hidden. The panel says 58 older events exist and that nothing defines when they go.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">blocked by &middot; CF-64<br>artefact class &middot; retention, open</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; dashboard &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; searchField &middot; timeline</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyNoEvents</b> &middot; truncated &middot; exportQueued &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; 11 audit trails &mdash; each confirmed <span style="color:#0A6B49">list-only, onLoad</span></div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">all 23 carried one generated block</span> &middot; 7 to <a href="#bp-006-p">BP-006-P</a> &middot; 5 <a href="Vocabulary%20Corrections.dc.html#d4">re-signatured</a> &middot; <span style="color:#B98900">emptyFirstRun wrong on all 11</span></div>
+      </div>
+
+      <div style="margin-top:6px;background:#fff;border:1px solid #E8ECF3;border-radius:14px;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF1F6"><div style="font-size:13px;font-weight:800">Roster — every screen this frame serves</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ bp6.count }} screens &middot; {{ bp6.groupCount }} modules</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;margin-top:14px">
+          <sc-for list="{{ bp6.groups }}" as="g" hint-placeholder-count="7">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid #F1F4F8"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5A6577">{{ g.key }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ g.count }}</div></div>
+              <sc-for list="{{ g.screens }}" as="s" hint-placeholder-count="4">
+                <div style="display:grid;grid-template-columns:66px 1fr;gap:8px;align-items:baseline;padding:3px 0;font-size:11.5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.id }}</span><span style="color:#26303F">{{ s.name }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="bp-010" data-screen-label="BP-010" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-010 → BP-001</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Split — ledger and queue</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">17 screens &middot; P08 only</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">dataTable &middot; detailPanel</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">corrected &middot; phase 4</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Drawn against <b>BO-084 Approval Inbox</b>, and folded into <a href="#bp-001">BP-001</a> by the <a href="Vocabulary%20Corrections.dc.html#d1">Phase 4 pass</a> &mdash; the frame still serves these seventeen, they are simply no longer a pattern of their own. Finance, stock and approvals — the three back-office areas where a row is a document and the detail panel has to hold the whole of it.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">People &amp; access rights &middot; approvals</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-084 &middot; 11 waiting on you</span></div>
+          <div style="flex:1;display:flex;min-height:0">
+
+            <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0;border-right:1px solid #E8ECF3">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid #E8ECF3">
+                <div style="height:30px;padding:0 12px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">Waiting on you 11</div>
+                <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Delegated 3</div>
+                <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Breaching SLA 2</div>
+                <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Decided</div>
+              </div>
+              <div style="flex:none;display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:9px 16px;border-bottom:1px solid #E8ECF3;background:#FAFBFD;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8494A8"><div>ref</div><div>what</div><div>raised by</div><div>value</div><div style="text-align:right">age</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+                <div style="display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#EAF4FF;border-left:3px solid #0D6EFD"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">AP-2291</span><span style="font-weight:800">Refund above threshold &middot; order 88-40213</span><span style="color:#5A6577">S. Nair &middot; box office</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">4,120.00</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#B98900">31h</span></div>
+                <div style="display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFDF7"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-2288</span><span style="font-weight:700;color:#26303F">Shift variance &middot; till 4, short</span><span style="color:#5A6577">Auto &middot; POS-008</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">218.50</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#B98900">28h</span></div>
+                <div style="display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-2284</span><span style="font-weight:700;color:#26303F">Manual discount &middot; group booking GB-771</span><span style="color:#5A6577">R. Haddad</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">1,890.00</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">9h</span></div>
+                <div style="display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-2281</span><span style="font-weight:700;color:#26303F">Release promotion &middot; venue-management-web 4.2</span><span style="color:#5A6577">D. Kulkarni</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">&mdash;</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">6h</span></div>
+                <div style="display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-2279</span><span style="font-weight:700;color:#26303F">Requisition &middot; central kitchen, 22 lines</span><span style="color:#5A6577">M. Osei</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">12,440.00</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">4h</span></div>
+                <div style="display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:11px 16px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-2277</span><span style="font-weight:700;color:#26303F">Stock write-off &middot; damage, retail store 2</span><span style="color:#5A6577">L. Ferreira</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">3,015.00</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">2h</span></div>
+                <div style="display:grid;grid-template-columns:80px 1.7fr 1fr 90px 68px;gap:10px;padding:11px 16px;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-2275</span><span style="font-weight:700;color:#26303F">Period close &middot; August, journal 4471</span><span style="color:#5A6577">Finance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">&mdash;</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">1h</span></div>
+              </div>
+              <div style="flex:none;padding:10px 16px;border-top:1px solid #E8ECF3;background:#FAFBFD;font-size:11px;color:#5A6577">Sorted by SLA breach, then value. <b>Four different approval mechanisms</b> are in this one list — refund threshold, shift variance, release promotion and manual discount.</div>
+            </div>
+
+            <div style="flex:none;width:392px;display:flex;flex-direction:column;min-height:0;background:#FAFBFD">
+              <div style="flex:none;padding:16px 18px 14px;border-bottom:1px solid #E8ECF3">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">AP-2291 &middot; breaching SLA by 7h</div>
+                <div style="font-size:16px;font-weight:800;letter-spacing:-.018em;margin-top:3px">Refund above threshold</div>
+                <div style="font-size:11.5px;color:#5A6577;margin-top:5px;line-height:1.5">Order 88-40213 &middot; 4 tickets, rained-off session. Requested by S. Nair, box office, 31 hours ago.</div>
+                <div style="display:flex;gap:7px;margin-top:12px"><div style="flex:1;height:34px;border-radius:8px;background:#0E9F6E;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800">Approve</div><div style="flex:1;height:34px;border-radius:8px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#5A6577">Decline</div></div>
+              </div>
+              <div style="flex:1;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Amount</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">AED 4,120.00</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Threshold</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">AED 2,000.00</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Permission</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">ORDER_REFUND_APPROVE</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Original payment</span><span style="font-weight:700">Card &middot; refundable</span></div>
+                </div>
+                <div style="border:1px solid #E8ECF3;background:#fff;border-radius:11px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12px;font-weight:800">Guest history</div>
+                  <div style="font-size:11px;color:#5A6577;line-height:1.55">Third refund in 90 days, all weather. Not flagged &mdash; there is no fraud signal in the platform, and drawing one here would invent it.</div>
+                </div>
+                <div style="border:1px solid #F0DFB8;background:#FFFDF7;border-radius:11px;padding:12px 14px;display:flex;flex-direction:column;gap:7px">
+                  <div style="font-size:12px;font-weight:800;color:#8A6D00">Approvals are implemented four times</div>
+                  <div style="font-size:11px;color:#5A4A20;line-height:1.55">Refund thresholds, shift variance, release promotion and manual discount each grew their own approval path. <b>CF-59a</b> — 80 requirements, no owning contract. This inbox is where the four meet, which is why it reads as one queue and behaves as four.</div>
+                </div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">reads &middot; approval.request<br>writes &middot; approval.decision</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">A list template carrying a detail panel is a split</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">BP-010 declared <span style="font-family:'IBM Plex Mono',monospace">list</span> and then asked for a <span style="font-family:'IBM Plex Mono',monospace">detailPanel</span>, which is the definition of the <span style="font-family:'IBM Plex Mono',monospace">split</span> template it was not using. It mattered because <b>the vocabulary is what the pattern count is computed from</b> — a wrong template name is a pattern that looks new and is not. <b>Corrected:</b> the seventeen are <span style="font-family:'IBM Plex Mono',monospace">split</span>, they gain the <span style="font-family:'IBM Plex Mono',monospace">searchField</span> twelve of them needed, and they now sit inside BP-001.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">done &middot; 17 retemplated to split<br>BP-001 &middot; 314 → 331 &middot; patterns 44 → 43</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">No search, and it needs one</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The declaration has no <span style="font-family:'IBM Plex Mono',monospace">searchField</span>. An approval inbox is fine without one; <span style="font-family:'IBM Plex Mono',monospace">BO-081 Inventory Items</span> and <span style="font-family:'IBM Plex Mono',monospace">BO-089 Journal Entries</span> are on the same pattern and are not.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">tabs instead &middot; 4<br>screens needing search &middot; 12 of 17</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Approve is not a button</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">It is a permission, a threshold, a delegation and an audit line. All four are on the panel, because an approval screen that shows only the amount is asking someone to sign blind.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">see &middot; CF-36, CF-59a<br>mechanisms in one queue &middot; 4</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; split <span style="color:#0A6B49">(was list)</span> &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; dataTable &middot; detailPanel &middot; <span style="color:#0A6B49">searchField</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyNothingWaiting</b> &middot; slaBreached &middot; decided &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; 17 screens, all P08 &mdash; finance, stock and approvals</div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">4 approval mechanisms in one queue (CF-59a)</span> &middot; <span style="color:#0A6B49">template mislabel corrected</span></div>
+      </div>
+
+      <div style="margin-top:6px;background:#fff;border:1px solid #E8ECF3;border-radius:14px;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF1F6"><div style="font-size:13px;font-weight:800">Roster — every screen this frame serves</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ bp10.count }} screens &middot; {{ bp10.groupCount }} modules &middot; now inside BP-001</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;margin-top:14px">
+          <sc-for list="{{ bp10.groups }}" as="g" hint-placeholder-count="3">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid #F1F4F8"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5A6577">{{ g.key }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ g.count }}</div></div>
+              <sc-for list="{{ g.screens }}" as="s" hint-placeholder-count="6">
+                <div style="display:grid;grid-template-columns:66px 1fr;gap:8px;align-items:baseline;padding:3px 0;font-size:11.5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.id }}</span><span style="color:#26303F">{{ s.name }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="bp-007" data-screen-label="BP-007" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-007</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">List — handheld card stack</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">20 screens &middot; P06 only</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">cardList &middot; primaryButton &middot; searchField</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">the retired packs' subject matter</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Drawn against <b>EMP-056 Walk-In &amp; Waitlist Management</b> at the staff app's own 390&times;844, because a card stack on a desk monitor is a table. Ten Floor Service screens and ten Stock on the Floor screens, and every one of them is a phone in a moving hand.</div>
+      </div>
+
+      <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+        <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+          <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>19:42</span><span>venue wifi &middot; 64%</span></div>
+          <div style="flex:none;padding:6px 20px 14px"><div style="font-size:12.5px;color:#8A94A3">Marina Grill &middot; Fri service</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em;margin-top:2px">Waitlist</div></div>
+          <div style="flex:none;padding:0 20px 12px"><div style="height:40px;border-radius:11px;background:#161B22;border:1px solid #262C36;display:flex;align-items:center;padding:0 13px;font-size:13px;color:#6B7686">Search name or phone</div></div>
+          <div style="flex:none;padding:0 20px 12px;display:flex;gap:8px">
+            <div style="height:32px;padding:0 13px;border-radius:16px;background:#E8ECF2;color:#0E1116;display:flex;align-items:center;font-size:12.5px;font-weight:700">Waiting 7</div>
+            <div style="height:32px;padding:0 13px;border-radius:16px;border:1px solid #262C36;display:flex;align-items:center;font-size:12.5px;font-weight:600;color:#8A94A3">Seated 22</div>
+            <div style="height:32px;padding:0 13px;border-radius:16px;border:1px solid #262C36;display:flex;align-items:center;font-size:12.5px;font-weight:600;color:#8A94A3">No-show 2</div>
+          </div>
+          <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+            <div style="flex:none;border-radius:14px;background:#161B22;border:1px solid #2E3A46;padding:14px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:16px;font-weight:800;letter-spacing:-.015em">Haddad &middot; 4</div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#E5A84A">waiting 38m</div></div>
+              <div style="font-size:12.5px;color:#8A94A3;line-height:1.5">Quoted 25m &middot; high chair &middot; window if possible</div>
+              <div style="display:flex;gap:9px"><div style="flex:1;height:46px;border-radius:11px;background:#3D8BFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">Seat now</div><div style="flex:none;width:46px;height:46px;border-radius:11px;border:1px solid #2E3A46;display:flex;align-items:center;justify-content:center;font-size:17px">&#9743;</div><div style="flex:none;width:46px;height:46px;border-radius:11px;border:1px solid #2E3A46;display:flex;align-items:center;justify-content:center;font-size:17px">&#8943;</div></div>
+            </div>
+            <div style="flex:none;border-radius:14px;background:#161B22;border:1px solid #262C36;padding:14px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:16px;font-weight:800;letter-spacing:-.015em">Osei &middot; 2</div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8A94A3">waiting 12m</div></div>
+              <div style="font-size:12.5px;color:#8A94A3;line-height:1.5">Quoted 20m &middot; bar seating accepted</div>
+              <div style="display:flex;gap:9px"><div style="flex:1;height:46px;border-radius:11px;background:#3D8BFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">Seat now</div><div style="flex:none;width:46px;height:46px;border-radius:11px;border:1px solid #2E3A46;display:flex;align-items:center;justify-content:center;font-size:17px">&#9743;</div><div style="flex:none;width:46px;height:46px;border-radius:11px;border:1px solid #2E3A46;display:flex;align-items:center;justify-content:center;font-size:17px">&#8943;</div></div>
+            </div>
+            <div style="flex:none;border-radius:14px;background:#161B22;border:1px solid #262C36;padding:14px;display:flex;flex-direction:column;gap:9px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:16px;font-weight:800;letter-spacing:-.015em">Ferreira &middot; 6</div><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8A94A3">waiting 9m</div></div>
+              <div style="font-size:12.5px;color:#8A94A3;line-height:1.5">Quoted 40m &middot; no table of 6 free until 20:30</div>
+              <div style="display:flex;gap:9px"><div style="flex:1;height:46px;border-radius:11px;border:1px solid #2E3A46;color:#8A94A3;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">No table yet</div><div style="flex:none;width:46px;height:46px;border-radius:11px;border:1px solid #2E3A46;display:flex;align-items:center;justify-content:center;font-size:17px">&#9743;</div></div>
+            </div>
+            <div style="flex:none;font-size:12px;color:#6B7686;padding:2px 2px 0">4 more waiting</div>
+          </div>
+          <div style="flex:none;padding:12px 20px 16px"><div style="height:50px;border-radius:13px;background:#E8ECF2;color:#0E1116;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">Add a walk-in</div></div>
+          <div style="flex:none;height:58px;border-top:1px solid #1D2733;display:flex;align-items:center;justify-content:space-around;font-size:10.5px;color:#6B7686"><span>Home</span><span>Tasks</span><span>Scan</span><span style="color:#E8ECF2;font-weight:700">Floor</span><span>More</span></div>
+        </div>
+
+        <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">This is where the retired packs went</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">Five client packs were retired on 7 September on the grounds that their subject matter is in the package under other names. <b>These twenty screens are the proof.</b> <span style="font-family:'IBM Plex Mono',monospace">EMP-051 Restaurant Service Command Center</span> is <span style="font-family:'IBM Plex Mono',monospace">FNB-4A</span>. <span style="font-family:'IBM Plex Mono',monospace">EMP-052 Floor Plan &amp; Table Map</span> is <span style="font-family:'IBM Plex Mono',monospace">FNB-4B</span>. <span style="font-family:'IBM Plex Mono',monospace">EMP-061 Retail Inventory Command Center</span> is <span style="font-family:'IBM Plex Mono',monospace">RET-4A</span>, and the whole of <span style="font-family:'IBM Plex Mono',monospace">EMP-061&ndash;070</span> is <i>Stock on the Floor</i> — a module the legacy pack had no name for.</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6">What changed is not the subject but the <b>device</b>. The F&amp;B pack drew a floor plan for a manager at a desk. The package puts it on a handheld held by someone standing between two tables, and that is a different screen with the same title.</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Why a card and not a row</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A row is for comparing; a card is for acting. Nothing on this screen is compared — the host takes the top party and seats it. So each card carries its own primary action at <b>46px</b>, and the two secondary actions are icons rather than words because the thumb reaching them is holding a tray.</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">hit target &middot; 46px<br>minimum &middot; 44px</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The third card cannot be acted on</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Ferreira's party of six has no table until 20:30, so the primary action is absent rather than present and failing. A card stack where every card offers the same button teaches the host to stop reading.</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">actionable &middot; 2 of 3 shown<br>state &middot; blocked, not disabled</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Offline is not drawn, and it should be</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6">P06 declares <span style="font-family:'IBM Plex Mono',monospace">offlineCapable</span> and none of these twenty screens has an offline state written. A waitlist that loses a party when the wifi drops between two tables is the failure the state would have caught.</div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">states written &middot; 0 of 20<br>gate &middot; check-screens offlineCapable</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; list &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; cardList &middot; primaryButton &middot; searchField</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">offline</b> <span style="color:#B98900">(not written on any of the 20)</span> &middot; emptyNoneWaiting &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; 20 screens, all P06 &mdash; Floor Service 10, Stock on the Floor 10</div>
+        <div><b style="color:#4A5566;font-weight:600">SUPERSEDES</b> &middot; <span style="color:#9AA5B6">FNB-4A&ndash;4K and RET-4A&ndash;4K, retired 7 September</span></div>
+      </div>
+
+      <div style="margin-top:6px;background:#fff;border:1px solid #E8ECF3;border-radius:14px;padding:16px 18px">
+        <div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:10px;border-bottom:1px solid #EDF1F6"><div style="font-size:13px;font-weight:800">Roster — every screen this frame serves</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ bp7.count }} screens &middot; {{ bp7.groupCount }} modules</div></div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:22px;margin-top:14px">
+          <sc-for list="{{ bp7.groups }}" as="g" hint-placeholder-count="2">
+            <div style="display:flex;flex-direction:column;gap:5px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding-bottom:6px;border-bottom:1px solid #F1F4F8"><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#5A6577">{{ g.key }}</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ g.count }}</div></div>
+              <sc-for list="{{ g.screens }}" as="s" hint-placeholder-count="10">
+                <div style="display:grid;grid-template-columns:66px 1fr;gap:8px;align-items:baseline;padding:3px 0;font-size:11.5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.id }}</span><span style="color:#26303F">{{ s.name }}</span></div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="bp-006-p" data-screen-label="BP-006-P" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-006-P</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Validate and publish</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">7 screens</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAFBF3;color:#0A6E4C">split from BP-006</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Drawn against <b>BO-153 Topology Validation &amp; Publication</b>. These seven declared the same two components as an audit trail and do the opposite thing: they model a change, then make it live. The frame exists so the difference is visible — an audit trail writes nothing, and this one ends in a button that reaches 214 gates.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Access &amp; venue &middot; topology</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-153 &middot; draft 12 &middot; not published</span></div>
+
+          <div style="flex:1;display:flex;min-height:0">
+            <div style="flex:none;width:330px;border-right:1px solid #E8ECF3;background:#FAFBFD;display:flex;flex-direction:column;min-height:0">
+              <div style="flex:none;padding:14px 16px;border-bottom:1px solid #E8ECF3"><div style="font-size:12.5px;font-weight:800">What changed</div><div style="font-size:11px;color:#8494A8;margin-top:3px">Draft 12 against live 11</div></div>
+              <div style="flex:1;padding:12px 16px;display:flex;flex-direction:column;gap:9px;min-height:0;overflow:hidden">
+                <div style="display:flex;gap:10px;align-items:baseline;font-size:11.5px"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0E9F6E;width:18px">+3</span><span style="color:#26303F">Access points &middot; marina jetty lanes 1&ndash;3</span></div>
+                <div style="display:flex;gap:10px;align-items:baseline;font-size:11.5px"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#0E9F6E;width:18px">+1</span><span style="color:#26303F">Zone &middot; Marina</span></div>
+                <div style="display:flex;gap:10px;align-items:baseline;font-size:11.5px"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#B98900;width:18px">~9</span><span style="color:#26303F">Re-entry rules &middot; Beach side, window extended to 4h</span></div>
+                <div style="display:flex;gap:10px;align-items:baseline;font-size:11.5px"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#B98900;width:18px">~2</span><span style="color:#26303F">Anti-passback &middot; north gate, 90s &rarr; 120s</span></div>
+                <div style="display:flex;gap:10px;align-items:baseline;font-size:11.5px"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#D0454C;width:18px">&minus;1</span><span style="color:#26303F">Access point &middot; AP-0161 seasonal, retired</span></div>
+                <div style="margin-top:12px;padding:11px 12px;border-radius:10px;background:#fff;border:1px solid #E8ECF3;font-size:11px;color:#5A6577;line-height:1.55">The diff is the subject of the screen. A publish button with no diff beside it is asking someone to approve a number.</div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">changed by &middot; C. Mehta<br>since &middot; 28 Aug 16:30</div>
+              </div>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0">
+              <div style="flex:1;padding:18px 22px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow:hidden">
+                <div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:14px">
+                  <div><div style="font-size:16px;font-weight:800;letter-spacing:-.018em">Validation run</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8;margin-top:3px">completed 19:04 &middot; 6 checks &middot; 41s</div></div>
+                  <div style="height:32px;padding:0 14px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:12px;font-weight:700;color:#5A6577">Re-run</div>
+                </div>
+
+                <div style="flex:none;border:1px solid #E8ECF3;border-radius:12px;overflow:hidden">
+                  <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid #F1F4F8"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E;width:44px">pass</span><span style="flex:1;font-size:12px;font-weight:700">Every access point reaches a zone</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">217 checked</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid #F1F4F8"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E;width:44px">pass</span><span style="flex:1;font-size:12px;font-weight:700">No zone is unreachable from an entrance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">9 zones</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid #F1F4F8;background:#FFFDF7"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#B98900;width:44px">warn</span><span style="flex:1;font-size:12px;font-weight:700">One access point has no reader &middot; <span style="font-family:'IBM Plex Mono',monospace;font-weight:600">AP-0121</span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">publishable</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid #F1F4F8"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#0E9F6E;width:44px">pass</span><span style="flex:1;font-size:12px;font-weight:700">Anti-passback windows are within policy</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">2 changed</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:11px 14px;border-bottom:1px solid #F1F4F8;background:#FEF3F3"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#D0454C;width:44px">fail</span><span style="flex:1;font-size:12px;font-weight:700">AP-0161 is retired and holds 214 live entitlements</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#D0454C">blocking</span></div>
+                  <div style="display:flex;align-items:center;gap:11px;padding:11px 14px"><span style="flex:none;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:#8494A8;width:44px">skip</span><span style="flex:1;font-size:12px;color:#5A6577">Device reachability &mdash; no device contract to check against</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">CF-136</span></div>
+                </div>
+
+                <div style="flex:1;border:1px solid #FBD9DB;background:#FEF3F3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:9px;min-height:0">
+                  <div style="font-size:12.5px;font-weight:800;color:#8E2F35">One failure, and it names the consequence</div>
+                  <div style="font-size:11.5px;color:#8E2F35;line-height:1.6">Retiring <span style="font-family:'IBM Plex Mono',monospace">AP-0161</span> would leave 214 season entitlements pointing at a gate that no longer exists. The run does not say "validation failed" — it says which gate, how many entitlements, and what happens to them at the door. <b>Publishing is blocked until this is resolved or explicitly overridden with a reason.</b></div>
+                  <div style="display:flex;gap:8px;margin-top:auto"><div style="height:32px;padding:0 14px;border-radius:8px;background:#fff;border:1px solid #FBD9DB;display:flex;align-items:center;font-size:12px;font-weight:700;color:#8E2F35">Reassign the 214</div><div style="height:32px;padding:0 14px;border-radius:8px;background:#fff;border:1px solid #FBD9DB;display:flex;align-items:center;font-size:12px;font-weight:700;color:#8E2F35">Keep AP-0161 open</div></div>
+                </div>
+              </div>
+
+              <div style="flex:none;padding:14px 22px;border-top:1px solid #E8ECF3;background:#FAFBFD;display:flex;align-items:center;justify-content:space-between;gap:18px">
+                <div style="min-width:0"><div style="font-size:12px;font-weight:800">Publishing reaches 214 access points, 9 zones and 4 scanner fleets</div><div style="font-size:11px;color:#5A6577;margin-top:2px">Takes effect immediately. Rollback is a new publish, not an undo.</div></div>
+                <div style="flex:none;display:flex;gap:9px;align-items:center"><div style="height:38px;padding:0 15px;border-radius:9px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;font-size:12.5px;font-weight:700;color:#5A6577">Save draft</div><div style="height:38px;padding:0 18px;border-radius:9px;background:#E8EBF0;color:#9AA5B6;display:flex;align-items:center;font-size:12.5px;font-weight:800">Publish &middot; blocked</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Why this could not share the audit frame</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">An audit trail is read to answer a question about the past and writes nothing. These seven model a change and then make it live across a venue. Both declare <span style="font-family:'IBM Plex Mono',monospace">searchField &middot; timeline</span>, which is why the generator filed them together — and the timeline on this frame is a validation run, not a history. <b>The component list was never going to catch the difference, because the difference is what happens when you press the last button.</b></div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">audit writes &middot; nothing<br>this writes &middot; 214 access points</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Blocked, not disabled</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The publish button is greyed and labelled with why. The two routes out of the failure sit inside the failure, not in a menu — a blocked state that does not offer the unblock is a dead end.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">checks &middot; 6<br>blocking &middot; 1</div>
+          </div>
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">One check cannot run</div>
+            <div style="font-size:11px;color:#5A4A20;line-height:1.6">Device reachability is skipped and says so. Device management is 60 requirements with no contract and no workshop held — <b>CF-136</b>. A validation screen that silently omits a check it cannot perform is worse than one that fails.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">skipped &middot; 1 of 6<br>blocked by &middot; CF-136, CF-21</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; dashboard &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; searchField &middot; timeline <span style="color:#B98900">(insufficient &mdash; needs a publish gate)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; draft &middot; validating &middot; <b style="color:#0A4FB8">blocked</b> &middot; publishable &middot; published &middot; overridden &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; BO-153 &middot; BO-173 &middot; BO-193 &middot; BO-213 &middot; BO-223 &middot; BO-343 &middot; ADM-227</div>
+        <div><b style="color:#4A5566;font-weight:600">SPLIT FROM</b> &middot; <a href="#bp-006">BP-006</a> &middot; raise as a vocabulary addition, not a new screen</div>
+      </div>
+    </div>
+
+    <div id="no-template" data-screen-label="No template" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-037 &middot; BP-038 &middot; BP-039</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">The three screens that declare no template</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FEF3F3;color:#8E2F35">template: none</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">3 screens &middot; P08</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Drawn against <b>BO-094 Map Editor &amp; Publish</b>. Three of the 44 patterns have <span style="font-family:'IBM Plex Mono',monospace">template: none</span> — every one of them a venue-map screen, and every one of them the nearest thing the package has to the seating-geometry gap.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Access &amp; venue &middot; map editor</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-094 &middot; Marina Park &middot; v4 draft</span></div>
+          <div style="flex:1;display:flex;min-height:0">
+
+            <div style="flex:none;width:250px;border-right:1px solid #E8ECF3;background:#FAFBFD;display:flex;flex-direction:column;min-height:0">
+              <div style="flex:none;padding:13px 15px;border-bottom:1px solid #E8ECF3;font-size:12.5px;font-weight:800">Layers</div>
+              <div style="flex:1;padding:10px 15px;display:flex;flex-direction:column;gap:8px;min-height:0;overflow:hidden">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;font-size:11.5px"><span style="font-weight:700">Zones</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">9</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;font-size:11.5px"><span style="font-weight:700">Access points</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">214</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;font-size:11.5px"><span style="font-weight:700">Facilities</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">61</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;font-size:11.5px"><span style="font-weight:700">Wayfinding</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">38</span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:9px;font-size:11.5px;color:#8494A8"><span style="font-weight:700">Seating geometry</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px">&mdash;</span></div>
+                <div style="margin-top:10px;padding:11px 12px;border-radius:10px;background:#FEF3F3;border:1px solid #FBD9DB;font-size:11px;color:#8E2F35;line-height:1.55">There is no seating layer, and the <span style="font-family:'IBM Plex Mono',monospace">seating</span> schema holds 14 tables. This editor authors zones and access points; nothing in the package authors rows, seats or standing capacity.</div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">source &middot; BO-093 import<br>format &middot; unagreed, CF-17</div>
+              </div>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;min-width:0;min-height:0">
+              <div style="flex:none;display:flex;align-items:center;gap:8px;padding:11px 16px;border-bottom:1px solid #E8ECF3">
+                <div style="height:30px;padding:0 12px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">Select</div>
+                <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Draw zone</div>
+                <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Place point</div>
+                <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Label</div>
+                <div style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">1 : 400 &middot; snap 0.5m</div>
+              </div>
+              <div style="flex:1;padding:16px;min-height:0">
+                <div style="width:100%;height:100%;border:1px dashed #C6CFDA;border-radius:12px;background:#FBFCFE;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8">map canvas &middot; placeholder</div>
+                  <div style="font-size:13px;font-weight:700;color:#5A6577;max-width:52ch;line-height:1.6">A real venue plan goes here — imported CAD or SVG, zones drawn over it. Not sketched on this board, because a made-up park plan would read as a decision about a venue nobody has surveyed.</div>
+                  <div style="font-size:11.5px;color:#8494A8;max-width:60ch;line-height:1.6">The client supplied <span style="font-family:'IBM Plex Mono',monospace">Sample_Amphitheater_Seating.pdf</span> and <span style="font-family:'IBM Plex Mono',monospace">Seating_Manifest.xlsx</span> in August (CF-146). Those are the files this canvas should be drawn against.</div>
+                </div>
+              </div>
+              <div style="flex:none;padding:13px 16px;border-top:1px solid #E8ECF3;background:#FAFBFD;display:flex;align-items:center;justify-content:space-between;gap:16px">
+                <div><div style="font-size:12px;font-weight:800">v4 draft &middot; 3 zones edited, 1 access point moved</div><div style="font-size:11px;color:#5A6577;margin-top:2px">v3 is selling. Publishing swaps what every guest map and scanner reads.</div></div>
+                <div style="flex:none;display:flex;gap:9px"><div style="height:36px;padding:0 14px;border-radius:9px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;font-size:12.5px;font-weight:700;color:#5A6577">Validate</div><div style="height:36px;padding:0 17px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;font-size:12.5px;font-weight:800">Publish v4</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF3F3;border:1px solid #FBD9DB;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8E2F35">Three screens, no template, and they sit on the largest package gap</div>
+            <div style="font-size:11.5px;color:#8E2F35;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">BO-092 Venue Maps</span>, <span style="font-family:'IBM Plex Mono',monospace">BO-093 Map Import &amp; Labelling</span> and <span style="font-family:'IBM Plex Mono',monospace">BO-094 Map Editor &amp; Publish</span> declare <span style="font-family:'IBM Plex Mono',monospace">template: none</span> — the only three in 1,091 screens that do. They are also the two screens a search for a map authoring surface returns. <b>The 130-screen seat management pack has no package counterpart, and the three screens nearest to it were never given a layout.</b></div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8E2F35;line-height:1.7">raise &middot; assign a template to all three<br>see &middot; notes/decisions-2026-09-07.md</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The canvas is left empty on purpose</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A drawn park plan would be a decision about a venue's geometry made on a wireframe board. The placeholder names the two client files that should fill it instead.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">client files &middot; supplied Aug<br>see &middot; CF-146</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A map version is a live thing</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">v3 is selling while v4 is edited. The footer says which, because publishing a venue map changes what every guest map and every scanner reads at once.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">import format &middot; unagreed, CF-17<br>venue map contract &middot; CF-123</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; <span style="color:#D0454C">none declared on any of the three</span> &nbsp; <b style="color:#4A5566;font-weight:600">SUGGESTED</b> &middot; canvas</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">draftUnpublished</b> &middot; validating &middot; importFailed &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">SERVES</b> &middot; BO-092 &middot; BO-093 &middot; BO-094</div>
+        <div><b style="color:#4A5566;font-weight:600">RELATED GAP</b> &middot; <span style="color:#9AA5B6">seatp &mdash; 114 of 130 screens with no package counterpart</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;padding:16px 18px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+      <div><b>Eight frames, 629 screens, and four findings that outrank the drawing.</b> Coverage is 77% of the gap, and the frames turned up four things worth more than the coverage. <b>96 command centres</b> that are one dashboard per module boundary (<a href="#bp-003">BP-003</a>). <b>Seven publish screens sharing a signature with eleven read-only audit trails</b>, plus five that are neither — the component list could not catch the difference, because the difference is what happens when you press the last button (<a href="#bp-006">BP-006</a>, <a href="#bp-006-p">BP-006-P</a>). <b>Seventeen screens on a mislabelled template</b> that fold into BP-001 once corrected, taking the pattern count from 44 to 43 (<a href="#bp-010">BP-010</a>). And <b>three screens with no template at all</b> — every one a venue-map screen, and the three nearest the 130-screen seating gap (<a href="#no-template">BP-037–039</a>). Of the remaining 187 screens, 170 have an openable frame elsewhere in the packs and 17 across 15 patterns have nothing to reuse. <a href="notes/decisions-2026-09-07.md">The decisions</a> are written up separately.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}">
+class Component extends DCLogic {
+  state = { p: null, f: null };
+  componentDidMount() {
+    import('./pattern-data.js')
+      .then(m => this.setState({ p: m.PATTERNS, f: m.FOLDED_FROM_BP010 }))
+      .catch(e => console.error('pattern-data.js failed to load', e));
+  }
+  shape(bp) {
+    if (!bp) return { count: 0, groupCount: 0, groups: [] };
+    const groups = Object.entries(bp.groups).map(([key, rows]) => ({
+      key, count: rows.length,
+      screens: rows.map(r => ({ id: r[0], name: r[1] }))
+    }));
+    return { count: bp.screenCount, groupCount: groups.length, groups };
+  }
+  renderVals() {
+    const p = this.state.p, f = this.state.f;
+    return {
+      bp1: this.shape(p && p['BP-001']),
+      bp2: this.shape(p && p['BP-002']),
+      bp3: this.shape(p && p['BP-003']),
+      bp6: this.shape(p && p['BP-006']),
+      bp7: this.shape(p && p['BP-007']),
+      bp10: this.shape(f)
+    };
+  }
+}
+</script>
+</body>
+</html>

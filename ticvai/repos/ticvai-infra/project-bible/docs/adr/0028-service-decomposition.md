@@ -1,7 +1,8 @@
 # ADR-0028: Sixteen services, and the data boundary decides where they split
 
 **Status:** Accepted. **The data topology reopened by CF-161 on 24 August is settled by
-[ADR-0038](0038-cell-is-a-region-database-per-tenant.md):** the decomposition below is unchanged —
+[ADR-0038](0038-cell-is-a-region-database-per-tenant.md) — amended by ADR-0040 on how many
+instances a region holds, which changes nothing here:** the decomposition below is unchanged —
 no service spans a schema it does not own — and the 26 schemas now live once per tenant database
 rather than once per cell.
 **Date:** 24 August 2026

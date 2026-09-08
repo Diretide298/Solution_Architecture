@@ -155,13 +155,25 @@ def _ddl_counts() -> dict:
     250 indexes, `services/README.md` said 580 and 194, against 594 and 240 actually emitted. A
     figure a person retypes is a figure that stops being true on the next generation.
     """
-    out = {"foreignKeys": 0, "indexes": 0}
-    fk = ROOT / "backend" / "900-foreign-keys.sql"
-    ix = ROOT / "backend" / "910-indexes.sql"
-    if fk.exists():
-        out["foreignKeys"] = fk.read_text(encoding="utf-8").count("ADD CONSTRAINT")
-    if ix.exists():
-        out["indexes"] = ix.read_text(encoding="utf-8").count("CREATE INDEX")
+    # **Globbed, because ADR-0039 split the DDL into two databases.** These were two flat paths,
+    # `backend/900-foreign-keys.sql` and `backend/910-indexes.sql`, and derive-ddl now writes
+    # `backend/control/` and `backend/tenant/`. Neither path existed any more, both `if` branches
+    # were skipped, and **status.json published `foreignKeys: 0` against 574 actually emitted** —
+    # the failure this function's own docstring was written about, one layout change later.
+    out = {"foreignKeys": 0, "indexes": 0, "tablesWritten": 0}
+    be = ROOT / "backend"
+    for f in sorted(be.glob("**/900-foreign-keys.sql")):
+        out["foreignKeys"] += f.read_text(encoding="utf-8").count("ADD CONSTRAINT")
+    for f in sorted(be.glob("**/910-indexes.sql")):
+        out["indexes"] += f.read_text(encoding="utf-8").count("CREATE INDEX")
+    # **What is actually built**, so the build metric stops being a constant. A quoted identifier
+    # is still a table: fnb."table" and three others are quoted for being reserved words.
+    for f in sorted(be.glob("**/0*.sql")):
+        body = f.read_text(encoding="utf-8")
+        cut = re.search(r"^-- =+\n-- ROLLBACK", body, re.M)
+        out["tablesWritten"] += len(re.findall(
+            r'CREATE TABLE (?:IF NOT EXISTS )?"?\w+"?\."?\w+"?',
+            body[:cut.start() if cut else len(body)]))
     return out
 
 
@@ -179,7 +191,12 @@ def platform_status() -> dict:
     #
     # A pseudo-store is a real thing and it is not a table. Both are counted, separately.
     tables = {t for t in schema["cols"] if "." in t and ":" not in t}
-    stores = (set(schema["cols"]) | set(schema["storage"])) - tables
+    # **A store is a colon name, and nothing else.** This was the union minus `tables`, which
+    # swept in four entries that are in `storage`, carry no columns and are ordinary Postgres
+    # tables — access.scan_event_unassigned, fnb.guest_note, orders.sales_order_unassigned and
+    # platform.schema_version. status.json therefore published **9 stores beside its own list of
+    # 5**, and the same four are why `386` and `390` are both in circulation for one fact.
+    stores = {t for t in set(schema["cols"]) | set(schema["storage"]) if ":" in t}
     # Everything addressable, for the reach metrics below — a relationship may point at a cache.
     addressable = set(schema["cols"]) | set(schema["storage"])
     rels = [r for r in links["rels"] if r.get("to")]
@@ -302,7 +319,11 @@ def platform_status() -> dict:
     }
 
     build = [
-        _metric("Tables written", 0, len(tables), "DDL is generated when the design stops moving (ADR-0024)."),
+        # **Counted from backend/, not asserted.** This was a literal 0 while backend/ held every
+        # table in 34 files, so the published build headline read 0% against a generated DDL.
+        _metric("Tables written", _ddl_counts()["tablesWritten"], len(tables),
+                "Counted from backend/. ADR-0024 said DDL waits for the design to settle; "
+                "ADR-0038 and ADR-0039 settled it."),
         _metric("Sprint 0", 0, 11, "Repository, CI, migrations, seed data."),
         _metric("Code built", 0, 1, "Nothing has executed since 30 July."),
     ]
@@ -323,7 +344,18 @@ def platform_status() -> dict:
         "metricDefinitions": definitions,
         "headline": {
             "design": round(100 * sum(m["done"] for m in design) / sum(m["total"] for m in design)),
-            "build": 0,
+            # **Derived, and averaged differently from design on purpose.**
+            #
+            # This was a literal `0`, which stopped being true the moment `Tables written` went to
+            # 386 of 386 — a headline of 0% sitting directly above a metric reading 100%.
+            #
+            # It is the mean of the three percentages rather than design's done-over-total, because
+            # **the build metrics are not commensurable**: pooling them by count lets 386 tables
+            # drown 11 sprint items and 1 running service, and reports ~97% built for a system
+            # where nothing has executed since 30 July. Design's metrics are all counts of the same
+            # kind of artefact, so pooling them there is fair. Here it would be a number that gets
+            # quoted and is wrong.
+            "build": round(sum(m["percent"] for m in build) / len(build)),
         },
         "waves": {f"wave{k}": v for k, v in sorted(waves.items())},
         "platformBreakdown": platforms,

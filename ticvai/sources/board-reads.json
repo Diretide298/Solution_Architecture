@@ -1,0 +1,690 @@
+{
+ "addGuestNote": [
+  "FNB-4G"
+ ],
+ "addWalkIn": [
+  "FNB-4F"
+ ],
+ "adjustStock": [
+  "FNB-5B"
+ ],
+ "allocateToOutlets": [
+  "FNB-2N"
+ ],
+ "applyMenuActions": [
+  "FNB-2K"
+ ],
+ "approveAction": [
+  "FNB-6K"
+ ],
+ "approveScenario": [
+  "FNB-6J"
+ ],
+ "approveWriteOff": [
+  "FNB-5E"
+ ],
+ "archiveProduct": [
+  "FNB-2C"
+ ],
+ "askAssistant": [
+  "FNB-6K"
+ ],
+ "attachEvidence": [
+  "FNB-5E"
+ ],
+ "attachModifierGroup": [
+  "FNB-2E"
+ ],
+ "buildProductionPlan": [
+  "FNB-2M"
+ ],
+ "bulkUpdateProducts": [
+  "FNB-2C"
+ ],
+ "callGuest": [
+  "FNB-3G"
+ ],
+ "chaseStation": [
+  "FNB-3F"
+ ],
+ "checkTableAvailability": [
+  "FNB-4E"
+ ],
+ "classifyMenuItems": [
+  "FNB-2K",
+  "FNB-6D"
+ ],
+ "compItem": [
+  "FNB-4J"
+ ],
+ "consolidateOutletDemand": [
+  "FNB-2N"
+ ],
+ "createBatch": [
+  "FNB-5D"
+ ],
+ "createCombo": [
+  "FNB-2G"
+ ],
+ "createModifierGroup": [
+  "FNB-2E"
+ ],
+ "createOutlet": [
+  "FNB-1B",
+  "FNB-1C",
+  "FNB-1D"
+ ],
+ "createProduct": [
+  "FNB-2C"
+ ],
+ "createRequisition": [
+  "FNB-5B",
+  "FNB-5F"
+ ],
+ "createRequisitionsBulk": [
+  "FNB-5K"
+ ],
+ "createReservation": [
+  "FNB-4E"
+ ],
+ "createTable": [
+  "FNB-4C"
+ ],
+ "enterCountLine": [
+  "FNB-5H"
+ ],
+ "fireCourse": [
+  "FNB-3C"
+ ],
+ "forecastDemand": [
+  "FNB-5K",
+  "FNB-6H"
+ ],
+ "forecastKitchenDemand": [
+  "FNB-3K"
+ ],
+ "getActualUsage": [
+  "FNB-5C"
+ ],
+ "getAnswerSources": [
+  "FNB-6K"
+ ],
+ "getBatchYield": [
+  "FNB-5D"
+ ],
+ "getBatchYieldSummary": [
+  "FNB-6F"
+ ],
+ "getCapacityUtilisation": [
+  "FNB-6G"
+ ],
+ "getCategoryMargin": [
+  "FNB-6D"
+ ],
+ "getChannelContribution": [
+  "FNB-6B"
+ ],
+ "getChannelRevenue": [
+  "FNB-6B"
+ ],
+ "getComboCost": [
+  "FNB-2G"
+ ],
+ "getCountHistory": [
+  "FNB-5H"
+ ],
+ "getDaypartRevenue": [
+  "FNB-6B"
+ ],
+ "getExecutiveSummary": [
+  "FNB-6A"
+ ],
+ "getFloorPlan": [
+  "FNB-4B"
+ ],
+ "getFoodCostBridge": [
+  "FNB-6E"
+ ],
+ "getForecastAccuracy": [
+  "FNB-6H"
+ ],
+ "getForecastDrivers": [
+  "FNB-6H"
+ ],
+ "getGuest": [
+  "FNB-4G"
+ ],
+ "getGuestMenu": [
+  "FNB-1G"
+ ],
+ "getGuestMix": [
+  "FNB-6C"
+ ],
+ "getHaccpStatus": [
+  "FNB-5J"
+ ],
+ "getIngredientCoverage": [
+  "FNB-5B"
+ ],
+ "getIngredientInflation": [
+  "FNB-6E"
+ ],
+ "getKitchenLoad": [
+  "FNB-3A",
+  "FNB-3E"
+ ],
+ "getKitchenPerformance": [
+  "FNB-3K",
+  "FNB-6G"
+ ],
+ "getKitchenSla": [
+  "FNB-3A",
+  "FNB-3J"
+ ],
+ "getLostSales": [
+  "FNB-6F"
+ ],
+ "getMakeVsBuyCost": [
+  "FNB-2N"
+ ],
+ "getMarginBridge": [
+  "FNB-6A"
+ ],
+ "getMenuDiff": [
+  "FNB-2J"
+ ],
+ "getMenuPerformance": [
+  "FNB-2A",
+  "FNB-2K"
+ ],
+ "getModifierUplift": [
+  "FNB-6D"
+ ],
+ "getOnTimeByChannel": [
+  "FNB-6G"
+ ],
+ "getOrder": [
+  "FNB-3D"
+ ],
+ "getOrderCourses": [
+  "FNB-3C"
+ ],
+ "getOutletFoodCost": [
+  "FNB-6E"
+ ],
+ "getOutletPerformance": [
+  "FNB-6C"
+ ],
+ "getPaymentMix": [
+  "FNB-6B"
+ ],
+ "getPrepRequirements": [
+  "FNB-2M"
+ ],
+ "getProduct": [
+  "FNB-2D"
+ ],
+ "getProductAllergens": [
+  "FNB-2L"
+ ],
+ "getProductPerformance": [
+  "FNB-6D"
+ ],
+ "getProfitability": [
+  "FNB-6E"
+ ],
+ "getRecipe": [
+  "FNB-2F"
+ ],
+ "getRecipeCost": [
+  "FNB-2A",
+  "FNB-2D",
+  "FNB-2F"
+ ],
+ "getReservationMetrics": [
+  "FNB-4K"
+ ],
+ "getReservationTimeline": [
+  "FNB-4D"
+ ],
+ "getRevenueVsBudget": [
+  "FNB-6A"
+ ],
+ "getRevpash": [
+  "FNB-4K"
+ ],
+ "getScenarioAssumptions": [
+  "FNB-6J"
+ ],
+ "getSectionRevenue": [
+  "FNB-2K"
+ ],
+ "getServiceMetrics": [
+  "FNB-6C"
+ ],
+ "getServiceOverview": [
+  "FNB-4A"
+ ],
+ "getStationBottlenecks": [
+  "FNB-6G"
+ ],
+ "getStationPerformance": [
+  "FNB-3K"
+ ],
+ "getStockOverview": [
+  "FNB-5A"
+ ],
+ "getTableCheck": [
+  "FNB-4J"
+ ],
+ "getTablePerformance": [
+  "FNB-4K"
+ ],
+ "getTableTimeline": [
+  "FNB-4H"
+ ],
+ "getTheoreticalUsage": [
+  "FNB-5C"
+ ],
+ "getVarianceReasons": [
+  "FNB-5C"
+ ],
+ "getVarianceSummary": [
+  "FNB-5A"
+ ],
+ "getVarianceTrend": [
+  "FNB-6F"
+ ],
+ "getWastageByReason": [
+  "FNB-5E"
+ ],
+ "getWasteByOrigin": [
+  "FNB-6F"
+ ],
+ "holdCourse": [
+  "FNB-3C"
+ ],
+ "list86Events": [
+  "FNB-2H"
+ ],
+ "listActionQueue": [
+  "FNB-6K"
+ ],
+ "listActiveOrders": [
+  "FNB-3D"
+ ],
+ "listAvailability": [
+  "FNB-2H"
+ ],
+ "listCollectionQueue": [
+  "FNB-3G"
+ ],
+ "listCombos": [
+  "FNB-2G"
+ ],
+ "listComplaintThemes": [
+  "FNB-6C"
+ ],
+ "listCostHistory": [
+  "FNB-2F"
+ ],
+ "listDiningOutlets": [
+  "FNB-1B",
+  "FNB-1D",
+  "FNB-1E",
+  "FNB-1F",
+  "FNB-1G",
+  "FNB-1K"
+ ],
+ "listExecutiveInsights": [
+  "FNB-6A"
+ ],
+ "listExpoOrders": [
+  "FNB-3F"
+ ],
+ "listGuestVisits": [
+  "FNB-4G"
+ ],
+ "listKitchenExceptions": [
+  "FNB-3A",
+  "FNB-3H"
+ ],
+ "listKitchenRecommendations": [
+  "FNB-3K"
+ ],
+ "listKitchenStations": [
+  "FNB-1B",
+  "FNB-1C",
+  "FNB-1D",
+  "FNB-1F",
+  "FNB-1H",
+  "FNB-1J",
+  "FNB-3E"
+ ],
+ "listKitchenTickets": [
+  "FNB-1H",
+  "FNB-3A",
+  "FNB-3B"
+ ],
+ "listMenus": [
+  "FNB-1B",
+  "FNB-1C",
+  "FNB-1E",
+  "FNB-1G",
+  "FNB-1K",
+  "FNB-2A",
+  "FNB-2B"
+ ],
+ "listModifierGroups": [
+  "FNB-2E"
+ ],
+ "listOrderLog": [
+  "FNB-3C"
+ ],
+ "listOutletStock": [
+  "FNB-5B"
+ ],
+ "listPriceHistory": [
+  "FNB-2D"
+ ],
+ "listProductionBatches": [
+  "FNB-5D"
+ ],
+ "listProducts": [
+  "FNB-2A",
+  "FNB-2C"
+ ],
+ "listRecommendations": [
+  "FNB-6J"
+ ],
+ "listReservations": [
+  "FNB-4A",
+  "FNB-4D"
+ ],
+ "listSeatedTables": [
+  "FNB-4H"
+ ],
+ "listStockAlerts": [
+  "FNB-5A",
+  "FNB-5K"
+ ],
+ "listTableRecommendations": [
+  "FNB-4K"
+ ],
+ "listTables": [
+  "FNB-4A",
+  "FNB-4B",
+  "FNB-4C"
+ ],
+ "listTransfers": [
+  "FNB-5G"
+ ],
+ "listUnavailableItems": [
+  "FNB-5J"
+ ],
+ "listWaitlist": [
+  "FNB-4A",
+  "FNB-4F"
+ ],
+ "listWastage": [
+  "FNB-5A",
+  "FNB-5E"
+ ],
+ "logBatchWaste": [
+  "FNB-5D"
+ ],
+ "logColdChain": [
+  "FNB-5G"
+ ],
+ "logKitchenException": [
+  "FNB-3H"
+ ],
+ "logTemperature": [
+  "FNB-5J"
+ ],
+ "logWastage": [
+  "FNB-5E"
+ ],
+ "markOrderCollected": [
+  "FNB-3G"
+ ],
+ "matchGuest": [
+  "FNB-4E"
+ ],
+ "mergeGuests": [
+  "FNB-4G"
+ ],
+ "mergeTables": [
+  "FNB-4B"
+ ],
+ "moveTable": [
+  "FNB-4B"
+ ],
+ "notifyServer": [
+  "FNB-4H"
+ ],
+ "notifyWaitlistParty": [
+  "FNB-4F"
+ ],
+ "postStockAdjustment": [
+  "FNB-5C"
+ ],
+ "postStockCount": [
+  "FNB-5H"
+ ],
+ "printBill": [
+  "FNB-4J"
+ ],
+ "printOrderLabel": [
+  "FNB-3F"
+ ],
+ "printPrepSheets": [
+  "FNB-2M"
+ ],
+ "prioritiseKitchenTicket": [
+  "FNB-1H",
+  "FNB-1J",
+  "FNB-3B",
+  "FNB-3D"
+ ],
+ "publishDemandPlan": [
+  "FNB-6H"
+ ],
+ "publishMenu": [
+  "FNB-2B",
+  "FNB-2J"
+ ],
+ "queueAction": [
+  "FNB-6K"
+ ],
+ "quoteWaitTime": [
+  "FNB-4F"
+ ],
+ "raiseTransferClaim": [
+  "FNB-5G"
+ ],
+ "reassignServer": [
+  "FNB-4H"
+ ],
+ "reassignTable": [
+  "FNB-4D"
+ ],
+ "rebalanceStationLoad": [
+  "FNB-3E"
+ ],
+ "recalculateNutrition": [
+  "FNB-2L"
+ ],
+ "recallKitchenTicket": [
+  "FNB-3B"
+ ],
+ "receiveTransfer": [
+  "FNB-5G"
+ ],
+ "recordBatchOutput": [
+  "FNB-5D"
+ ],
+ "refireItem": [
+  "FNB-3H"
+ ],
+ "rejectTransferLine": [
+  "FNB-5G"
+ ],
+ "releaseProductionPlan": [
+  "FNB-2M"
+ ],
+ "requestApproval": [
+  "FNB-2J"
+ ],
+ "requestRecount": [
+  "FNB-5H"
+ ],
+ "resolveBookingConflict": [
+  "FNB-4D"
+ ],
+ "rollbackMenu": [
+  "FNB-2J"
+ ],
+ "scheduleCommissaryRun": [
+  "FNB-2N"
+ ],
+ "scheduleMenuPublish": [
+  "FNB-2J"
+ ],
+ "seatParty": [
+  "FNB-4B",
+  "FNB-4F"
+ ],
+ "sendBookingConfirmation": [
+  "FNB-4E"
+ ],
+ "sendOrderNotification": [
+  "FNB-3G"
+ ],
+ "setAlertRules": [
+  "FNB-5K"
+ ],
+ "setChannelPrices": [
+  "FNB-2D"
+ ],
+ "setComboSlots": [
+  "FNB-2G"
+ ],
+ "setCourseRules": [
+  "FNB-3C"
+ ],
+ "setDailyCount": [
+  "FNB-2H"
+ ],
+ "setItemAvailability": [
+  "FNB-2H",
+  "FNB-3H",
+  "FNB-5J"
+ ],
+ "setKitchenSla": [
+  "FNB-3J"
+ ],
+ "setKitchenStations": [
+  "FNB-1H",
+  "FNB-1J",
+  "FNB-1K",
+  "FNB-3E"
+ ],
+ "setKitchenTicketStatus": [
+  "FNB-1J",
+  "FNB-3B",
+  "FNB-3F"
+ ],
+ "setMenuSections": [
+  "FNB-1E",
+  "FNB-2B"
+ ],
+ "setModifierOptions": [
+  "FNB-2E"
+ ],
+ "setPosLayout": [
+  "FNB-2B"
+ ],
+ "setPriorityWeights": [
+  "FNB-3J"
+ ],
+ "setRecipeLines": [
+  "FNB-2F"
+ ],
+ "setSectionLayout": [
+  "FNB-4C"
+ ],
+ "setServiceStage": [
+  "FNB-4H"
+ ],
+ "setSubstitutionRules": [
+  "FNB-2L"
+ ],
+ "setTableCombinations": [
+  "FNB-4C"
+ ],
+ "signCorrectiveAction": [
+  "FNB-5J"
+ ],
+ "simulateScenario": [
+  "FNB-6J"
+ ],
+ "simulateSlaPolicy": [
+  "FNB-3J"
+ ],
+ "splitCheck": [
+  "FNB-4J"
+ ],
+ "startStockCount": [
+  "FNB-5H"
+ ],
+ "submitForApproval": [
+  "FNB-5F"
+ ],
+ "suggestPrice": [
+  "FNB-2F"
+ ],
+ "suggestReplenishment": [
+  "FNB-5K"
+ ],
+ "suggestRequisition": [
+  "FNB-5F"
+ ],
+ "takePayment": [
+  "FNB-4J"
+ ],
+ "transferOrderItems": [
+  "FNB-3D"
+ ],
+ "updateGuestPreferences": [
+  "FNB-4G"
+ ],
+ "updateOutlet": [
+  "FNB-1C",
+  "FNB-1D",
+  "FNB-1E",
+  "FNB-1F",
+  "FNB-1G",
+  "FNB-1K"
+ ],
+ "updateProduct": [
+  "FNB-2C",
+  "FNB-2D"
+ ],
+ "updateRequisitionLines": [
+  "FNB-5F"
+ ],
+ "updateReservation": [
+  "FNB-4E"
+ ],
+ "updateTable": [
+  "FNB-4C"
+ ],
+ "verifyAllergens": [
+  "FNB-2L"
+ ],
+ "voidOrderItem": [
+  "FNB-3D",
+  "FNB-3H"
+ ]
+}

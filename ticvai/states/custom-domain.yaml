@@ -89,17 +89,17 @@ transitions:
 - from: active
   to: revoked
   trigger: revoke
-  operation: releaseCustomDomain
+  operation: relinquishCustomDomain
   guard: Withdrawn.
 - from: failed
   to: revoked
   trigger: revoke
-  operation: releaseCustomDomain
+  operation: relinquishCustomDomain
   guard: Given up on.
 - from: pending
   to: revoked
   trigger: revoke
-  operation: releaseCustomDomain
+  operation: relinquishCustomDomain
   guard: Never completed.
 openQuestions: '**How long before an `expired` domain is revoked automatically?** A certificate that
   lapsed on a tenant who has left is a claim held indefinitely against a domain somebody else may want.

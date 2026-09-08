@@ -134,7 +134,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/ExecutiveCommandCenterDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-001
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-6A in the client POS pack.** The pack''s frame is the specification — it carries
@@ -233,7 +234,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/SalesRevenueChannelDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-002
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6L in the client Retail pack.**'
@@ -334,7 +336,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/OperationalPerformanceDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-003
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-6B, POS-6C, POS-6D in the client POS pack.** The pack''s frame is the specification
@@ -437,7 +440,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/ProductPerformanceDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-004
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6C in the client Retail pack.**'
@@ -530,7 +534,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/CostMarginProfitabilityDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-005
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6F in the client Retail pack.**'
@@ -628,7 +633,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/InventoryWasteIntelligenceDashboard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 6.dc.html#ret-6d
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6D in the client Retail pack.**'
@@ -737,7 +743,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/GuestConversionIntelligenceDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-007
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6E in the client Retail pack.**'
@@ -823,7 +830,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/DemandForecastingDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-008
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6G in the client Retail pack.**'
@@ -938,7 +946,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/AiAssistantActionCenterDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-009
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-6E in the client POS pack.** The pack''s frame is the specification — it carries
@@ -1036,7 +1045,8 @@ screens:
     component: apps/venue-management-web/src/routes/analytics/SuggestionsDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P16 Venue Analytics.dc.html#anl-010
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-6F in the client POS pack.** The pack''s frame is the specification — it carries

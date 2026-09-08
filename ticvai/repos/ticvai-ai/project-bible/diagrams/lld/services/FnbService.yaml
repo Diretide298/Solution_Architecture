@@ -19,7 +19,7 @@ schemas:
   tables: 34
   stores:
   - postgres
-  largestTable: fnb.table_reservation
+  largestTable: fnb.kitchen_ticket
 operationsByContract:
 - contract: fnb
   count: 99

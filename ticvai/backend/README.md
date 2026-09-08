@@ -25,7 +25,7 @@ definition won every time.
 
 **The damage was in the ordering rather than the duplication.** `900-foreign-keys.sql` attaches all
 580 keys by `ALTER TABLE` and runs *before* the V-series, because `900 < V`. The V-series then
-re-created those 386 tables and **0 foreign keys went with them.**
+re-created those 386 tables and **574 foreign keys went with them.**
 
 **And nothing reported a dangling reference**, because both generations' tables existed: the
 surviving key on `identity.principal` pointed at `platform.scope_node`, a name this generation

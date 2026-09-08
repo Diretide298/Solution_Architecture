@@ -77,7 +77,8 @@ screens:
     error: Queue service unavailable. Manual wait times can still be set — the fallback must not depend
       on the thing that failed
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-001
   permission: QUEUE_VIEW
   apis:
@@ -232,7 +233,8 @@ screens:
       commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Save failed, with the field named. Values are never silently dropped
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 2.dc.html#seat-2c
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-002
   permission: QUEUE_MANAGE
@@ -373,7 +375,8 @@ screens:
     error: Save failed. The test result stays on screen — losing it forces the configurer to run the test
       again
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-003
   permission: QUEUE_MANAGE
   apis:
@@ -474,7 +477,8 @@ screens:
       commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Publish failed. The entered value is kept on screen
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-004
   permission: QUEUE_MANAGE
   apis:
@@ -594,7 +598,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Live data unavailable. Last known values shown with their age
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-005
   permission: QUEUE_VIEW
   apis:
@@ -758,16 +763,23 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-006
   notes: Placeholder. Parking was discussed on 14 August and the MoM has not yet been received. States
     derived from the screen pattern on 17 August, not individually considered — sound for a list, a form
     or a money screen, and worth revisiting where this screen is unusual. Purpose derived from the screen
     name and its operations on 17 August, not from a requirement.
   openQuestions:
-  - 'Awaiting the 14 August MoM. Scope unknown: whether parking is barrier integration, space counting,
-    pre-booking, or all three. `parking` is already a module key in the White Label Builder with nothing
-    behind it — the same gap as diningAndFnb and push.'
+  - 'Answered by the 14 August MoM section 10, which this question was waiting for. Parking is barrier
+    integration, in three models, and it is not space counting. (1) No integration - TICVAI issues its
+    own QR and on-site security verifies it manually; (2) ANPR - the guest enters a plate at checkout
+    and TICVAI pushes it to the parking system''s whitelist so the barrier opens; (3) QR handoff -
+    TICVAI sends a QR to the barrier for validation. Pay-per-hour parking is explicitly out of scope,
+    handled by the parking vendor''s own POS. So this is one configuration screen choosing a model and
+    binding a vendor adaptor, not the three different screens the question feared - and ADR-0012''s
+    adaptor-first rule is what the minute asks for when it says a new parking vendor should take days
+    rather than weeks. The `parking` module key in the White Label Builder now has something behind it.'
   implementation:
     app: venue-management-web
     route: /parking/parking-configuration
@@ -871,7 +883,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ProductDirectoryDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 2.dc.html#ret-2a
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-2A, RET-2B in the client Retail pack.**'
@@ -1015,7 +1028,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ProductDetailVariantsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 2.dc.html#ret-2c
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-2C in the client Retail pack.**'
@@ -1120,7 +1134,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/PricingRulesDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 2.dc.html#ret-2f
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-2F in the client Retail pack.**'
@@ -1220,6 +1235,11 @@ screens:
           **Added 31 August.** `confirmDialog` and `modal` were both in the component library and used
           **zero times across 492 screens**, while `destructiveButton` was used 39 times and its own entry
           reads *always requires confirmation*.'
+      - kind: publishGate
+        impliedBy: publishPromotion
+        notes: >
+          Declares `publishPromotion`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1255,7 +1275,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/PromotionsCouponsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 4.dc.html#pos-4e
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-4E in the client POS pack.** The pack''s frame is the specification — it carries
@@ -1403,6 +1424,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: publishBundle
+      - kind: publishGate
+        impliedBy: publishBundle
+        notes: >
+          Declares `publishBundle`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1438,7 +1464,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/PackagesBundlesDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 5.dc.html#ret-5h
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-5H in the client Retail pack.**'
@@ -1547,7 +1574,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/MembershipProductsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-012
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -1638,6 +1666,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: setChannelAllocations
+      - kind: publishGate
+        impliedBy: publishBundle
+        notes: >
+          Declares `publishBundle`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1673,7 +1706,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ChannelDistributionDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 5.dc.html#ret-5g
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-5G in the client Retail pack.**'
@@ -1704,7 +1738,7 @@ screens:
     contract: catalogue
     purpose: List capacity envelopes
     trigger: onLoad
-  - operationId: releaseChannelAllocation
+  - operationId: relinquishChannelAllocation
     contract: catalogue
     purpose: Return unsold channel allocation to the general pool
     trigger: onAction
@@ -1771,6 +1805,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createProduct
+      - kind: publishGate
+        impliedBy: publishBundle
+        notes: >
+          Declares `publishBundle`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -1806,7 +1845,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/CataloguePublishingDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 2.dc.html#ret-2h
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-2H in the client Retail pack.**'
@@ -1969,7 +2009,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/SessionCalendarDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 2.dc.html#seat-2a
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-015
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -2119,7 +2160,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/SessionTemplateDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 2.dc.html#seat-2b
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-016
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -2252,7 +2294,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/CapacityManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-017
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -2270,7 +2313,7 @@ screens:
     contract: catalogue
     purpose: Create a capacity envelope
     trigger: onAction
-  - operationId: releaseChannelAllocation
+  - operationId: relinquishChannelAllocation
     contract: catalogue
     purpose: Return unsold channel allocation to the general pool
     trigger: onAction
@@ -2318,7 +2361,7 @@ screens:
         notes: The act the screen exists for.
       - kind: destructiveButton
         derived: true
-        impliedBy: releaseInventoryHold
+        impliedBy: relinquishInventoryHold
         label: Release lease
         notes: '**Always confirms, never the default focus.** The consequence goes in the body — *cancel
           3 orders worth AED 480* is a confirmation, *are you sure* is not.'
@@ -2373,7 +2416,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/AllocationHoldsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-018
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -2391,7 +2435,7 @@ screens:
     contract: catalogue
     purpose: Reclaim a stranded lease
     trigger: onAction
-  - operationId: releaseInventoryHold
+  - operationId: relinquishInventoryHold
     contract: catalogue
     purpose: Return unsold units
     trigger: onAction
@@ -2491,7 +2535,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ClosuresBlackoutsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 2.dc.html#seat-2d
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-019
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -2640,10 +2685,12 @@ screens:
       from: deepLink
     coldEntry: An order opened from a list or a link. A kitchen ticket opened from the rail.
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: primaryButton
         derived: true
@@ -2691,7 +2738,8 @@ screens:
     component: apps/venue-management-web/src/routes/fnb/BO020List.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-020
   notes: 'Restored 20 August when the P15 build was rolled back. **Named `Timed Entry Rules` and carrying
     eleven F&B order operations.** Timed entry is an admission profile; this is the order desk. The client
@@ -2735,10 +2783,12 @@ screens:
       from: deepLink
     coldEntry: An order opened from a list or a link.
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: primaryButton
         derived: true
@@ -2768,7 +2818,8 @@ screens:
     component: apps/venue-management-web/src/routes/fnb/BO021List.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 3.dc.html#ret-3a
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-3A in the client Retail pack.**'
@@ -2855,7 +2906,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/OrderDetailDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-022
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -3005,7 +3057,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/RefundsExchangesDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-023
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -3140,7 +3193,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/PaymentExceptionsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 3.dc.html#ret-3k
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-3K in the client Retail pack.**'
@@ -3246,7 +3300,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ChargebacksDisputesDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-025
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -3362,7 +3417,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/GroupBookingsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Platform Board 7.dc.html#seatp-7e
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-026
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -3492,7 +3548,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ReissueMediaReplacementDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-027
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -3572,7 +3629,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/RefundApprovalQueueDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-028
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -3662,7 +3720,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ReportBuilderDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-029
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -3795,7 +3854,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/AccessPointDirectoryDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-030
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -3920,7 +3980,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/AccessPointConfigurationDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-031
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -4030,7 +4091,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/AdmissionProfilesDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-032
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -4140,7 +4202,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/BlacklistManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-033
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -4236,7 +4299,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ScanActivityDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-034
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -4344,7 +4408,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/OverrideAuditDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-035
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -4417,6 +4482,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: registerDevice
+      - kind: publishGate
+        impliedBy: deployConfigurationProfile
+        notes: >
+          Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4452,7 +4522,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/DeviceRegistryDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 1.dc.html#pos-1a
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-1A, POS-1B, POS-1C in the client POS pack.** The pack''s frame is the specification
@@ -4598,6 +4669,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: publishBundle
+      - kind: publishGate
+        impliedBy: publishBundle
+        notes: >
+          Declares `publishBundle`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: List skeleton; the count renders first
     emptyFirstRun: Nothing matches. Distinguishes an empty filter from an empty dataset
@@ -4633,7 +4709,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/OfflinePackageStatusDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 5.dc.html#pos-5a
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-5A, POS-5C in the client POS pack.** The pack''s frame is the specification
@@ -4762,7 +4839,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ReconciliationQueueDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-038
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -4872,7 +4950,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ShiftDirectoryDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-039
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -4998,7 +5077,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/VarianceApprovalDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-040
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -5122,7 +5202,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/CashMovementsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-041
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -5246,7 +5327,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/BankingSafeDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-042
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -5369,7 +5451,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/DailyReconciliationDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-043
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -5478,7 +5561,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/FBOutletsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 1.dc.html#ret-1b
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-1B, RET-1C, RET-1D, RET-1E, RET-1F, RET-1G, RET-1H, RET-1J, RET-1K in the client
@@ -5664,10 +5748,12 @@ screens:
     coldEntry: A menu opened from the list. An item opened from the menu. **Allergen verification is per
       item** — a menu-wide check is a job, not a screen.
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
         derived: true
@@ -5683,6 +5769,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createMenu
+      - kind: publishGate
+        impliedBy: publishMenu
+        notes: >
+          Declares `publishMenu`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   navigation:
     entryFrom:
     - BO-104
@@ -5701,7 +5792,8 @@ screens:
     component: apps/venue-management-web/src/routes/fnb/BO045List.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 2.dc.html#fnb-2a
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-2A, FNB-2B, FNB-2E, FNB-2J, FNB-2K in the client F&B pack.**'
@@ -5792,7 +5884,8 @@ screens:
     component: apps/venue-management-web/src/routes/fnb/BO046List.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-046
   notes: Restored 20 August when the P15 build was rolled back. **Retained in P08 on 20 August when the
     P15 build was rolled back**, and P15 now owns the kitchen display for the venue floor. **This is the
@@ -5880,7 +5973,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/FBOrderManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-047
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -6018,7 +6112,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/RetailProductsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-048
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -6121,7 +6216,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/StockLevelsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4a
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4A, RET-4H in the client Retail pack.**'
@@ -6216,7 +6312,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/StockCountDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-050
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -6314,7 +6411,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/PurchaseOrdersDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-051
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -6465,7 +6563,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/GoodsReceiptDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4e
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4E in the client Retail pack.**'
@@ -6600,7 +6699,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/StaffDirectoryDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Marketing Board 1.dc.html#crm-1b
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-053
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -6691,7 +6791,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/RoleAssignmentDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-054
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -6765,7 +6866,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/RotaSchedulingDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-055
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -6855,7 +6957,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/TimeAttendanceDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-056
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -6931,7 +7034,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/TrainingCertificationDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-057
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -7024,7 +7128,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ReportingHomeDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 6.dc.html#ret-6h
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6H in the client Retail pack.**'
@@ -7170,7 +7275,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/SalesReportsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-059
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -7313,7 +7419,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/AttendanceFootfallDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-060
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -7472,7 +7579,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ScheduledReportsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-061
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -7588,7 +7696,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/VenueProfileDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-062
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -7698,7 +7807,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/OpeningHoursCalendarDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 1.dc.html#seat-1c
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-063
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -7843,7 +7953,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/ZonesAreasDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-064
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -7966,7 +8077,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/VenueConfigurationDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-065
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -8028,6 +8140,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: publishAnnouncement
+      - kind: publishGate
+        impliedBy: publishAnnouncement
+        notes: >
+          Declares `publishAnnouncement`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Current values, with the level each resolves from
     emptyFirstRun: Nothing set at this level — the inherited value is shown and labelled as inherited
@@ -8059,7 +8176,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/NotificationSettingsDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-066
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -8125,7 +8243,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/IntegrationsDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Platform Board 13.dc.html#seatp-13d
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-067
   notes: 'Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
@@ -8224,7 +8343,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/AuditLogDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 6.dc.html#ret-6j
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-6J in the client Retail pack.**'
@@ -8316,7 +8436,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/AssetRegisterDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-069
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -8458,7 +8579,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/WorkOrdersDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-070
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -8588,7 +8710,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/PlannedMaintenanceDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-071
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -8679,7 +8802,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/IncidentLogDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-072
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -8777,7 +8901,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-operations/LostFoundRegisterDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-073
   notes: Definition derived from the wireframe board on 14 August. CF-53 — 67 of these 73 had no definition
     at all. States derived from the screen pattern on 17 August, not individually considered — sound for
@@ -8810,10 +8935,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -8878,7 +9005,8 @@ screens:
     component: apps/venue-management-web/src/routes/finance/ChartOfAccounts.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-074
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). **F16 says it itself** — no chart of accounts
@@ -8902,10 +9030,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -8967,7 +9097,8 @@ screens:
     component: apps/venue-management-web/src/routes/finance/AccountMapping.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-075
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. Pulled to Wave 1 (CF-101). Without a mapping every sale posts to suspense.
@@ -8993,10 +9124,12 @@ screens:
   capability: C00
   wave: 2
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9045,7 +9178,8 @@ screens:
     component: apps/venue-management-web/src/routes/finance/RevenueRecognition.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-076
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -9059,10 +9193,12 @@ screens:
   capability: C00
   wave: 2
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9110,7 +9246,8 @@ screens:
     component: apps/venue-management-web/src/routes/finance/FxRatesVariances.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-077
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -9133,10 +9270,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9216,7 +9355,8 @@ screens:
     component: apps/venue-management-web/src/routes/inventory/Requisitions.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4c
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4C, RET-4K in the client Retail pack.**'
@@ -9249,10 +9389,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9324,7 +9466,8 @@ screens:
     component: apps/venue-management-web/src/routes/inventory/StockCount.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4f
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4F in the client Retail pack.**'
@@ -9357,10 +9500,12 @@ screens:
   capability: C00
   wave: 2
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9422,7 +9567,8 @@ screens:
     component: apps/venue-management-web/src/routes/inventory/StockTransfers.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4d
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4D in the client Retail pack.**'
@@ -9452,10 +9598,12 @@ screens:
   capability: C00
   wave: 2
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9521,7 +9669,8 @@ screens:
     component: apps/venue-management-web/src/routes/inventory/InventoryItems.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4b
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4B in the client Retail pack.**'
@@ -9548,10 +9697,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9606,7 +9757,8 @@ screens:
     component: apps/venue-management-web/src/routes/inventory/StockMovements.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4g
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4G in the client Retail pack.**'
@@ -9626,10 +9778,12 @@ screens:
   capability: C00
   wave: 2
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9687,7 +9841,8 @@ screens:
     component: apps/venue-management-web/src/routes/inventory/Suppliers.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 2.dc.html#ret-2g
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-2G in the client Retail pack.**'
@@ -9714,10 +9869,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9765,7 +9922,8 @@ screens:
     component: apps/venue-management-web/src/routes/approvals/ApprovalInbox.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-084
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -9788,10 +9946,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9845,7 +10005,8 @@ screens:
     component: apps/venue-management-web/src/routes/approvals/ApprovalRequest.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-085
   notes: 'Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Cross-platform navigation removed 24 August**: POS-005. **A till does not
@@ -9870,10 +10031,12 @@ screens:
   capability: C00
   wave: 2
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9914,7 +10077,8 @@ screens:
     component: apps/venue-management-web/src/routes/approvals/ApprovalMatrix.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-086
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -9928,10 +10092,12 @@ screens:
   capability: C00
   wave: 2
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -9976,7 +10142,8 @@ screens:
     component: apps/venue-management-web/src/routes/approvals/ApprovalDelegations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-087
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -9999,10 +10166,12 @@ screens:
   capability: C00
   wave: 3
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -10042,7 +10211,8 @@ screens:
     component: apps/venue-management-web/src/routes/approvals/ApprovalAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-088
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing. **Retail board operations wired 24 August.**
@@ -10056,10 +10226,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -10118,7 +10290,8 @@ screens:
     component: apps/venue-management-web/src/routes/finance/JournalEntries.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-089
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -10141,10 +10314,12 @@ screens:
   capability: C00
   wave: 1
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
       components:
+      - kind: searchField
+        notes: Find a record
       - kind: dataTable
       - kind: detailPanel
   apis:
@@ -10202,7 +10377,8 @@ screens:
     component: apps/venue-management-web/src/routes/finance/PeriodClose.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-090
   notes: Added 17 August because the contract had operations no screen declared. **Not on the wireframe
     board** — needs drawing.
@@ -10284,7 +10460,8 @@ screens:
     component: apps/venue-management-web/src/routes/AiPolicySpend.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-091
   notes: Added 17 August. **Staff and guest spend shown separately** — a venue can manage the first and
     cannot stop guests asking questions. At the ceiling the manager decides whether to continue; the assistant
@@ -10345,13 +10522,15 @@ screens:
     component: apps/venue-management-web/src/routes/venue-mapping/VenueMapList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 2.dc.html#seat-2e
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-092
   density: compact
   requiresModule: seating
   statesDerived: true
   layout:
+    template: list
     regions:
     - name: contentBody
       components:
@@ -10425,7 +10604,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-mapping/VenueMapImportForm.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 1.dc.html#seat-1a
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-093
   density: compact
@@ -10441,9 +10621,16 @@ screens:
   requiresModule: seating
   statesDerived: true
   layout:
+    template: form
     regions:
     - name: contentBody
       components:
+      - kind: fileUpload
+        notes: The geometry file being imported.
+      - kind: progressIndicator
+        notes: >
+          Import is long enough to leave the screen. **A spinner with no proportion is a screen
+          people reload**, and reloading an import is how a venue gets two of everything.
       - kind: primaryButton
         derived: true
         impliedBy: importVenueGeometry
@@ -10524,7 +10711,8 @@ screens:
     component: apps/venue-management-web/src/routes/venue-mapping/VenueMapEditorForm.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 1.dc.html#seat-1b
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-094
   density: compact
@@ -10542,6 +10730,7 @@ screens:
   requiresModule: seating
   statesDerived: true
   layout:
+    template: canvas
     regions:
     - name: contentBody
       components:
@@ -10554,6 +10743,11 @@ screens:
         impliedBy: setVenuePoint
         label: Save venue point
         notes: The act the screen exists for.
+      - kind: publishGate
+        impliedBy: publishVenueMap
+        notes: >
+          **Publishing a map moves people.** The gate names what changes before it happens —
+          which routes, which closures, which points become unreachable.
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
@@ -10607,7 +10801,8 @@ screens:
     component: apps/venue-management-web/src/routes/resources/ResourceList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-095
   notes: CF-125. **A resource is a specific object, not a quantity** — forty identical strollers are forty
     rows, because guest twelve returned stroller twelve.
@@ -10661,7 +10856,8 @@ screens:
     component: apps/venue-management-web/src/routes/resources/ResourceCalendar.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-096
   notes: CF-125. **Conflict detection before assignment is the whole point** — two bookings on one cabana
     is a guest arriving to find somebody in their chair, and it must be impossible rather than unlikely.
@@ -10689,7 +10885,7 @@ screens:
     contract: orders
     purpose: Hold the deposit
     trigger: onAction
-  - operationId: releaseStoredValue
+  - operationId: relinquishStoredValue
     contract: orders
     purpose: Release it
     trigger: onAction
@@ -10737,7 +10933,8 @@ screens:
     component: apps/venue-management-web/src/routes/resources/ResourceCheckOutForm.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-097
   notes: CF-125, CF-126. **The deposit is held, not taken** — a deposit taken and refunded is two transactions
     and a fee. **Damage routes the resource to maintenance directly**, because routing through available
@@ -10802,7 +10999,8 @@ screens:
     component: apps/venue-management-web/src/routes/resources/QualificationList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-098
   notes: CF-125. **Expiry is the field that makes this worth having** — a certification with no expiry
     is one nobody renews.
@@ -10862,7 +11060,8 @@ screens:
     component: apps/venue-management-web/src/routes/resources/SessionManifest.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-099
   notes: CF-125, CF-129. Distinct from duration, which variants already handle.
   entryState:
@@ -10940,7 +11139,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/VenueHomeDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-100
   notes: '**Built 20 August because P08 had none.** `BO-001 Queue Directory` was the declared entry point
     to a 99-screen back office — it exits to four queue screens, and **93 screens hung off nothing.**
@@ -11030,7 +11230,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/OrdersMoneyList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-101
   notes: Section landing. **28 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
@@ -11124,7 +11325,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/SellList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-102
   notes: Section landing. **14 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
@@ -11207,7 +11409,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/AccessVenueList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-103
   notes: Section landing. **24 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
@@ -11275,7 +11478,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/FoodBeverageList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-104
   notes: Section landing. **4 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Navigation repointed to P15 on 20 August** — the F&B screens it linked to moved
@@ -11353,7 +11557,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/StockSupplyList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-105
   notes: Section landing. **9 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
@@ -11419,7 +11624,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/PeopleAccessRightsList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-106
   notes: Section landing. **11 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
@@ -11481,7 +11687,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/GuestsMarketingList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-107
   notes: Section landing. **3 screens reach the entry point through here** — before 20 August they reached
     it through nothing.
@@ -11558,7 +11765,8 @@ screens:
     component: apps/venue-management-web/src/routes/home/VenueOperationsList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-108
   notes: Section landing. **6 screens reach the entry point through here** — before 20 August they reached
     it through nothing. **Given its section's own operations on 4 September.** It sat on `getVenueSettings`
@@ -11636,7 +11844,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MenuBuilderPosLayoutDesignerList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 2.dc.html#fnb-2b
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-109
   provenance: client board, specified
@@ -11706,7 +11915,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/RecipeBomManagementList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-110
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -11785,7 +11995,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/IngredientSubstitutionAllergenNutritioList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 2.dc.html#fnb-2l
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-2L in the client F&B pack.**'
@@ -11848,7 +12059,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/ProductionPlanningProductionSheetsList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 2.dc.html#ret-2e
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-2E in the client Retail pack.**'
@@ -11917,7 +12129,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/CentralKitchenCommissaryManagementList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 2.dc.html#ret-2d
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-2D in the client Retail pack.**'
@@ -11984,7 +12197,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/VariantsAttributesBarcodeRfidManagemenList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4j
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-4J in the client Retail pack.**'
@@ -12066,7 +12280,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/CategoryBrandMerchandiseHierarchyList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 4.dc.html#pos-4a
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-4A in the client POS pack.** The pack''s frame is the specification — it carries
@@ -12164,7 +12379,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MerchandisingProductPresentationList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 4.dc.html#pos-4b
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-4B in the client POS pack.** The pack''s frame is the specification — it carries
@@ -12251,7 +12467,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/ProductImportGovernanceAiConfigurationList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 4.dc.html#pos-4c
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-4C in the client POS pack.** The pack''s frame is the specification — it carries
@@ -12343,7 +12560,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/CampaignAudienceManagementList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 4.dc.html#pos-4d
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-4D in the client POS pack.** The pack''s frame is the specification — it carries
@@ -12414,7 +12632,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/CrossSellUpsellRecommendationRulesList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 5.dc.html#ret-5d
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-5D in the client Retail pack.**'
@@ -12482,7 +12701,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/OmnichannelCommerceJourneyConfiguratioList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 5.dc.html#ret-5g
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-120
   provenance: client board, named only
@@ -12553,7 +12773,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/PersonalizedOffersGuestEngagementList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 5.dc.html#ret-5f
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-5F in the client Retail pack.**'
@@ -12616,7 +12837,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/PosExperienceDashboardList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 5.dc.html#ret-5j
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-5J in the client Retail pack.**'
@@ -12684,7 +12906,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/PosProfileManagementList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-123
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -12755,6 +12978,11 @@ screens:
       - kind: searchField
         label: Search layout
       - kind: dataTable
+      - kind: publishGate
+        impliedBy: deployConfigurationProfile
+        notes: >
+          Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   navigation:
     entryFrom:
     - BO-102
@@ -12770,7 +12998,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/LayoutJourneyBuilderList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 1.dc.html#pos-1d
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-1D in the client POS pack.** The pack''s frame is the specification — it carries
@@ -12864,7 +13093,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/ProductCategoryButtonConfigurationList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 1.dc.html#pos-1e
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-1E in the client POS pack.** The pack''s frame is the specification — it carries
@@ -12949,6 +13179,11 @@ screens:
       - kind: searchField
         label: Search deployment, preview
       - kind: dataTable
+      - kind: publishGate
+        impliedBy: deployConfigurationProfile
+        notes: >
+          Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   navigation:
     entryFrom:
     - BO-102
@@ -12964,7 +13199,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/DeploymentPreviewAuditList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 1.dc.html#pos-1f
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-1F, POS-4F in the client POS pack.** The pack''s frame is the specification
@@ -13042,7 +13278,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/HardwarePeripheralsManagementList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-127
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -13110,7 +13347,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/LiveWorkstationHealthMonitorList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 5.dc.html#pos-5b
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-5B in the client POS pack.** The pack''s frame is the specification — it carries
@@ -13186,6 +13424,11 @@ screens:
       - kind: searchField
         label: Search software, configuration
       - kind: dataTable
+      - kind: publishGate
+        impliedBy: deployConfigurationProfile
+        notes: >
+          Declares `deployConfigurationProfile`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   navigation:
     entryFrom:
     - BO-108
@@ -13201,7 +13444,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/SoftwareConfigurationVersionManagementList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 5.dc.html#pos-5d
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-5D in the client POS pack.** The pack''s frame is the specification — it carries
@@ -13279,7 +13523,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/OfflinePolicyRulesConfigurationList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 5.dc.html#pos-5e
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-5E in the client POS pack.** The pack''s frame is the specification — it carries
@@ -13352,7 +13597,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/ConnectivityAutoSwitchSettingsList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-131
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -13414,7 +13660,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/OfflineTransactionMonitorSyncQueueList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-132
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -13497,7 +13744,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/OfflineAlertsLimitsAuditList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 5.dc.html#pos-5f
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-5F in the client POS pack.** The pack''s frame is the specification — it carries
@@ -13572,7 +13820,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/KitchenPreparationStationsList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 1.dc.html#fnb-1h
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-134
   provenance: client board, named only
@@ -13642,7 +13891,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/OrderRoutingKdsPrinterRulesList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 1.dc.html#fnb-1j
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-135
   provenance: client board, named only
@@ -13712,6 +13962,11 @@ screens:
       - kind: searchField
         label: Search f
       - kind: dataTable
+      - kind: publishGate
+        impliedBy: releaseProductionPlan
+        notes: >
+          Declares `releaseProductionPlan`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   navigation:
     entryFrom:
     - BO-104
@@ -13727,7 +13982,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/FBGlobalSettingsControlsList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 2.dc.html#fnb-2m
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-2M, FNB-2N, FNB-5D in the client F&B pack.**'
@@ -13809,7 +14065,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/RecipeConsumptionTheoreticalInventoryList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 2.dc.html#fnb-2f
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-2F, FNB-5C in the client F&B pack.**'
@@ -13882,7 +14139,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/ProductionExecutionBatchManagementList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-138
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -13942,7 +14200,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/WastageSpoilageReturnsWriteOffList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-139
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -14006,7 +14265,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/ProductAvailability86OperationalFoodSaList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-140
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -14075,7 +14335,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/OperationalAlertsAiReplenishmentActionList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-141
   provenance: client board, named only
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -14146,7 +14407,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/StoreRulesControlsPermissionsList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 1.dc.html#ret-1j
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-142
   provenance: client board, named only
@@ -14216,7 +14478,8 @@ screens:
     component: apps/venue-management-web/src/routes/ops/RetailGlobalSettingsControlsList.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 1.dc.html#ret-1k
     generatedFallback: wireframes/P08 Venue Management.dc.html#bo-143
   provenance: client board, named only
@@ -14267,7 +14530,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessControlCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-144
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-144
   source:
@@ -14331,7 +14595,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VenueParkAccessStructure.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-145
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-145
   source:
@@ -14385,7 +14650,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessAreaZoneBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-146
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-146
   source:
@@ -14439,7 +14705,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AttractionAccessConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-147
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-147
   source:
@@ -14494,7 +14761,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessPointDirectory.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-148
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-148
   source:
@@ -14548,7 +14816,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GateLaneConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-149
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-149
   source:
@@ -14602,7 +14871,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessControlGraphicalMapDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-150
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-150
   source:
@@ -14657,7 +14927,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessLocationGrouping.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-151
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-151
   source:
@@ -14711,7 +14982,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OperatingCalendarSpecialAccessDays.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-152
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-152
   source:
@@ -14745,6 +15017,11 @@ screens:
         notes: What changed, when, and by whom
       - kind: searchField
         notes: Find a change
+      - kind: publishGate
+        impliedBy: publishTopologyValidation
+        notes: >
+          The screen's one declared operation publishes. **A validation that publishes without
+          naming what it activates is a validation nobody can refuse.**
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first topology entry, and
@@ -14765,7 +15042,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/TopologyValidationPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-153
     workshopBoard: wireframes/WS01 Access Control Board 1.dc.html#bo-153
   source:
@@ -14817,7 +15095,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessRuleCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-154
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-154
   source:
@@ -14882,7 +15161,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VisualAccessRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-155
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-155
   source:
@@ -14938,7 +15218,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EntryExitReEntryRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-156
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-156
   source:
@@ -14992,7 +15273,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AntiPassbackJourneySequence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-157
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-157
   source:
@@ -15046,7 +15328,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessValidityTimeRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-158
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-158
   source:
@@ -15102,7 +15385,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EntitlementConsumptionEngine.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-159
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-159
   source:
@@ -15158,7 +15442,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MultiParkCrossoverRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-160
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-160
   source:
@@ -15212,7 +15497,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GuestCompanionEligibilityRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-161
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-161
   source:
@@ -15268,7 +15554,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GroupAdmissionQuantityValidation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-162
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-162
   source:
@@ -15302,6 +15589,11 @@ screens:
         notes: Scope this applies at
       - kind: toggle
         notes: Active
+      - kind: publishGate
+        impliedBy: publishRuleConflictCheck
+        notes: >
+          Declares `publishRuleConflictCheck`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first rule entry, and this
@@ -15322,7 +15614,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/RuleSimulationConflictCheckPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-163
     workshopBoard: wireframes/WS02 Access Control Board 2.dc.html#bo-163
   source:
@@ -15374,7 +15667,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DigitalCredentialSecurityCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-164
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-164
   source:
@@ -15439,7 +15733,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DynamicQrSecurityProfileBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-165
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-165
   source:
@@ -15495,7 +15790,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialActivationDisplayRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-166
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-166
   source:
@@ -15551,7 +15847,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DeviceBindingSessionSecurity.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-167
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-167
   source:
@@ -15607,7 +15904,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BleBeaconGeofenceConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-168
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-168
   source:
@@ -15663,7 +15961,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialTransferRebinding.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-169
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-169
   source:
@@ -15718,7 +16017,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialRevocationLifecycleEvents.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-170
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-170
   source:
@@ -15774,7 +16074,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OfflineCryptographicValidationProfile.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-171
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-171
   source:
@@ -15830,7 +16131,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EmbeddedEntitlementPayloadDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-172
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-172
   source:
@@ -15882,7 +16184,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialSecuritySimulationAuditPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-173
     workshopBoard: wireframes/WS03 Access Control Board 3.dc.html#bo-173
   source:
@@ -15934,7 +16237,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaCredentialCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-174
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-174
   source:
@@ -15999,7 +16303,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaTypeTechnologyLibrary.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-175
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-175
   source:
@@ -16053,7 +16358,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VirtualCredentialMediaAssociation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-176
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-176
   source:
@@ -16109,7 +16415,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VerificationMethodSelectionLocking.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-177
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-177
   source:
@@ -16165,7 +16472,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaIssuanceEncodingProfile.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-178
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-178
   source:
@@ -16221,7 +16529,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaSwapReplacement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-179
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-179
   source:
@@ -16276,7 +16585,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/RfidNfcConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-180
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-180
   source:
@@ -16332,7 +16642,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ExternalPartnerCredentialMapping.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-181
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-181
   source:
@@ -16388,7 +16699,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/HotelWalletExternalMediaIntegration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-182
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-182
   source:
@@ -16424,6 +16736,11 @@ screens:
         notes: Scope this applies at
       - kind: toggle
         notes: Active
+      - kind: publishGate
+        impliedBy: publishMediaCompatibilityTesting
+        notes: >
+          Declares `publishMediaCompatibilityTesting`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first media entry, and this
@@ -16444,7 +16761,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaCompatibilityTestingPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-183
     workshopBoard: wireframes/WS04 Access Control Board 4.dc.html#bo-183
   source:
@@ -16506,7 +16824,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BiometricAccessCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-184
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-184
   source:
@@ -16572,7 +16891,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BiometricVerificationProfileBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-185
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-185
   source:
@@ -16627,7 +16947,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FacePassEnrollmentConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-186
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-186
   source:
@@ -16683,7 +17004,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BiometricConsentGuardianManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-187
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-187
   source:
@@ -16739,7 +17061,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FaceTagTemporaryEnrollment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-188
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-188
   source:
@@ -16794,7 +17117,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FaceMatchingVerificationThresholds.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-189
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-189
   source:
@@ -16850,7 +17174,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FaceChangeReEnrollmentIdentityProtection.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-190
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-190
   source:
@@ -16904,7 +17229,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BiometricValidationAtGate.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-191
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-191
   source:
@@ -16958,7 +17284,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BiometricLifecycleRetentionDeletion.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-192
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-192
   source:
@@ -17010,7 +17337,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BiometricSimulationAuditPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-193
     workshopBoard: wireframes/WS05 Access Control Board 5.dc.html#bo-193
   source:
@@ -17073,7 +17401,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DeviceGateCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-194
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-194
   source:
@@ -17137,7 +17466,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DeviceTypeHardwareLibrary.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-195
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-195
   source:
@@ -17191,7 +17521,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/PhysicalDeviceRegistrationProvisioning.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-196
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-196
   source:
@@ -17246,7 +17577,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/TurnstileLaneBehaviorConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-197
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-197
   source:
@@ -17301,7 +17633,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ValidationOutcomeGuestFeedbackDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-198
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-198
   source:
@@ -17355,7 +17688,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ReaderScannerPeripheralConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-199
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-199
   source:
@@ -17410,7 +17744,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/HandheldMobileAccessDeviceConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-200
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-200
   source:
@@ -17465,7 +17800,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GateModesFreeSpinEmergencyControls.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-201
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-201
   source:
@@ -17521,7 +17857,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DeviceSoftwareContentRemoteConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-202
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-202
   source:
@@ -17576,7 +17913,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/HardwareCompatibilityHealthTestingDeployment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-203
     workshopBoard: wireframes/WS06 Access Control Board 6.dc.html#bo-203
   source:
@@ -17638,7 +17976,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OfflineEdgeOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-204
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-204
   source:
@@ -17702,7 +18041,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EdgeNodeLocalProcessingConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-205
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-205
   source:
@@ -17758,7 +18098,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OfflineValidationPolicyBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-206
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-206
   source:
@@ -17812,7 +18153,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EdgePackageDataDistribution.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-207
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-207
   source:
@@ -17868,7 +18210,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OfflineCredentialRevocationCache.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-208
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-208
   source:
@@ -17923,7 +18266,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OfflineEntitlementUsageLedger.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-209
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-209
   source:
@@ -17977,7 +18321,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ConnectivityFailureDegradedModePolicy.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-210
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-210
   source:
@@ -18031,7 +18376,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ReconnectionSynchronizationConflictResolution.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-211
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-211
   source:
@@ -18086,7 +18432,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OfflineSimulationResilienceTesting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-212
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-212
   source:
@@ -18138,7 +18485,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EdgeSecurityAuditDeployment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-213
     workshopBoard: wireframes/WS07 Access Control Board 7.dc.html#bo-213
   source:
@@ -18190,7 +18538,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GuestJourneyCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-214
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-214
   source:
@@ -18254,7 +18603,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GroupB2bAdmissionProfileBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-215
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-215
   source:
@@ -18309,7 +18659,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GroupLeaderFastB2bValidation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-216
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-216
   source:
@@ -18365,7 +18716,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GroupAttendancePartialEntryManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-217
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-217
   source:
@@ -18421,7 +18773,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FamilyChildPodCompanionJourney.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-218
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-218
   source:
@@ -18477,7 +18830,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ReEntryTemporaryExitJourney.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-219
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-219
   source:
@@ -18532,7 +18886,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MultiParkCrossoverJourneyOrchestrator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-220
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-220
   source:
@@ -18588,7 +18943,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FastPassAttractionAccessJourney.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-221
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-221
   source:
@@ -18644,7 +19000,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/SpecialEventFreeViewAlternativeAdmission.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-222
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-222
   source:
@@ -18696,7 +19053,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/JourneySimulationAuditPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-223
     workshopBoard: wireframes/WS08 Access Control Board 8.dc.html#bo-223
   source:
@@ -18759,7 +19117,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/LiveAccessOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-224
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-224
   source:
@@ -18824,7 +19183,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/PodiumOperationsConsole.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-225
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-225
   source:
@@ -18878,7 +19238,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/TicketCredentialInvestigationConsole.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-226
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-226
   source:
@@ -18933,7 +19294,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ValidationExceptionReasonCodeManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-227
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-227
   source:
@@ -18988,7 +19350,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ManualOverrideSupervisorApproval.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-228
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-228
   source:
@@ -19042,7 +19405,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialDisableBlacklistWhitelistOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-229
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-229
   source:
@@ -19098,7 +19462,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/LiveGateModeLaneControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-230
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-230
   source:
@@ -19153,7 +19518,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/QueueThroughputLaneOptimization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-231
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-231
   source:
@@ -19207,7 +19573,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OperationalIncidentExceptionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-232
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-232
   source:
@@ -19242,8 +19609,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first operations entry, and
-      this state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -19260,7 +19627,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/OperationsAuditShiftHandoverControlSummary.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-233
     workshopBoard: wireframes/WS09 Access Control Board 9.dc.html#bo-233
   source:
@@ -19312,7 +19680,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DynamicAccessPolicyCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-234
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-234
   source:
@@ -19347,14 +19716,16 @@ screens:
   wave: 3
   density: compact
   layout:
-    template: dashboard
+    template: list
     regions:
     - name: contentBody
       components:
-      - kind: timeline
-        notes: What changed, when, and by whom
+      - kind: dataTable
+        notes: Every access attribute with its scope.
       - kind: searchField
-        notes: Find a change
+        notes: Find an attribute
+      - kind: primaryButton
+        notes: The act the screen exists for.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first access entry, and this
@@ -19375,7 +19746,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessAttributeCatalog.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-235
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-235
   source:
@@ -19429,7 +19801,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VisualDynamicPolicyBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-236
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-236
   source:
@@ -19483,7 +19856,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ContextTimeEventCapacityPolicyBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-237
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-237
   source:
@@ -19537,7 +19911,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/IdentityMembershipAccreditationPolicies.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-238
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-238
   source:
@@ -19591,7 +19966,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/PolicyScopeHierarchyInheritance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-239
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-239
   source:
@@ -19645,7 +20021,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AuthorizationGovernanceTemporaryAccess.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-240
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-240
   source:
@@ -19700,7 +20077,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/PolicyEvaluationArchitectureOfflineDistribution.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-241
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-241
   source:
@@ -19754,7 +20132,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/PolicySimulationConflictImpactAnalysis.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-242
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-242
   source:
@@ -19806,7 +20185,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/PolicyApprovalAuditAnalyticsAiOptimization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-243
     workshopBoard: wireframes/WS10 Access Control Board 10.dc.html#bo-243
   source:
@@ -19869,7 +20249,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessSecurityFraudCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-244
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-244
   source:
@@ -19933,7 +20314,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FraudDetectionRuleSignalLibrary.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-245
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-245
   source:
@@ -19988,7 +20370,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialSharingConcurrentUsageDetection.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-246
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-246
   source:
@@ -20043,7 +20426,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/UnifiedIdentityCredentialLockManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-247
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-247
   source:
@@ -20096,7 +20480,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BiometricIdentityIntegrityMonitoring.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-248
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-248
   source:
@@ -20149,7 +20534,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/RelationshipCompanionFraudMonitoring.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-249
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-249
   source:
@@ -20203,7 +20589,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessRiskScoringDecisionEngine.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-250
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-250
   source:
@@ -20257,7 +20644,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/RealTimeSecurityResponsePlaybookBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-251
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-251
   source:
@@ -20312,7 +20700,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/SecurityInvestigationEvidenceWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-252
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-252
   source:
@@ -20364,7 +20753,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/SecurityAnalyticsAiDetectionGovernance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-253
     workshopBoard: wireframes/WS11 Access Control Board 11.dc.html#bo-253
   source:
@@ -20417,7 +20807,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessMonitoringAnalyticsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-254
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-254
   source:
@@ -20481,7 +20872,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/LiveVenueOccupancyPeopleCounting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-255
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-255
   source:
@@ -20535,7 +20927,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GraphicalAccessMapLiveGatePerformance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-256
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-256
   source:
@@ -20588,7 +20981,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AttendanceAdmissionAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-257
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-257
   source:
@@ -20640,7 +21034,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EntryExitReEntryCrossoverAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-258
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-258
   source:
@@ -20692,7 +21087,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ThroughputQueueValidationPerformanceAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-259
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-259
   source:
@@ -20744,7 +21140,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/ValidationOutcomeRejectionAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-260
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-260
   source:
@@ -20798,7 +21195,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GuestDwellTimeLengthOfStayAttractionFlow.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-261
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-261
   source:
@@ -20852,7 +21250,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AccessReportsScheduledReportingDataExport.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-262
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-262
   source:
@@ -20905,7 +21304,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AiAccessIntelligenceForecastingExecutiveInsights.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-263
     workshopBoard: wireframes/WS12 Access Control Board 12.dc.html#bo-263
   source:
@@ -20968,7 +21368,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupSalesCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-264
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-264
   source:
@@ -21032,7 +21433,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupEnquiryOpportunityCapture.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-265
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-265
   source:
@@ -21086,7 +21488,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupCustomerOrganizationProfile.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-266
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-266
   source:
@@ -21140,7 +21543,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupRequirementsAvailabilityCapacityPlanner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-267
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-267
   source:
@@ -21194,7 +21598,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupPackageExperienceBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-268
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-268
   source:
@@ -21248,7 +21653,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupQuotationBuilderProposalGeneration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-269
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-269
   source:
@@ -21302,7 +21708,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/QuoteRevisionNegotiationVersionManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-270
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-270
   source:
@@ -21356,7 +21763,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupDiscountExceptionApprovalWorkflow.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-271
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-271
   source:
@@ -21411,7 +21819,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/QuoteToBookingConversionConfirmation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-272
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-272
   source:
@@ -21466,7 +21875,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupBooking360HandoverWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-273
     workshopBoard: wireframes/WS19 Group Sales   Corporate Booking Management Board 1.dc.html#bo-273
   source:
@@ -21528,7 +21938,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupBookingOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-274
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-274
   source:
@@ -21592,7 +22003,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupOperationalPlanningTaskWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-275
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-275
   source:
@@ -21646,7 +22058,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/ParticipantsGuestListsGroupStructure.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-276
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-276
   source:
@@ -21700,7 +22113,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupPaymentDepositBalanceManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-277
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-277
   source:
@@ -21754,7 +22168,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupTicketSeatEntitlementAllocation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-278
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-278
   source:
@@ -21808,7 +22223,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupTicketFulfillmentDistribution.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-279
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-279
   source:
@@ -21862,7 +22278,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupArrivalCheckInAdmissionOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-280
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-280
   source:
@@ -21916,7 +22333,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupAmendmentsCancellationRefundOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-281
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-281
   source:
@@ -21970,7 +22388,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupBookingReconciliationClosurePerformance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-282
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-282
   source:
@@ -22023,7 +22442,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/GroupSalesAnalyticsAiIntelligenceCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-283
     workshopBoard: wireframes/WS20 Group Sales   Corporate Booking Management Board 2.dc.html#bo-283
   source:
@@ -22086,7 +22506,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipAnnualPassCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-284
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-284
   source:
@@ -22150,7 +22571,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipProductTierBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-285
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-285
   source:
@@ -22204,7 +22626,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipEligibilityQualificationRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-286
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-286
   source:
@@ -22258,7 +22681,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/ValidityActivationExpiryConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-287
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-287
   source:
@@ -22312,7 +22736,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipEntitlementAdmissionBenefitBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-288
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-288
   source:
@@ -22367,7 +22792,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipUsageVisitConsumptionRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-289
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-289
   source:
@@ -22422,7 +22848,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/FamilyHouseholdDependentMembershipConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-290
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-290
   source:
@@ -22477,7 +22904,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipCommercialPricingChannelAssociation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-291
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-291
   source:
@@ -22531,7 +22959,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/RenewalAutoRenewalMembershipContinuityConfigurat.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-292
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-292
   source:
@@ -22586,7 +23015,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipProductValidationApprovalPublicationVe.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-293
     workshopBoard: wireframes/WS21 Membership   Annual Pass Management Board 1.dc.html#bo-293
   source:
@@ -22649,7 +23079,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MemberOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-294
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-294
   source:
@@ -22714,7 +23145,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/Member360MembershipAccountWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-295
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-295
   source:
@@ -22769,7 +23201,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipActivationAssignmentCredentialManageme.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-296
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-296
   source:
@@ -22832,7 +23265,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/VisitAdmissionEntitlementUsageMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-297
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-297
   source:
@@ -22887,7 +23321,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipFreezeSuspensionReactivationManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-298
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-298
   source:
@@ -22941,7 +23376,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipUpgradeDowngradeProductMigrationOperat.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-299
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-299
   source:
@@ -22996,7 +23432,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/RenewalOperationsAutoRenewalManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-300
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-300
   source:
@@ -23051,7 +23488,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MemberExceptionsOverridesServiceRecovery.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-301
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-301
   source:
@@ -23086,8 +23524,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first member entry, and this
-      state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -23104,7 +23542,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MemberLifecycleHistoryAuditCaseTimeline.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-302
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-302
   source:
@@ -23167,7 +23606,8 @@ screens:
     component: apps/venue-management-web/src/routes/sell/MembershipAnalyticsRenewalIntelligenceAiRetentio.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-303
     workshopBoard: wireframes/WS22 Membership   Annual Pass Management Board 2.dc.html#bo-303
   source:
@@ -23230,7 +23670,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderReservationCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-304
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-304
   source:
@@ -23295,7 +23736,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderDetailTransactionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-305
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-305
   source:
@@ -23349,7 +23791,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/ReservationHoldPolicyConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-306
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-306
   source:
@@ -23404,7 +23847,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderReservationStatusLifecycleConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-307
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-307
   source:
@@ -23459,7 +23903,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderCreationSourceChannelConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-308
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-308
   source:
@@ -23513,7 +23958,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/CustomerGuestAccountAssignment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-309
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-309
   source:
@@ -23567,7 +24013,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderLineProductEntitlementComposition.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-310
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-310
   source:
@@ -23622,7 +24069,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/CapacityReservationInventoryCommitment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-311
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-311
   source:
@@ -23677,7 +24125,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/ReservationConfirmationExpiryFulfillmentReadines.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-312
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-312
   source:
@@ -23732,7 +24181,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderLifecycleTimelineSlaExceptionsAiOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-313
     workshopBoard: wireframes/WS23 Order   Reservation Management Board 1.dc.html#bo-313
   source:
@@ -23795,7 +24245,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/AmendmentAfterSalesCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-314
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-314
   source:
@@ -23860,7 +24311,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderAmendmentWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-315
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-315
   source:
@@ -23914,7 +24366,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/AmendmentEligibilityPolicyRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-316
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-316
   source:
@@ -23968,7 +24421,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/CancellationPartialCancellationPolicyConfigurati.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-317
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-317
   source:
@@ -24023,7 +24477,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/RefundPolicyRefundCalculationConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-318
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-318
   source:
@@ -24085,7 +24540,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/VoidReversalSameDayCorrectionManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-319
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-319
   source:
@@ -24140,7 +24596,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/TicketReissueFulfillmentRegeneration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-320
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-320
   source:
@@ -24196,7 +24653,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/AfterSalesFinancialSettlementAdjustmentWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-321
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-321
   source:
@@ -24251,7 +24709,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/ApprovalExceptionServiceRecoveryManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-322
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-322
   source:
@@ -24304,7 +24763,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/AmendmentHistoryAuditAfterSalesAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-323
     workshopBoard: wireframes/WS24 Order   Reservation Management Board 2.dc.html#bo-323
   source:
@@ -24366,7 +24826,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/PaymentOrderFinancialCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-324
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-324
   source:
@@ -24430,7 +24891,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderPaymentDetailTransactionLedger.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-325
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-325
   source:
@@ -24484,7 +24946,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/MultiPaymentSplitTenderPaymentAllocationConfigur.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-326
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-326
   source:
@@ -24539,7 +25002,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/DepositPartialPaymentOutstandingBalanceManagemen.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-327
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-327
   source:
@@ -24593,7 +25057,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderSplitMergeTransactionRelationshipManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-328
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-328
   source:
@@ -24648,7 +25113,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/RelatedOrderTransactionRelationshipExplorer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-329
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-329
   source:
@@ -24702,7 +25168,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/ExternalPaymentPartnerSettlementReferenceMapping.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-330
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-330
   source:
@@ -24756,7 +25223,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/PaymentReconciliationExceptionManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-331
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-331
   source:
@@ -24810,7 +25278,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/FinancialTraceabilityControlAuditExplorer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-332
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-332
   source:
@@ -24863,7 +25332,8 @@ screens:
     component: apps/venue-management-web/src/routes/orders-money/OrderFinancialAnalyticsAiReconciliationIntellige.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-333
     workshopBoard: wireframes/WS25 Order   Reservation Management Board 3.dc.html#bo-333
   source:
@@ -24927,7 +25397,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VirtualTicketCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-334
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-334
   source:
@@ -24992,7 +25463,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VirtualTicketIdentityMasterRecordConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-335
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-335
   source:
@@ -25047,7 +25519,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VirtualTicketStatusLifecycleModel.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-336
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-336
   source:
@@ -25102,7 +25575,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaTypeCredentialTechnologyRegistry.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-337
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-337
   source:
@@ -25157,7 +25631,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MultiMediaBindingAssociationRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-338
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-338
   source:
@@ -25212,7 +25687,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialIdentityTokenReferenceMapping.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-339
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-339
   source:
@@ -25267,7 +25743,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/EntitlementCrossMediaSynchronizationRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-340
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-340
   source:
@@ -25322,7 +25799,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaActivationPriorityFallbackRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-341
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-341
   source:
@@ -25377,7 +25855,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaReplacementRevocationRebindingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-342
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-342
   source:
@@ -25430,7 +25909,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VirtualTicketArchitectureTestingGovernanceAudit.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-343
     workshopBoard: wireframes/WS51 Ticket Media   Credential Management Board 1.dc.html#bo-343
   source:
@@ -25493,7 +25973,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaDesignStudioCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-344
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-344
   source:
@@ -25557,7 +26038,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DigitalQrBarcodeTicketDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-345
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-345
   source:
@@ -25612,7 +26094,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/PdfPrintablePosTicketDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-346
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-346
   source:
@@ -25667,7 +26150,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/AppleWalletPassDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-347
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-347
   source:
@@ -25721,7 +26205,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/GoogleWalletPassDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-348
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-348
   source:
@@ -25776,7 +26261,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/RfidNfcCardWristbandMediaDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-349
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-349
   source:
@@ -25831,7 +26317,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DigitalCardMembershipWearableDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-350
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-350
   source:
@@ -25886,7 +26373,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/DynamicFieldsDataMappingContentBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-351
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-351
   source:
@@ -25941,7 +26429,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/BrandingLocalizationTemplateInheritance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-352
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-352
   source:
@@ -25996,7 +26485,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MultiMediaPreviewTestingApprovalPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-353
     workshopBoard: wireframes/WS52 Ticket Media   Credential Management Board 2.dc.html#bo-353
   source:
@@ -26059,7 +26549,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-354
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-354
   source:
@@ -26124,7 +26615,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/VirtualTicketCredential360Workspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-355
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-355
   source:
@@ -26186,7 +26678,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialGenerationIssuanceMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-356
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-356
   source:
@@ -26241,7 +26734,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialDeliveryDistributionOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-357
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-357
   source:
@@ -26295,7 +26789,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/MediaBindingActivationAssignmentOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-358
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-358
   source:
@@ -26349,7 +26844,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialReplacementReissueRevocationRecovery.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-359
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-359
   source:
@@ -26403,7 +26899,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/FailedGenerationDeliveryCredentialExceptionManag.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-360
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-360
   source:
@@ -26459,7 +26956,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialUsageCrossMediaTraceability.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-361
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-361
   source:
@@ -26493,8 +26991,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first credential entry, and
-      this state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -26511,7 +27009,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/CredentialSecurityAuditOperationalEvidence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-362
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-362
   source:
@@ -26564,7 +27063,8 @@ screens:
     component: apps/venue-management-web/src/routes/access-venue/TicketMediaAnalyticsAiOperationsIntelligence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P08 Venue Management.dc.html#bo-363
     workshopBoard: wireframes/WS53 Ticket Media   Credential Management Board 3.dc.html#bo-363
   source:

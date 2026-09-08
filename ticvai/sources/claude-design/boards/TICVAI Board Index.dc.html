@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="page">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F2F5F9}
+  a{color:#0D6EFD;text-decoration:none}
+  a:hover{color:#0A58CA;text-decoration:underline}
+</style>
+</helmet>
+<div style="font-family:Manrope,-apple-system,'Segoe UI',sans-serif;color:#0B1324;font-size:13px;line-height:1.55;max-width:1420px;margin:0 auto;padding:26px 34px 90px;--rowpad:{{ rowpad }}">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:16px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:22px;font-weight:800;letter-spacing:-.02em;margin:6px 0 0">Board index — what is drawn, what is left</h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      counted from the files in <span style="color:#0B1324">wireframes/</span><br>4 September 2026 · 81 board files + 2 hubs
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:88ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Every row below was counted by reading the board files, not a plan. A screen counts as <b style="color:#0B1324">drawn</b> only where a frame in a client-pack board carries its code; the platform boards are generated at wireframe fidelity and are listed separately, because a client reading both sees the difference.</p>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:26px;align-items:end;padding:18px 20px;margin-top:18px;background:#0B1324;border-radius:12px;color:#DCE8F7">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">drawn · board file present</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#fff">292</span><span style="font-size:12px;color:#9FB6CF">frames · 21 board files</span></div>
+      <div style="height:7px;border-radius:4px;background:rgba(255,255,255,.12)"><div style="width:27%;height:7px;border-radius:4px;background:#0E9F6E"></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">left to draw</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#B98900">799</span><span style="font-size:12px;color:#9FB6CF">of 1,091 package screens</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">The count was <b style="color:#DCE8F7">0</b> until 7 September, and it was wrong twice over. A generated frame was being counted as a drawn board, and the 4 September pack raised five platforms at once: <b style="color:#DCE8F7">P09 to 318</b>, <b style="color:#DCE8F7">P08 to 363</b>, P13 to 60, P10 to 51, P12 to 28. <a href="TICVAI%20Web%20Board.dc.html" style="color:#8FE3FF">TICVAI Web Board</a> was also an orphan — 37 real frames that no module referenced, so the index reported 3. Five legacy packs (F&amp;B, Retail, POS, Inventory, Seat sampler — 33 boards, 246 frames) are retired: their subject matter is in the package under other names.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">platform boards · generated</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#8FE3FF">500</span><span style="font-size:12px;color:#9FB6CF">frames · 15 platforms · no file present</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">Scaffolded, not drawn at pack fidelity. P08 alone is 143, and P02 gained eight on this pull. <a href="Venue%20Scanner%20Board.dc.html" style="color:#8FE3FF">P07 Venue Scanner</a> left this column on 2 September and <a href="Venue%20Support%20Board.dc.html" style="color:#8FE3FF">P12 Venue Support</a> , <a href="Kitchen%20Display%20Board.dc.html" style="color:#8FE3FF">P15 Kitchen Display</a> , <a href="Developer%20Portal%20Board.dc.html" style="color:#8FE3FF">P14 Developer</a> , <a href="Venue%20Analytics%20Board.dc.html" style="color:#8FE3FF">P16 Venue Analytics</a> , <a href="Accreditation%20Board.dc.html" style="color:#8FE3FF">P11 Accreditation Web</a> , <a href="Venue%20CMS%20Board.dc.html" style="color:#8FE3FF">P13 Venue CMS</a> and <a href="Partner%20Web%20Board.dc.html" style="color:#8FE3FF">P10 Partner Web</a> on 4 September. Three platforms now show a screen count well under their own YAML — P12 by twenty, P13 by forty, P10 by thirty — most of them pointing at workshop boards that do not exist in <span style="font-family:'IBM Plex Mono',monospace">wireframes/</span>. This column read <b style="color:#DCE8F7">404</b> until 7 September and the array has always summed to <b style="color:#DCE8F7">500</b> — the figure was typed, not counted. None of the fifteen <span style="font-family:'IBM Plex Mono',monospace">P0x …dc.html</span> files exists here, so nothing in this column is openable and no row links out. It is the denominator, and it is now 500 against the package's 1,091.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:12px;padding:14px 16px;margin-top:16px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+    <div>What the 4 September index got wrong. Its two inventories were counted as one. <span style="font-family:'IBM Plex Mono',monospace">modules</span> holds boards drawn at pack fidelity and links out per screen; <span style="font-family:'IBM Plex Mono',monospace">platforms</span> holds one generated frame per package screen and links nowhere. Read together they claimed full coverage; read apart, <b>292 of 1,091</b>. The package also defines <b>fifteen</b> platforms, not sixteen — <span style="font-family:'IBM Plex Mono',monospace">P03</span> is skipped on both sides.<br><br>What the index before that got wrong. It claimed <b>96 boards</b>. There are now <b>81 board files</b> in <span style="font-family:'IBM Plex Mono',monospace">wireframes/</span> — 65 client packs, the v2 sampler and 15 generated platform boards — plus two hub pages; the 8 superseded files counted on 1 September have been deleted at source. Sixty of them carry drawn frames. <b>Marketing &amp; CRM is complete</b> — 120 of 120 across twelve boards, listed there as not drawn. <b>Seat Management is complete</b> — 130 of 130 across thirteen Seat Platform boards. <b>Event Management (100)</b> appears in no file in <span style="font-family:'IBM Plex Mono',monospace">wireframes/</span> and is not counted here.<br><br>The Guest App was the larger correction. Its eight boards are a thematic pack coded <span style="font-family:'IBM Plex Mono',monospace">GM-1A…GM-8E</span>, and only twenty of P02's <span style="font-family:'IBM Plex Mono',monospace">GST</span> screens — seventy-one of them since this pull — had a frame answering to a code — not the forty the old index claimed. The remaining <b>43 are now drawn</b> in <a href="Guest%20App%20Board.dc.html">Guest App Board</a>, and the sixth Dashboards screen in <a href="Dashboards%20Board%202.dc.html">Dashboards Board 2</a>, where it is marked proposed: it has no screen definition yet.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:44px;margin-top:40px">
+
+    <sc-for list="{{ modules }}" as="m" hint-placeholder-count="4">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:10px;border-bottom:1px solid #DCE3ED">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#8494A8">{{ m.state }}</div>
+            <div style="font-size:17px;font-weight:800;letter-spacing:-.015em;margin-top:4px">{{ m.name }}</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px">
+            <div style="width:180px;height:8px;border-radius:5px;background:#EEF2F7"><div style="height:8px;border-radius:5px;background:{{ m.barColor }};width:{{ m.pct }}"></div></div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">{{ m.tally }}</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px">
+          <sc-for list="{{ m.boards }}" as="b" hint-placeholder-count="6">
+            <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid #EDF1F6">
+                <sc-if value="{{ b.isLink }}" hint-placeholder-val="{{ true }}">
+                  <a href="{{ b.href }}" style="font-size:13px;font-weight:700;letter-spacing:-.01em">{{ b.label }}</a>
+                </sc-if>
+                <sc-if value="{{ b.isPending }}" hint-placeholder-val="{{ false }}">
+                  <div style="font-size:13px;font-weight:700;letter-spacing:-.01em;color:#8A6D00">{{ b.label }}</div>
+                </sc-if>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ b.count }}</div>
+              </div>
+              <sc-for list="{{ b.screens }}" as="s" hint-placeholder-count="8">
+                <div style="display:grid;grid-template-columns:1fr 78px;align-items:baseline;gap:8px;padding:var(--rowpad,6px) 0;border-bottom:1px solid #F4F6FA;font-size:11.5px">
+                  <div style="min-width:0"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.c }}</span> <a href="{{ s.href }}" style="color:#26303F">{{ s.t }}</a></div>
+                  <sc-if value="{{ s.isDrawn }}" hint-placeholder-val="{{ true }}">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#0E9F6E;text-align:right">drawn</div>
+                  </sc-if>
+                  <sc-if value="{{ s.isPending }}" hint-placeholder-val="{{ false }}">
+                    <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#B98900;text-align:right">to draw</div>
+                  </sc-if>
+                </div>
+              </sc-for>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-for>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:10px;border-bottom:1px solid #DCE3ED">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#8494A8">drawn once · serves many</div>
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.015em;margin-top:4px">Pattern boards</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">{{ patternSummary }}</div>
+      </div>
+      <p style="font-size:12px;color:#5A6577;max-width:88ch;margin:0;line-height:1.6">The 799 undrawn screens were generated from a short layout vocabulary, so they collapse into 43 patterns. A pattern counts as <b style="color:#0B1324">available</b> only where a screen sharing its exact template and component set sits on a board file that opens — computed here, not carried from the plan. Eight frames on <a href="Pattern%20Boards.dc.html">Pattern Boards</a> cover 629 screens between them, and drawing them raised four findings that outrank the coverage: 96 per-module command centres, seven publish screens sharing a signature with eleven read-only audit trails, seventeen screens on a mislabelled template, and three venue-map screens that declare no template at all. All four are answered as YAML patches on <a href="Vocabulary%20Corrections.dc.html">Vocabulary corrections</a>, which takes the count from 44 to 43 &mdash; the counts on this page still read from the current files and move when the vocabulary is regenerated.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px">
+        <sc-for list="{{ patterns }}" as="bp" hint-placeholder-count="12">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:8px;border-bottom:1px solid #EDF1F6">
+              <div style="display:flex;align-items:baseline;gap:8px;min-width:0"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#8494A8">{{ bp.board }}</span><span style="font-size:12.5px;font-weight:700;letter-spacing:-.01em">{{ bp.template }}</span></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ bp.n }}</div>
+            </div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#5A6577;line-height:1.6">{{ bp.components }}</div>
+            <div style="font-size:11px;color:#8494A8">{{ bp.platforms }}</div>
+            <sc-if value="{{ bp.hasRefs }}" hint-placeholder-val="{{ true }}">
+              <div style="display:flex;flex-direction:column;gap:3px;padding-top:6px;border-top:1px solid #F4F6FA">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:#0E9F6E">frame available</div>
+                <sc-for list="{{ bp.refs }}" as="r" hint-placeholder-count="2">
+                  <div style="font-size:11.5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ r.c }}</span> <a href="{{ r.href }}">{{ r.t }}</a></div>
+                </sc-for>
+              </div>
+            </sc-if>
+            <sc-if value="{{ bp.noRefs }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;flex-direction:column;gap:3px;padding-top:6px;border-top:1px solid #F0DFB8">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:600;letter-spacing:.11em;text-transform:uppercase;color:#B98900">no frame anywhere</div>
+                <div style="font-size:11.5px;color:#5A4A20">{{ bp.n }} screens with nothing to reuse</div>
+              </div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:14px">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:10px;border-bottom:1px solid #DCE3ED">
+        <div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#8494A8">generated · not drawn at pack fidelity</div>
+          <div style="font-size:17px;font-weight:800;letter-spacing:-.015em;margin-top:4px">Platform boards · P01 – P16</div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">404 screens · 5 boards left · P07, P09, P10, P11, P12, P13, P14, P15, P16 drawn</div>
+      </div>
+      <p style="font-size:12px;color:#5A6577;max-width:88ch;margin:0;line-height:1.6">These carry a frame per screen, rendered as dashed-box wireframes by the generator. They are the denominator for the apps, and nothing in them is a finished screen — so no row here links out.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:14px">
+        <sc-for list="{{ platforms }}" as="p" hint-placeholder-count="15">
+          <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:2px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid #EDF1F6">
+              <div style="font-size:13px;font-weight:700;letter-spacing:-.01em">{{ p.label }}</div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">{{ p.count }}</div>
+            </div>
+            <sc-if value="{{ showPlatformScreens }}" hint-placeholder-val="{{ true }}">
+              <sc-for list="{{ p.screens }}" as="s" hint-placeholder-count="8">
+                <div style="display:grid;grid-template-columns:1fr 78px;align-items:baseline;gap:8px;padding:var(--rowpad,6px) 0;border-bottom:1px solid #F4F6FA;font-size:11.5px">
+                  <div style="min-width:0"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ s.c }}</span> <span style="color:#26303F">{{ s.t }}</span></div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#8A6D00;text-align:right">scaffold</div>
+                </div>
+              </sc-for>
+            </sc-if>
+            <sc-if value="{{ hidePlatformScreens }}" hint-placeholder-val="{{ false }}">
+              <div style="font-size:11.5px;color:#8494A8;padding:4px 0">{{ p.groupLine }}</div>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <sc-if value="{{ showSuperseded }}" hint-placeholder-val="{{ true }}">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;padding-bottom:10px;border-bottom:1px solid #DCE3ED">
+          <div>
+            <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#0E9F6E">resolved · deleted at source</div>
+            <div style="font-size:17px;font-weight:800;letter-spacing:-.015em;margin-top:4px">Older naming generation</div>
+          </div>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">8 files · 221 frames · gone</div>
+        </div>
+        <p style="font-size:12px;color:#5A6577;max-width:88ch;margin:0;line-height:1.6">All eight are absent from <span style="font-family:'IBM Plex Mono',monospace">wireframes/</span> on the 4 September pull, and <span style="font-family:'IBM Plex Mono',monospace">manifest.json</span> now reports <span style="font-family:'IBM Plex Mono',monospace">unrecognised: []</span> — the duplicate naming generation is closed. Kept here as the record of what each file became. One reference outlives them: <span style="font-family:'IBM Plex Mono',monospace">LINKAGE.md</span> still documents the chain through <span style="font-family:'IBM Plex Mono',monospace">P07 Staff Scanner.dc.html#scn-004</span>, a file that no longer exists.</p>
+        <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:6px 16px 10px">
+          <sc-for list="{{ superseded }}" as="x" hint-placeholder-count="8">
+            <div style="display:grid;grid-template-columns:1.2fr 60px 1.2fr;align-items:baseline;gap:12px;padding:9px 0;border-bottom:1px solid #F4F6FA;font-size:12px">
+              <div><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A81E1E">{{ x.file }}</span></div>
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">{{ x.frames }}</div>
+              <div style="color:#5A6577">superseded by <b style="color:#0B1324;font-weight:700">{{ x.by }}</b></div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;gap:12px;padding:14px 16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+      <div><b>Cross-board references, swept 4 September.</b> Every board here was checked for outbound links to files that are not in this project — 107 of them, pointing at client packs and platform boards that live only in the source <span style="font-family:'IBM Plex Mono',monospace">wireframes/</span> folder. Three resolved to a board that does exist under its venue name and were repointed (<span style="font-family:'IBM Plex Mono',monospace">P07 Venue Scanner</span>, <span style="font-family:'IBM Plex Mono',monospace">P06 Venue Staff App</span>, <span style="font-family:'IBM Plex Mono',monospace">P12 Venue Support</span>). The rest are now dotted text rather than links: the reference is still readable, and the click no longer silently does nothing. No dead in-page anchor remains in any board.</div>
+    </div>
+
+    <div style="display:flex;gap:12px;padding:14px 16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+      <div><b>Two hubs, neither complete.</b> <span style="font-family:'IBM Plex Mono',monospace">TICVAI Wireframe Boards.dc.html</span> links the 15 generated platform boards and none of the client packs. The previous all-boards index links the client packs and none of the platform boards. This page links all of them. The eight superseded files it never reached are now deleted at source.</div>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;density&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;comfortable&quot;,&quot;compact&quot;],&quot;default&quot;:&quot;comfortable&quot;,&quot;tsType&quot;:&quot;string&quot;},&quot;showPlatformScreens&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;},&quot;showSuperseded&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { data: null };
+  componentDidMount() {
+    import('./board-data.js').then(m => this.setState({ data: m.DATA }));
+  }
+  renderVals() {
+    const d = this.state.data;
+    const showPlatformScreens = this.props.showPlatformScreens ?? true;
+    const base = {
+      rowpad: (this.props.density ?? 'comfortable') === 'compact' ? '3px' : '6px',
+      showPlatformScreens,
+      hidePlatformScreens: !showPlatformScreens,
+      showSuperseded: this.props.showSuperseded ?? true,
+      modules: [], platforms: [], superseded: [], patterns: [], patternSummary: ''
+    };
+    if (!d) return base;
+    const url = f => encodeURI(f);
+    return {
+      ...base,
+      modules: d.modules.map(m => ({
+        name: m.name,
+        tally: m.drawn + ' of ' + m.target + ' · ' + m.boards.filter(b => !b.sampler && !b.pending).length + ' boards'
+          + (m.boards.some(b => b.sampler) ? ' + sampler' : ''),
+        pct: Math.round((m.drawn / m.target) * 100) + '%',
+        barColor: m.remaining === 0 ? '#0E9F6E' : '#E0A03A',
+        state: m.remaining === 0 ? 'complete' : m.remaining + ' left to draw',
+        boards: m.boards.map(b => ({
+          label: b.label,
+          href: b.pending ? '' : url(b.file),
+          isLink: !b.pending, isPending: !!b.pending,
+          count: b.screens.length + (b.sampler ? ' here' : '') + (b.pending ? ' left' : ''),
+          screens: b.screens.map(s => ({
+            c: s.c, t: s.t,
+            href: b.pending ? '' : url(b.file) + '#' + s.a,
+            isDrawn: !b.pending, isPending: !!b.pending
+          }))
+        }))
+      })),
+      patternSummary: d.patternSummary
+        ? d.patternSummary.covered + ' of ' + d.patternSummary.screens + ' screens have a frame · '
+          + d.patternSummary.uncovered + ' across ' + d.patternSummary.uncoveredPatterns + ' patterns do not'
+        : '',
+      patterns: (d.patterns || []).map(bp => ({
+        board: bp.board,
+        template: bp.template,
+        n: bp.n + ' screens',
+        components: bp.components.join(' · '),
+        platforms: bp.platforms.join(' · '),
+        hasRefs: bp.refs.length > 0,
+        noRefs: bp.refs.length === 0,
+        refs: bp.refs.map(r => ({ c: r.c, t: r.t, href: url(r.file) + '#' + r.a }))
+      })),
+      platforms: d.platforms.map(p => ({
+        label: p.title || p.label,
+        count: p.n,
+        groupLine: p.groups.length + ' groups · ' + p.n + ' screens',
+        screens: p.screens
+      })),
+      superseded: d.superseded.map(x => ({ file: x.file.replace('.dc.html', ''), frames: x.n + ' frames', by: x.by }))
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -3384,7 +3384,7 @@ paths:
     get:
       operationId: listProductLifecycle
       x-ticvai-consumed-by:
-        - P09 ADM-118 Product Lifecycle Command Center
+        - "P09 ADM-118 Product Lifecycle Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3422,7 +3422,7 @@ paths:
     put:
       operationId: setLifecycleStatuWorkflow
       x-ticvai-consumed-by:
-        - P09 ADM-120 Lifecycle Status & Workflow Configuration
+        - "P09 ADM-120 Lifecycle Status & Workflow Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3464,7 +3464,7 @@ paths:
     post:
       operationId: createBulkProductCatalogue
       x-ticvai-consumed-by:
-        - P09 ADM-121 Bulk Product Creation & Catalogue Import
+        - "P09 ADM-121 Bulk Product Creation & Catalogue Import"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3507,7 +3507,7 @@ paths:
     get:
       operationId: listProductImportExport
       x-ticvai-consumed-by:
-        - P09 ADM-122 Product Import / Export & Environment Transfer
+        - "P09 ADM-122 Product Import / Export & Environment Transfer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3546,7 +3546,7 @@ paths:
     put:
       operationId: setProductContextOwnership
       x-ticvai-consumed-by:
-        - P09 ADM-123 Product Context, Ownership & Assignment
+        - "P09 ADM-123 Product Context, Ownership & Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3588,7 +3588,7 @@ paths:
     put:
       operationId: publishChannelAvailability
       x-ticvai-consumed-by:
-        - P09 ADM-124 Channel Publication & Availability
+        - "P09 ADM-124 Channel Publication & Availability"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3630,7 +3630,7 @@ paths:
     put:
       operationId: publishActivationScheduler
       x-ticvai-consumed-by:
-        - P09 ADM-125 Publication & Activation Scheduler
+        - "P09 ADM-125 Publication & Activation Scheduler"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3672,7 +3672,7 @@ paths:
     get:
       operationId: listProductDuplicationTemplate
       x-ticvai-consumed-by:
-        - P09 ADM-126 Product Duplication & Template Library
+        - "P09 ADM-126 Product Duplication & Template Library"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3711,7 +3711,7 @@ paths:
     put:
       operationId: setCatalogueReview
       x-ticvai-consumed-by:
-        - P09 ADM-127 AI Catalogue Builder & Configuration Review
+        - "P09 ADM-127 AI Catalogue Builder & Configuration Review"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3755,7 +3755,7 @@ paths:
     get:
       operationId: listProductGovernance
       x-ticvai-consumed-by:
-        - P09 ADM-128 Product Governance Command Center
+        - "P09 ADM-128 Product Governance Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3836,7 +3836,7 @@ paths:
     put:
       operationId: approveWorkflow
       x-ticvai-consumed-by:
-        - P09 ADM-129 Approval Workflow Designer
+        - "P09 ADM-129 Approval Workflow Designer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3878,7 +3878,7 @@ paths:
     put:
       operationId: approveReviewDecision
       x-ticvai-consumed-by:
-        - P09 ADM-130 Approval Review & Decision Workspace
+        - "P09 ADM-130 Approval Review & Decision Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3920,7 +3920,7 @@ paths:
     get:
       operationId: listRollbackRecovery
       x-ticvai-consumed-by:
-        - P09 ADM-132 Rollback & Recovery Management
+        - "P09 ADM-132 Rollback & Recovery Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3958,7 +3958,7 @@ paths:
     get:
       operationId: listChangeImpactAnalysis
       x-ticvai-consumed-by:
-        - P09 ADM-133 Change Impact Analysis
+        - "P09 ADM-133 Change Impact Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3997,7 +3997,7 @@ paths:
     get:
       operationId: listChangePropagationDependency
       x-ticvai-consumed-by:
-        - P09 ADM-134 Change Propagation & Dependency Control
+        - "P09 ADM-134 Change Propagation & Dependency Control"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4036,7 +4036,7 @@ paths:
     get:
       operationId: listProductRetirementSuspension
       x-ticvai-consumed-by:
-        - P09 ADM-135 Product Retirement, Suspension & Archive
+        - "P09 ADM-135 Product Retirement, Suspension & Archive"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4075,7 +4075,7 @@ paths:
     get:
       operationId: listProductTrailChange
       x-ticvai-consumed-by:
-        - P09 ADM-136 Product Audit Trail & Change History
+        - "P09 ADM-136 Product Audit Trail & Change History"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4139,7 +4139,7 @@ paths:
     get:
       operationId: listGovernanceRiskMonitoring
       x-ticvai-consumed-by:
-        - P09 ADM-137 Governance Risk, AI Monitoring & Control Center
+        - "P09 ADM-137 Governance Risk, AI Monitoring & Control Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4178,7 +4178,7 @@ paths:
     get:
       operationId: listSaleChannel
       x-ticvai-consumed-by:
-        - P09 ADM-258 Sales Channel Command Center
+        - "P09 ADM-258 Sales Channel Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4216,7 +4216,7 @@ paths:
     post:
       operationId: createChannelProfile
       x-ticvai-consumed-by:
-        - P09 ADM-259 Channel Creation & Profile Configuration
+        - "P09 ADM-259 Channel Creation & Profile Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4258,7 +4258,7 @@ paths:
     put:
       operationId: setProductCatalogue
       x-ticvai-consumed-by:
-        - P09 ADM-260 Product & Catalogue Assignment
+        - "P09 ADM-260 Product & Catalogue Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4300,7 +4300,7 @@ paths:
     put:
       operationId: setChannelPricingCommercial
       x-ticvai-consumed-by:
-        - P09 ADM-261 Channel Pricing & Commercial Profile Assignment
+        - "P09 ADM-261 Channel Pricing & Commercial Profile Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4342,7 +4342,7 @@ paths:
     get:
       operationId: listInventoryCapacityChannel
       x-ticvai-consumed-by:
-        - P09 ADM-262 Inventory, Capacity & Channel Allocation
+        - "P09 ADM-262 Inventory, Capacity & Channel Allocation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4380,7 +4380,7 @@ paths:
     get:
       operationId: listChannelSaleSchedule
       x-ticvai-consumed-by:
-        - P09 ADM-263 Channel Sales Schedule & Availability Windows
+        - "P09 ADM-263 Channel Sales Schedule & Availability Windows"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4418,7 +4418,7 @@ paths:
     get:
       operationId: listCustomerEligibilityRule
       x-ticvai-consumed-by:
-        - P09 ADM-264 Customer & Eligibility Rules by Channel
+        - "P09 ADM-264 Customer & Eligibility Rules by Channel"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4456,7 +4456,7 @@ paths:
     get:
       operationId: listChannelSaleRule
       x-ticvai-consumed-by:
-        - P09 ADM-265 Channel Sales Rules, Limits & Restrictions
+        - "P09 ADM-265 Channel Sales Rules, Limits & Restrictions"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4494,7 +4494,7 @@ paths:
     put:
       operationId: setChannelFeePayment
       x-ticvai-consumed-by:
-        - P09 ADM-266 Channel Fees, Payment & Fulfillment Configuration
+        - "P09 ADM-266 Channel Fees, Payment & Fulfillment Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4536,7 +4536,7 @@ paths:
     put:
       operationId: publishChannelReadinessValidation
       x-ticvai-consumed-by:
-        - P09 ADM-267 Channel Publication, Readiness & AI Validation
+        - "P09 ADM-267 Channel Publication, Readiness & AI Validation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4578,7 +4578,7 @@ paths:
     get:
       operationId: listChannel
       x-ticvai-consumed-by:
-        - P09 ADM-268 Channel Operations Command Center
+        - "P09 ADM-268 Channel Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4616,7 +4616,7 @@ paths:
     get:
       operationId: listChannelConnectionIntegration
       x-ticvai-consumed-by:
-        - P09 ADM-269 Channel Connection & Integration Manager
+        - "P09 ADM-269 Channel Connection & Integration Manager"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4654,7 +4654,7 @@ paths:
     get:
       operationId: listProductPriceAvailability
       x-ticvai-consumed-by:
-        - P09 ADM-270 Product, Price & Availability Synchronization
+        - "P09 ADM-270 Product, Price & Availability Synchronization"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4692,7 +4692,7 @@ paths:
     get:
       operationId: listRealTimeChannel
       x-ticvai-consumed-by:
-        - P09 ADM-271 Real-Time Channel Availability & Inventory Monitor
+        - "P09 ADM-271 Real-Time Channel Availability & Inventory Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4730,7 +4730,7 @@ paths:
     get:
       operationId: listChannelAllocationRebalancing
       x-ticvai-consumed-by:
-        - P09 ADM-272 Channel Allocation & Rebalancing Operations
+        - "P09 ADM-272 Channel Allocation & Rebalancing Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4769,7 +4769,7 @@ paths:
     get:
       operationId: listChannelExceptionIncident
       x-ticvai-consumed-by:
-        - P09 ADM-273 Channel Exceptions, Incidents & Recovery
+        - "P09 ADM-273 Channel Exceptions, Incidents & Recovery"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4807,7 +4807,7 @@ paths:
     get:
       operationId: listChannelPerformanceCommercial
       x-ticvai-consumed-by:
-        - P09 ADM-274 Channel Performance & Commercial Analytics
+        - "P09 ADM-274 Channel Performance & Commercial Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4894,7 +4894,7 @@ paths:
     get:
       operationId: listChannelLogTransaction
       x-ticvai-consumed-by:
-        - P09 ADM-275 Channel Audit, Logs & Transaction Traceability
+        - "P09 ADM-275 Channel Audit, Logs & Transaction Traceability"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4981,7 +4981,7 @@ paths:
     get:
       operationId: listChannelGovernanceSla
       x-ticvai-consumed-by:
-        - P09 ADM-276 Channel Governance, SLA & Partner Control
+        - "P09 ADM-276 Channel Governance, SLA & Partner Control"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5019,7 +5019,7 @@ paths:
     get:
       operationId: listChannel2
       x-ticvai-consumed-by:
-        - P09 ADM-277 AI Channel Optimization & Intelligence Center
+        - "P09 ADM-277 AI Channel Optimization & Intelligence Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5057,7 +5057,7 @@ paths:
     get:
       operationId: listCommercialPricing
       x-ticvai-consumed-by:
-        - P09 ADM-048 Commercial Pricing Command Center
+        - "P09 ADM-048 Commercial Pricing Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5115,7 +5115,7 @@ paths:
     put:
       operationId: setPriceListMaster
       x-ticvai-consumed-by:
-        - P09 ADM-049 Price List Master Configuration
+        - "P09 ADM-049 Price List Master Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5157,7 +5157,7 @@ paths:
     get:
       operationId: listPriceCategoryRate
       x-ticvai-consumed-by:
-        - P09 ADM-050 Price Category & Rate Type Library
+        - "P09 ADM-050 Price Category & Rate Type Library"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5196,7 +5196,7 @@ paths:
     put:
       operationId: setRateStructure
       x-ticvai-consumed-by:
-        - P09 ADM-051 Rate Structure Builder
+        - "P09 ADM-051 Rate Structure Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5238,7 +5238,7 @@ paths:
     put:
       operationId: setProductServicePrice
       x-ticvai-consumed-by:
-        - P09 ADM-052 Product & Service Price Assignment
+        - "P09 ADM-052 Product & Service Price Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5280,7 +5280,7 @@ paths:
     get:
       operationId: listPackageBundleAdd
       x-ticvai-consumed-by:
-        - P09 ADM-053 Package, Bundle & Add-On Pricing
+        - "P09 ADM-053 Package, Bundle & Add-On Pricing"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5320,7 +5320,7 @@ paths:
     get:
       operationId: listMarketVenueCurrency
       x-ticvai-consumed-by:
-        - P09 ADM-054 Market, Venue & Currency Pricing Structure
+        - "P09 ADM-054 Market, Venue & Currency Pricing Structure"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5358,7 +5358,7 @@ paths:
     put:
       operationId: setPriceHierarchyInheritance
       x-ticvai-consumed-by:
-        - P09 ADM-055 Price Hierarchy & Inheritance Configuration
+        - "P09 ADM-055 Price Hierarchy & Inheritance Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5400,7 +5400,7 @@ paths:
     get:
       operationId: listPriceListTemplate
       x-ticvai-consumed-by:
-        - P09 ADM-056 Price List Templates, Clone & Reuse
+        - "P09 ADM-056 Price List Templates, Clone & Reuse"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5438,7 +5438,7 @@ paths:
     get:
       operationId: listCommercialPricingStructure
       x-ticvai-consumed-by:
-        - P09 ADM-057 Commercial Pricing Structure Validation
+        - "P09 ADM-057 Commercial Pricing Structure Validation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5477,7 +5477,7 @@ paths:
     get:
       operationId: listPricingRule
       x-ticvai-consumed-by:
-        - P09 ADM-058 Pricing Rule Command Center
+        - "P09 ADM-058 Pricing Rule Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5515,7 +5515,7 @@ paths:
     get:
       operationId: listCustomerSegmentProfile
       x-ticvai-consumed-by:
-        - P09 ADM-059 Customer Segment & Profile Pricing Rules
+        - "P09 ADM-059 Customer Segment & Profile Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5553,7 +5553,7 @@ paths:
     get:
       operationId: listMembershipLoyaltyPricing
       x-ticvai-consumed-by:
-        - P09 ADM-060 Membership & Loyalty Pricing Rules
+        - "P09 ADM-060 Membership & Loyalty Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5591,7 +5591,7 @@ paths:
     get:
       operationId: listResidencyNationalityMarket
       x-ticvai-consumed-by:
-        - P09 ADM-061 Residency, Nationality & Market Pricing Rules
+        - "P09 ADM-061 Residency, Nationality & Market Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5629,7 +5629,7 @@ paths:
     get:
       operationId: listChannelBasedPricing
       x-ticvai-consumed-by:
-        - P09 ADM-062 Channel-Based Pricing Rules
+        - "P09 ADM-062 Channel-Based Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5667,7 +5667,7 @@ paths:
     get:
       operationId: listLocationVenueEvent
       x-ticvai-consumed-by:
-        - P09 ADM-063 Location, Venue & Event Pricing Rules
+        - "P09 ADM-063 Location, Venue & Event Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5705,7 +5705,7 @@ paths:
     get:
       operationId: listQuantityGroupVolume
       x-ticvai-consumed-by:
-        - P09 ADM-064 Quantity, Group & Volume Pricing Rules
+        - "P09 ADM-064 Quantity, Group & Volume Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5743,7 +5743,7 @@ paths:
     get:
       operationId: listEffectiveDateSeason
       x-ticvai-consumed-by:
-        - P09 ADM-065 Effective Date, Season & Day-Based Pricing Rules
+        - "P09 ADM-065 Effective Date, Season & Day-Based Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5781,7 +5781,7 @@ paths:
     get:
       operationId: listTimeslotPerformanceTime
       x-ticvai-consumed-by:
-        - P09 ADM-066 Timeslot, Performance & Time-of-Day Pricing Rules
+        - "P09 ADM-066 Timeslot, Performance & Time-of-Day Pricing Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5819,7 +5819,7 @@ paths:
     get:
       operationId: listPricingRulePriority
       x-ticvai-consumed-by:
-        - P09 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing
+        - "P09 ADM-067 Pricing Rule Priority, Conflict Resolution & Testing"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5858,7 +5858,7 @@ paths:
     get:
       operationId: listTaxFeeCalculation
       x-ticvai-consumed-by:
-        - P09 ADM-068 Tax, Fee & Calculation Command Center
+        - "P09 ADM-068 Tax, Fee & Calculation Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5939,7 +5939,7 @@ paths:
     put:
       operationId: setTaxProfileJurisdiction
       x-ticvai-consumed-by:
-        - P09 ADM-069 Tax Profile & Jurisdiction Configuration
+        - "P09 ADM-069 Tax Profile & Jurisdiction Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5981,7 +5981,7 @@ paths:
     put:
       operationId: setTaxRuleTreatment
       x-ticvai-consumed-by:
-        - P09 ADM-070 Tax Rule & Treatment Builder
+        - "P09 ADM-070 Tax Rule & Treatment Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6024,7 +6024,7 @@ paths:
     get:
       operationId: listFeeSurcharge
       x-ticvai-consumed-by:
-        - P09 ADM-071 Fee & Surcharge Library
+        - "P09 ADM-071 Fee & Surcharge Library"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6062,7 +6062,7 @@ paths:
     put:
       operationId: setFeeApplicabilityCharging
       x-ticvai-consumed-by:
-        - P09 ADM-072 Fee Applicability & Charging Rule Builder
+        - "P09 ADM-072 Fee Applicability & Charging Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6104,7 +6104,7 @@ paths:
     get:
       operationId: listFeeWaiverTax
       x-ticvai-consumed-by:
-        - P09 ADM-073 Fee Waiver, Tax Exemption & Exception Rules
+        - "P09 ADM-073 Fee Waiver, Tax Exemption & Exception Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6142,7 +6142,7 @@ paths:
     get:
       operationId: listPriceCalculationSequence
       x-ticvai-consumed-by:
-        - P09 ADM-074 Price Calculation Sequence & Formula Engine
+        - "P09 ADM-074 Price Calculation Sequence & Formula Engine"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6180,7 +6180,7 @@ paths:
     get:
       operationId: listCurrencyPrecisionRounding
       x-ticvai-consumed-by:
-        - P09 ADM-075 Currency Precision, Rounding & Monetary Rules
+        - "P09 ADM-075 Currency Precision, Rounding & Monetary Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6218,7 +6218,7 @@ paths:
     put:
       operationId: simulatePriceBreakdownCalculation
       x-ticvai-consumed-by:
-        - P09 ADM-076 Price Breakdown, Calculation Simulation & Explainability
+        - "P09 ADM-076 Price Breakdown, Calculation Simulation & Explainability"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6260,7 +6260,7 @@ paths:
     get:
       operationId: listCalculationValidationReconciliation
       x-ticvai-consumed-by:
-        - P09 ADM-077 Calculation Validation, Reconciliation & Service Interface
+        - "P09 ADM-077 Calculation Validation, Reconciliation & Service Interface"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6298,7 +6298,7 @@ paths:
     get:
       operationId: listPricingGovernance
       x-ticvai-consumed-by:
-        - P09 ADM-078 Pricing Governance Command Center
+        - "P09 ADM-078 Pricing Governance Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6385,7 +6385,7 @@ paths:
     put:
       operationId: setPricingChangeRequest
       x-ticvai-consumed-by:
-        - P09 ADM-079 Pricing Change Request & Workspace
+        - "P09 ADM-079 Pricing Change Request & Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6427,7 +6427,7 @@ paths:
     get:
       operationId: listBulkPricingUpdate
       x-ticvai-consumed-by:
-        - P09 ADM-080 Bulk Pricing Update, Import & Mass Maintenance
+        - "P09 ADM-080 Bulk Pricing Update, Import & Mass Maintenance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6465,7 +6465,7 @@ paths:
     get:
       operationId: listPricingVersionBaseline
       x-ticvai-consumed-by:
-        - P09 ADM-081 Pricing Version & Baseline Management
+        - "P09 ADM-081 Pricing Version & Baseline Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6503,7 +6503,7 @@ paths:
     get:
       operationId: listPricingChangeImpact
       x-ticvai-consumed-by:
-        - P09 ADM-082 Pricing Change Impact Analysis
+        - "P09 ADM-082 Pricing Change Impact Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6542,7 +6542,7 @@ paths:
     put:
       operationId: approvePricingWorkflowAuthority
       x-ticvai-consumed-by:
-        - P09 ADM-083 Pricing Approval Workflow & Authority Matrix
+        - "P09 ADM-083 Pricing Approval Workflow & Authority Matrix"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6584,7 +6584,7 @@ paths:
     put:
       operationId: publishPricingEffectiveDate
       x-ticvai-consumed-by:
-        - P09 ADM-084 Pricing Publication & Effective-Date Scheduler
+        - "P09 ADM-084 Pricing Publication & Effective-Date Scheduler"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6626,7 +6626,7 @@ paths:
     get:
       operationId: listPricingDistributionSynchronization
       x-ticvai-consumed-by:
-        - P09 ADM-085 Pricing Distribution, Synchronization & Publication Monitor
+        - "P09 ADM-085 Pricing Distribution, Synchronization & Publication Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6664,7 +6664,7 @@ paths:
     get:
       operationId: listPricingRollbackEmergency
       x-ticvai-consumed-by:
-        - P09 ADM-086 Pricing Rollback & Emergency Control Center
+        - "P09 ADM-086 Pricing Rollback & Emergency Control Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6702,7 +6702,7 @@ paths:
     get:
       operationId: listPricingCompliance
       x-ticvai-consumed-by:
-        - P09 ADM-087 Pricing History, Audit & Compliance Explorer
+        - "P09 ADM-087 Pricing History, Audit & Compliance Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6789,7 +6789,7 @@ paths:
     get:
       operationId: listDynamicPricingStrategy
       x-ticvai-consumed-by:
-        - P09 ADM-088 Dynamic Pricing Strategy Command Center
+        - "P09 ADM-088 Dynamic Pricing Strategy Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6828,7 +6828,7 @@ paths:
     put:
       operationId: setDynamicPricingStrategy
       x-ticvai-consumed-by:
-        - P09 ADM-089 Dynamic Pricing Strategy Builder
+        - "P09 ADM-089 Dynamic Pricing Strategy Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6870,7 +6870,7 @@ paths:
     put:
       operationId: setDemandOccupancyAvailability
       x-ticvai-consumed-by:
-        - P09 ADM-090 Demand, Occupancy & Availability Rule Builder
+        - "P09 ADM-090 Demand, Occupancy & Availability Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6913,7 +6913,7 @@ paths:
     put:
       operationId: setBookingVelocityTime
       x-ticvai-consumed-by:
-        - P09 ADM-091 Booking Velocity & Time-to-Event Rule Builder
+        - "P09 ADM-091 Booking Velocity & Time-to-Event Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6956,7 +6956,7 @@ paths:
     get:
       operationId: listSeasonalCalendarDay
       x-ticvai-consumed-by:
-        - P09 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules
+        - "P09 ADM-092 Seasonal, Calendar, Day & Timeslot Dynamic Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6994,7 +6994,7 @@ paths:
     get:
       operationId: listChannelCustomerSegment
       x-ticvai-consumed-by:
-        - P09 ADM-093 Channel, Customer Segment & Location Dynamic Rules
+        - "P09 ADM-093 Channel, Customer Segment & Location Dynamic Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7032,7 +7032,7 @@ paths:
     get:
       operationId: listDynamicPriceBand
       x-ticvai-consumed-by:
-        - P09 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix
+        - "P09 ADM-094 Dynamic Price Bands, Ladders & Adjustment Matrix"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7070,7 +7070,7 @@ paths:
     get:
       operationId: listDynamicPricingGuardrail
       x-ticvai-consumed-by:
-        - P09 ADM-095 Dynamic Pricing Guardrails & Commercial Protection
+        - "P09 ADM-095 Dynamic Pricing Guardrails & Commercial Protection"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7108,7 +7108,7 @@ paths:
     get:
       operationId: listDynamicPricingAutomation
       x-ticvai-consumed-by:
-        - P09 ADM-096 Dynamic Pricing Automation Policy & Control
+        - "P09 ADM-096 Dynamic Pricing Automation Policy & Control"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7148,7 +7148,7 @@ paths:
     get:
       operationId: listRulePriorityConflict
       x-ticvai-consumed-by:
-        - P09 ADM-097 Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
+        - "P09 ADM-097 Rule Priority, Conflict Resolution & Dynamic Pricing Test Console"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7187,7 +7187,7 @@ paths:
     get:
       operationId: listPricing
       x-ticvai-consumed-by:
-        - P09 ADM-098 AI Pricing Intelligence Command Center
+        - "P09 ADM-098 AI Pricing Intelligence Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7225,7 +7225,7 @@ paths:
     get:
       operationId: listInternalDemandBooking
       x-ticvai-consumed-by:
-        - P09 ADM-099 Internal Demand & Booking Signal Hub
+        - "P09 ADM-099 Internal Demand & Booking Signal Hub"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7264,7 +7264,7 @@ paths:
     get:
       operationId: listWeatherDemandImpact
       x-ticvai-consumed-by:
-        - P09 ADM-100 Weather Intelligence & Demand Impact Configuration
+        - "P09 ADM-100 Weather Intelligence & Demand Impact Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7303,7 +7303,7 @@ paths:
     get:
       operationId: listNearbyEventExhibition
       x-ticvai-consumed-by:
-        - P09 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence
+        - "P09 ADM-101 Nearby Event, Exhibition & Local Demand Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7342,7 +7342,7 @@ paths:
     get:
       operationId: listCompetitorPricingMarket
       x-ticvai-consumed-by:
-        - P09 ADM-102 Competitor Pricing & Market Position Intelligence
+        - "P09 ADM-102 Competitor Pricing & Market Position Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7380,7 +7380,7 @@ paths:
     get:
       operationId: listMarketTourismHoliday
       x-ticvai-consumed-by:
-        - P09 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub
+        - "P09 ADM-103 Market, Tourism, Holiday & Contextual Signal Hub"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7418,7 +7418,7 @@ paths:
     get:
       operationId: listDemandBookingCurve
       x-ticvai-consumed-by:
-        - P09 ADM-104 AI Demand Forecasting & Booking Curve Studio
+        - "P09 ADM-104 AI Demand Forecasting & Booking Curve Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7456,7 +7456,7 @@ paths:
     get:
       operationId: listPriceElasticityRevenue
       x-ticvai-consumed-by:
-        - P09 ADM-105 Price Elasticity & Revenue Response Intelligence
+        - "P09 ADM-105 Price Elasticity & Revenue Response Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7525,7 +7525,7 @@ paths:
     get:
       operationId: listPricingRecommendationExplainability
       x-ticvai-consumed-by:
-        - P09 ADM-106 AI Pricing Recommendation & Explainability Center
+        - "P09 ADM-106 AI Pricing Recommendation & Explainability Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7563,7 +7563,7 @@ paths:
     get:
       operationId: listSignalDataQuality
       x-ticvai-consumed-by:
-        - P09 ADM-107 AI Signal Registry, Data Quality & Model Governance
+        - "P09 ADM-107 AI Signal Registry, Data Quality & Model Governance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7602,7 +7602,7 @@ paths:
     get:
       operationId: listRevenue
       x-ticvai-consumed-by:
-        - P09 ADM-108 Revenue Optimization Command Center
+        - "P09 ADM-108 Revenue Optimization Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7641,7 +7641,7 @@ paths:
     put:
       operationId: setPricing
       x-ticvai-consumed-by:
-        - P09 ADM-109 Pricing Simulation Studio
+        - "P09 ADM-109 Pricing Simulation Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7684,7 +7684,7 @@ paths:
     get:
       operationId: listScenarioModelingWhat
       x-ticvai-consumed-by:
-        - P09 ADM-110 Scenario Modeling & What-If Analysis
+        - "P09 ADM-110 Scenario Modeling & What-If Analysis"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7721,7 +7721,7 @@ paths:
     put:
       operationId: setPricingExperiment
       x-ticvai-consumed-by:
-        - P09 ADM-111 A/B Pricing Experiment Studio
+        - "P09 ADM-111 A/B Pricing Experiment Studio"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7764,7 +7764,7 @@ paths:
     get:
       operationId: listRevenueDemandImpact
       x-ticvai-consumed-by:
-        - P09 ADM-112 Revenue & Demand Impact Forecasting
+        - "P09 ADM-112 Revenue & Demand Impact Forecasting"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7802,7 +7802,7 @@ paths:
     get:
       operationId: listRecommendationReviewDecision
       x-ticvai-consumed-by:
-        - P09 ADM-113 AI Recommendation Review & Decision Queue
+        - "P09 ADM-113 AI Recommendation Review & Decision Queue"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7840,7 +7840,7 @@ paths:
     get:
       operationId: listAutomationPolicyAutonomous
       x-ticvai-consumed-by:
-        - P09 ADM-114 Automation Policy & Autonomous Pricing Orchestrator
+        - "P09 ADM-114 Automation Policy & Autonomous Pricing Orchestrator"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7879,7 +7879,7 @@ paths:
     post:
       operationId: createLiveDynamicPrice
       x-ticvai-consumed-by:
-        - P09 ADM-115 Live Dynamic Price Execution & Deployment Monitor
+        - "P09 ADM-115 Live Dynamic Price Execution & Deployment Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7921,7 +7921,7 @@ paths:
     get:
       operationId: listDynamicPricingPerformance
       x-ticvai-consumed-by:
-        - P09 ADM-116 Dynamic Pricing Performance & Optimization Analytics
+        - "P09 ADM-116 Dynamic Pricing Performance & Optimization Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7959,7 +7959,7 @@ paths:
     get:
       operationId: listLearningModelPerformance
       x-ticvai-consumed-by:
-        - P09 ADM-117 AI Learning, Model Performance & Optimization Feedback
+        - "P09 ADM-117 AI Learning, Model Performance & Optimization Feedback"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true

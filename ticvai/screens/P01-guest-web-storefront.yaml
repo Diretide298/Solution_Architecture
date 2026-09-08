@@ -84,7 +84,8 @@ screens:
     error: Config fetch failed. Falls back to the last cached configuration with a dismissible warning.
       A storefront that will not load because branding is unavailable is worse than an unbranded one.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-001
   capability: C79
   apis:
@@ -164,7 +165,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Retry with filters preserved. Filters are never silently reset.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-002
   capability: C79
   navigation:
@@ -239,7 +241,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Search unavailable. Falls back to browsing the catalogue
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-003
   capability: C79
   implementation:
@@ -301,7 +304,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Product unavailable, with a route back to the listing.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-004
   capability: C79
   navigation:
@@ -387,7 +391,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Pricing unavailable. Continue is blocked rather than showing a stale price.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-005
   capability: C80
   navigation:
@@ -456,7 +461,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Availability unavailable. Selection blocked — overselling is worse than waiting.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-006
   capability: C81
   navigation:
@@ -525,7 +531,8 @@ screens:
       a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Map unavailable, with the option to continue on best-available instead.
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 3.dc.html#seat-3b
     generatedFallback: wireframes/P01 Guest Web.dc.html#web-007
   capability: C51
@@ -610,7 +617,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Upsells unavailable. **The purchase continues** — a failed upsell must never block a sale
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-008
   capability: C86
   implementation:
@@ -690,7 +698,8 @@ screens:
     emptyFirstRun: Nothing saved — explains what the list is for
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-009
   capability: C79
   apis:
@@ -771,7 +780,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Pricing failed. Checkout blocked rather than proceeding on a stale total.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-010
   capability: C02
   apis:
@@ -883,7 +893,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Prefill failed. The form still works, entered manually.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-011
   capability: C03
   apis:
@@ -993,7 +1004,8 @@ screens:
     error: Declined, with the reason where it is safe to show, and a retry that reuses the same idempotency
       key.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-012
   capability: C04
   apis:
@@ -1077,7 +1089,8 @@ screens:
     error: Payment succeeded but confirmation did not load. Shows the order number and a support route
       — never implies the purchase failed.
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-013
   capability: C03
   apis:
@@ -1155,7 +1168,8 @@ screens:
     superseded: '**A newer link was sent.** Names the channel it went to, because *this link no longer
       works* with no explanation sends them to the phone.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-014
   capability: C04
   apis:
@@ -1224,7 +1238,8 @@ screens:
       admitting, and says so, because a guest who thinks they lost their place will open a second tab
       and make it worse'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-015
   openQuestions:
   - CF-48 — Q2 Virtual Waiting Room. Edge infrastructure, not the Q1 queue contract. Build-or-buy decision
@@ -1287,7 +1302,8 @@ screens:
       panel for both sends somebody looking for data they already filtered out.**'
     error: Sign-in failed. Wrong password reads differently from an unavailable identity provider
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-016
   capability: C36
   apis:
@@ -1422,7 +1438,8 @@ screens:
     emptyFirstRun: A new account with no orders — offers what to do next
     error: Partial. Each tile fails independently
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Dashboards Board.dc.html#web-017
     generatedFallback: wireframes/P01 Guest Web.dc.html#web-017
   capability: C36
@@ -1515,7 +1532,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-018
   capability: C09
   notes: 'Dynamic QR with a visible countdown. Anti-screenshot, per the guest boards. Purpose derived
@@ -1595,7 +1613,8 @@ screens:
       panel for both sends somebody looking for data they already filtered out.**'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-019
   capability: C34
   apis:
@@ -1680,7 +1699,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-020
   capability: C36
   notes: Consent withdrawal must be as easy as granting it. Same screen, same number of clicks. Purpose
@@ -1761,7 +1781,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-021
   capability: C21
   implementation:
@@ -1838,7 +1859,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-022
   capability: C31
   implementation:
@@ -1901,7 +1923,8 @@ screens:
     emptyFirstRun: —
     error: Could not load. Cancellation and renewal are both blocked
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-023
   capability: C31
   apis:
@@ -1995,7 +2018,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-024
   capability: C93
   apis:
@@ -2075,7 +2099,8 @@ screens:
     emptyFirstRun: No articles — offers contact instead of an empty help centre
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-025
   capability: C105
   notes: Same content the AI concierge grounds on. One source, two surfaces. Purpose derived from the
@@ -2127,7 +2152,8 @@ screens:
     emptyFirstRun: —
     error: Could not submit. **The answers are kept** and retried
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-026
   capability: C33
   apis:
@@ -2204,7 +2230,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-027
   capability: C59
   apis:
@@ -2291,7 +2318,8 @@ screens:
     emptyFirstRun: —
     error: Could not load. Falls back to the tenant contact details from the cached config
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-028
   capability: C105
   apis:
@@ -2333,7 +2361,8 @@ screens:
     error: '**This screen is the error state.** It distinguishes sold out, closed, and platform unavailable
       — three different things a guest must not confuse, because only one means come back later'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-029
   capability: C57
   notes: Tenant-branded. An unbranded error page inside a tenant's storefront reads as the tenant's failure,
@@ -2417,7 +2446,8 @@ screens:
     component: apps/guest-web/src/routes/TicketTransfer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-030
   notes: Added 17 August for parity with GST-014. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
@@ -2508,7 +2538,8 @@ screens:
     component: apps/guest-web/src/routes/MyReservations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-031
   notes: Added 17 August for parity with GST-016. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
@@ -2589,7 +2620,8 @@ screens:
     component: apps/guest-web/src/routes/OffersPromotions.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-032
   notes: Added 17 August for parity with GST-037. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
@@ -2676,7 +2708,8 @@ screens:
     component: apps/guest-web/src/routes/Shop.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-033
   notes: Added 17 August for parity with GST-026. **Not on the wireframe board** — needs drawing. CF-93.
   density: compact
@@ -2755,7 +2788,8 @@ screens:
     component: apps/guest-web/src/routes/LostFound.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-034
   notes: Added 17 August for parity with GST-034. **Not on the wireframe board** — needs drawing. CF-93.
     **Guest case operations wired 24 August.** **No case operation was guest-callable** — a guest could
@@ -2821,7 +2855,8 @@ screens:
     component: apps/guest-web/src/routes/MulticurrencyPricing.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-035
   notes: 'Added 17 August. **The surface the matrix names** — 2.6.33 *"website should be able to display
     multi currency"* and 2.9.1 *"in the B2C portal for guests comparison"*. Wave 1 against the app''s
@@ -2914,7 +2949,8 @@ screens:
     component: apps/guest-web/src/routes/FBBrowseOrder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-036
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**A guest scans a QR on a table and lands in a browser.** That is the single most common F&B
@@ -2978,7 +3014,8 @@ screens:
     component: apps/guest-web/src/routes/MenuItemDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-037
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**Allergens are read here more often than anywhere else in the platform**, and a guest checking
@@ -3044,7 +3081,8 @@ screens:
     component: apps/guest-web/src/routes/FBOrderTracking.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-038
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**Order to ready is the kitchen''s number; ready to collected is the counter''s.** A guest watching
@@ -3114,7 +3152,8 @@ screens:
     component: apps/guest-web/src/routes/VenueMapWaitTimes.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 3.dc.html#seat-3c
     generatedFallback: wireframes/P01 Guest Web.dc.html#web-039
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
@@ -3186,7 +3225,8 @@ screens:
     component: apps/guest-web/src/routes/VirtualQueue.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-040
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**The point of a virtual queue is that the guest walks away** — which works the same in a browser
@@ -3250,7 +3290,8 @@ screens:
     component: apps/guest-web/src/routes/ParkingReservePay.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-041
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**A guest reserves parking on the drive, from whatever is open on their phone.** Requiring an
@@ -3318,7 +3359,8 @@ screens:
     component: apps/guest-web/src/routes/RetailShopAndDrop.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-042
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**The web could sell merchandise and could not arrange collection.** `lookupShopAndDrop` was
@@ -3383,7 +3425,8 @@ screens:
     component: apps/guest-web/src/routes/LoyaltyRewards.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-043
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**P01 Board 3 drew *Membership* with nothing behind it.** `getLoyaltyPosition` and `listLoyaltyProgrammes`
@@ -3455,7 +3498,8 @@ screens:
     component: apps/guest-web/src/routes/AiConcierge.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-044
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**A concierge in a browser is a concierge.** ADR-0020 keeps it read-only against the transactional
@@ -3516,7 +3560,8 @@ screens:
     component: apps/guest-web/src/routes/HelpCentreAccessibility.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-045
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**P01 Board 4 drew *Help Centre* and *Accessibility Statement* and neither could load content.**
@@ -3569,7 +3614,8 @@ screens:
     component: apps/guest-web/src/routes/InVenueNotifications.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P01 Guest Web.dc.html#web-046
   provenance: parity gap found 24 August — the web could not do what the app could, and a browser can
   notes: '**Web push is weaker than native and it is not absent.** A guest with a tab open gets their

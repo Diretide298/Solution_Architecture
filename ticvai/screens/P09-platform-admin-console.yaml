@@ -68,7 +68,8 @@ screens:
       terminal is the way through.'
     error: Sign-in failed. Wrong credentials read differently from an unreachable directory
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-001
   capability: C35
   apis:
@@ -155,7 +156,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Each tile fails independently. **One dead cell must not blank the console that manages it**
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Dashboards Board.dc.html#adm-002
     generatedFallback: wireframes/P09 TICVAI Web.dc.html#adm-002
   capability: C95
@@ -253,7 +255,8 @@ screens:
     error: '**A cell that does not answer is the finding, not an error.** It is rendered unreachable with
       its last-known state and the age of it'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Dashboards Board.dc.html#adm-003
     generatedFallback: wireframes/P09 TICVAI Web.dc.html#adm-003
   capability: C95
@@ -366,7 +369,8 @@ screens:
     error: Log unavailable. **The console says so rather than showing an empty log** — an empty audit
       trail and a broken one look identical and mean opposite things
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-004
   capability: C97
   openQuestions:
@@ -425,7 +429,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-005
   capability: C95
   apis:
@@ -550,7 +555,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Partial. Branches that failed are marked, not hidden
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-006
   capability: C20
   implementation:
@@ -687,7 +693,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-007
   capability: C75
   apis:
@@ -789,7 +796,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Save failed. The subscription is unchanged and says so
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-008
   capability: C74
   apis:
@@ -949,7 +957,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-009
   capability: C74
   apis:
@@ -1056,7 +1065,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-010
   capability: C74
   apis:
@@ -1147,7 +1157,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-011
   capability: C75
   apis:
@@ -1271,7 +1282,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-012
   capability: C96
   apis:
@@ -1374,7 +1386,8 @@ screens:
     error: Metrics unavailable. The cell may be healthy and unobserved, and the screen distinguishes the
       two
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-013
   capability: C96
   apis:
@@ -1460,7 +1473,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not read capacity. Scaling changes are blocked
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-014
   capability: C96
   openQuestions:
@@ -1552,7 +1566,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-015
   openQuestions:
   - Blocked — Developer & API workshop
@@ -1639,6 +1654,11 @@ screens:
       components:
       - kind: textField
       - kind: primaryButton
+      - kind: publishGate
+        impliedBy: publishTenantConfig
+        notes: >
+          Declares `publishTenantConfig`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Tenant config and its published version
     emptyFirstRun: Never published — draft only
@@ -1652,7 +1672,8 @@ screens:
       terminal is the way through.'
     error: Could not load. **Publishing is blocked**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-016
   capability: C57
   apis:
@@ -1761,7 +1782,8 @@ screens:
     error: Certificate status unknown. **An expiring certificate nobody can see is an outage with a date
       on it**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-017
   capability: C96
   openQuestions:
@@ -1792,7 +1814,7 @@ screens:
     contract: white-label
     purpose: Check the record and issue the certificate
     trigger: onAction
-  - operationId: releaseCustomDomain
+  - operationId: relinquishCustomDomain
     contract: white-label
     purpose: Give the domain up
     trigger: onAction
@@ -1867,7 +1889,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-018
   capability: C57
   apis:
@@ -1956,7 +1979,8 @@ screens:
     error: Could not load. **Editing blocked** — a default saved over an unread one propagates to every
       tenant
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-019
   capability: C95
   openQuestions:
@@ -2030,7 +2054,8 @@ screens:
       terminal is the way through.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-020
   capability: C56
   apis:
@@ -2096,7 +2121,8 @@ screens:
       terminal is the way through.'
     error: Could not load. Role editing is blocked
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-021
   capability: C56
   apis:
@@ -2137,6 +2163,11 @@ screens:
       components:
       - kind: textField
       - kind: primaryButton
+      - kind: publishGate
+        impliedBy: promoteRelease
+        notes: >
+          Declares `promoteRelease`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Releases, newest first
     emptyFirstRun: No releases — before the first build
@@ -2150,7 +2181,8 @@ screens:
       terminal is the way through.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-022
   capability: C96
   openQuestions:
@@ -2223,6 +2255,11 @@ screens:
       components:
       - kind: detailPanel
       - kind: primaryButton
+      - kind: publishGate
+        impliedBy: promoteRelease
+        notes: >
+          Declares `promoteRelease`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Readiness checks run in parallel and each reports separately
     emptyFirstRun: —
@@ -2236,7 +2273,8 @@ screens:
       terminal is the way through.'
     error: '**A readiness check that cannot run is a failed check, not a passed one.** Promotion is blocked'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-023
   capability: C96
   openQuestions:
@@ -2310,6 +2348,11 @@ screens:
       components:
       - kind: textField
       - kind: primaryButton
+      - kind: publishGate
+        impliedBy: publishSupportNotice
+        notes: >
+          Declares `publishSupportNotice`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Composer with the release notes prefilled
     emptyFirstRun: —
@@ -2323,7 +2366,8 @@ screens:
       terminal is the way through.'
     error: Send failed. The draft is kept
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-024
   capability: C96
   openQuestions:
@@ -2383,7 +2427,8 @@ screens:
       terminal is the way through.'
     error: Could not load. Scheduling is blocked
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-025
   capability: C96
   openQuestions:
@@ -2426,6 +2471,11 @@ screens:
       components:
       - kind: textField
       - kind: primaryButton
+      - kind: publishGate
+        impliedBy: publishSupportNotice
+        notes: >
+          Declares `publishSupportNotice`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Notices and their affected versions
     emptyFirstRun: No notices
@@ -2439,7 +2489,8 @@ screens:
       terminal is the way through.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-026
   capability: C96
   openQuestions:
@@ -2524,7 +2575,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-027
   capability: C96
   openQuestions:
@@ -2624,7 +2676,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-028
   capability: C96
   openQuestions:
@@ -2685,7 +2738,8 @@ screens:
     error: '**A rollout whose state cannot be read is paused, not continued.** Continuing blind is how
       a bad release reaches every cell'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-029
   capability: C96
   apis:
@@ -2794,7 +2848,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not read. Sizing changes are blocked
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-030
   capability: C96
   openQuestions:
@@ -2890,7 +2945,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. **An unreadable compliance dashboard is not a clean one**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-031
   capability: C97
   openQuestions:
@@ -2966,7 +3022,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-032
   capability: C96
   openQuestions:
@@ -3063,7 +3120,8 @@ screens:
     error: '**Backup status unknown is the alarm.** A cell whose last backup cannot be confirmed is shown
       as at risk, not as fine'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-033
   capability: C96
   apis:
@@ -3153,7 +3211,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-034
   capability: C96
   openQuestions:
@@ -3242,6 +3301,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: publishSupportNotice
+      - kind: publishGate
+        impliedBy: publishSupportNotice
+        notes: >
+          Declares `publishSupportNotice`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Open escalations
     emptyFirstRun: Nothing open
@@ -3259,7 +3323,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-035
   openQuestions:
   - No contract — overlaps P12
@@ -3301,6 +3366,11 @@ screens:
       components:
       - kind: textField
       - kind: primaryButton
+      - kind: publishGate
+        impliedBy: publishSupportNotice
+        notes: >
+          Declares `publishSupportNotice`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Composer, with the audience resolved
     emptyFirstRun: —
@@ -3314,7 +3384,8 @@ screens:
       terminal is the way through.'
     error: Send failed. **Nothing partially sent** — the broadcast is atomic or it is not sent
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-036
   capability: C96
   openQuestions:
@@ -3433,7 +3504,8 @@ screens:
     component: apps/ticvai-web/src/routes/AiProviderCredentials.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-037
   notes: Added 17 August. **The key is entered once and never returned** — the screen shows a reference,
     a rotation date and a last-verified date, never a secret. Test before activate. **Not on the wireframe
@@ -3496,7 +3568,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/CommunicationServiceCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-038
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-038
   source:
@@ -3560,7 +3633,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/ChannelProviderConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-039
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-039
   source:
@@ -3614,7 +3688,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/SenderIdentityDomainBrandConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-040
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-040
   source:
@@ -3669,7 +3744,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/SystemTransactionalTemplateRegistry.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-041
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-041
   source:
@@ -3724,7 +3800,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/BusinessEventNotificationTriggerMapping.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-042
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-042
   source:
@@ -3778,7 +3855,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/RoutingPriorityThrottlingFallbackRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-043
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-043
   source:
@@ -3833,7 +3911,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/ConsentPreferenceCommunicationPolicyEnforcement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-044
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-044
   source:
@@ -3888,7 +3967,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/DeliveryQueueFailureRetryManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-045
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-045
   source:
@@ -3950,7 +4030,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/ProviderHealthUsageCostMonitoring.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-046
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-046
   source:
@@ -4005,7 +4086,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/AiDeliveryOptimizationCommunicationPlatformDiagn.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-047
     workshopBoard: wireframes/WS16 Communication & Notification Platform Services Board 1.dc.html#adm-047
   source:
@@ -4068,7 +4150,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CommercialPricingCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-048
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-048
   source:
@@ -4133,7 +4216,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PriceListMasterConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-049
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-049
   source:
@@ -4188,7 +4272,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PriceCategoryRateTypeLibrary.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-050
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-050
   source:
@@ -4243,7 +4328,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RateStructureBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-051
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-051
   source:
@@ -4297,7 +4383,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ProductServicePriceAssignment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-052
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-052
   source:
@@ -4353,7 +4440,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PackageBundleAddOnPricing.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-053
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-053
   source:
@@ -4407,7 +4495,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/MarketVenueCurrencyPricingStructure.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-054
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-054
   source:
@@ -4462,7 +4551,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PriceHierarchyInheritanceConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-055
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-055
   source:
@@ -4516,7 +4606,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PriceListTemplatesCloneReuse.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-056
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-056
   source:
@@ -4572,7 +4663,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CommercialPricingStructureValidation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-057
     workshopBoard: wireframes/WS26 Pricing   Revenue Management Board 1.dc.html#adm-057
   source:
@@ -4635,7 +4727,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingRuleCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-058
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-058
   source:
@@ -4699,7 +4792,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CustomerSegmentProfilePricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-059
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-059
   source:
@@ -4753,7 +4847,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/MembershipLoyaltyPricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-060
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-060
   source:
@@ -4807,7 +4902,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResidencyNationalityMarketPricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-061
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-061
   source:
@@ -4861,7 +4957,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelBasedPricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-062
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-062
   source:
@@ -4915,7 +5012,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/LocationVenueEventPricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-063
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-063
   source:
@@ -4969,7 +5067,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/QuantityGroupVolumePricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-064
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-064
   source:
@@ -5023,7 +5122,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/EffectiveDateSeasonDayBasedPricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-065
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-065
   source:
@@ -5077,7 +5177,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TimeslotPerformanceTimeOfDayPricingRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-066
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-066
   source:
@@ -5132,7 +5233,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingRulePriorityConflictResolutionTesting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-067
     workshopBoard: wireframes/WS27 Pricing   Revenue Management Board 2.dc.html#adm-067
   source:
@@ -5195,7 +5297,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TaxFeeCalculationCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-068
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-068
   source:
@@ -5260,7 +5363,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TaxProfileJurisdictionConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-069
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-069
   source:
@@ -5314,7 +5418,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TaxRuleTreatmentBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-070
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-070
   source:
@@ -5368,7 +5473,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/FeeSurchargeLibrary.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-071
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-071
   source:
@@ -5423,7 +5529,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/FeeApplicabilityChargingRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-072
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-072
   source:
@@ -5478,7 +5585,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/FeeWaiverTaxExemptionExceptionRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-073
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-073
   source:
@@ -5533,7 +5641,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PriceCalculationSequenceFormulaEngine.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-074
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-074
   source:
@@ -5588,7 +5697,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CurrencyPrecisionRoundingMonetaryRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-075
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-075
   source:
@@ -5642,7 +5752,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PriceBreakdownCalculationSimulationExplainabilit.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-076
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-076
   source:
@@ -5697,7 +5808,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CalculationValidationReconciliationServiceInterf.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-077
     workshopBoard: wireframes/WS28 Pricing   Revenue Management Board 3.dc.html#adm-077
   source:
@@ -5760,7 +5872,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingGovernanceCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-078
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-078
   source:
@@ -5825,7 +5938,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingChangeRequestWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-079
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-079
   source:
@@ -5880,7 +5994,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BulkPricingUpdateImportMassMaintenance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-080
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-080
   source:
@@ -5935,7 +6050,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingVersionBaselineManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-081
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-081
   source:
@@ -5990,7 +6106,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingChangeImpactAnalysis.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-082
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-082
   source:
@@ -6044,7 +6161,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingApprovalWorkflowAuthorityMatrix.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-083
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-083
   source:
@@ -6078,6 +6196,11 @@ screens:
         notes: Scope this applies at
       - kind: toggle
         notes: Active
+      - kind: publishGate
+        impliedBy: publishPricingEffectiveDate
+        notes: >
+          Declares `publishPricingEffectiveDate`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first pricing entry, and this
@@ -6098,7 +6221,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingPublicationEffectiveDateScheduler.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-084
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-084
   source:
@@ -6160,7 +6284,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingDistributionSynchronizationPublicationMon.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-085
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-085
   source:
@@ -6215,7 +6340,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingRollbackEmergencyControlCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-086
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-086
   source:
@@ -6269,7 +6395,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingHistoryAuditComplianceExplorer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-087
     workshopBoard: wireframes/WS29 Pricing   Revenue Management Board 4.dc.html#adm-087
   source:
@@ -6332,7 +6459,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicPricingStrategyCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-088
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-088
   source:
@@ -6396,7 +6524,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicPricingStrategyBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-089
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-089
   source:
@@ -6452,7 +6581,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DemandOccupancyAvailabilityRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-090
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-090
   source:
@@ -6508,7 +6638,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BookingVelocityTimeToEventRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-091
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-091
   source:
@@ -6562,7 +6693,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/SeasonalCalendarDayTimeslotDynamicRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-092
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-092
   source:
@@ -6616,7 +6748,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelCustomerSegmentLocationDynamicRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-093
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-093
   source:
@@ -6671,7 +6804,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicPriceBandsLaddersAdjustmentMatrix.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-094
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-094
   source:
@@ -6725,7 +6859,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicPricingGuardrailsCommercialProtection.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-095
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-095
   source:
@@ -6781,7 +6916,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicPricingAutomationPolicyControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-096
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-096
   source:
@@ -6836,7 +6972,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RulePriorityConflictResolutionDynamicPricingTest.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-097
     workshopBoard: wireframes/WS30 Pricing   Revenue Management Board 5.dc.html#adm-097
   source:
@@ -6899,7 +7036,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiPricingIntelligenceCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-098
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-098
   source:
@@ -6964,7 +7102,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/InternalDemandBookingSignalHub.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-099
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-099
   source:
@@ -7017,7 +7156,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/WeatherIntelligenceDemandImpactConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-100
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-100
   source:
@@ -7070,7 +7210,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/NearbyEventExhibitionLocalDemandIntelligence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-101
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-101
   source:
@@ -7122,7 +7263,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CompetitorPricingMarketPositionIntelligence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-102
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-102
   source:
@@ -7176,7 +7318,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/MarketTourismHolidayContextualSignalHub.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-103
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-103
   source:
@@ -7237,7 +7380,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiDemandForecastingBookingCurveStudio.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-104
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-104
   source:
@@ -7289,7 +7433,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PriceElasticityRevenueResponseIntelligence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-105
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-105
   source:
@@ -7344,7 +7489,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiPricingRecommendationExplainabilityCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-106
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-106
   source:
@@ -7400,7 +7546,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiSignalRegistryDataQualityModelGovernance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-107
     workshopBoard: wireframes/WS31 Pricing   Revenue Management Board 6.dc.html#adm-107
   source:
@@ -7463,7 +7610,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RevenueOptimizationCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-108
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-108
   source:
@@ -7528,7 +7676,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PricingSimulationStudio.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-109
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-109
   source:
@@ -7582,7 +7731,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ScenarioModelingWhatIfAnalysis.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-110
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-110
   source:
@@ -7638,7 +7788,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ABPricingExperimentStudio.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-111
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-111
   source:
@@ -7691,7 +7842,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RevenueDemandImpactForecasting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-112
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-112
   source:
@@ -7746,7 +7898,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiRecommendationReviewDecisionQueue.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-113
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-113
   source:
@@ -7802,7 +7955,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AutomationPolicyAutonomousPricingOrchestrator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-114
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-114
   source:
@@ -7854,7 +8008,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/LiveDynamicPriceExecutionDeploymentMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-115
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-115
   source:
@@ -7907,7 +8062,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicPricingPerformanceOptimizationAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-116
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-116
   source:
@@ -7962,7 +8118,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiLearningModelPerformanceOptimizationFeedback.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-117
     workshopBoard: wireframes/WS32 Pricing   Revenue Management Board 7.dc.html#adm-117
   source:
@@ -8015,7 +8172,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductLifecycleCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-118
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-118
   source:
@@ -8079,7 +8237,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductCreationWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-119
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-119
   source:
@@ -8133,7 +8292,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/LifecycleStatusWorkflowConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-120
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-120
   source:
@@ -8158,14 +8318,22 @@ screens:
   wave: 3
   density: compact
   layout:
-    template: dashboard
+    template: form
     regions:
     - name: contentBody
       components:
-      - kind: timeline
-        notes: What changed, when, and by whom
-      - kind: searchField
-        notes: Find a change
+      - kind: fileUpload
+        notes: The spreadsheet of products being created.
+      - kind: progressIndicator
+        notes: >
+          A bulk create is long enough to leave the screen, and **a create that reports nothing
+          is a create somebody runs twice**.
+      - kind: dataTable
+        notes: The parsed rows, with the ones that will not import marked before anything is written.
+      - kind: banner
+        notes: >
+          The outcome of the run — created, skipped and refused, counted. **Named from the
+          operation, not from the screen title**: this screen creates, it does not configure.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first bulk entry, and this
@@ -8186,7 +8354,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/BulkProductCreationCatalogueImport.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-121
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-121
   source:
@@ -8241,7 +8410,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductImportExportEnvironmentTransfer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-122
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-122
   source:
@@ -8295,7 +8465,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductContextOwnershipAssignment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-123
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-123
   source:
@@ -8329,6 +8500,11 @@ screens:
         notes: Scope this applies at
       - kind: toggle
         notes: Active
+      - kind: publishGate
+        impliedBy: publishChannelAvailability
+        notes: >
+          Declares `publishChannelAvailability`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first channel entry, and this
@@ -8349,7 +8525,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ChannelPublicationAvailability.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-124
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-124
   source:
@@ -8383,6 +8560,11 @@ screens:
         notes: Scope this applies at
       - kind: toggle
         notes: Active
+      - kind: publishGate
+        impliedBy: publishActivationScheduler
+        notes: >
+          Declares `publishActivationScheduler`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first publication entry, and
@@ -8403,7 +8585,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/PublicationActivationScheduler.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-125
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-125
   source:
@@ -8459,7 +8642,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductDuplicationTemplateLibrary.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-126
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-126
   source:
@@ -8515,7 +8699,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/AiCatalogueBuilderConfigurationReview.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-127
     workshopBoard: wireframes/WS35 Product Lifecycle   Catalogue Governance Board 1.dc.html#adm-127
   source:
@@ -8568,7 +8753,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductGovernanceCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-128
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-128
   source:
@@ -8632,7 +8818,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ApprovalWorkflowDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-129
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-129
   source:
@@ -8687,7 +8874,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ApprovalReviewDecisionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-130
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-130
   source:
@@ -8742,7 +8930,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductVersionManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-131
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-131
   source:
@@ -8804,7 +8993,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/RollbackRecoveryManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-132
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-132
   source:
@@ -8860,7 +9050,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ChangeImpactAnalysis.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-133
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-133
   source:
@@ -8916,7 +9107,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ChangePropagationDependencyControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-134
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-134
   source:
@@ -8971,7 +9163,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductRetirementSuspensionArchive.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-135
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-135
   source:
@@ -9006,8 +9199,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first product entry, and this
-      state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -9024,7 +9217,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/ProductAuditTrailChangeHistory.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-136
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-136
   source:
@@ -9087,7 +9281,8 @@ screens:
     component: apps/ticvai-web/src/routes/catalogue/GovernanceRiskAiMonitoringControlCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-137
     workshopBoard: wireframes/WS36 Product Lifecycle   Catalogue Governance Board 2.dc.html#adm-137
   source:
@@ -9143,7 +9338,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionCommandCenterDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-138
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-138
   source:
@@ -9217,7 +9413,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionCampaignDirectory.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-139
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-139
   source:
@@ -9272,7 +9469,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionOverview.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-140
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-140
   source:
@@ -9326,7 +9524,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionLifecycleStatusManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-141
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-141
   source:
@@ -9380,7 +9579,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CampaignCalendarTimeline.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-142
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-142
   source:
@@ -9432,7 +9632,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionChannelPublicationMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-143
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-143
   source:
@@ -9486,7 +9687,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionAlertsExceptionCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-144
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-144
   source:
@@ -9548,7 +9750,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionApprovalInbox.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-145
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-145
   source:
@@ -9607,7 +9810,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionHealthPerformanceMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-146
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-146
   source:
@@ -9641,8 +9845,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first promotion entry, and
-      this state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -9659,7 +9863,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionAuditActivityVersionHistory.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-147
     workshopBoard: wireframes/WS37 Promotions   Bundles Management Board 1.dc.html#adm-147
   source:
@@ -9713,7 +9918,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-148
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-148
   source:
@@ -9778,7 +9984,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PercentageFixedDiscountConfigurator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-149
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-149
   source:
@@ -9834,7 +10041,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CartTransactionThresholdRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-150
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-150
   source:
@@ -9889,7 +10097,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/VolumeBulkTierDiscountConfigurator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-151
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-151
   source:
@@ -9943,7 +10152,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TimeBasedSeasonalDiscountRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-152
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-152
   source:
@@ -9997,7 +10207,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CustomerMembershipSegmentDiscountRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-153
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-153
   source:
@@ -10052,7 +10263,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PaymentMethodBankPartnerDiscountRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-154
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-154
   source:
@@ -10107,7 +10319,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/SpecialPriceGuestOfferConfigurator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-155
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-155
   source:
@@ -10161,7 +10374,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DiscountLimitsGuardrailsCommercialControls.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-156
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-156
   source:
@@ -10217,7 +10431,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RuleTestSimulationAiRecommendationWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-157
     workshopBoard: wireframes/WS38 Promotions   Bundles Management Board 2.dc.html#adm-157
   source:
@@ -10270,7 +10485,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CouponPromoCodeCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-158
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-158
   source:
@@ -10341,7 +10557,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CouponPromoCodeBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-159
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-159
   source:
@@ -10395,7 +10612,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UniqueCodeGenerationBatchManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-160
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-160
   source:
@@ -10451,7 +10669,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CodeEligibilityRestrictionManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-161
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-161
   source:
@@ -10506,7 +10725,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UsageCapacityFrequencyControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-162
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-162
   source:
@@ -10560,7 +10780,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ValidityDateTimeControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-163
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-163
   source:
@@ -10614,7 +10835,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CodeDistributionAssignmentManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-164
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-164
   source:
@@ -10666,7 +10888,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RedemptionMonitorCodeLookup.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-165
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-165
   source:
@@ -10720,7 +10943,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CodeSecurityFraudExceptionCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-166
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-166
   source:
@@ -10772,7 +10996,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RedemptionAnalyticsAuditAiOptimization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-167
     workshopBoard: wireframes/WS39 Promotions   Bundles Management Board 3.dc.html#adm-167
   source:
@@ -10824,7 +11049,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AdvancedOfferCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-168
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-168
   source:
@@ -10888,7 +11114,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BuyXGetYBogoRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-169
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-169
   source:
@@ -10943,7 +11170,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/MultiBuyQuantityOfferConfigurator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-170
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-170
   source:
@@ -10999,7 +11227,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CheapestLowestValueItemPromotion.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-171
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-171
   source:
@@ -11054,7 +11283,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/FixedPriceNForXOfferBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-172
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-172
   source:
@@ -11110,7 +11340,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/GiftFreeProductAddedValueOfferBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-173
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-173
   source:
@@ -11164,7 +11395,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CrossCategoryPromotionBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-174
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-174
   source:
@@ -11218,7 +11450,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RewardSelectionSubstitutionCustomerChoice.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-175
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-175
   source:
@@ -11274,7 +11507,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AdvancedOfferGuardrailsConflictControls.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-176
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-176
   source:
@@ -11328,7 +11562,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/OfferSimulationBasketTraceAiOptimization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-177
     workshopBoard: wireframes/WS40 Promotions   Bundles Management Board 4.dc.html#adm-177
   source:
@@ -11380,7 +11615,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleComboCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-178
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-178
   source:
@@ -11444,7 +11680,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleDefinitionSetup.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-179
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-179
   source:
@@ -11498,7 +11735,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleComponentBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-180
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-180
   source:
@@ -11554,7 +11792,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/GuestChoiceBuildYourOwnBundleDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-181
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-181
   source:
@@ -11608,7 +11847,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundlePricingCommercialModel.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-182
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-182
   source:
@@ -11664,7 +11904,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleAvailabilityCapacityValidation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-183
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-183
   source:
@@ -11719,7 +11960,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleValiditySchedulingRedemptionRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-184
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-184
   source:
@@ -11775,7 +12017,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PartnerExternalProductBundleManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-185
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-185
   source:
@@ -11831,7 +12074,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RevenueAllocationCostSettlementRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-186
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-186
   source:
@@ -11887,7 +12131,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundlePreviewSimulationAiRecommendation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-187
     workshopBoard: wireframes/WS41 Promotions   Bundles Management Board 5.dc.html#adm-187
   source:
@@ -11939,7 +12184,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicBundleOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-188
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-188
   source:
@@ -12004,7 +12250,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ComponentInventoryAvailabilityMatrix.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-189
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-189
   source:
@@ -12058,7 +12305,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleSellabilityDependencyRuleEngine.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-190
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-190
   source:
@@ -12114,7 +12362,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CapacityPoolReservationManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-191
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-191
   source:
@@ -12168,7 +12417,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicComponentSubstitutionEngine.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-192
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-192
   source:
@@ -12224,7 +12474,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicBundleRuleCompositionEngine.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-193
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-193
   source:
@@ -12279,7 +12530,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RealTimeAvailabilityCheckoutValidation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-194
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-194
   source:
@@ -12333,7 +12585,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleAvailabilityByChannelVenuePartner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-195
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-195
   source:
@@ -12385,7 +12638,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleAvailabilityForecastAlertsRecovery.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-196
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-196
   source:
@@ -12439,7 +12693,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DynamicBundleSimulationAiOptimization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-197
     workshopBoard: wireframes/WS42 Promotions   Bundles Management Board 6.dc.html#adm-197
   source:
@@ -12492,7 +12747,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TargetingEligibilityCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-198
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-198
   source:
@@ -12556,7 +12812,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/EligibilityRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-199
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-199
   source:
@@ -12611,7 +12868,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CrmCustomerSegmentManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-200
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-200
   source:
@@ -12666,7 +12924,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/MembershipLoyaltyGuestEligibility.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-201
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-201
   source:
@@ -12720,7 +12979,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BehavioralTransactionTargeting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-202
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-202
   source:
@@ -12774,7 +13034,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ContextLocationChannelTimeTargeting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-203
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-203
   source:
@@ -12828,7 +13089,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PartnerB2bPaymentEligibility.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-204
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-204
   source:
@@ -12883,7 +13145,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AudiencePreviewReachEligibilitySimulator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-205
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-205
   source:
@@ -12937,7 +13200,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TargetingConflictFrequencyExclusionControls.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-206
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-206
   source:
@@ -12992,7 +13256,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiAudienceDiscoveryTargetingOptimization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-207
     workshopBoard: wireframes/WS43 Promotions   Bundles Management Board 7.dc.html#adm-207
   source:
@@ -13044,7 +13309,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/StackingConflictCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-208
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-208
   source:
@@ -13108,7 +13374,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionPriorityHierarchyManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-209
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-209
   source:
@@ -13162,7 +13429,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionStackingRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-210
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-210
   source:
@@ -13216,7 +13484,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionExclusionCompatibilityMatrix.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-211
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-211
   source:
@@ -13270,7 +13539,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DiscountCalculationApplicationSequence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-212
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-212
   source:
@@ -13325,7 +13595,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BestOfferCustomerBenefitResolver.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-213
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-213
   source:
@@ -13379,7 +13650,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DiscountCapMaximumBenefitController.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-214
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-214
   source:
@@ -13433,7 +13705,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ConflictDetectionResolutionCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-215
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-215
   source:
@@ -13489,7 +13762,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionDecisionTraceTransactionExplainer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-216
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-216
   source:
@@ -13543,7 +13817,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ConflictSimulationAiOptimization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-217
     workshopBoard: wireframes/WS44 Promotions   Bundles Management Board 8.dc.html#adm-217
   source:
@@ -13596,7 +13871,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CampaignGovernanceBudgetCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-218
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-218
   source:
@@ -13660,7 +13936,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CampaignBudgetFinancialLimitSetup.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-219
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-219
   source:
@@ -13714,7 +13991,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RedemptionDiscountExposureLimitManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-220
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-220
   source:
@@ -13777,7 +14055,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BudgetConsumptionForecastMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-221
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-221
   source:
@@ -13832,7 +14111,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ThresholdActionsAutomaticSuspension.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-222
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-222
   source:
@@ -13887,7 +14167,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CampaignApprovalWorkflowDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-223
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-223
   source:
@@ -13942,7 +14223,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ApprovalInboxDecisionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-224
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-224
   source:
@@ -13997,7 +14279,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CampaignFinancialCommercialSimulator.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-225
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-225
   source:
@@ -14053,7 +14336,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CampaignExperimentABTestManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-226
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-226
   source:
@@ -14105,7 +14389,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/GovernanceAuditAiRiskLaunchReadiness.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-227
     workshopBoard: wireframes/WS45 Promotions   Bundles Management Board 9.dc.html#adm-227
   source:
@@ -14158,7 +14443,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PromotionPerformanceCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-228
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-228
   source:
@@ -14222,7 +14508,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CampaignPromotionPerformanceExplorer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-229
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-229
   source:
@@ -14274,7 +14561,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RedemptionConversionFunnelAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-230
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-230
   source:
@@ -14326,7 +14614,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/DiscountMarginProfitabilityAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-231
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-231
   source:
@@ -14378,7 +14667,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BundleBogoAdvancedOfferAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-232
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-232
   source:
@@ -14432,7 +14722,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpsellCrossSellAttachRateAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-233
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-233
   source:
@@ -14484,7 +14775,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CustomerSegmentChannelPartnerAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-234
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-234
   source:
@@ -14538,7 +14830,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/IncrementalityAttributionCannibalizationAnalysis.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-235
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-235
   source:
@@ -14593,7 +14886,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiOptimizationNextBestActionCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-236
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-236
   source:
@@ -14646,7 +14940,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ExecutivePromotionIntelligenceReportingStudio.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-237
     workshopBoard: wireframes/WS46 Promotions   Bundles Management Board 10.dc.html#adm-237
   source:
@@ -14709,7 +15004,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/RulesWorkflowCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-238
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-238
   source:
@@ -14773,7 +15069,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/VisualBusinessRuleBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-239
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-239
   source:
@@ -14797,14 +15094,16 @@ screens:
   wave: 3
   density: compact
   layout:
-    template: dashboard
+    template: split
     regions:
     - name: contentBody
       components:
-      - kind: timeline
-        notes: What changed, when, and by whom
       - kind: searchField
-        notes: Find a change
+        notes: Find a rule
+      - kind: dataTable
+        notes: Every condition and decision table with its scope.
+      - kind: detailPanel
+        notes: The selected rule, read-only.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first conditions, entry, and
@@ -14825,7 +15124,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/ConditionsDecisionLogicDecisionTables.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-240
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-240
   source:
@@ -14879,7 +15179,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/VisualWorkflowDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-241
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-241
   source:
@@ -14933,7 +15234,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/ApprovalMatrixMultiLevelApprovalConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-242
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-242
   source:
@@ -14988,7 +15290,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/RolesAuthorityDelegationApprovalLimits.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-243
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-243
   source:
@@ -15042,7 +15345,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/SlaEscalationReminderTimeoutRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-244
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-244
   source:
@@ -15096,7 +15400,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/TriggerActionCrossModuleOrchestrationConfigurati.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-245
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-245
   source:
@@ -15151,7 +15456,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/WorkflowTestingSimulationImpactAnalysis.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-246
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-246
   source:
@@ -15205,7 +15511,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/VersioningGovernanceApprovalPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-247
     workshopBoard: wireframes/WS47 Rules  Workflow  Approval   Automation Engine Board 1.dc.html#adm-247
   source:
@@ -15268,7 +15575,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/WorkflowOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-248
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-248
   source:
@@ -15334,7 +15642,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/UnifiedApprovalInboxDecisionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-249
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-249
   source:
@@ -15396,7 +15705,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/WorkflowInstanceMonitorProcessTimeline.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-250
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-250
   source:
@@ -15450,7 +15760,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/WorkflowExceptionFailureRecoveryCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-251
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-251
   source:
@@ -15512,7 +15823,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/SlaEscalationBottleneckMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-252
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-252
   source:
@@ -15575,7 +15887,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/AutomationExecutionAutonomousActionMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-253
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-253
   source:
@@ -15627,7 +15940,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/CrossModuleOrchestrationMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-254
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-254
   source:
@@ -15679,7 +15993,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/WorkflowAnalyticsProcessPerformance.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-255
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-255
   source:
@@ -15734,7 +16049,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/ProcessOptimizationAutomationOpportunityCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-256
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-256
   source:
@@ -15787,7 +16103,8 @@ screens:
     component: apps/ticvai-web/src/routes/platform/AiWorkflowIntelligenceAutonomousGovernanceCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-257
     workshopBoard: wireframes/WS48 Rules  Workflow  Approval   Automation Engine Board 2.dc.html#adm-257
   source:
@@ -15850,7 +16167,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/SalesChannelCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-258
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-258
   source:
@@ -15914,7 +16232,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelCreationProfileConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-259
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-259
   source:
@@ -15938,14 +16257,18 @@ screens:
   wave: 3
   density: compact
   layout:
-    template: dashboard
+    template: split
     regions:
     - name: contentBody
       components:
-      - kind: timeline
-        notes: What changed, when, and by whom
-      - kind: searchField
-        notes: Find a change
+      - kind: treeNav
+        notes: The catalogue hierarchy being assigned into.
+      - kind: multiSelect
+        notes: The products being assigned.
+      - kind: confirmDialog
+        notes: >
+          **The consequence goes in the body.** An assignment that moves 400 products between
+          catalogues is a confirmation; *are you sure* is not.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first product entry, and this
@@ -15966,7 +16289,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ProductCatalogueAssignment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-260
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-260
   source:
@@ -16020,7 +16344,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelPricingCommercialProfileAssignment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-261
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-261
   source:
@@ -16074,7 +16399,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/InventoryCapacityChannelAllocation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-262
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-262
   source:
@@ -16128,7 +16454,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelSalesScheduleAvailabilityWindows.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-263
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-263
   source:
@@ -16182,7 +16509,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CustomerEligibilityRulesByChannel.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-264
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-264
   source:
@@ -16236,7 +16564,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelSalesRulesLimitsRestrictions.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-265
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-265
   source:
@@ -16290,7 +16619,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelFeesPaymentFulfillmentConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-266
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-266
   source:
@@ -16325,6 +16655,11 @@ screens:
         notes: Scope this applies at
       - kind: toggle
         notes: Active
+      - kind: publishGate
+        impliedBy: publishChannelReadinessValidation
+        notes: >
+          Declares `publishChannelReadinessValidation`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first channel entry, and this
@@ -16345,7 +16680,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelPublicationReadinessAiValidation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-267
     workshopBoard: wireframes/WS49 Sales Channel Management Board 1.dc.html#adm-267
   source:
@@ -16407,7 +16743,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-268
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-268
   source:
@@ -16472,7 +16809,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelConnectionIntegrationManager.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-269
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-269
   source:
@@ -16527,7 +16865,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ProductPriceAvailabilitySynchronization.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-270
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-270
   source:
@@ -16589,7 +16928,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RealTimeChannelAvailabilityInventoryMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-271
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-271
   source:
@@ -16644,7 +16984,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelAllocationRebalancingOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-272
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-272
   source:
@@ -16698,7 +17039,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelExceptionsIncidentsRecovery.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-273
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-273
   source:
@@ -16750,7 +17092,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelPerformanceCommercialAnalytics.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-274
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-274
   source:
@@ -16784,8 +17127,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first channel entry, and this
-      state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -16802,7 +17145,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelAuditLogsTransactionTraceability.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-275
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-275
   source:
@@ -16857,7 +17201,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ChannelGovernanceSlaPartnerControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-276
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-276
   source:
@@ -16910,7 +17255,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiChannelOptimizationIntelligenceCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-277
     workshopBoard: wireframes/WS50 Sales Channel Management Board 2.dc.html#adm-277
   source:
@@ -16972,7 +17318,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleMarketplaceCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-278
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-278
   source:
@@ -17037,7 +17384,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleEligibilityRuleConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-279
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-279
   source:
@@ -17091,7 +17439,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResalePolicyMarketplaceSettings.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-280
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-280
   source:
@@ -17145,7 +17494,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ListingCreationSellerConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-281
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-281
   source:
@@ -17199,7 +17549,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResalePricingPriceGuardrails.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-282
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-282
   source:
@@ -17253,7 +17604,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleFeesCommissionSellerProceeds.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-283
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-283
   source:
@@ -17307,7 +17659,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ListingApprovalModeration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-284
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-284
   source:
@@ -17361,7 +17714,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleInventoryAvailabilityManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-285
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-285
   source:
@@ -17415,7 +17769,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ListingLifecycleExpiryCancellation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-286
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-286
   source:
@@ -17470,7 +17825,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/AiResaleConfigurationMarketplaceRecommendations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-287
     workshopBoard: wireframes/WS54 Ticket Resale Marketplace Board 1.dc.html#adm-287
   source:
@@ -17533,7 +17889,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-288
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-288
   source:
@@ -17598,7 +17955,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BuyerPurchaseResaleOrderManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-289
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-289
   source:
@@ -17652,7 +18010,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/TicketOwnershipTransferManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-290
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-290
   source:
@@ -17707,7 +18066,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CredentialRevocationRegeneration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-291
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-291
   source:
@@ -17761,7 +18121,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleFraudDuplicateSaleProtection.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-292
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-292
   source:
@@ -17815,7 +18176,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CapacityInventoryReconciliation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-293
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-293
   source:
@@ -17869,7 +18231,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/SellerSettlementPayoutManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-294
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-294
   source:
@@ -17923,7 +18286,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/RefundsDisputesResaleExceptions.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-295
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-295
   source:
@@ -17957,8 +18321,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first resale entry, and this
-      state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -17975,7 +18339,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleAuditOwnershipHistory.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-296
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-296
   source:
@@ -18038,7 +18403,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleAnalyticsAiIntelligence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-297
     workshopBoard: wireframes/WS55 Ticket Resale Marketplace Board 2.dc.html#adm-297
   source:
@@ -18094,7 +18460,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/MyTicketsResaleMarketplaceEntry.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-298
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-298
   source:
@@ -18158,7 +18525,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleEligibilityTicketSelection.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-299
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-299
   source:
@@ -18213,7 +18581,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/CreateListingResalePriceSelection.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-300
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-300
   source:
@@ -18268,7 +18637,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/FeesSellerProceedsListingConfirmation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-301
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-301
   source:
@@ -18330,7 +18700,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/MyResaleListingsSellerDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-302
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-302
   source:
@@ -18384,7 +18755,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/OfficialResaleMarketplaceBuyerDiscovery.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-303
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-303
   source:
@@ -18439,7 +18811,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleTicketDetailSeatSelectionPrimaryVsResaleEx.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-304
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-304
   source:
@@ -18494,7 +18867,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BuyerCheckoutInventoryHoldSecurePayment.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-305
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-305
   source:
@@ -18549,7 +18923,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ResaleConfirmationOwnershipTransferTicketDeliver.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-306
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-306
   source:
@@ -18604,7 +18979,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/WhiteLabelMarketplaceDeploymentExperienceArchite.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-307
     workshopBoard: wireframes/WS56 Ticket Resale Marketplace Board 3.dc.html#adm-307
   source:
@@ -18667,7 +19043,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpgradeConversionCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-308
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-308
   source:
@@ -18732,7 +19109,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpgradeConversionPathBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-309
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-309
   source:
@@ -18787,7 +19165,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpgradeEligibilityQualificationRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-310
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-310
   source:
@@ -18842,7 +19221,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpgradeTimingUsageTicketStatusRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-311
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-311
   source:
@@ -18896,7 +19276,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpgradeFinancialTreatmentPriceDifferenceRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-312
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-312
   source:
@@ -18950,7 +19331,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/ProRataResidualValueEntitlementCreditConfigurati.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-313
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-313
   source:
@@ -19004,7 +19386,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/PersonTypeProductEntitlementConversionRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-314
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-314
   source:
@@ -19059,7 +19442,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/BulkGroupAssistedUpgradeOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-315
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-315
   source:
@@ -19114,7 +19498,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpgradeExecutionCredentialRegenerationChannelCon.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-316
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-316
   source:
@@ -19169,7 +19554,8 @@ screens:
     component: apps/ticvai-web/src/routes/commercial/UpgradeHistoryExceptionManagementAuditExplorer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-317
     workshopBoard: wireframes/WS57 Ticket Upgrade, Exchange & Conversion Board 1.dc.html#adm-317
   source:
@@ -19249,7 +19635,8 @@ screens:
     component: apps/ticvai-web/src/routes/DeadLetters.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P09 TICVAI Web.dc.html#adm-318
   notes: 'Added 4 September. **47 consumers declare `retryThenDeadLetter` and all 47 are marked `isCritical`,
     and until this screen existed nothing in the package read the table they land in.** Deliberately not

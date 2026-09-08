@@ -1,0 +1,5642 @@
+[
+ {
+  "board": "BP-001",
+  "template": "split",
+  "components": [
+   "dataTable",
+   "detailPanel",
+   "searchField"
+  ],
+  "screenCount": 314,
+  "platforms": [
+   "P08",
+   "P09",
+   "P10",
+   "P12",
+   "P13"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-145",
+    "name": "Venue & Park Access Structure",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-148",
+    "name": "Access Point Directory",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-151",
+    "name": "Access Location Grouping",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-152",
+    "name": "Operating Calendar & Special Access Days",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-156",
+    "name": "Entry, Exit & Re-entry Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-157",
+    "name": "Anti-Passback & Journey Sequence",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-158",
+    "name": "Access Validity & Time Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-159",
+    "name": "Entitlement Consumption Engine",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-160",
+    "name": "Multi-Park & Crossover Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-161",
+    "name": "Guest, Companion & Eligibility Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-162",
+    "name": "Group Admission & Quantity Validation",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-166",
+    "name": "Credential Activation & Display Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-167",
+    "name": "Device Binding & Session Security",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-169",
+    "name": "Credential Transfer & Rebinding",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-170",
+    "name": "Credential Revocation & Lifecycle Events",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-171",
+    "name": "Offline Cryptographic Validation Profile",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-175",
+    "name": "Media Type & Technology Library",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-176",
+    "name": "Virtual Credential & Media Association",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-177",
+    "name": "Verification Method Selection & Locking",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-178",
+    "name": "Media Issuance & Encoding Profile",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-179",
+    "name": "Media Swap & Replacement",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-181",
+    "name": "External & Partner Credential Mapping",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-182",
+    "name": "Hotel, Wallet & External Media Integration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-187",
+    "name": "Biometric Consent & Guardian Management",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-188",
+    "name": "Face Tag Temporary Enrollment",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-189",
+    "name": "Face Matching & Verification Thresholds",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-190",
+    "name": "Face Change, Re-enrollment & Identity Protection",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-191",
+    "name": "Biometric Validation at Gate",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-192",
+    "name": "Biometric Lifecycle, Retention & Deletion",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-195",
+    "name": "Device Type & Hardware Library",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-196",
+    "name": "Physical Device Registration & Provisioning",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-201",
+    "name": "Gate Modes, Free Spin & Emergency Controls",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-203",
+    "name": "Hardware Compatibility, Health, Testing & Deployment",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-207",
+    "name": "Edge Package & Data Distribution",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-208",
+    "name": "Offline Credential & Revocation Cache",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-209",
+    "name": "Offline Entitlement & Usage Ledger",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-210",
+    "name": "Connectivity Failure & Degraded Mode Policy",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-211",
+    "name": "Reconnection, Synchronization & Conflict Resolution",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-216",
+    "name": "Group Leader & Fast B2B Validation",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-217",
+    "name": "Group Attendance & Partial Entry Manager",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-218",
+    "name": "Family, Child, POD & Companion Journey",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-219",
+    "name": "Re-entry & Temporary Exit Journey",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-220",
+    "name": "Multi-Park & Crossover Journey Orchestrator",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-221",
+    "name": "Fast Pass & Attraction Access Journey",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-222",
+    "name": "Special Event, Free View & Alternative Admission",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-225",
+    "name": "Podium Operations Console",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-226",
+    "name": "Ticket & Credential Investigation Console",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-227",
+    "name": "Validation Exception & Reason Code Manager",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-228",
+    "name": "Manual Override & Supervisor Approval",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-229",
+    "name": "Credential Disable, Blacklist & Whitelist Operations",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-230",
+    "name": "Live Gate Mode & Lane Control",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-231",
+    "name": "Queue, Throughput & Lane Optimization",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-238",
+    "name": "Identity, Membership & Accreditation Policies",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-239",
+    "name": "Policy Scope, Hierarchy & Inheritance",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-240",
+    "name": "Authorization Governance & Temporary Access",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-241",
+    "name": "Policy Evaluation Architecture & Offline Distribution",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-245",
+    "name": "Fraud Detection Rule & Signal Library",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-246",
+    "name": "Credential Sharing & Concurrent Usage Detection",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-247",
+    "name": "Unified Identity & Credential Lock Manager",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-250",
+    "name": "Access Risk Scoring & Decision Engine",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-255",
+    "name": "Live Venue Occupancy & People Counting",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-256",
+    "name": "Graphical Access Map & Live Gate Performance",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-261",
+    "name": "Guest Dwell Time, Length of Stay & Attraction Flow",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-262",
+    "name": "Access Reports, Scheduled Reporting & Data Export",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-265",
+    "name": "Group Enquiry & Opportunity Capture",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-266",
+    "name": "Group Customer & Organization Profile",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-267",
+    "name": "Group Requirements, Availability & Capacity Planner",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-270",
+    "name": "Quote Revision, Negotiation & Version Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-271",
+    "name": "Group Discount, Exception & Approval Workflow",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-272",
+    "name": "Quote-to-Booking Conversion & Confirmation",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-276",
+    "name": "Participants, Guest Lists & Group Structure",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-277",
+    "name": "Group Payment, Deposit & Balance Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-278",
+    "name": "Group Ticket, Seat & Entitlement Allocation",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-279",
+    "name": "Group Ticket Fulfillment & Distribution",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-280",
+    "name": "Group Arrival, Check-In & Admission Operations",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-281",
+    "name": "Group Amendments, Cancellation & Refund Operations",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-282",
+    "name": "Group Booking Reconciliation, Closure & Performance",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-289",
+    "name": "Membership Usage, Visit & Consumption Rules",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-291",
+    "name": "Membership Commercial, Pricing & Channel Association",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-293",
+    "name": "Membership Product Validation, Approval, Publication & Versioning",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-296",
+    "name": "Membership Activation, Assignment & Credential Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-298",
+    "name": "Membership Freeze, Suspension & Reactivation Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-299",
+    "name": "Membership Upgrade, Downgrade & Product Migration Operations",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-300",
+    "name": "Renewal Operations & Auto-Renewal Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-301",
+    "name": "Member Exceptions, Overrides & Service Recovery",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-309",
+    "name": "Customer, Guest & Account Assignment",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-310",
+    "name": "Order Line, Product & Entitlement Composition",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-311",
+    "name": "Capacity Reservation & Inventory Commitment",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-312",
+    "name": "Reservation Confirmation, Expiry & Fulfillment Readiness",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-313",
+    "name": "Order Lifecycle Timeline, SLA, Exceptions & AI Operations",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-319",
+    "name": "Void, Reversal & Same-Day Correction Management",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-320",
+    "name": "Ticket Reissue & Fulfillment Regeneration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-322",
+    "name": "Approval, Exception & Service Recovery Management",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-325",
+    "name": "Order Payment Detail & Transaction Ledger",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-327",
+    "name": "Deposit, Partial Payment & Outstanding Balance Management",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-328",
+    "name": "Order Split, Merge & Transaction Relationship Management",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-329",
+    "name": "Related Order & Transaction Relationship Explorer",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-330",
+    "name": "External Payment, Partner & Settlement Reference Mapping",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-331",
+    "name": "Payment Reconciliation & Exception Management",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-332",
+    "name": "Financial Traceability, Control & Audit Explorer",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-336",
+    "name": "Virtual Ticket Status & Lifecycle Model",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-337",
+    "name": "Media Type & Credential Technology Registry",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-338",
+    "name": "Multi-Media Binding & Association Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-339",
+    "name": "Credential Identity, Token & Reference Mapping",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-340",
+    "name": "Entitlement & Cross-Media Synchronization Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-341",
+    "name": "Media Activation, Priority & Fallback Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-342",
+    "name": "Media Replacement, Revocation & Rebinding Rules",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-352",
+    "name": "Branding, Localization & Template Inheritance",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-353",
+    "name": "Multi-Media Preview, Testing, Approval & Publication",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-357",
+    "name": "Credential Delivery & Distribution Operations",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-358",
+    "name": "Media Binding, Activation & Assignment Operations",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-359",
+    "name": "Credential Replacement, Reissue, Revocation & Recovery",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-360",
+    "name": "Failed Generation, Delivery & Credential Exception Management",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-361",
+    "name": "Credential Usage & Cross-Media Traceability",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "ADM-042",
+    "name": "Business Event & Notification Trigger Mapping",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-043",
+    "name": "Routing, Priority, Throttling & Fallback Rules",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-044",
+    "name": "Consent, Preference & Communication Policy Enforcement",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-045",
+    "name": "Delivery Queue, Failure & Retry Management",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-047",
+    "name": "AI Delivery Optimization & Communication Platform Diagnostics",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-050",
+    "name": "Price Category & Rate Type Library",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-052",
+    "name": "Product & Service Price Assignment",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-053",
+    "name": "Package, Bundle & Add-On Pricing",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-054",
+    "name": "Market, Venue & Currency Pricing Structure",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-056",
+    "name": "Price List Templates, Clone & Reuse",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-057",
+    "name": "Commercial Pricing Structure Validation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-059",
+    "name": "Customer Segment & Profile Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-060",
+    "name": "Membership & Loyalty Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-061",
+    "name": "Residency, Nationality & Market Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-062",
+    "name": "Channel-Based Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-063",
+    "name": "Location, Venue & Event Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-064",
+    "name": "Quantity, Group & Volume Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-065",
+    "name": "Effective Date, Season & Day-Based Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-066",
+    "name": "Timeslot, Performance & Time-of-Day Pricing Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-067",
+    "name": "Pricing Rule Priority, Conflict Resolution & Testing",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-071",
+    "name": "Fee & Surcharge Library",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-073",
+    "name": "Fee Waiver, Tax Exemption & Exception Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-074",
+    "name": "Price Calculation Sequence & Formula Engine",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-075",
+    "name": "Currency Precision, Rounding & Monetary Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-077",
+    "name": "Calculation Validation, Reconciliation & Service Interface",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-080",
+    "name": "Bulk Pricing Update, Import & Mass Maintenance",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-081",
+    "name": "Pricing Version & Baseline Management",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-082",
+    "name": "Pricing Change Impact Analysis",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-083",
+    "name": "Pricing Approval Workflow & Authority Matrix",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-086",
+    "name": "Pricing Rollback & Emergency Control Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-087",
+    "name": "Pricing History, Audit & Compliance Explorer",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-092",
+    "name": "Seasonal, Calendar, Day & Timeslot Dynamic Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-093",
+    "name": "Channel, Customer Segment & Location Dynamic Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-094",
+    "name": "Dynamic Price Bands, Ladders & Adjustment Matrix",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-095",
+    "name": "Dynamic Pricing Guardrails & Commercial Protection",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-096",
+    "name": "Dynamic Pricing Automation Policy & Control",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-097",
+    "name": "Rule Priority, Conflict Resolution & Dynamic Pricing Test Console",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-099",
+    "name": "Internal Demand & Booking Signal Hub",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-103",
+    "name": "Market, Tourism, Holiday & Contextual Signal Hub",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-106",
+    "name": "AI Pricing Recommendation & Explainability Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-107",
+    "name": "AI Signal Registry, Data Quality & Model Governance",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-110",
+    "name": "Scenario Modeling & What-If Analysis",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-113",
+    "name": "AI Recommendation Review & Decision Queue",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-114",
+    "name": "Automation Policy & Autonomous Pricing Orchestrator",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-117",
+    "name": "AI Learning, Model Performance & Optimization Feedback",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-122",
+    "name": "Product Import / Export & Environment Transfer",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-123",
+    "name": "Product Context, Ownership & Assignment",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-126",
+    "name": "Product Duplication & Template Library",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-131",
+    "name": "Product Version Management",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-132",
+    "name": "Rollback & Recovery Management",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-133",
+    "name": "Change Impact Analysis",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-134",
+    "name": "Change Propagation & Dependency Control",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-135",
+    "name": "Product Retirement, Suspension & Archive",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-139",
+    "name": "Promotion & Campaign Directory",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-140",
+    "name": "Promotion Overview",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-141",
+    "name": "Promotion Lifecycle & Status Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-142",
+    "name": "Campaign Calendar & Timeline",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-144",
+    "name": "Promotion Alerts & Exception Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-145",
+    "name": "Promotion Approval Inbox",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-149",
+    "name": "Percentage & Fixed Discount Configurator",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-150",
+    "name": "Cart & Transaction Threshold Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-151",
+    "name": "Volume, Bulk & Tier Discount Configurator",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-152",
+    "name": "Time-Based & Seasonal Discount Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-153",
+    "name": "Customer, Membership & Segment Discount Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-154",
+    "name": "Payment Method, Bank & Partner Discount Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-155",
+    "name": "Special Price & Guest Offer Configurator",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-156",
+    "name": "Discount Limits, Guardrails & Commercial Controls",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-160",
+    "name": "Unique Code Generation & Batch Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-161",
+    "name": "Code Eligibility & Restriction Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-162",
+    "name": "Usage, Capacity & Frequency Control",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-163",
+    "name": "Validity, Date & Time Control",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-164",
+    "name": "Code Distribution & Assignment Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-166",
+    "name": "Code Security, Fraud & Exception Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-170",
+    "name": "Multi-Buy & Quantity Offer Configurator",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-171",
+    "name": "Cheapest / Lowest-Value Item Promotion",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-175",
+    "name": "Reward Selection, Substitution & Customer Choice",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-176",
+    "name": "Advanced Offer Guardrails & Conflict Controls",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-182",
+    "name": "Bundle Pricing & Commercial Model",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-183",
+    "name": "Bundle Availability, Capacity & Validation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-184",
+    "name": "Bundle Validity, Scheduling & Redemption Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-185",
+    "name": "Partner & External Product Bundle Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-186",
+    "name": "Revenue Allocation, Cost & Settlement Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-189",
+    "name": "Component Inventory & Availability Matrix",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-190",
+    "name": "Bundle Sellability & Dependency Rule Engine",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-191",
+    "name": "Capacity Pool & Reservation Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-192",
+    "name": "Dynamic Component Substitution Engine",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-193",
+    "name": "Dynamic Bundle Rule & Composition Engine",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-194",
+    "name": "Real-Time Availability & Checkout Validation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-195",
+    "name": "Bundle Availability by Channel, Venue & Partner",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-200",
+    "name": "CRM & Customer Segment Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-201",
+    "name": "Membership, Loyalty & Guest Eligibility",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-202",
+    "name": "Behavioral & Transaction Targeting",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-203",
+    "name": "Context, Location, Channel & Time Targeting",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-204",
+    "name": "Partner, B2B & Payment Eligibility",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-205",
+    "name": "Audience Preview, Reach & Eligibility Simulator",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-206",
+    "name": "Targeting Conflict, Frequency & Exclusion Controls",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-207",
+    "name": "AI Audience Discovery & Targeting Optimization",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-209",
+    "name": "Promotion Priority & Hierarchy Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-211",
+    "name": "Promotion Exclusion & Compatibility Matrix",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-212",
+    "name": "Discount Calculation & Application Sequence",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-213",
+    "name": "Best Offer & Customer Benefit Resolver",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-214",
+    "name": "Discount Cap & Maximum Benefit Controller",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-215",
+    "name": "Conflict Detection & Resolution Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-216",
+    "name": "Promotion Decision Trace & Transaction Explainer",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-220",
+    "name": "Redemption, Discount & Exposure Limit Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-222",
+    "name": "Threshold Actions & Automatic Suspension",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-225",
+    "name": "Campaign Financial & Commercial Simulator",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-226",
+    "name": "Campaign Experiment & A/B Test Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-229",
+    "name": "Campaign & Promotion Performance Explorer",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-235",
+    "name": "Incrementality, Attribution & Cannibalization Analysis",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-236",
+    "name": "AI Optimization & Next-Best-Action Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-243",
+    "name": "Roles, Authority, Delegation & Approval Limits",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-244",
+    "name": "SLA, Escalation, Reminder & Timeout Rules",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-247",
+    "name": "Versioning, Governance, Approval & Publication",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-251",
+    "name": "Workflow Exception, Failure & Recovery Center",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-256",
+    "name": "Process Optimization & Automation Opportunity Center",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-261",
+    "name": "Channel Pricing & Commercial Profile Assignment",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-262",
+    "name": "Inventory, Capacity & Channel Allocation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-263",
+    "name": "Channel Sales Schedule & Availability Windows",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-264",
+    "name": "Customer & Eligibility Rules by Channel",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-265",
+    "name": "Channel Sales Rules, Limits & Restrictions",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-269",
+    "name": "Channel Connection & Integration Manager",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-270",
+    "name": "Product, Price & Availability Synchronization",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-272",
+    "name": "Channel Allocation & Rebalancing Operations",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-273",
+    "name": "Channel Exceptions, Incidents & Recovery",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-276",
+    "name": "Channel Governance, SLA & Partner Control",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-280",
+    "name": "Resale Policy & Marketplace Settings",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-282",
+    "name": "Resale Pricing & Price Guardrails",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-283",
+    "name": "Resale Fees, Commission & Seller Proceeds",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-284",
+    "name": "Listing Approval & Moderation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-285",
+    "name": "Resale Inventory & Availability Management",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-286",
+    "name": "Listing Lifecycle, Expiry & Cancellation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-289",
+    "name": "Buyer Purchase & Resale Order Management",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-290",
+    "name": "Ticket Ownership Transfer Management",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-291",
+    "name": "Credential Revocation & Regeneration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-292",
+    "name": "Resale Fraud & Duplicate Sale Protection",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-293",
+    "name": "Capacity & Inventory Reconciliation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-294",
+    "name": "Seller Settlement & Payout Management",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-295",
+    "name": "Refunds, Disputes & Resale Exceptions",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-298",
+    "name": "My Tickets & Resale Marketplace Entry",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-299",
+    "name": "Resale Eligibility & Ticket Selection",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-300",
+    "name": "Create Listing & Resale Price Selection",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-301",
+    "name": "Fees, Seller Proceeds & Listing Confirmation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-303",
+    "name": "Official Resale Marketplace & Buyer Discovery",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-304",
+    "name": "Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-305",
+    "name": "Buyer Checkout, Inventory Hold & Secure Payment",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-306",
+    "name": "Resale Confirmation, Ownership Transfer & Ticket Delivery",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-307",
+    "name": "White-Label Marketplace Deployment & Experience Architecture",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-310",
+    "name": "Upgrade Eligibility & Qualification Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-311",
+    "name": "Upgrade Timing, Usage & Ticket Status Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-312",
+    "name": "Upgrade Financial Treatment & Price Difference Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-314",
+    "name": "Person-Type, Product & Entitlement Conversion Rules",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-315",
+    "name": "Bulk, Group & Assisted Upgrade Operations",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-316",
+    "name": "Upgrade Execution, Credential Regeneration & Channel Controls",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-317",
+    "name": "Upgrade History, Exception Management & Audit Explorer",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "PTR-024",
+    "name": "Partner Onboarding & Application Workflow",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-025",
+    "name": "Partner Contacts & User Administration",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-026",
+    "name": "Territory, Market & Distribution Rights",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-027",
+    "name": "Partner Brand, Venue & Business Scope Assignment",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-028",
+    "name": "Partner Documentation & Compliance Repository",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-029",
+    "name": "Partner Access, Roles & Permission Profile",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-030",
+    "name": "Partner Approval, Status & Lifecycle Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-031",
+    "name": "Partner 360° Profile, Readiness & AI Review",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-035",
+    "name": "Commission, Margin & Incentive Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-036",
+    "name": "Credit Limit & Exposure Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-037",
+    "name": "Deposit, Guarantee & Financial Security Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-039",
+    "name": "Commercial Allocation, Quota & Commitment Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-040",
+    "name": "Booking Limits, Commercial Exceptions & Approval",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-041",
+    "name": "Commercial Agreement 360°, Health & AI Review",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-043",
+    "name": "Partner Orders & Booking Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-044",
+    "name": "Reservations, Holds & Release Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-045",
+    "name": "Partner Cancellations, Refunds & Amendments",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-046",
+    "name": "Partner Statement & Account Activity",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-047",
+    "name": "Partner Reconciliation & Exception Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-048",
+    "name": "Commission Calculation & Settlement Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-049",
+    "name": "Partner Disputes, Cases & Service Management",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "SUP-010",
+    "name": "Customer 360° Service Profile",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-012",
+    "name": "Case Creation, Classification & Intelligent Routing",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-016",
+    "name": "Escalation, Collaboration & Internal Resolution",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-017",
+    "name": "Case Resolution, Closure & Customer Feedback",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-021",
+    "name": "Intelligent Routing, Skills & Assignment Engine",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-022",
+    "name": "SLA Policy & Service-Level Management",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-023",
+    "name": "Agent Workload, Availability & Workforce Control",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-025",
+    "name": "Quality Management & Agent Evaluation",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-026",
+    "name": "Customer Satisfaction, Feedback & Voice of Customer",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "CMS-022",
+    "name": "Data Processing Purpose & Lawful Basis Registry",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-025",
+    "name": "Cookie, Tracking & Digital Technology Registry",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-028",
+    "name": "Privacy Notice, Policy & Terms Version Management",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-032",
+    "name": "Customer Privacy, Consent & Preference 360°",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-034",
+    "name": "Data Subject / Customer Privacy Request Management",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-036",
+    "name": "Deletion, Anonymization & Restriction Operations",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-037",
+    "name": "Data Retention, Expiry & Legal Hold Operations",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-046",
+    "name": "Product, Event & Experience Association",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-047",
+    "name": "Waiver Trigger, Eligibility & Completion Rules",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-048",
+    "name": "Versioning, Effective Dates & Legal Change Control",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-052",
+    "name": "Participant Waiver Status & Tracking",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-053",
+    "name": "Digital Signing & Collection Operations",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-054",
+    "name": "Minor, Guardian & Group Consent Management",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-056",
+    "name": "Missing, Expired & Invalid Waiver Management",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-057",
+    "name": "On-Site Waiver & Exception Handling",
+    "platform": "P13",
+    "module": "Policy"
+   }
+  ]
+ },
+ {
+  "board": "BP-002",
+  "template": "split",
+  "components": [
+   "detailPanel",
+   "selectField",
+   "toggle"
+  ],
+  "screenCount": 137,
+  "platforms": [
+   "P08",
+   "P09",
+   "P10",
+   "P12",
+   "P13"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-146",
+    "name": "Access Area & Zone Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-147",
+    "name": "Attraction Access Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-149",
+    "name": "Gate & Lane Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-150",
+    "name": "Access Control Graphical Map Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-155",
+    "name": "Visual Access Rule Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-163",
+    "name": "Rule Simulation, Conflict Check & Publication",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-165",
+    "name": "Dynamic QR Security Profile Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-168",
+    "name": "BLE Beacon & Geofence Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-172",
+    "name": "Embedded Entitlement Payload Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-180",
+    "name": "RFID & NFC Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-183",
+    "name": "Media Compatibility, Testing & Publication",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-185",
+    "name": "Biometric Verification Profile Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-186",
+    "name": "Face Pass Enrollment Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-197",
+    "name": "Turnstile & Lane Behavior Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-198",
+    "name": "Validation Outcome & Guest Feedback Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-199",
+    "name": "Reader, Scanner & Peripheral Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-200",
+    "name": "Handheld & Mobile Access Device Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-202",
+    "name": "Device Software, Content & Remote Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-205",
+    "name": "Edge Node & Local Processing Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-206",
+    "name": "Offline Validation Policy Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-212",
+    "name": "Offline Simulation & Resilience Testing",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-215",
+    "name": "Group & B2B Admission Profile Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-232",
+    "name": "Operational Incident & Exception Workspace",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-236",
+    "name": "Visual Dynamic Policy Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-237",
+    "name": "Context, Time, Event & Capacity Policy Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-242",
+    "name": "Policy Simulation, Conflict & Impact Analysis",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-251",
+    "name": "Real-Time Security Response & Playbook Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-252",
+    "name": "Security Investigation & Evidence Workspace",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-268",
+    "name": "Group Package & Experience Builder",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-269",
+    "name": "Group Quotation Builder & Proposal Generation",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-273",
+    "name": "Group Booking 360° & Handover Workspace",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-275",
+    "name": "Group Operational Planning & Task Workspace",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-285",
+    "name": "Membership Product & Tier Builder",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-286",
+    "name": "Membership Eligibility & Qualification Rule Builder",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-287",
+    "name": "Validity, Activation & Expiry Configuration",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-288",
+    "name": "Membership Entitlement & Admission Benefit Builder",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-290",
+    "name": "Family, Household & Dependent Membership Configuration",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-292",
+    "name": "Renewal, Auto-Renewal & Membership Continuity Configuration",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-295",
+    "name": "Member 360° Membership Account Workspace",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-305",
+    "name": "Order Detail & Transaction Workspace",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-306",
+    "name": "Reservation & Hold Policy Configuration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-307",
+    "name": "Order & Reservation Status Lifecycle Configuration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-308",
+    "name": "Order Creation & Source/Channel Configuration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-315",
+    "name": "Order Amendment Workspace",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-316",
+    "name": "Amendment Eligibility & Policy Rule Builder",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-317",
+    "name": "Cancellation & Partial Cancellation Policy Configuration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-318",
+    "name": "Refund Policy & Refund Calculation Configuration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-321",
+    "name": "After-Sales Financial Settlement & Adjustment Workspace",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-326",
+    "name": "Multi-Payment, Split Tender & Payment Allocation Configuration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-335",
+    "name": "Virtual Ticket Identity & Master Record Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-345",
+    "name": "Digital QR & Barcode Ticket Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-346",
+    "name": "PDF, Printable & POS Ticket Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-347",
+    "name": "Apple Wallet Pass Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-348",
+    "name": "Google Wallet Pass Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-349",
+    "name": "RFID, NFC, Card & Wristband Media Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-350",
+    "name": "Digital Card, Membership & Wearable Designer",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-351",
+    "name": "Dynamic Fields, Data Mapping & Content Builder",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-355",
+    "name": "Virtual Ticket & Credential 360° Workspace",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "ADM-039",
+    "name": "Channel & Provider Configuration",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-040",
+    "name": "Sender Identity, Domain & Brand Configuration",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-049",
+    "name": "Price List Master Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-051",
+    "name": "Rate Structure Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-055",
+    "name": "Price Hierarchy & Inheritance Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-069",
+    "name": "Tax Profile & Jurisdiction Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-070",
+    "name": "Tax Rule & Treatment Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-072",
+    "name": "Fee Applicability & Charging Rule Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-076",
+    "name": "Price Breakdown, Calculation Simulation & Explainability",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-079",
+    "name": "Pricing Change Request & Workspace",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-084",
+    "name": "Pricing Publication & Effective-Date Scheduler",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-089",
+    "name": "Dynamic Pricing Strategy Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-090",
+    "name": "Demand, Occupancy & Availability Rule Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-091",
+    "name": "Booking Velocity & Time-to-Event Rule Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-109",
+    "name": "Pricing Simulation Studio",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-111",
+    "name": "A/B Pricing Experiment Studio",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-119",
+    "name": "Product Creation Workspace",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-120",
+    "name": "Lifecycle Status & Workflow Configuration",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-124",
+    "name": "Channel Publication & Availability",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-125",
+    "name": "Publication & Activation Scheduler",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-127",
+    "name": "AI Catalogue Builder & Configuration Review",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-129",
+    "name": "Approval Workflow Designer",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-130",
+    "name": "Approval Review & Decision Workspace",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-148",
+    "name": "Promotion Rule Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-157",
+    "name": "Rule Test, Simulation & AI Recommendation Workspace",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-159",
+    "name": "Coupon & Promo Code Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-169",
+    "name": "Buy X Get Y / BOGO Rule Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-172",
+    "name": "Fixed-Price & “N for X” Offer Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-173",
+    "name": "Gift, Free Product & Added-Value Offer Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-174",
+    "name": "Cross-Category Promotion Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-177",
+    "name": "Offer Simulation, Basket Trace & AI Optimization",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-179",
+    "name": "Bundle Definition & Setup",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-180",
+    "name": "Bundle Component Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-181",
+    "name": "Guest Choice & Build-Your-Own Bundle Designer",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-187",
+    "name": "Bundle Preview, Simulation & AI Recommendation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-197",
+    "name": "Dynamic Bundle Simulation & AI Optimization",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-199",
+    "name": "Eligibility Rule Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-210",
+    "name": "Promotion Stacking Rule Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-217",
+    "name": "Conflict Simulation & AI Optimization",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-219",
+    "name": "Campaign Budget & Financial Limit Setup",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-223",
+    "name": "Campaign Approval Workflow Designer",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-224",
+    "name": "Approval Inbox & Decision Workspace",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-239",
+    "name": "Visual Business Rule Builder",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-241",
+    "name": "Visual Workflow Designer",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-242",
+    "name": "Approval Matrix & Multi-Level Approval Configuration",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-245",
+    "name": "Trigger, Action & Cross-Module Orchestration Configuration",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-246",
+    "name": "Workflow Testing, Simulation & Impact Analysis",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-249",
+    "name": "Unified Approval Inbox & Decision Workspace",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-259",
+    "name": "Channel Creation & Profile Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-266",
+    "name": "Channel Fees, Payment & Fulfillment Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-267",
+    "name": "Channel Publication, Readiness & AI Validation",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-279",
+    "name": "Resale Eligibility Rule Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-281",
+    "name": "Listing Creation & Seller Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-287",
+    "name": "AI Resale Configuration & Marketplace Recommendations",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-309",
+    "name": "Upgrade & Conversion Path Builder",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-313",
+    "name": "Pro-Rata, Residual Value & Entitlement Credit Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "PTR-023",
+    "name": "Partner Profile & Organization Setup",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-033",
+    "name": "Agreement & Contract Terms Builder",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-034",
+    "name": "Partner Rate & Net Pricing Configuration",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-038",
+    "name": "Payment Terms, Billing & Account Configuration",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "SUP-013",
+    "name": "Case Investigation & Resolution Workspace",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-014",
+    "name": "Order, Booking & Ticket Service Workspace",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-015",
+    "name": "Refund, Compensation & Service Exception Workspace",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-018",
+    "name": "AI Customer Service Copilot & Knowledge Workspace",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-020",
+    "name": "Queue Configuration & Management",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "CMS-023",
+    "name": "Consent Purpose & Consent Type Builder",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-024",
+    "name": "Communication Preference & Marketing Permission Configuration",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-026",
+    "name": "Cookie Banner & Preference Center Designer",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-027",
+    "name": "Consent Capture Point & Customer Journey Configuration",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-029",
+    "name": "Minor, Guardian & Age-Based Privacy Configuration",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-030",
+    "name": "Privacy Configuration Testing, Approval & Publication",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-035",
+    "name": "Data Discovery, Access, Export & Correction Workspace",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-038",
+    "name": "Privacy Compliance, Exception & Investigation Workspace",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-042",
+    "name": "Waiver Template Library & Master Setup",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-043",
+    "name": "Digital Waiver & Form Builder",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-045",
+    "name": "Signatory, Signature & Guardian Rule Configuration",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-049",
+    "name": "Localization, Branding & Customer Experience Configuration",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-050",
+    "name": "Waiver Approval, Testing & Publication Workspace",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-055",
+    "name": "Waiver Verification & Validation Workspace",
+    "platform": "P13",
+    "module": "Policy"
+   }
+  ]
+ },
+ {
+  "board": "BP-003",
+  "template": "dashboard",
+  "components": [
+   "dataTable",
+   "metricTile"
+  ],
+  "screenCount": 115,
+  "platforms": [
+   "P08",
+   "P09",
+   "P10",
+   "P12",
+   "P13"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-144",
+    "name": "Access Control Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-154",
+    "name": "Access Rule Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-164",
+    "name": "Digital Credential Security Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-174",
+    "name": "Media & Credential Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-184",
+    "name": "Biometric Access Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-194",
+    "name": "Device & Gate Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-204",
+    "name": "Offline & Edge Operations Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-214",
+    "name": "Guest Journey Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-224",
+    "name": "Live Access Operations Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-234",
+    "name": "Dynamic Access Policy Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-243",
+    "name": "Policy Approval, Audit, Analytics & AI Optimization",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-244",
+    "name": "Access Security & Fraud Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-248",
+    "name": "Biometric & Identity Integrity Monitoring",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-249",
+    "name": "Relationship & Companion Fraud Monitoring",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-253",
+    "name": "Security Analytics, AI Detection & Governance",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-254",
+    "name": "Access Monitoring & Analytics Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-257",
+    "name": "Attendance & Admission Analytics",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-258",
+    "name": "Entry, Exit, Re-entry & Crossover Analytics",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-259",
+    "name": "Throughput, Queue & Validation Performance Analytics",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-260",
+    "name": "Validation Outcome & Rejection Analytics",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-263",
+    "name": "AI Access Intelligence, Forecasting & Executive Insights",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-264",
+    "name": "Group Sales Command Center",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-274",
+    "name": "Group Booking Operations Command Center",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-283",
+    "name": "Group Sales Analytics & AI Intelligence Center",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-284",
+    "name": "Membership & Annual Pass Command Center",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-294",
+    "name": "Member Operations Command Center",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-297",
+    "name": "Visit, Admission & Entitlement Usage Monitor",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-303",
+    "name": "Membership Analytics, Renewal Intelligence & AI Retention Center",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-304",
+    "name": "Order & Reservation Command Center",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-314",
+    "name": "Amendment & After-Sales Command Center",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-323",
+    "name": "Amendment History, Audit & After-Sales Analytics",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-324",
+    "name": "Payment & Order Financial Command Center",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-333",
+    "name": "Order Financial Analytics & AI Reconciliation Intelligence",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-334",
+    "name": "Virtual Ticket Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-344",
+    "name": "Media Design Studio Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-354",
+    "name": "Credential Operations Command Center",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-356",
+    "name": "Credential Generation & Issuance Monitor",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-363",
+    "name": "Ticket Media Analytics & AI Operations Intelligence",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "ADM-038",
+    "name": "Communication Service Command Center",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-046",
+    "name": "Provider Health, Usage & Cost Monitoring",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-048",
+    "name": "Commercial Pricing Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-058",
+    "name": "Pricing Rule Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-068",
+    "name": "Tax, Fee & Calculation Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-078",
+    "name": "Pricing Governance Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-085",
+    "name": "Pricing Distribution, Synchronization & Publication Monitor",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-088",
+    "name": "Dynamic Pricing Strategy Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-098",
+    "name": "AI Pricing Intelligence Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-100",
+    "name": "Weather Intelligence & Demand Impact Configuration",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-101",
+    "name": "Nearby Event, Exhibition & Local Demand Intelligence",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-102",
+    "name": "Competitor Pricing & Market Position Intelligence",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-104",
+    "name": "AI Demand Forecasting & Booking Curve Studio",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-105",
+    "name": "Price Elasticity & Revenue Response Intelligence",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-108",
+    "name": "Revenue Optimization Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-112",
+    "name": "Revenue & Demand Impact Forecasting",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-115",
+    "name": "Live Dynamic Price Execution & Deployment Monitor",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-116",
+    "name": "Dynamic Pricing Performance & Optimization Analytics",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-118",
+    "name": "Product Lifecycle Command Center",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-128",
+    "name": "Product Governance Command Center",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-137",
+    "name": "Governance Risk, AI Monitoring & Control Center",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-138",
+    "name": "Promotion Command Center Dashboard",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-143",
+    "name": "Promotion Channel & Publication Monitor",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-146",
+    "name": "Promotion Health & Performance Monitor",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-158",
+    "name": "Coupon & Promo Code Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-165",
+    "name": "Redemption Monitor & Code Lookup",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-167",
+    "name": "Redemption Analytics, Audit & AI Optimization",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-168",
+    "name": "Advanced Offer Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-178",
+    "name": "Bundle & Combo Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-188",
+    "name": "Dynamic Bundle Operations Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-196",
+    "name": "Bundle Availability Forecast, Alerts & Recovery",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-198",
+    "name": "Targeting & Eligibility Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-208",
+    "name": "Stacking & Conflict Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-218",
+    "name": "Campaign Governance & Budget Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-221",
+    "name": "Budget Consumption & Forecast Monitor",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-228",
+    "name": "Promotion Performance Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-230",
+    "name": "Redemption, Conversion & Funnel Analytics",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-231",
+    "name": "Discount, Margin & Profitability Analytics",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-232",
+    "name": "Bundle, BOGO & Advanced Offer Analytics",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-233",
+    "name": "Upsell, Cross-Sell & Attach-Rate Analytics",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-234",
+    "name": "Customer, Segment, Channel & Partner Analytics",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-237",
+    "name": "Executive Promotion Intelligence & Reporting Studio",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-238",
+    "name": "Rules & Workflow Command Center",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-248",
+    "name": "Workflow Operations Command Center",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-250",
+    "name": "Workflow Instance Monitor & Process Timeline",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-252",
+    "name": "SLA, Escalation & Bottleneck Monitor",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-253",
+    "name": "Automation Execution & Autonomous Action Monitor",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-254",
+    "name": "Cross-Module Orchestration Monitor",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-255",
+    "name": "Workflow Analytics & Process Performance",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-257",
+    "name": "AI Workflow Intelligence & Autonomous Governance Center",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-258",
+    "name": "Sales Channel Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-268",
+    "name": "Channel Operations Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-271",
+    "name": "Real-Time Channel Availability & Inventory Monitor",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-274",
+    "name": "Channel Performance & Commercial Analytics",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-277",
+    "name": "AI Channel Optimization & Intelligence Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-278",
+    "name": "Resale Marketplace Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-288",
+    "name": "Resale Operations Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-297",
+    "name": "Resale Analytics & AI Intelligence",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-302",
+    "name": "My Resale Listings & Seller Dashboard",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-308",
+    "name": "Upgrade & Conversion Command Center",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "PTR-022",
+    "name": "Partner Management Command Center",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-032",
+    "name": "Commercial Agreement Command Center",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-042",
+    "name": "Partner Operations Command Center",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-050",
+    "name": "Partner Performance Scorecard & Risk Monitoring",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "PTR-051",
+    "name": "Partner AI Intelligence & Relationship Optimization",
+    "platform": "P10",
+    "module": "Partners"
+   },
+   {
+    "id": "SUP-009",
+    "name": "Customer Service Command Center",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-019",
+    "name": "Contact Center Operations Command Center",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-024",
+    "name": "Escalation & Critical Case Monitor",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-027",
+    "name": "Service Analytics & Root-Cause Intelligence",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "SUP-028",
+    "name": "AI Contact Center Intelligence & Automation Studio",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "CMS-021",
+    "name": "Privacy & Consent Configuration Command Center",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-031",
+    "name": "Privacy Operations Command Center",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-040",
+    "name": "Privacy Analytics & AI Compliance Intelligence",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-041",
+    "name": "Waiver & Consent Command Center",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-051",
+    "name": "Waiver Operations Command Center",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-059",
+    "name": "Waiver Analytics, Compliance & Operational Insights",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-060",
+    "name": "AI Waiver Compliance & Risk Intelligence Center",
+    "platform": "P13",
+    "module": "Policy"
+   }
+  ]
+ },
+ {
+  "board": "BP-004",
+  "template": "list",
+  "components": [
+   "dataTable",
+   "searchField"
+  ],
+  "screenCount": 40,
+  "platforms": [
+   "P08",
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-109",
+    "name": "Menu Builder & POS Layout Designer",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-110",
+    "name": "Recipe & BOM Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-111",
+    "name": "Ingredient Substitution, Allergen & Nutrition",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-112",
+    "name": "Production Planning & Production Sheets",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-113",
+    "name": "Central Kitchen & Commissary Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-114",
+    "name": "Variants, Attributes, Barcode & RFID Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-115",
+    "name": "Category, Brand & Merchandise Hierarchy",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-116",
+    "name": "Merchandising & Product Presentation",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-117",
+    "name": "Product Import, Governance & AI Configuration Assistant",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-118",
+    "name": "Campaign & Audience Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-119",
+    "name": "Cross-Sell, Upsell & Recommendation Rules",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-120",
+    "name": "Omnichannel Commerce & Journey Configuration",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-121",
+    "name": "Personalized Offers & Guest Engagement",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-122",
+    "name": "POS Experience Dashboard",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-123",
+    "name": "POS Profile Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-124",
+    "name": "Layout & Journey Builder",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-125",
+    "name": "Product & Category Button Configuration",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-126",
+    "name": "Deployment, Preview & Audit",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-127",
+    "name": "Hardware & Peripherals Management",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-128",
+    "name": "Live Workstation Health Monitor",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-129",
+    "name": "Software, Configuration & Version Management",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-130",
+    "name": "Offline Policy & Rules Configuration",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-131",
+    "name": "Connectivity & Auto-Switch Settings",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-132",
+    "name": "Offline Transaction Monitor & Sync Queue",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-133",
+    "name": "Offline Alerts, Limits & Audit",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-134",
+    "name": "Kitchen & Preparation Stations",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   },
+   {
+    "id": "BO-135",
+    "name": "Order Routing & KDS/Printer Rules",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   },
+   {
+    "id": "BO-136",
+    "name": "F&B Global Settings & Controls",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   },
+   {
+    "id": "BO-137",
+    "name": "Recipe Consumption & Theoretical Inventory",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-138",
+    "name": "Production Execution & Batch Management",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-139",
+    "name": "Wastage, Spoilage, Returns & Write-Off",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-140",
+    "name": "Product Availability, 86 & Operational Food Safety",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-141",
+    "name": "Operational Alerts, AI Replenishment & Action Center",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-142",
+    "name": "Store Rules, Controls & Permissions",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-143",
+    "name": "Retail Global Settings & Controls",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "ADM-001",
+    "name": "Platform Login / MFA",
+    "platform": "P09",
+    "module": "Access & Identity"
+   },
+   {
+    "id": "ADM-004",
+    "name": "Platform Audit Log",
+    "platform": "P09",
+    "module": "Overview & Health"
+   },
+   {
+    "id": "ADM-005",
+    "name": "Tenant Directory",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   },
+   {
+    "id": "ADM-006",
+    "name": "Tenant Hierarchy Explorer",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   },
+   {
+    "id": "ADM-020",
+    "name": "Platform User Directory",
+    "platform": "P09",
+    "module": "Access & Identity"
+   }
+  ]
+ },
+ {
+  "board": "BP-005",
+  "template": "detail",
+  "components": [
+   "dataTable",
+   "detailPanel",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 38,
+  "platforms": [
+   "P08",
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-007",
+    "name": "Product Directory",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-008",
+    "name": "Product Detail & Variants",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-009",
+    "name": "Pricing Rules",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-011",
+    "name": "Packages & Bundles",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-012",
+    "name": "Membership Products",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-013",
+    "name": "Channel & Distribution",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-014",
+    "name": "Catalogue Publishing",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-017",
+    "name": "Capacity Management",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-025",
+    "name": "Chargebacks & Disputes",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-032",
+    "name": "Admission Profiles",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-037",
+    "name": "Offline Package Status",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-038",
+    "name": "Reconciliation Queue",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-039",
+    "name": "Shift Directory",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-040",
+    "name": "Variance Approval",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-041",
+    "name": "Cash Movements",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-042",
+    "name": "Banking & Safe",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-043",
+    "name": "Daily Reconciliation",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-044",
+    "name": "F&B Outlets",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-049",
+    "name": "Stock Levels",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-053",
+    "name": "Staff Directory",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-054",
+    "name": "Role Assignment",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-055",
+    "name": "Rota & Scheduling",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-056",
+    "name": "Time & Attendance",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-062",
+    "name": "Venue Profile",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-064",
+    "name": "Zones & Areas",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-065",
+    "name": "Venue Configuration",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-066",
+    "name": "Notification Settings",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-068",
+    "name": "Audit Log",
+    "platform": "P08",
+    "module": "Guests & Marketing"
+   },
+   {
+    "id": "BO-071",
+    "name": "Planned Maintenance",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-072",
+    "name": "Incident Log",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-073",
+    "name": "Lost & Found Register",
+    "platform": "P08",
+    "module": "Guests & Marketing"
+   },
+   {
+    "id": "ADM-009",
+    "name": "Tenant Billing & Invoicing",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   },
+   {
+    "id": "ADM-012",
+    "name": "Tenant Isolation & Resource Pool",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   },
+   {
+    "id": "ADM-018",
+    "name": "Localisation & Language Pack",
+    "platform": "P09",
+    "module": "Branding & Localisation"
+   },
+   {
+    "id": "ADM-027",
+    "name": "Database Migration Console",
+    "platform": "P09",
+    "module": "Releases & Environments"
+   },
+   {
+    "id": "ADM-028",
+    "name": "Environment Registry",
+    "platform": "P09",
+    "module": "Releases & Environments"
+   },
+   {
+    "id": "ADM-035",
+    "name": "Support & Escalation Console",
+    "platform": "P09",
+    "module": "Support & Communications"
+   },
+   {
+    "id": "ADM-037",
+    "name": "AI Provider & Credentials",
+    "platform": "P09",
+    "module": "AI"
+   }
+  ]
+ },
+ {
+  "board": "BP-006",
+  "template": "dashboard",
+  "components": [
+   "searchField",
+   "timeline"
+  ],
+  "screenCount": 23,
+  "platforms": [
+   "P08",
+   "P09",
+   "P12",
+   "P13"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-153",
+    "name": "Topology Validation & Publication",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-173",
+    "name": "Credential Security Simulation, Audit & Publication",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-193",
+    "name": "Biometric Simulation, Audit & Publication",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-213",
+    "name": "Edge Security, Audit & Deployment",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-223",
+    "name": "Journey Simulation, Audit & Publication",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-233",
+    "name": "Operations Audit, Shift Handover & Control Summary",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-235",
+    "name": "Access Attribute Catalog",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-302",
+    "name": "Member Lifecycle History, Audit & Case Timeline",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-343",
+    "name": "Virtual Ticket Architecture Testing, Governance & Audit",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-362",
+    "name": "Credential Security, Audit & Operational Evidence",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "ADM-121",
+    "name": "Bulk Product Creation & Catalogue Import",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-136",
+    "name": "Product Audit Trail & Change History",
+    "platform": "P09",
+    "module": "Catalogue"
+   },
+   {
+    "id": "ADM-147",
+    "name": "Promotion Audit, Activity & Version History",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-227",
+    "name": "Governance Audit, AI Risk & Launch Readiness",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-240",
+    "name": "Conditions, Decision Logic & Decision Tables",
+    "platform": "P09",
+    "module": "Platform"
+   },
+   {
+    "id": "ADM-260",
+    "name": "Product & Catalogue Assignment",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-275",
+    "name": "Channel Audit, Logs & Transaction Traceability",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "ADM-296",
+    "name": "Resale Audit & Ownership History",
+    "platform": "P09",
+    "module": "Commercial"
+   },
+   {
+    "id": "SUP-011",
+    "name": "Unified Interaction & Communication History",
+    "platform": "P12",
+    "module": "Support"
+   },
+   {
+    "id": "CMS-033",
+    "name": "Consent Evidence, History & Withdrawal Management",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-039",
+    "name": "Privacy Audit, Evidence & Compliance Reporting",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-044",
+    "name": "Dynamic Fields, Questions & Conditional Logic",
+    "platform": "P13",
+    "module": "Policy"
+   },
+   {
+    "id": "CMS-058",
+    "name": "Compliance Evidence, Audit & Waiver Repository",
+    "platform": "P13",
+    "module": "Policy"
+   }
+  ]
+ },
+ {
+  "board": "BP-007",
+  "template": "list",
+  "components": [
+   "cardList",
+   "primaryButton",
+   "searchField"
+  ],
+  "screenCount": 20,
+  "platforms": [
+   "P06"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "EMP-051",
+    "name": "Restaurant Service Command Center",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-052",
+    "name": "Floor Plan & Table Map",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-053",
+    "name": "Table & Seating Configuration",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-054",
+    "name": "Reservation Calendar & Timeline",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-055",
+    "name": "Create / Edit Reservation",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-056",
+    "name": "Walk-In & Waitlist Management",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-057",
+    "name": "Guest Profile & Dining History",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-058",
+    "name": "Live Table & Service Management",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-059",
+    "name": "Table Order, Bill & Payment Management",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-060",
+    "name": "Reservation & Table Performance",
+    "platform": "P06",
+    "module": "Floor Service"
+   },
+   {
+    "id": "EMP-061",
+    "name": "Retail Inventory Command Center",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-062",
+    "name": "Store Stock & SKU Availability",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-063",
+    "name": "Requisition & Smart Store Replenishment",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-064",
+    "name": "Store-to-Store & Warehouse Transfers",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-065",
+    "name": "Receiving & Store Put-Away",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-066",
+    "name": "Stock Count & Cycle Count Management",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-067",
+    "name": "Damage, Loss, Shrinkage & Stock Adjustment",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-068",
+    "name": "Reservation, Allocation & Omnichannel Inventory",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-069",
+    "name": "Barcode, RFID, Serialized Stock & Traceability",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   },
+   {
+    "id": "EMP-070",
+    "name": "Inventory Exceptions, AI Replenishment & Action Center",
+    "platform": "P06",
+    "module": "Stock on the Floor"
+   }
+  ]
+ },
+ {
+  "board": "BP-008",
+  "template": "detail",
+  "components": [
+   "confirmDialog",
+   "dataTable",
+   "destructiveButton",
+   "detailPanel",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 20,
+  "platforms": [
+   "P08",
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-010",
+    "name": "Promotions & Coupons",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-015",
+    "name": "Session Calendar",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-016",
+    "name": "Session Template",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-018",
+    "name": "Allocation & Holds",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-019",
+    "name": "Closures & Blackouts",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-022",
+    "name": "Order Detail",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-023",
+    "name": "Refunds & Exchanges",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-026",
+    "name": "Group Bookings",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-029",
+    "name": "Report Builder",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-030",
+    "name": "Work Order Verification",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-033",
+    "name": "Blacklist Management",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-047",
+    "name": "F&B Order Management",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-051",
+    "name": "Purchase Orders",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-052",
+    "name": "Goods Receipt",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-058",
+    "name": "Reporting Home",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-059",
+    "name": "Sales Reports",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-061",
+    "name": "Scheduled Reports",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-063",
+    "name": "Opening Hours & Calendar",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-070",
+    "name": "Work Orders",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "ADM-007",
+    "name": "Module & Feature Entitlement",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   }
+  ]
+ },
+ {
+  "board": "BP-009",
+  "template": "form",
+  "components": [
+   "primaryButton",
+   "textField"
+  ],
+  "screenCount": 17,
+  "platforms": [
+   "P02",
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "GST-009",
+    "name": "Review & Payment",
+    "platform": "P02",
+    "module": "Cart & Checkout"
+   },
+   {
+    "id": "GST-057",
+    "name": "Accessibility Information",
+    "platform": "P02",
+    "module": "Discovery & Browse"
+   },
+   {
+    "id": "ADM-008",
+    "name": "Subscription & Plan Management",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   },
+   {
+    "id": "ADM-011",
+    "name": "Licence & Seat Management",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   },
+   {
+    "id": "ADM-014",
+    "name": "Auto-Scaling Configuration",
+    "platform": "P09",
+    "module": "Infrastructure & Resilience"
+   },
+   {
+    "id": "ADM-015",
+    "name": "API Rate Limit & Quota Management",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   },
+   {
+    "id": "ADM-016",
+    "name": "White-Label Branding Management",
+    "platform": "P09",
+    "module": "Branding & Localisation"
+   },
+   {
+    "id": "ADM-017",
+    "name": "Domain & Certificate Management",
+    "platform": "P09",
+    "module": "Branding & Localisation"
+   },
+   {
+    "id": "ADM-019",
+    "name": "Global Configuration & Defaults",
+    "platform": "P09",
+    "module": "Branding & Localisation"
+   },
+   {
+    "id": "ADM-021",
+    "name": "Platform Role Management",
+    "platform": "P09",
+    "module": "Access & Identity"
+   },
+   {
+    "id": "ADM-022",
+    "name": "Release & Version Management",
+    "platform": "P09",
+    "module": "Releases & Environments"
+   },
+   {
+    "id": "ADM-024",
+    "name": "Release Notification Composer",
+    "platform": "P09",
+    "module": "Releases & Environments"
+   },
+   {
+    "id": "ADM-025",
+    "name": "Tenant Upgrade Scheduler",
+    "platform": "P09",
+    "module": "Releases & Environments"
+   },
+   {
+    "id": "ADM-026",
+    "name": "End-of-Support Notice Management",
+    "platform": "P09",
+    "module": "Releases & Environments"
+   },
+   {
+    "id": "ADM-030",
+    "name": "Infrastructure Sizing & Scaling Policy",
+    "platform": "P09",
+    "module": "Infrastructure & Resilience"
+   },
+   {
+    "id": "ADM-032",
+    "name": "WAF & Security Policy View",
+    "platform": "P09",
+    "module": "Security & Compliance"
+   },
+   {
+    "id": "ADM-036",
+    "name": "Platform Notification Broadcast",
+    "platform": "P09",
+    "module": "Support & Communications"
+   }
+  ]
+ },
+ {
+  "board": "BP-010",
+  "template": "list",
+  "components": [
+   "dataTable",
+   "detailPanel"
+  ],
+  "screenCount": 17,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-074",
+    "name": "Chart of Accounts",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-075",
+    "name": "Account Mapping",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-076",
+    "name": "Revenue Recognition",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-077",
+    "name": "FX Rates & Variances",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-078",
+    "name": "Requisitions",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-079",
+    "name": "Stock Count",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-080",
+    "name": "Stock Transfers",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-081",
+    "name": "Inventory Items",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-082",
+    "name": "Stock Movements",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-083",
+    "name": "Suppliers",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-084",
+    "name": "Approval Inbox",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-085",
+    "name": "Approval Request",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-086",
+    "name": "Approval Matrix",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-087",
+    "name": "Approval Delegations",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-088",
+    "name": "Approval Analytics",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-089",
+    "name": "Journal Entries",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-090",
+    "name": "Period Close",
+    "platform": "P08",
+    "module": "Orders & Money"
+   }
+  ]
+ },
+ {
+  "board": "BP-011",
+  "template": "list",
+  "components": [
+   "cardList",
+   "searchField"
+  ],
+  "screenCount": 12,
+  "platforms": [
+   "P02",
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "GST-005",
+    "name": "What's On",
+    "platform": "P02",
+    "module": "Discovery & Browse"
+   },
+   {
+    "id": "GST-008",
+    "name": "Tickets & Add-ons",
+    "platform": "P02",
+    "module": "Booking & Selection"
+   },
+   {
+    "id": "GST-012",
+    "name": "My Tickets",
+    "platform": "P02",
+    "module": "Account & Self-Service"
+   },
+   {
+    "id": "GST-024",
+    "name": "F&B – Browse & Order",
+    "platform": "P02",
+    "module": "In-venue Services"
+   },
+   {
+    "id": "BO-101",
+    "name": "Orders & Money",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-102",
+    "name": "Sell",
+    "platform": "P08",
+    "module": "Sell"
+   },
+   {
+    "id": "BO-103",
+    "name": "Access & Venue",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-104",
+    "name": "Food & Beverage",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   },
+   {
+    "id": "BO-105",
+    "name": "Stock & Supply",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-106",
+    "name": "People & Access Rights",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "BO-107",
+    "name": "Guests & Marketing",
+    "platform": "P08",
+    "module": "Guests & Marketing"
+   },
+   {
+    "id": "BO-108",
+    "name": "Venue Operations",
+    "platform": "P08",
+    "module": "Venue Operations"
+   }
+  ]
+ },
+ {
+  "board": "BP-012",
+  "template": "detail",
+  "components": [
+   "detailPanel",
+   "primaryButton"
+  ],
+  "screenCount": 10,
+  "platforms": [
+   "P02"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "GST-006",
+    "name": "Event / Exhibition Details",
+    "platform": "P02",
+    "module": "Discovery & Browse"
+   },
+   {
+    "id": "GST-007",
+    "name": "Select Date & Time",
+    "platform": "P02",
+    "module": "Booking & Selection"
+   },
+   {
+    "id": "GST-010",
+    "name": "Booking Confirmation",
+    "platform": "P02",
+    "module": "Cart & Checkout"
+   },
+   {
+    "id": "GST-013",
+    "name": "Ticket Details",
+    "platform": "P02",
+    "module": "Account & Self-Service"
+   },
+   {
+    "id": "GST-014",
+    "name": "Ticket Transfer",
+    "platform": "P02",
+    "module": "Ticketing"
+   },
+   {
+    "id": "GST-015",
+    "name": "Memberships",
+    "platform": "P02",
+    "module": "Membership, Loyalty & Value"
+   },
+   {
+    "id": "GST-025",
+    "name": "F&B – Order Tracking",
+    "platform": "P02",
+    "module": "In-venue Services"
+   },
+   {
+    "id": "GST-026",
+    "name": "Retail / Merchandise",
+    "platform": "P02",
+    "module": "Retail"
+   },
+   {
+    "id": "GST-030",
+    "name": "In-Venue Notifications",
+    "platform": "P02",
+    "module": "Engagement & Support"
+   },
+   {
+    "id": "GST-045",
+    "name": "Ticket Delivery & Sharing",
+    "platform": "P02",
+    "module": "Account & Self-Service"
+   }
+  ]
+ },
+ {
+  "board": "BP-013",
+  "template": "list",
+  "components": [
+   "dataTable",
+   "primaryButton"
+  ],
+  "screenCount": 5,
+  "platforms": [
+   "P04",
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "POS-016",
+    "name": "Till Configuration",
+    "platform": "P04",
+    "module": "Sell"
+   },
+   {
+    "id": "POS-017",
+    "name": "Cash In / Cash Out Operations",
+    "platform": "P04",
+    "module": "Sell"
+   },
+   {
+    "id": "POS-019",
+    "name": "Shift Templates & Policies",
+    "platform": "P04",
+    "module": "Sell"
+   },
+   {
+    "id": "POS-020",
+    "name": "Shift Exceptions & Alerts",
+    "platform": "P04",
+    "module": "Sell"
+   },
+   {
+    "id": "ADM-318",
+    "name": "Dead Letters",
+    "platform": "P09",
+    "module": "Platform Ops"
+   }
+  ]
+ },
+ {
+  "board": "BP-014",
+  "template": "dashboard",
+  "components": [
+   "chart",
+   "metricTile"
+  ],
+  "screenCount": 5,
+  "platforms": [
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "ADM-013",
+    "name": "Tenant Performance Monitor",
+    "platform": "P09",
+    "module": "Overview & Health"
+   },
+   {
+    "id": "ADM-029",
+    "name": "Deployment Monitor",
+    "platform": "P09",
+    "module": "Overview & Health"
+   },
+   {
+    "id": "ADM-031",
+    "name": "Security & Compliance Dashboard",
+    "platform": "P09",
+    "module": "Security & Compliance"
+   },
+   {
+    "id": "ADM-033",
+    "name": "Backup & DR Status",
+    "platform": "P09",
+    "module": "Infrastructure & Resilience"
+   },
+   {
+    "id": "ADM-034",
+    "name": "Archival Job Monitor",
+    "platform": "P09",
+    "module": "Infrastructure & Resilience"
+   }
+  ]
+ },
+ {
+  "board": "BP-015",
+  "template": "detail",
+  "components": [
+   "detailPanel",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 4,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-024",
+    "name": "Payment Exceptions",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-027",
+    "name": "Reissue & Media Replacement",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-028",
+    "name": "Refund Approval Queue",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-091",
+    "name": "AI Policy & Spend",
+    "platform": "P08",
+    "module": "Guests & Marketing"
+   }
+  ]
+ },
+ {
+  "board": "BP-016",
+  "template": "detail",
+  "components": [
+   "dataTable",
+   "detailPanel",
+   "primaryButton",
+   "searchField",
+   "secondaryButton"
+  ],
+  "screenCount": 4,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-031",
+    "name": "Asset Register",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-036",
+    "name": "Device Registry",
+    "platform": "P08",
+    "module": "Venue Operations"
+   },
+   {
+    "id": "BO-048",
+    "name": "Retail Products",
+    "platform": "P08",
+    "module": "Orders & Money"
+   },
+   {
+    "id": "BO-069",
+    "name": "Asset Register",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-017",
+  "template": "detail",
+  "components": [
+   "dataTable",
+   "detailPanel"
+  ],
+  "screenCount": 3,
+  "platforms": [
+   "P06",
+   "P08",
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "EMP-030",
+    "name": "Venue map",
+    "platform": "P06",
+    "module": "Operations"
+   },
+   {
+    "id": "BO-057",
+    "name": "Training & Certification",
+    "platform": "P08",
+    "module": "People & Access Rights"
+   },
+   {
+    "id": "ADM-010",
+    "name": "Usage Metering",
+    "platform": "P09",
+    "module": "Tenants & Licensing"
+   }
+  ]
+ },
+ {
+  "board": "BP-018",
+  "template": "list",
+  "components": [
+   "banner",
+   "dataTable"
+  ],
+  "screenCount": 3,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-001",
+    "name": "Queue Directory",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-098",
+    "name": "Qualifications",
+    "platform": "P08",
+    "module": "Access & Venue"
+   },
+   {
+    "id": "BO-099",
+    "name": "Session Manifest",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-019",
+  "template": "dashboard",
+  "components": [
+   "cardList",
+   "metricTile"
+  ],
+  "screenCount": 2,
+  "platforms": [
+   "P02"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "GST-001",
+    "name": "Home – Default",
+    "platform": "P02",
+    "module": "Discovery & Browse"
+   },
+   {
+    "id": "GST-039",
+    "name": "Profile",
+    "platform": "P02",
+    "module": "Account & Self-Service"
+   }
+  ]
+ },
+ {
+  "board": "BP-020",
+  "template": "list",
+  "components": [
+   "dataTable",
+   "detailPanel",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 2,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-021",
+    "name": "Order Search",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   },
+   {
+    "id": "BO-045",
+    "name": "Menu Management",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   }
+  ]
+ },
+ {
+  "board": "BP-021",
+  "template": "detail",
+  "components": [
+   "detailPanel"
+  ],
+  "screenCount": 2,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-050",
+    "name": "Stock Position & Valuation",
+    "platform": "P08",
+    "module": "Stock & Supply"
+   },
+   {
+    "id": "BO-067",
+    "name": "Integrations",
+    "platform": "P08",
+    "module": "Venue Operations"
+   }
+  ]
+ },
+ {
+  "board": "BP-022",
+  "template": "canvas",
+  "components": [
+   "banner",
+   "cartPanel",
+   "primaryButton",
+   "seatMap"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P01"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "WEB-007",
+    "name": "Interactive Seat Selection",
+    "platform": "P01",
+    "module": "Booking & Selection"
+   }
+  ]
+ },
+ {
+  "board": "BP-023",
+  "template": "canvas",
+  "components": [
+   "detailPanel",
+   "primaryButton",
+   "scanTarget",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P02"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "GST-049",
+    "name": "Interactive Seat Selection",
+    "platform": "P02",
+    "module": "Booking & Selection"
+   }
+  ]
+ },
+ {
+  "board": "BP-024",
+  "template": "canvas",
+  "components": [
+   "primaryButton",
+   "scanTarget",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P02"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "GST-055",
+    "name": "Dynamic QR Ticket",
+    "platform": "P02",
+    "module": "Account & Self-Service"
+   }
+  ]
+ },
+ {
+  "board": "BP-025",
+  "template": "wizard",
+  "components": [
+   "banner",
+   "numberField",
+   "primaryButton",
+   "timeline"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P04"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "POS-007",
+    "name": "Close Shift",
+    "platform": "P04",
+    "module": "Shift"
+   }
+  ]
+ },
+ {
+  "board": "BP-026",
+  "template": "list",
+  "components": [
+   "dataTable",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P04"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "POS-009",
+    "name": "Staff Roster",
+    "platform": "P04",
+    "module": "Shift"
+   }
+  ]
+ },
+ {
+  "board": "BP-027",
+  "template": "form",
+  "components": [
+   "numberField",
+   "primaryButton",
+   "selectField",
+   "textField",
+   "toggle"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-002",
+    "name": "Queue Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-028",
+  "template": "form",
+  "components": [
+   "detailPanel",
+   "numberField",
+   "primaryButton",
+   "secondaryButton",
+   "selectField",
+   "textField",
+   "toggle"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-003",
+    "name": "Queue Integration Setup",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-029",
+  "template": "form",
+  "components": [
+   "banner",
+   "cardList",
+   "primaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-004",
+    "name": "Manual Wait Time Entry",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-030",
+  "template": "dashboard",
+  "components": [
+   "chart",
+   "dataTable",
+   "metricTile",
+   "primaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-005",
+    "name": "Queue Monitor",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-031",
+  "template": "form",
+  "components": [
+   "dataTable",
+   "detailPanel",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-006",
+    "name": "Parking Configuration",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-032",
+  "template": "list",
+  "components": [
+   "confirmDialog",
+   "dataTable",
+   "destructiveButton",
+   "detailPanel",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-020",
+    "name": "F&B Order Management",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   }
+  ]
+ },
+ {
+  "board": "BP-033",
+  "template": "detail",
+  "components": [
+   "detailPanel",
+   "primaryButton",
+   "scanTarget",
+   "searchField",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-034",
+    "name": "Scan Activity",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-034",
+  "template": "detail",
+  "components": [
+   "dataTable",
+   "detailPanel",
+   "primaryButton",
+   "scanTarget",
+   "searchField",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-035",
+    "name": "Override Audit",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-035",
+  "template": "list",
+  "components": [
+   "dataTable",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "BO-046",
+    "name": "Kitchen Display",
+    "platform": "P08",
+    "module": "Food & Beverage"
+   }
+  ]
+ },
+ {
+  "board": "BP-036",
+  "template": "detail",
+  "components": [
+   "confirmDialog",
+   "dataTable",
+   "destructiveButton",
+   "detailPanel",
+   "primaryButton",
+   "scanTarget",
+   "searchField",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-060",
+    "name": "Attendance & Footfall",
+    "platform": "P08",
+    "module": "Venue Operations"
+   }
+  ]
+ },
+ {
+  "board": "BP-037",
+  "template": "none",
+  "components": [
+   "dataTable",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-092",
+    "name": "Venue Maps",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-038",
+  "template": "none",
+  "components": [
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-093",
+    "name": "Map Import & Labelling",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-039",
+  "template": "none",
+  "components": [
+   "detailPanel",
+   "primaryButton",
+   "secondaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-094",
+    "name": "Map Editor & Publish",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-040",
+  "template": "list",
+  "components": [
+   "dataTable",
+   "multiSelect",
+   "searchField"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-095",
+    "name": "Resources",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-041",
+  "template": "calendar",
+  "components": [
+   "banner",
+   "primaryButton",
+   "timeline"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-096",
+    "name": "Resource Calendar",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-042",
+  "template": "detail",
+  "components": [
+   "detailPanel",
+   "fileUpload",
+   "primaryButton",
+   "secondaryButton",
+   "textField"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-097",
+    "name": "Check Out & Check In",
+    "platform": "P08",
+    "module": "Access & Venue"
+   }
+  ]
+ },
+ {
+  "board": "BP-043",
+  "template": "dashboard",
+  "components": [
+   "banner",
+   "cardList",
+   "metricTile",
+   "treeNav"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P08"
+  ],
+  "patternAlreadyDrawn": false,
+  "screens": [
+   {
+    "id": "BO-100",
+    "name": "Venue Home",
+    "platform": "P08",
+    "module": "Venue Operations"
+   }
+  ]
+ },
+ {
+  "board": "BP-044",
+  "template": "wizard",
+  "components": [
+   "detailPanel",
+   "primaryButton"
+  ],
+  "screenCount": 1,
+  "platforms": [
+   "P09"
+  ],
+  "patternAlreadyDrawn": true,
+  "screens": [
+   {
+    "id": "ADM-023",
+    "name": "Staging Promotion & Approval",
+    "platform": "P09",
+    "module": "Releases & Environments"
+   }
+  ]
+ }
+]

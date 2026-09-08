@@ -49,6 +49,14 @@ screenStates:
       **The person may not see this.** Never rendered as empty — an empty list where the truth is
       a permission is a lie a person will act on, and they will ask why the data vanished.
     requiredWhen: the screen resolves a permission that some roles lack
+  - key: emptyNoEvents
+    required: false
+    requiredWhen: the screen renders a timeline it does not write to
+    description: >
+      **The record is complete and nothing has happened yet.** No action, and saying so is the
+      point: an audit trail that offers to create its first entry is offering to author
+      evidence. Distinct from `emptyFirstRun`, which is correct only where the person reading
+      the screen is the person who would create the first row.
   - key: error
     required: true
     description: The fetch failed. Says what is unaffected, because a person needs to know what they can still do.
@@ -245,6 +253,26 @@ components:
       homepage" is a confirmation; "Are you sure?" is not.
   - kind: progressIndicator
     states: [determinate, indeterminate, complete, failed]
+
+  - kind: publishGate
+    description: >
+      Making a draft live, with what it will affect named before it happens.
+    states: [draft, validating, blocked, publishable, publishing, published, overridden]
+    requiredWhen: >
+      the screen declares an operation that publishes, deploys, promotes or activates
+    notes: >
+      `blocked` names what is wrong and what to do — a disabled Publish with no reason is the
+      state operators escalate. `overridden` is a publish that went past a warning; it is
+      recorded, because the person who authorised it is the whole value of the record.
+      Saving is not publishing. A gate that shares its button with save will be pressed by
+      somebody who meant to save.
+
+      **A component, not a template.** `BO-094` is a canvas that publishes and `BO-153` is a
+      dashboard that publishes; a template can only be one of those.
+
+      `requiredWhen` keys off the declared operation, not the screen's subject. It needs no
+      `release*` exclusion: the seven hold-releasing operations were renamed to `relinquish*`
+      on 8 September, so `release` now means publish and nothing else.
 
   - kind: scanTarget
     description: Camera viewport for barcode, QR or NFC.

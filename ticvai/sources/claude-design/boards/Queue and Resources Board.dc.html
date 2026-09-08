@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="page">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  body{margin:0;background:#F2F5F9}
+  *{box-sizing:border-box;font-family:'Manrope',system-ui,sans-serif}
+  a{color:#0A4FB8;text-decoration:none;border-bottom:1px solid rgba(10,79,184,.28)}
+  a:hover{color:#083B8A;border-bottom-color:#083B8A}
+</style>
+</helmet>
+
+<div style="max-width:1400px;margin:0 auto;padding:34px 26px 90px;color:#0B1324">
+
+  <div style="display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap">
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#8494A8">phase 1 &middot; queue &amp; resources &middot; 7 september 2026</div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>P08 &middot; back office &middot; 1280 &times; 880 &middot; compact</div>
+      <div><a href="TICVAI%20Board%20Index.dc.html">board index</a> &middot; <a href="Pattern%20Boards.dc.html">pattern boards</a> &middot; <a href="Vocabulary%20Corrections.dc.html">vocabulary</a></div>
+    </div>
+  </div>
+
+  <h1 style="font-size:32px;font-weight:800;letter-spacing:-.028em;margin:7px 0 0;max-width:40ch">Seven frames, and a cleanup that stopped after one screen</h1>
+  <p style="font-size:12.5px;color:#5A6577;max-width:88ch;margin:14px 0 0;line-height:1.65;text-wrap:pretty">The two clusters that closed the pattern gap. Queue is four screens the build plan wanted drawn as <i>integration rather than implementation</i>, and <span style="font-family:'IBM Plex Mono',monospace">ADR-0012</span> already settles that: adaptor-first, a named vendor is one driver behind a stable inbound shape. Resource management is three screens carrying 47 requirements, drawn as they stand with the missing surface written down rather than invented. Both clusters turned up the same thing the vocabulary pass did &mdash; <b>the defect is in what the screens declare, not in how they look.</b></p>
+
+  <div style="display:flex;gap:12px;padding:14px 16px;margin-top:16px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+    <div><b>BO-003 was cleaned on 24 August and the check was never re-run.</b> Fifteen order operations came off it &mdash; create an order, apply a discount, exchange lines, refund &mdash; and its own notes record how they were found: deriving <span style="font-family:'IBM Plex Mono',monospace">emptyNoAccess</span> produced <i>"needs <span style="font-family:'IBM Plex Mono',monospace">ORDER_CREATE</span> to create orders"</i> on a screen called Queue Integration Setup, a sentence accurate to the data and absurd about the screen. <b>The other three queue screens still carry the residue.</b> <a href="#bo-005">BO-005 Queue Monitor</a> declares nineteen operations of which twelve are campaign management, and its empty state reads <i>"needs <span style="font-family:'IBM Plex Mono',monospace">MARKETING_MANAGE</span>, <span style="font-family:'IBM Plex Mono',monospace">MARKETING_SEND</span> to manage marketings"</i>. Same absurdity, second screen, still there.</div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:24px;align-items:end;padding:18px 20px;margin-top:16px;background:#0B1324;border-radius:12px;color:#DCE8F7">
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">frames here</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#fff">7</span><span style="font-size:12px;color:#9FB6CF">7 patterns closed</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">BP-018, 027, 028, 030, 040, 041, 042. The pattern gap is closed to the strays.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">operations declared</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#E0A03A">56</span><span style="font-size:12px;color:#9FB6CF">on 4 queue screens</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">Twenty-eight are queue operations. The other 28 are catalogue, seating and campaigns.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">resource surface</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#8FE3FF">3</span><span style="font-size:12px;color:#9FB6CF">screens · 47 requirements</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">Five more named in the gap below, each one something the three already reference.</div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#7FA3C9">vendor question</div>
+      <div style="display:flex;align-items:baseline;gap:7px"><span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;line-height:1;color:#fff">1</span><span style="font-size:12px;color:#9FB6CF">screen at risk</span></div>
+      <div style="font-size:11px;line-height:1.5;color:#9FB6CF">Not four. ADR-0012 makes 001&ndash;003 ours whoever wins <span style="font-family:'IBM Plex Mono',monospace">CF-33a</span>.</div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">01 &mdash; queue &middot; drawn as integration &middot; 4 frames</div>
+
+    <div id="bo-001" data-screen-label="BO-001" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-018 &middot; BO-001</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Queue Directory</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">list</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">dataTable &middot; banner</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">19 operations declared</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">See every queue in the venue and whether its data is arriving. <b>The source column is the screen</b> &mdash; a queue on the manual adaptor is configured and working, and showing it as <i>no feed</i> makes the health view lie.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Access &amp; venue &middot; queue management</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-001 &middot; 14 queues &middot; QUEUE_VIEW</span></div>
+
+          <div style="flex:none;display:flex;gap:10px;padding:13px 18px;border-bottom:1px solid #E8ECF3;background:#FFFBF0">
+            <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.55"><b>Two feeds have gone quiet.</b> Splash Canyon last read 14 minutes ago against a 60-second interval; Sky Tower turnstile count stopped at 11:42. <span style="color:#8A6D00">Both queues are still open and showing a wait that is now a guess.</span></div>
+            <div style="flex:none;display:flex;align-items:center;gap:8px"><div style="height:28px;padding:0 11px;border-radius:7px;background:#fff;border:1px solid #E0C98A;display:flex;align-items:center;font-size:11px;font-weight:700;color:#8A6D00">Set manual wait</div></div>
+          </div>
+
+          <div style="flex:none;display:flex;align-items:center;gap:8px;padding:12px 18px;border-bottom:1px solid #E8ECF3">
+            <div style="height:30px;padding:0 12px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">All 14</div>
+            <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Open 11</div>
+            <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">Paused 2</div>
+            <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #E0C98A;background:#FFFBF0;display:flex;align-items:center;font-size:11.5px;font-weight:700;color:#8A6D00">Feed quiet 2</div>
+            <div style="margin-left:auto;height:30px;padding:0 13px;border-radius:8px;background:#0D6EFD;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">Create queue</div>
+          </div>
+
+          <div style="flex:none;display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;border-bottom:1px solid #E8ECF3;background:#FAFBFD;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8494A8"><div>queue</div><div>source</div><div style="text-align:right">wait</div><div>feed</div><div>status</div><div style="text-align:right">waiting</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+
+            <div style="display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFDF7"><div><div style="font-weight:800">Splash Canyon</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Water park &middot; ride</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">sensor API</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#B98900">45m</div><div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#E0A03A;flex:none"></span><span style="font-size:11px;color:#8A6D00;font-weight:700">quiet 14m</span></div><div><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">Open</span></div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px">312</div></div>
+
+            <div style="display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><div><div style="font-weight:700;color:#26303F">Sky Tower</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Central &middot; observation deck</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">turnstile count</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#B98900">20m</div><div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#E0A03A;flex:none"></span><span style="font-size:11px;color:#8A6D00;font-weight:700">quiet 27m</span></div><div><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">Open</span></div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px">88</div></div>
+
+            <div style="display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><div><div style="font-weight:700;color:#26303F">Dragon Coaster</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Adventure &middot; ride</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">MQTT</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">55m</div><div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#0E9F6E;flex:none"></span><span style="font-size:11px;color:#5A6577">4s ago</span></div><div><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">Open</span></div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px">470</div></div>
+
+            <div style="display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><div><div style="font-weight:700;color:#26303F">Guest services desk</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Entry plaza &middot; service</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#0A4FB8;font-weight:600">manual</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">10m</div><div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#8494A8;flex:none"></span><span style="font-size:11px;color:#5A6577">set by hand &middot; 09:15</span></div><div><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">Open</span></div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8494A8">&mdash;</div></div>
+
+            <div style="display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><div><div style="font-weight:700;color:#26303F">Character breakfast</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Riverside &middot; virtual queue</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">vendor poll</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">&mdash;</div><div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#0E9F6E;flex:none"></span><span style="font-size:11px;color:#5A6577">31s ago</span></div><div><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">Virtual</span></div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px">126</div></div>
+
+            <div style="display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><div><div style="font-weight:700;color:#26303F">Rapids &middot; north lane</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Water park &middot; ride</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">CV camera</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;color:#8494A8">&mdash;</div><div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#8494A8;flex:none"></span><span style="font-size:11px;color:#5A6577">disabled &middot; test failed</span></div><div><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#F1F4F8;color:#5A6577">Paused</span></div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8494A8">&mdash;</div></div>
+
+            <div style="display:grid;grid-template-columns:1.6fr 1.15fr 92px 1.05fr 96px 74px;gap:12px;padding:9px 18px;font-size:11.5px;align-items:baseline"><div><div style="font-weight:700;color:#26303F">Kids' zone entry</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Family &middot; capacity gate</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">webhook</div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">5m</div><div style="display:flex;align-items:center;gap:6px"><span style="width:7px;height:7px;border-radius:4px;background:#0E9F6E;flex:none"></span><span style="font-size:11px;color:#5A6577">2s ago</span></div><div><span style="font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">Open</span></div><div style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:11px">41</div></div>
+          </div>
+          <div style="flex:none;padding:10px 18px;border-top:1px solid #E8ECF3;background:#FAFBFD;font-size:11px;color:#5A6577">Seven sources in one column, and <b>manual is a valid end state</b> rather than a configuration nobody finished. Cursor pagination.</div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">A directory that can create an event</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">Nineteen operations are declared here. Six are catalogue &mdash; <span style="font-family:'IBM Plex Mono',monospace">createEvent</span>, <span style="font-family:'IBM Plex Mono',monospace">createPerformances</span>, <span style="font-family:'IBM Plex Mono',monospace">updateEvent</span>, <span style="font-family:'IBM Plex Mono',monospace">getEvent</span>, <span style="font-family:'IBM Plex Mono',monospace">listEvents</span>, <span style="font-family:'IBM Plex Mono',monospace">listPerformances</span> &mdash; on a screen whose purpose is one sentence about whether data is arriving. This is the residue the 24 August pass took off <a href="#bo-003">BO-003</a> and did not take off here.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">declared &middot; 19 &middot; queue 13 &middot; catalogue 6<br>drawn against &middot; 6</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The fallback cannot need the feed</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The error state reads <i>Queue service unavailable. Manual wait times can still be set.</i> Drawn as a working control in the banner, because a fallback that lives behind the thing that failed is not one.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">states &middot; loading &middot; emptyFirstRun<br>emptyNoResults &middot; emptyNoAccess &middot; error</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Ninety-three screens hung off this one</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">It was the declared entry point to the whole back office until 20 August, which is why 93 screens were unreachable. Now reached from <span style="font-family:'IBM Plex Mono',monospace">BO-100</span> through its section.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">exits &middot; BO-002 &middot; BO-003 &middot; BO-004 &middot; BO-005<br>navigation &middot; inferred</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; list &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; dataTable &middot; banner &nbsp; <b style="color:#4A5566;font-weight:600">PERMISSION</b> &middot; QUEUE_VIEW &nbsp; <b style="color:#4A5566;font-weight:600">MODULE</b> &middot; queue</div>
+        <div><b style="color:#4A5566;font-weight:600">READS</b> &middot; listQueues &middot; listQueueFeeds &middot; getQueueFeedHealth &middot; getWaitTimes &middot; listQueueEntries</div>
+        <div><b style="color:#4A5566;font-weight:600">WRITES</b> &middot; createQueue &middot; updateQueue &middot; setQueueStatus &middot; setWaitTime &middot; configureQueueFeed &middot; testQueueFeed &middot; callNextParties</div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">6 catalogue operations to remove &middot; same residue class as BO-003 (corrected 24 Aug)</span></div>
+      </div>
+    </div>
+
+    <div id="bo-002" data-screen-label="BO-002" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-027 &middot; BO-002</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Queue Configuration</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">form</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">5 components</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">drawn 26 Aug &middot; seat-2c</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Create a queue and set how it behaves. Five fields, and <b>the redemption window is the one that decides whether a virtual queue works</b> &mdash; too short and a guest across the park loses their place, too long and the ride runs empty.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">New queue</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-002 &middot; QUEUE_MANAGE</span></div>
+          <div style="flex:1;display:flex;min-height:0">
+            <div style="flex:1;min-width:0;padding:22px 26px;display:flex;flex-direction:column;gap:18px;overflow:hidden">
+
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:11.5px;font-weight:700;color:#3D4756">Name</div>
+                <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;padding:0 12px;font-size:12.5px">Dragon Coaster &mdash; single rider</div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:11.5px;font-weight:700;color:#3D4756">Attraction or resource</div>
+                <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:12.5px"><span>Dragon Coaster &middot; Adventure</span><span style="color:#8494A8;font-size:10px">&#9662;</span></div>
+                <div style="font-size:10.5px;color:#8494A8">One queue may serve a ride, a restaurant or a bookable resource.</div>
+              </div>
+
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="font-size:11.5px;font-weight:700;color:#3D4756">Capacity per call</div>
+                  <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px">24</div>
+                  <div style="font-size:10.5px;color:#8494A8">Parties, not guests. A party of six takes six seats.</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="font-size:11.5px;font-weight:700;color:#3D4756">Redemption window</div>
+                  <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px"><span>15</span><span style="font-size:11px;color:#8494A8">minutes</span></div>
+                  <div style="font-size:10.5px;color:#8494A8">How long after being called before the entry expires.</div>
+                </div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:14px 16px;border:1px solid #E8ECF3;border-radius:11px;background:#FAFBFD">
+                <div style="flex:none;width:38px;height:22px;border-radius:12px;background:#0E9F6E;padding:2px;display:flex;justify-content:flex-end"><div style="width:18px;height:18px;border-radius:9px;background:#fff"></div></div>
+                <div><div style="font-size:12px;font-weight:700">Guests may join from the app</div><div style="font-size:11px;color:#5A6577;line-height:1.55;margin-top:2px">A virtual queue. Turning this on means a guest holds a place without standing in it, which is a different operation for the staff at the gate &mdash; they are checking a credential rather than counting a line.</div></div>
+              </div>
+
+              <div style="display:flex;gap:11px;padding:13px 15px;border:1px solid #BBD8F5;background:#F2F7FD;border-radius:11px">
+                <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+                <div style="font-size:11.5px;color:#194975;line-height:1.6"><b>The wait time is not set here.</b> This form defines behaviour; the feed that supplies the number is <a href="#bo-003">BO-003</a>, and a hand-set number is BO-004. Three screens, deliberately, because the person configuring a queue and the person fixing a broken sensor at 11:40 on a Saturday are not the same person.</div>
+              </div>
+
+              <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:16px;border-top:1px solid #EDF1F6">
+                <div style="height:36px;padding:0 18px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;font-size:12.5px;font-weight:800">Save</div>
+                <div style="height:36px;padding:0 16px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:12.5px;font-weight:700;color:#5A6577">Cancel</div>
+                <div style="margin-left:auto;font-size:11px;color:#8494A8">Save failed states name the field. Values are never silently dropped.</div>
+              </div>
+            </div>
+
+            <div style="flex:none;width:360px;background:#FAFBFD;border-left:1px solid #E8ECF3;padding:20px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:#8494A8">what this queue will do</div>
+              <div style="background:#fff;border:1px solid #E8ECF3;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Calls</span><span style="font-weight:700">24 parties at a time</span></div>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Expiry</span><span style="font-weight:700">15 minutes after call</span></div>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Joinable from</span><span style="font-weight:700">App and gate</span></div>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Feed</span><span style="font-weight:700;color:#B98900">not configured</span></div>
+                <div style="padding-top:9px;border-top:1px solid #EDF1F6;font-size:11px;color:#5A6577;line-height:1.55">A queue saves without a feed and opens on manual. <b>Next step is offered, not forced.</b></div>
+              </div>
+              <div style="background:#fff;border:1px solid #F0DFB8;border-radius:11px;padding:14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12px;font-weight:800;color:#8A6D00">Seat recommendation, on a queue form</div>
+                <div style="font-size:11px;color:#5A4A20;line-height:1.55">This screen declares <span style="font-family:'IBM Plex Mono',monospace">recommendSeats</span> and <span style="font-family:'IBM Plex Mono',monospace">getSeatAvailability</span> against the seating contract, plus <span style="font-family:'IBM Plex Mono',monospace">cancelPerformance</span> and <span style="font-family:'IBM Plex Mono',monospace">updatePerformance</span>. Fourteen operations for a five-field form. Not drawn.</div>
+              </div>
+              <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.8">entry &middot; queueId, performanceId from BO-001<br>cold entry &middot; resolves from session</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Four patterns for four consecutive screens</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">BO-001 is <span style="font-family:'IBM Plex Mono',monospace">list</span>, BO-002 and BO-003 are both <span style="font-family:'IBM Plex Mono',monospace">form</span> and count as two patterns because their component sets differ, BO-005 is <span style="font-family:'IBM Plex Mono',monospace">dashboard</span>. Four pattern numbers on one module of four screens is what put this cluster in the gap at all &mdash; <b>not four unusual screens, one module nobody had drawn.</b></div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">closes &middot; BP-018 BP-027 BP-028 BP-030<br>module &middot; queue &middot; capability C05</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Already drawn once</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Frame <span style="font-family:'IBM Plex Mono',monospace">seat-2c</span> on Seat Board 2 draws this screen and names it on its own face. This frame is the pack-fidelity version, not a replacement.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">wireframe status &middot; designed<br>generated fallback &middot; exists</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">emptyFirstRun: not applicable</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Correctly declared. A create form has no first-run empty, and saying so is better than a state nobody wrote &mdash; the defect <a href="Vocabulary%20Corrections.dc.html#d5">defect 5</a> found on eleven audit trails.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">states &middot; loading &middot; emptyNoAccess &middot; error<br>module gate &middot; queue not licensed</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; form &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; textField &middot; selectField &middot; numberField &times;2 &middot; toggle &middot; primaryButton</div>
+        <div><b style="color:#4A5566;font-weight:600">WRITES</b> &middot; createQueue &middot; updateQueue &middot; setQueueStatus &middot; setWaitTime &middot; callNextParties</div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">4 catalogue + 2 seating operations to remove &middot; 14 declared, 5 drawn against</span></div>
+      </div>
+    </div>
+
+    <div id="bo-003" data-screen-label="BO-003" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-028 &middot; BO-003</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Queue Integration Setup</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">form</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">7 components</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">4 operations, all queue</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Connect a queue to an on-site system, or leave it on manual entry. <b>The best-declared screen in the cluster</b>, and the one whose cleanup nobody carried across &mdash; four operations, every component annotated, and the test result treated as the point of the screen rather than a confirmation toast.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Splash Canyon &middot; feed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-003 &middot; ADR-0012 adaptor-first &middot; QUEUE_MANAGE</span></div>
+          <div style="flex:1;display:flex;min-height:0">
+
+            <div style="flex:none;width:498px;border-right:1px solid #E8ECF3;padding:20px 22px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:11.5px;font-weight:700;color:#3D4756">Source</div>
+                <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:12.5px"><span>Sensor API</span><span style="color:#8494A8;font-size:10px">&#9662;</span></div>
+                <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:2px">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8;font-weight:600">sensor API</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px;border-radius:5px;background:#F1F4F8;color:#5A6577">manual</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px;border-radius:5px;background:#F1F4F8;color:#5A6577">webhook</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px;border-radius:5px;background:#F1F4F8;color:#5A6577">MQTT</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px;border-radius:5px;background:#F1F4F8;color:#5A6577">vendor poll</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px;border-radius:5px;background:#F1F4F8;color:#5A6577">turnstile count</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;padding:3px 7px;border-radius:5px;background:#F1F4F8;color:#5A6577">CV camera</span>
+                </div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:11.5px;font-weight:700;color:#3D4756">Endpoint or topic</div>
+                <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px;color:#3D4756">https://sensors.venue.local/v2/lanes/sc-01</div>
+                </div>
+
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:11.5px;font-weight:700;color:#3D4756">Credential reference</div>
+                <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:11.5px"><span>kv://venue-01/queue/sensor-api</span><span style="font-size:9.5px;padding:2px 6px;border-radius:4px;background:#E8F7F0;color:#0A6B49;font-weight:600">vault ref</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5"><b>A key vault reference, never the secret.</b> A secret typed into a form ends up in a screenshot.</div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:11.5px;font-weight:700;color:#3D4756">Expected interval</div>
+                <div style="height:38px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-family:'IBM Plex Mono',monospace;font-size:12.5px"><span>60</span><span style="font-size:11px;color:#8494A8">seconds</span></div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.5">Drives the went-quiet alarm. <b>Too tight and a duty manager learns to ignore it.</b></div>
+              </div>
+
+              <div style="display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border:1px solid #E0C98A;border-radius:11px;background:#FFFBF0">
+                <div style="flex:none;width:38px;height:22px;border-radius:12px;background:#D8DEE7;padding:2px;display:flex"><div style="width:18px;height:18px;border-radius:9px;background:#fff"></div></div>
+                <div><div style="font-size:12px;font-weight:700;color:#5A4A20">Enabled</div><div style="font-size:11px;color:#5A4A20;line-height:1.55;margin-top:2px">Disabled by default. <b>A feed goes live only after a passing test</b> &mdash; two of the five checks below are still failing.</div></div>
+              </div>
+
+              <div style="margin-top:auto;display:flex;align-items:center;gap:10px;padding-top:14px;border-top:1px solid #EDF1F6">
+                <div style="height:36px;padding:0 16px;border-radius:9px;border:1.5px solid #0D6EFD;color:#0A4FB8;background:#fff;display:flex;align-items:center;font-size:12.5px;font-weight:800">Test connection</div>
+                <div style="height:36px;padding:0 18px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;font-size:12.5px;font-weight:800">Save</div>
+                <div style="margin-left:auto;font-size:10.5px;color:#8494A8;text-align:right;line-height:1.4">Save failed keeps<br>the test result on screen</div>
+              </div>
+            </div>
+
+            <div style="flex:1;min-width:0;background:#FAFBFD;padding:20px 22px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+              <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+                <div style="font-size:13px;font-weight:800;letter-spacing:-.015em">Feed test &middot; 11:47:02</div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">testQueueFeed &middot; one exchange</div>
+              </div>
+
+              <div style="flex:none;display:flex;flex-direction:column;gap:5px">
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 13px;background:#fff;border:1px solid #E8ECF3;border-radius:9px"><span style="width:16px;height:16px;border-radius:9px;background:#0E9F6E;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800">&#10003;</span><span style="font-size:12px;font-weight:700;flex:1">Reachable</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">142 ms</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 13px;background:#fff;border:1px solid #E8ECF3;border-radius:9px"><span style="width:16px;height:16px;border-radius:9px;background:#0E9F6E;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800">&#10003;</span><span style="font-size:12px;font-weight:700;flex:1">Credential accepted</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">200</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 13px;background:#fff;border:1px solid #E8ECF3;border-radius:9px"><span style="width:16px;height:16px;border-radius:9px;background:#0E9F6E;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:10px;font-weight:800">&#10003;</span><span style="font-size:12px;font-weight:700;flex:1">Payload parsed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">JSON &middot; 4 fields</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 13px;background:#FFFBF0;border:1.5px solid #E0C98A;border-radius:9px"><span style="width:16px;height:16px;border-radius:9px;background:#E0A03A;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800">!</span><span style="font-size:12px;font-weight:800;flex:1;color:#5A4A20">Reading mapped</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">1 of 2 unmapped</span></div>
+                <div style="display:flex;align-items:center;gap:10px;padding:6px 13px;background:#FFFBF0;border:1.5px solid #E0C98A;border-radius:9px"><span style="width:16px;height:16px;border-radius:9px;background:#E0A03A;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;font-weight:800">!</span><span style="font-size:12px;font-weight:800;flex:1;color:#5A4A20">Interval plausible</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">sample gap 210s</span></div>
+              </div>
+
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:11px;padding:11px 15px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12px;font-weight:800">Mapped sample reading</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px">
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">waitMinutes</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600">45</span></div>
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">partiesWaiting</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600">312</span></div>
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">observedAt</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600">11:43:31Z</span></div>
+                  <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#B98900">lane_state</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;font-weight:600;color:#8A6D00">unmapped</span></div>
+                </div>
+                <div style="padding-top:7px;border-top:1px solid #EDF1F6;font-size:11px;color:#5A4A20;line-height:1.5"><b>Reachable, returning a shape nobody mapped, looks like silence rather than an error</b> &mdash; so the unmapped field is named, not counted.</div>
+              </div>
+
+              <div style="flex:none;height:152px;background:#0B1324;border-radius:11px;padding:11px 15px;font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.6;color:#9FB6CF;overflow:hidden">
+                <div style="color:#6B7484">raw payload &middot; last exchange</div>
+                <div style="white-space:pre">{</div>
+                <div style="white-space:pre;color:#8FE3FF">  "lane": "sc-01",</div>
+                <div style="white-space:pre;color:#8FE3FF">  "wait_min": 45,</div>
+                <div style="white-space:pre;color:#8FE3FF">  "count": 312,</div>
+                <div style="white-space:pre;color:#8FE3FF">  "ts": "2026-09-07T11:43:31Z",</div>
+                <div style="white-space:pre;color:#E0A03A">  "lane_state": "surge_hold"</div>
+                <div style="white-space:pre">}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#194975">The vendor question, answered in principle</div>
+            <div style="font-size:11.5px;color:#194975;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">ADR-0012</span> is adaptor-first: <b>a named vendor is a driver behind a stable inbound shape</b>, so adding one is configuration plus a driver rather than a core change. <i>Vendor poll</i> is one of seven sources in the select above. <span style="font-family:'IBM Plex Mono',monospace">CF-33a</span> is deliberately late and it does not block this screen, BO-001 or BO-002 &mdash; <b>it blocks only <a href="#bo-005">BO-005</a>.</b></div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1E5AA8;line-height:1.7">see &middot; ADR-0012, CF-33, CF-33a<br>sources &middot; 7 &middot; manual is a valid end state</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Fifteen order operations, removed</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Create an order, apply a discount, exchange lines, hold, refund &mdash; all attached to a queue screen by module resemblance and taken off on 24 August. <b>A screen that does not handle money should not be able to move it.</b></div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">corrected &middot; 24 August<br>class &middot; CF-87 &middot; requiresModule was ticketing</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Found by deriving a sentence</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The residue surfaced because <span style="font-family:'IBM Plex Mono',monospace">emptyNoAccess</span> generated <i>"needs ORDER_CREATE to create orders"</i> here. Accurate to the data, absurd about the screen, and that is what made it visible.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">still unrun on &middot; BO-001 BO-002 BO-005<br>cold entry &middot; carries a stray orderId</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; form &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; selectField &middot; textField &times;2 &middot; numberField &middot; secondaryButton &middot; detailPanel &middot; toggle &middot; primaryButton</div>
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; configureQueueFeed &middot; testQueueFeed &middot; getQueueFeedHealth &middot; listQueueFeeds <span style="color:#0A6B49">&mdash; four, all queue</span></div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">entryState still declares orderId from deepLink, and a coldEntry about refunded orders &mdash; residue of the removed 15</span></div>
+      </div>
+    </div>
+
+    <div id="bo-005" data-screen-label="BO-005" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-030 &middot; BO-005</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Queue Monitor</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">dashboard</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">metricTile &middot; dataTable &middot; chart</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FEE9EA;color:#A32833">12 of 19 are campaigns</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Watch queues during operation and call parties forward. <b>The one screen the vendor answer can delete</b>, and the one whose declaration is mostly somebody else's module.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Dragon Coaster &middot; live</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-005 &middot; onInterval 15s &middot; QUEUE_VIEW</span></div>
+
+          <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:16px 18px;border-bottom:1px solid #E8ECF3">
+            <div style="border:1px solid #E8ECF3;border-radius:11px;padding:13px 15px;display:flex;flex-direction:column;gap:4px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:#8494A8">waiting</div><div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;letter-spacing:-.03em;line-height:1">470</div><div style="font-size:10.5px;color:#5A6577">parties &middot; 1,180 guests</div></div>
+            <div style="border:1px solid #E8ECF3;border-radius:11px;padding:13px 15px;display:flex;flex-direction:column;gap:4px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:#8494A8">called</div><div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;letter-spacing:-.03em;line-height:1">24</div><div style="font-size:10.5px;color:#5A6577">window closes 11:58</div></div>
+            <div style="border:1.5px solid #E0C98A;background:#FFFBF0;border-radius:11px;padding:13px 15px;display:flex;flex-direction:column;gap:4px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:#8A6D00">expired</div><div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;letter-spacing:-.03em;line-height:1;color:#8A6D00">31</div><div style="font-size:10.5px;color:#8A6D00">today &middot; 6.2% of calls</div></div>
+            <div style="border:1px solid #E8ECF3;border-radius:11px;padding:13px 15px;display:flex;flex-direction:column;gap:4px"><div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:#8494A8">average wait</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-family:'IBM Plex Mono',monospace;font-size:27px;font-weight:600;letter-spacing:-.03em;line-height:1">55</div><div style="font-size:12px;color:#8494A8">min</div></div><div style="font-size:10.5px;color:#5A6577">feed live &middot; 4s ago</div></div>
+          </div>
+
+          <div style="flex:none;height:186px;padding:14px 18px;border-bottom:1px solid #E8ECF3;display:flex;flex-direction:column;gap:9px">
+            <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div style="font-size:12px;font-weight:800">Wait over the day</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">09:00 &rarr; 11:45 &middot; 5-minute buckets</div></div>
+            <div style="flex:1;display:flex;align-items:flex-end;gap:3px;min-height:0">
+              <div style="flex:1;height:18%;background:#CFE0F5;border-radius:2px 2px 0 0"></div><div style="flex:1;height:24%;background:#CFE0F5;border-radius:2px 2px 0 0"></div><div style="flex:1;height:31%;background:#CFE0F5;border-radius:2px 2px 0 0"></div><div style="flex:1;height:29%;background:#CFE0F5;border-radius:2px 2px 0 0"></div><div style="flex:1;height:38%;background:#A8C7EC;border-radius:2px 2px 0 0"></div><div style="flex:1;height:44%;background:#A8C7EC;border-radius:2px 2px 0 0"></div><div style="flex:1;height:51%;background:#A8C7EC;border-radius:2px 2px 0 0"></div><div style="flex:1;height:48%;background:#A8C7EC;border-radius:2px 2px 0 0"></div><div style="flex:1;height:57%;background:#7FA9DF;border-radius:2px 2px 0 0"></div><div style="flex:1;height:63%;background:#7FA9DF;border-radius:2px 2px 0 0"></div><div style="flex:1;height:71%;background:#7FA9DF;border-radius:2px 2px 0 0"></div><div style="flex:1;height:68%;background:#7FA9DF;border-radius:2px 2px 0 0"></div><div style="flex:1;height:79%;background:#4A82C8;border-radius:2px 2px 0 0"></div><div style="flex:1;height:86%;background:#4A82C8;border-radius:2px 2px 0 0"></div><div style="flex:1;height:92%;background:#4A82C8;border-radius:2px 2px 0 0"></div><div style="flex:1;height:88%;background:#4A82C8;border-radius:2px 2px 0 0"></div>
+              <div style="flex:1;height:84%;background:repeating-linear-gradient(135deg,#E0C98A 0 4px,#F5E6C0 4px 8px);border-radius:2px 2px 0 0"></div><div style="flex:1;height:84%;background:repeating-linear-gradient(135deg,#E0C98A 0 4px,#F5E6C0 4px 8px);border-radius:2px 2px 0 0"></div><div style="flex:1;height:84%;background:repeating-linear-gradient(135deg,#E0C98A 0 4px,#F5E6C0 4px 8px);border-radius:2px 2px 0 0"></div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:10.5px;color:#8A6D00"><span style="width:16px;height:8px;border-radius:2px;background:repeating-linear-gradient(135deg,#E0C98A 0 4px,#F5E6C0 4px 8px);flex:none"></span><b>Hatched where the feed went quiet.</b> The chart carries <span style="font-family:'IBM Plex Mono',monospace">stale</span> rather than continuing the line, because reporting reads a lag-tolerant replica.</div>
+          </div>
+
+          <div style="flex:1;display:flex;min-height:0">
+            <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0;border-right:1px solid #E8ECF3">
+              <div style="flex:none;display:grid;grid-template-columns:88px 1fr 96px 84px 84px;gap:10px;padding:9px 18px;border-bottom:1px solid #E8ECF3;background:#FAFBFD;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8494A8"><div>party</div><div>joined from</div><div style="text-align:right">waiting</div><div>size</div><div>state</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+                <div style="display:grid;grid-template-columns:88px 1fr 96px 84px 84px;gap:10px;padding:7px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#F2F7FD"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">DC-4471</span><span style="color:#5A6577">App &middot; 10:52</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">55m</span><span>4</span><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:#EAF4FF;color:#0A4FB8;justify-self:start">Called</span></div>
+                <div style="display:grid;grid-template-columns:88px 1fr 96px 84px 84px;gap:10px;padding:7px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFBF0"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">DC-4468</span><span style="color:#5A6577">App &middot; 10:49</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">58m</span><span>2</span><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:#FFF1CF;color:#8A6D00;justify-self:start">Expiring</span></div>
+                <div style="display:grid;grid-template-columns:88px 1fr 96px 84px 84px;gap:10px;padding:7px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">DC-4462</span><span style="color:#5A6577">Gate &middot; 10:44</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">63m</span><span>6</span><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:#F1F4F8;color:#5A6577;justify-self:start">Waiting</span></div>
+                <div style="display:grid;grid-template-columns:88px 1fr 96px 84px 84px;gap:10px;padding:7px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">DC-4459</span><span style="color:#5A6577">App &middot; 10:41</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">66m</span><span>3</span><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:#F1F4F8;color:#5A6577;justify-self:start">Waiting</span></div>
+                <div style="display:grid;grid-template-columns:88px 1fr 96px 84px 84px;gap:10px;padding:7px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;opacity:.55"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">DC-4455</span><span style="color:#5A6577">App &middot; 10:36</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">&mdash;</span><span>2</span><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:#FEE9EA;color:#A32833;justify-self:start">Expired</span></div>
+                <div style="display:grid;grid-template-columns:88px 1fr 96px 84px 84px;gap:10px;padding:7px 18px;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">DC-4451</span><span style="color:#5A6577">Gate &middot; 10:33</span><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">74m</span><span>5</span><span style="font-size:10px;font-weight:700;padding:2px 6px;border-radius:5px;background:#F1F4F8;color:#5A6577;justify-self:start">Waiting</span></div>
+              </div>
+            </div>
+
+            <div style="flex:none;width:330px;background:#FAFBFD;padding:16px 18px;display:flex;flex-direction:column;gap:11px">
+              <div style="height:44px;border-radius:10px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">Call next 24</div>
+              <div style="font-size:11px;color:#5A6577;line-height:1.5">A 15-minute window on 24 parties at once. <b>The expiring row is the cost of getting that number wrong.</b></div>
+              <div style="background:#fff;border:1px solid #F0DFB8;border-radius:11px;padding:12px 13px;display:flex;flex-direction:column;gap:7px">
+                <div style="font-size:12px;font-weight:800;color:#8A6D00">This screen may not exist</div>
+                <div style="font-size:11px;color:#5A4A20;line-height:1.5"><span style="font-family:'IBM Plex Mono',monospace">CF-33a</span> selects the vendor. If it ships an operator console, <b>this is the screen it replaces</b> &mdash; BO-001 to BO-003 stay, because ADR-0012 keeps the adaptor ours.</div>
+              </div>
+              <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.6">error &middot; last known values, with their age</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEE9EA;border:1px solid #F3C6CA;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#A32833">A queue monitor that can launch a campaign</div>
+            <div style="font-size:11.5px;color:#7A222B;line-height:1.6;text-wrap:pretty">Nineteen operations, and <b>twelve are marketing-crm</b>: <span style="font-family:'IBM Plex Mono',monospace">createCampaign</span>, <span style="font-family:'IBM Plex Mono',monospace">launchCampaign</span>, <span style="font-family:'IBM Plex Mono',monospace">pauseCampaign</span>, <span style="font-family:'IBM Plex Mono',monospace">stopCampaign</span>, <span style="font-family:'IBM Plex Mono',monospace">testSendCampaign</span>, <span style="font-family:'IBM Plex Mono',monospace">unscheduleCampaign</span> and six more. Its <span style="font-family:'IBM Plex Mono',monospace">emptyNoAccess</span> reads <i>"needs MARKETING_MANAGE, MARKETING_SEND, MARKETING_VIEW to manage marketings"</i> &mdash; <b>the same generated absurdity that exposed BO-003, on a screen nobody re-checked.</b></div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A32833;line-height:1.7">declared &middot; 19 &middot; queue 7 &middot; marketing 12<br>permission says QUEUE_VIEW &middot; empty state says MARKETING_*</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Expired is a number somebody owns</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">31 expirations at 6.2% of calls is the tile that decides whether the redemption window on <a href="#bo-002">BO-002</a> is right. Drawn as a first-class tile rather than a row in a report nobody opens.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">tiles &middot; waiting &middot; called &middot; expired &middot; average<br>metricTile &middot; noData is not zero</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two triggers, one screen</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">listQueueEntries</span> and <span style="font-family:'IBM Plex Mono',monospace">getWaitTimes</span> are <span style="font-family:'IBM Plex Mono',monospace">onInterval</span>; the rest are on load or action. The only screen in the cluster that polls, and the age of the data is on the tile.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">interval &middot; 15s<br>chart state &middot; stale where quiet</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; dashboard &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; metricTile &middot; dataTable &middot; chart &middot; primaryButton</div>
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listQueueEntries &middot; getWaitTimes <span style="color:#5A6577">(onInterval)</span> &middot; callNextParties &middot; setQueueStatus &middot; setWaitTime &middot; createQueue &middot; updateQueue &middot; getQueue &middot; listQueues</div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#A32833">12 marketing-crm operations to remove &middot; emptyNoAccess derived against the wrong module &middot; existence blocked on CF-33a</span></div>
+      </div>
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">02 &mdash; resource management &middot; 3 frames &middot; 47 requirements</div>
+
+    <div id="bo-095" data-screen-label="BO-095" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-040 &middot; BO-095</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Resources</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">list</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">searchField &middot; multiSelect &middot; dataTable</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">CF-125</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Every bookable object at this venue, and whether it is free. <b>A resource is a specific object, not a quantity</b> &mdash; forty identical strollers are forty rows, because guest twelve returned stroller twelve.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Resources &middot; Riverside venue</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-095 &middot; 214 resources &middot; RESOURCE_VIEW</span></div>
+
+          <div style="flex:none;display:flex;align-items:center;gap:10px;padding:13px 18px;border-bottom:1px solid #E8ECF3">
+            <div style="flex:1;max-width:320px;height:34px;border:1px solid #CBD5E1;border-radius:9px;display:flex;align-items:center;gap:8px;padding:0 12px;font-size:12px;color:#8494A8"><span style="font-size:11px">&#9906;</span><span>Search resources</span></div>
+            <div style="height:34px;padding:0 12px;border-radius:9px;border:1px solid #0D6EFD;background:#EAF4FF;display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;color:#0A4FB8">Kind &middot; 2 selected <span style="font-size:10px">&#9662;</span></div>
+            <div style="display:flex;gap:6px">
+              <span style="font-size:10.5px;font-weight:700;padding:5px 9px;border-radius:6px;background:#EAF4FF;color:#0A4FB8">Cabana &times;</span>
+              <span style="font-size:10.5px;font-weight:700;padding:5px 9px;border-radius:6px;background:#EAF4FF;color:#0A4FB8">Stroller &times;</span>
+            </div>
+            <div style="margin-left:auto;height:34px;padding:0 13px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">Define resource</div>
+          </div>
+
+          <div style="flex:none;display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:9px 18px;border-bottom:1px solid #E8ECF3;background:#FAFBFD;font-family:'IBM Plex Mono',monospace;font-size:9.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#8494A8"><div>asset</div><div>resource</div><div>kind</div><div>status &amp; reason</div><div style="text-align:right">deposit</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+
+            <div style="display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:11px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">CAB-04</span><div><div style="font-weight:700;color:#26303F">Cabana 4 &middot; poolside west</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Sleeps 6 &middot; shaded</div></div><span style="color:#5A6577">Cabana</span><div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:#0E9F6E;flex:none"></span><span style="font-weight:700;color:#0A6B49">Free</span><span style="color:#8494A8;font-size:11px">until 14:00</span></div><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">200.00</span></div>
+
+            <div style="display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:11px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">CAB-05</span><div><div style="font-weight:700;color:#26303F">Cabana 5 &middot; poolside west</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Sleeps 6 &middot; shaded</div></div><span style="color:#5A6577">Cabana</span><div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:#0D6EFD;flex:none"></span><span style="font-weight:700;color:#0A4FB8">Booked</span><span style="color:#8494A8;font-size:11px">Haddad &middot; to 17:00</span></div><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">200.00</span></div>
+
+            <div style="display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:11px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFFDF7"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">CAB-06</span><div><div style="font-weight:700;color:#26303F">Cabana 6 &middot; poolside east</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Sleeps 4</div></div><span style="color:#5A6577">Cabana</span><div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:#E0A03A;flex:none"></span><span style="font-weight:800;color:#8A6D00">Under repair</span><span style="color:#8A6D00;font-size:11px">canopy tear &middot; 2d</span></div><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">&mdash;</span></div>
+
+            <div style="display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:11px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">STR-011</span><div><div style="font-weight:700;color:#26303F">Stroller 11</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Double &middot; rain cover</div></div><span style="color:#5A6577">Stroller</span><div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:#0E9F6E;flex:none"></span><span style="font-weight:700;color:#0A6B49">Free</span></div><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">50.00</span></div>
+
+            <div style="display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:11px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">STR-012</span><div><div style="font-weight:700;color:#26303F">Stroller 12</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Double &middot; rain cover</div></div><span style="color:#5A6577">Stroller</span><div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:#0D6EFD;flex:none"></span><span style="font-weight:700;color:#0A4FB8">Out</span><span style="color:#8494A8;font-size:11px">guest 12 &middot; 2h 14m</span></div><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">50.00</span></div>
+
+            <div style="display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:11px 18px;border-bottom:1px solid #F1F4F8;font-size:11.5px;align-items:baseline;background:#FFF8F8"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">STR-013</span><div><div style="font-weight:700;color:#26303F">Stroller 13</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Double</div></div><span style="color:#5A6577">Stroller</span><div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:#E2545F;flex:none"></span><span style="font-weight:800;color:#A32833">Overdue</span><span style="color:#A32833;font-size:11px">due 09:30 &middot; 2h late</span></div><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">50.00</span></div>
+
+            <div style="display:grid;grid-template-columns:110px 1.5fr 1fr 1.5fr 96px;gap:12px;padding:11px 18px;font-size:11.5px;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">STR-014</span><div><div style="font-weight:700;color:#26303F">Stroller 14</div><div style="font-size:10.5px;color:#8494A8;margin-top:1px">Single</div></div><span style="color:#5A6577">Stroller</span><div style="display:flex;align-items:center;gap:7px"><span style="width:7px;height:7px;border-radius:4px;background:#0E9F6E;flex:none"></span><span style="font-weight:700;color:#0A6B49">Free</span></div><span style="text-align:right;font-family:'IBM Plex Mono',monospace;font-size:10.5px">50.00</span></div>
+          </div>
+          <div style="flex:none;padding:10px 18px;border-top:1px solid #E8ECF3;background:#FAFBFD;font-size:11px;color:#5A6577"><b>The status column carries the reason.</b> Booked and under repair need different responses from somebody looking for something free &mdash; one is a wait, the other is a different resource.</div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Kind is a filter over a taxonomy nobody defines</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">The <span style="font-family:'IBM Plex Mono',monospace">multiSelect</span> filters by kind &mdash; cabana, stroller, locker, wheelchair, meeting room. <b>No screen in the package creates a kind.</b> A resource type carries the deposit amount, the turnaround time and whether a condition photo is required, and all three are drawn on these frames from values that have nowhere to live.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">gap 1 of 5 &middot; resource types &amp; deposit policy<br>see &middot; the gap panel below</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Forty strollers, forty rows</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The alternative &mdash; a stroller row with <i>quantity 40</i> &mdash; cannot answer which one came back damaged. The identity is the point, and it is why this is a list of assets rather than a stock level.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">binds &middot; Resource[]<br>214 rows &middot; cursor pagination</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Widen the window, not the kind</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The <span style="font-family:'IBM Plex Mono',monospace">emptyNoResults</span> copy is already written and says exactly that: availability moves, definitions do not. One of the few screens in the package whose empty state was authored rather than derived.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">states &middot; 5, all authored<br>emptyNoAccess &middot; RESOURCE_VIEW named</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; list &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; searchField &middot; multiSelect &middot; dataTable &nbsp; <b style="color:#4A5566;font-weight:600">MODULE</b> &middot; resources</div>
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listResources <span style="color:#5A6577">(onLoad)</span> &middot; createResource <span style="color:#5A6577">(onAction)</span> <span style="color:#0A6B49">&mdash; two, both resources</span></div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">no resource-type registry &middot; deposit amount and turnaround have no owning screen</span></div>
+      </div>
+    </div>
+
+    <div id="bo-096" data-screen-label="BO-096" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-041 &middot; BO-096</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Resource Calendar</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">calendar</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">timeline &middot; primaryButton &middot; banner</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">template not in the enum</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">See what is free, and book it without double-booking. <b>Setup and teardown render as their own bands</b> &mdash; a 30-minute turnaround is invisible if it is drawn inside the booking, and invisible turnaround is how two guests end up in one cabana.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Cabanas &middot; Saturday 12 September</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-096 &middot; RESOURCE_BOOK</span></div>
+
+          <div style="flex:none;display:flex;gap:10px;padding:13px 18px;border-bottom:1px solid #E8ECF3;background:#FFF8F8">
+            <div style="width:3px;border-radius:2px;background:#E2545F;flex:none"></div>
+            <div style="font-size:11.5px;color:#7A222B;line-height:1.55"><b>Conflict &middot; Cabana 4.</b> The 14:00&ndash;17:00 booking you are placing starts inside the 13:30&ndash;14:00 teardown of the Nasser party. <span style="color:#A32833">Earliest clean start is 14:00 with no turnaround, or 14:30 with the standard 30 minutes.</span></div>
+            <div style="flex:none;display:flex;align-items:center;gap:7px"><div style="height:28px;padding:0 11px;border-radius:7px;background:#fff;border:1px solid #E8A0A6;display:flex;align-items:center;font-size:11px;font-weight:700;color:#A32833">Move to 14:30</div></div>
+          </div>
+
+          <div style="flex:none;display:flex;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid #E8ECF3">
+            <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">&larr;</div>
+            <div style="height:30px;padding:0 14px;border-radius:8px;background:#0F1E33;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">Sat 12 Sep</div>
+            <div style="height:30px;padding:0 12px;border-radius:8px;border:1px solid #DCE3ED;display:flex;align-items:center;font-size:11.5px;font-weight:600;color:#5A6577">&rarr;</div>
+            <div style="display:flex;gap:14px;margin-left:18px;font-size:11px;color:#5A6577">
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:9px;border-radius:2px;background:#4A82C8"></span>Booked</div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:9px;border-radius:2px;background:repeating-linear-gradient(135deg,#B8C4D4 0 3px,#DCE3ED 3px 6px)"></span>Setup</div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:9px;border-radius:2px;background:repeating-linear-gradient(135deg,#C9B78A 0 3px,#EDE2C4 3px 6px)"></span>Teardown</div>
+              <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:9px;border-radius:2px;background:#F0D7DA"></span>Maintenance</div>
+            </div>
+            <div style="margin-left:auto;height:30px;padding:0 13px;border-radius:8px;background:#0D6EFD;color:#fff;display:flex;align-items:center;font-size:11.5px;font-weight:700">Book</div>
+          </div>
+
+          <div style="flex:1;min-height:0;display:flex;flex-direction:column;overflow:hidden">
+            <div style="flex:none;display:grid;grid-template-columns:168px repeat(12,1fr);border-bottom:1px solid #E8ECF3;background:#FAFBFD;font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">
+              <div style="padding:8px 12px">resource</div>
+              <div style="padding:8px 4px;text-align:center">08</div><div style="padding:8px 4px;text-align:center">09</div><div style="padding:8px 4px;text-align:center">10</div><div style="padding:8px 4px;text-align:center">11</div><div style="padding:8px 4px;text-align:center">12</div><div style="padding:8px 4px;text-align:center">13</div><div style="padding:8px 4px;text-align:center">14</div><div style="padding:8px 4px;text-align:center">15</div><div style="padding:8px 4px;text-align:center">16</div><div style="padding:8px 4px;text-align:center">17</div><div style="padding:8px 4px;text-align:center">18</div><div style="padding:8px 4px;text-align:center">19</div>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;min-height:0;overflow:hidden">
+
+              <div style="flex:1;display:grid;grid-template-columns:168px 1fr;border-bottom:1px solid #F1F4F8;min-height:0">
+                <div style="padding:10px 12px;border-right:1px solid #F1F4F8;display:flex;flex-direction:column;gap:2px"><span style="font-size:11.5px;font-weight:700">Cabana 4</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">CAB-04 &middot; sleeps 6</span></div>
+                <div style="position:relative;padding:12px 0;display:flex;align-items:center">
+                  <div style="position:absolute;left:8.33%;width:33.3%;top:14px;bottom:14px;background:#4A82C8;border-radius:5px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:11px;font-weight:700">Nasser party &middot; 09:00&ndash;13:00</div>
+                  <div style="position:absolute;left:41.6%;width:8.3%;top:14px;bottom:14px;background:repeating-linear-gradient(135deg,#C9B78A 0 3px,#EDE2C4 3px 6px);border-radius:5px;border:1px solid #C9B78A"></div>
+                  <div style="position:absolute;left:50%;width:25%;top:14px;bottom:14px;border:2px dashed #E2545F;background:rgba(226,84,95,.08);border-radius:5px;display:flex;align-items:center;padding:0 10px;color:#A32833;font-size:11px;font-weight:800">Placing &middot; 14:00&ndash;17:00</div>
+                </div>
+              </div>
+
+              <div style="flex:1;display:grid;grid-template-columns:168px 1fr;border-bottom:1px solid #F1F4F8;min-height:0">
+                <div style="padding:10px 12px;border-right:1px solid #F1F4F8;display:flex;flex-direction:column;gap:2px"><span style="font-size:11.5px;font-weight:700">Cabana 5</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">CAB-05 &middot; sleeps 6</span></div>
+                <div style="position:relative;padding:12px 0;display:flex;align-items:center">
+                  <div style="position:absolute;left:8.33%;width:4.16%;top:14px;bottom:14px;background:repeating-linear-gradient(135deg,#B8C4D4 0 3px,#DCE3ED 3px 6px);border-radius:5px;border:1px solid #B8C4D4"></div>
+                  <div style="position:absolute;left:12.5%;width:41.6%;top:14px;bottom:14px;background:#4A82C8;border-radius:5px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:11px;font-weight:700">Haddad &middot; 09:30&ndash;14:30</div>
+                  <div style="position:absolute;left:54.1%;width:8.3%;top:14px;bottom:14px;background:repeating-linear-gradient(135deg,#C9B78A 0 3px,#EDE2C4 3px 6px);border-radius:5px;border:1px solid #C9B78A"></div>
+                  <div style="position:absolute;left:66.6%;width:25%;top:14px;bottom:14px;background:#4A82C8;border-radius:5px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:11px;font-weight:700">Okonjo &middot; 16:00&ndash;19:00</div>
+                </div>
+              </div>
+
+              <div style="flex:1;display:grid;grid-template-columns:168px 1fr;border-bottom:1px solid #F1F4F8;min-height:0;background:#FFFBFB">
+                <div style="padding:10px 12px;border-right:1px solid #F1F4F8;display:flex;flex-direction:column;gap:2px"><span style="font-size:11.5px;font-weight:700">Cabana 6</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#A32833">CAB-06 &middot; under repair</span></div>
+                <div style="position:relative;padding:12px 0;display:flex;align-items:center">
+                  <div style="position:absolute;left:0;right:0;top:14px;bottom:14px;background:#F0D7DA;border-radius:5px;display:flex;align-items:center;padding:0 12px;color:#A32833;font-size:11px;font-weight:700">Canopy tear &middot; unavailable until Monday &middot; not bookable</div>
+                </div>
+              </div>
+
+              <div style="flex:1;display:grid;grid-template-columns:168px 1fr;border-bottom:1px solid #F1F4F8;min-height:0">
+                <div style="padding:10px 12px;border-right:1px solid #F1F4F8;display:flex;flex-direction:column;gap:2px"><span style="font-size:11.5px;font-weight:700">Cabana 7</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">CAB-07 &middot; sleeps 4</span></div>
+                <div style="position:relative;padding:12px 0;display:flex;align-items:center">
+                  <div style="position:absolute;left:0;width:8.33%;top:14px;bottom:14px;background:#F1F4F8;border-radius:5px;display:flex;align-items:center;padding:0 8px;color:#8494A8;font-size:10.5px">closed</div>
+                  <div style="position:absolute;left:25%;width:25%;top:14px;bottom:14px;background:#4A82C8;border-radius:5px;display:flex;align-items:center;padding:0 10px;color:#fff;font-size:11px;font-weight:700">Ferreira &middot; 11:00&ndash;14:00</div>
+                </div>
+              </div>
+
+              <div style="flex:1;display:grid;grid-template-columns:168px 1fr;min-height:0">
+                <div style="padding:10px 12px;border-right:1px solid #F1F4F8;display:flex;flex-direction:column;gap:2px"><span style="font-size:11.5px;font-weight:700">Cabana 8</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#8494A8">CAB-08 &middot; sleeps 4</span></div>
+                <div style="position:relative;padding:12px 0;display:flex;align-items:center">
+                  <div style="position:absolute;left:0;right:0;top:14px;bottom:14px;display:flex;align-items:center;padding:0 12px;color:#0A6B49;font-size:11px;font-weight:700;background:#F4FBF7;border:1px dashed #A8DCC4;border-radius:5px">Free all day</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="flex:none;padding:10px 18px;border-top:1px solid #E8ECF3;background:#FAFBFD;font-size:11px;color:#5A6577">Five reasons a slot is not free &mdash; <b>booked, setup, teardown, maintenance, closed</b> &mdash; and the response says which, because <i>wait</i> and <i>look elsewhere</i> are different answers.</div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Five bands, and nowhere to set four of them</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">The availability response distinguishes booked, setup, teardown, maintenance and closed. <b>Only <i>booked</i> has a screen that creates it.</b> Setup and teardown durations, maintenance windows and opening hours are all drawn here from values no surface in the package owns &mdash; which is the shape of <span style="font-family:'IBM Plex Mono',monospace">CF-125</span> in one frame.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">gaps 2 and 3 &middot; availability rules, maintenance<br>declared &middot; getResourceAvailability, bookResource</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Conflict before assignment</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Two bookings on one cabana is a guest arriving to find somebody in their chair, and <b>it must be impossible rather than unlikely</b>. The banner names the times and offers the clean start, rather than refusing.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">error &middot; do not book blind<br>a stale calendar is the double-booking</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em"><span style="font-family:'IBM Plex Mono',monospace">calendar</span> is not a template</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The schema enum is list, detail, form, dashboard, wizard, split, canvas, modal, fullscreen, board. This screen declares <span style="font-family:'IBM Plex Mono',monospace">calendar</span>, so it fails CI as written &mdash; a sixth vocabulary defect, found by drawing.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">raise &middot; add calendar to the enum<br>or retemplate to board</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; calendar <span style="color:#B98900">(not in the schema enum)</span> &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; timeline &middot; primaryButton &middot; banner</div>
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getResourceAvailability <span style="color:#5A6577">(onLoad)</span> &middot; bookResource <span style="color:#5A6577">(onAction)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">template outside the enum &middot; four of five availability reasons have no owning screen</span></div>
+      </div>
+    </div>
+
+    <div id="bo-097" data-screen-label="BO-097" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">BP-042 &middot; BO-097</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Check Out &amp; Check In</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF4FF;color:#0A4FB8">detail</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F7F9FC;color:#5A6577">detailPanel &middot; textField &middot; fileUpload</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E8F7F0;color:#0A6B49">offline declared</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Hand it over with a deposit, take it back, settle. <b>The deposit is held, not taken</b> &mdash; a deposit taken and refunded is two transactions and a fee.</div>
+      </div>
+
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:#0F1E33"><span style="font-size:13px;font-weight:800;color:#fff">Stroller 12 &middot; check in</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">BO-097 &middot; RESOURCE_BOOK &middot; poolside kiosk</span></div>
+
+          <div style="flex:none;display:flex;align-items:center;gap:10px;padding:11px 18px;border-bottom:1px solid #E8ECF3;background:#FFFBF0;font-size:11.5px;color:#5A4A20">
+            <span style="width:7px;height:7px;border-radius:4px;background:#E0A03A;flex:none"></span>
+            <b>Offline.</b> Two check-outs and one check-in queued locally. <span style="color:#8A6D00">The deposit hold on this booking is authorised on sync; the condition note taken now is the only defence against a dispute later.</span>
+            <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:10.5px">last sync 11:02 &middot; 3 pending</span>
+          </div>
+
+          <div style="flex:1;display:flex;min-height:0">
+            <div style="flex:none;width:456px;border-right:1px solid #E8ECF3;padding:20px 22px 14px;display:flex;flex-direction:column;gap:9px;overflow:hidden">
+              <div>
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">STR-012 &middot; booking RB-8841</div>
+                <div style="font-size:17px;font-weight:800;letter-spacing:-.018em;margin-top:2px">Stroller 12 &middot; double</div>
+                <div style="font-size:11.5px;color:#5A6577;margin-top:4px;line-height:1.5">Out 2h 14m &middot; due back 16:00 &middot; guest 12, R. Haddad, order 88-40219</div>
+              </div>
+
+              <div style="display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Deposit</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600">AED 50.00 &middot; held</span></div>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Authorisation</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;font-weight:600">auth_9f31c &middot; expires in 5d</span></div>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Checked out by</span><span style="font-weight:700">A. Yusuf &middot; 09:46</span></div>
+                <div style="display:flex;justify-content:space-between;gap:10px;font-size:11.5px"><span style="color:#8494A8">Condition out</span><span style="font-weight:700;color:#0A6B49">Good &middot; 2 photos</span></div>
+              </div>
+
+              <div style="border:1px solid #E8ECF3;border-radius:11px;padding:10px 12px;display:flex;flex-direction:column;gap:7px;background:#FAFBFD">
+                <div style="font-size:12px;font-weight:800">Condition note</div>
+                <div style="min-height:52px;border:1px solid #CBD5E1;border-radius:9px;background:#fff;padding:9px 12px;font-size:12px;color:#3D4756;line-height:1.45">Rear left wheel bent, rain cover torn along the seam. Frame is sound.</div>
+                <div style="display:flex;gap:9px">
+                  <div style="flex:1;height:44px;border-radius:9px;border:1px dashed #CBD5E1;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span style="font-size:11px;font-weight:700;color:#5A6577">Photo 1</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#0A6B49">uploaded</span></div>
+                  <div style="flex:1;height:44px;border-radius:9px;border:1px dashed #CBD5E1;background:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px"><span style="font-size:11px;font-weight:700;color:#5A6577">Photo 2</span><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;color:#B98900">queued &middot; offline</span></div>
+                  <div style="flex:1;height:44px;border-radius:9px;border:1px dashed #CBD5E1;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;color:#8494A8">+ Add</div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.45"><b>Taken on the way out, not only on the way back</b> &mdash; a dispute is two sets of photographs or one person's word.</div>
+              </div>
+
+              <div style="margin-top:auto;display:flex;flex-direction:column;gap:9px;padding-top:14px;border-top:1px solid #EDF1F6">
+                <div style="height:44px;border-radius:10px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">Check in with damage</div>
+                <div style="height:38px;border-radius:10px;border:1px solid #DCE3ED;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#5A6577">Check in &mdash; no damage, release deposit</div>
+              </div>
+            </div>
+
+            <div style="flex:1;min-width:0;background:#FAFBFD;padding:20px 22px 14px;display:flex;flex-direction:column;gap:10px;overflow:hidden">
+              <div style="flex:none;background:#fff;border:1.5px solid #E8A0A6;border-radius:11px;padding:10px 14px;display:flex;flex-direction:column;gap:6px">
+                <div style="font-size:12.5px;font-weight:800;color:#A32833">What checking in with damage does</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px;color:#3D4756">
+                  <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;flex:none;width:14px">1</span><div>Routes <b>STR-012 straight to maintenance</b>, not to available. Routing through available leaves a window where the next guest books a broken item.</div></div>
+                  <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;flex:none;width:14px">2</span><div>Holds the deposit authorisation open rather than releasing it. <b>Held, not captured</b> &mdash; the charge is a separate decision by somebody with the permission to make it.</div></div>
+                  <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;flex:none;width:14px">3</span><div>Attaches the note and both photographs to the booking &mdash; the record a disputed charge is argued from.</div></div>
+                </div>
+                <div style="padding-top:8px;border-top:1px solid #F1F4F8;font-size:11px;color:#A32833;line-height:1.45"><b>Nothing here decides the charge, and no screen does</b> &mdash; that is gap 4.</div>
+              </div>
+
+              <div style="flex:none;background:#fff;border:1px solid #E8ECF3;border-radius:11px;padding:12px 14px;display:flex;flex-direction:column;gap:8px">
+                <div style="font-size:12.5px;font-weight:800">Out now &middot; 18</div>
+                <div style="display:flex;flex-direction:column;gap:5px">
+                  <div style="display:flex;align-items:center;gap:9px;font-size:11.5px"><span style="width:7px;height:7px;border-radius:4px;background:#E2545F;flex:none"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:66px">STR-013</span><span style="flex:1;color:#A32833;font-weight:700">Overdue 2h 12m</span><span style="color:#5A6577">guest 34</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;font-size:11.5px"><span style="width:7px;height:7px;border-radius:4px;background:#E0A03A;flex:none"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:66px">WCH-002</span><span style="flex:1;color:#8A6D00;font-weight:700">Due in 20m</span><span style="color:#5A6577">guest 41</span></div>
+                  <div style="display:flex;align-items:center;gap:9px;font-size:11.5px"><span style="width:7px;height:7px;border-radius:4px;background:#0D6EFD;flex:none"></span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;width:66px">STR-012</span><span style="flex:1;color:#0A4FB8;font-weight:700">Checking in now</span><span style="color:#5A6577">guest 12</span></div>
+                </div>
+                <div style="padding-top:8px;border-top:1px solid #F1F4F8;font-size:11px;color:#5A6577;line-height:1.45"><b>Overdue shows by default.</b> The list a poolside attendant checks at close &mdash; anything still out is a conversation.</div>
+              </div>
+
+              <div style="flex:none;margin-top:auto;height:142px;background:#0B1324;border-radius:11px;padding:11px 15px;font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.6;color:#9FB6CF;overflow:hidden">
+                <div style="color:#6B7484">operations, in the order the flow calls them</div>
+                <div style="white-space:pre;color:#8FE3FF">checkOutResource     &rarr; F25 step 3</div>
+                <div style="white-space:pre;color:#8FE3FF">authoriseStoredValue &rarr; F25 step 4</div>
+                <div style="white-space:pre;color:#8FE3FF">checkInResource      &rarr; F25 step 7</div>
+                <div style="white-space:pre;color:#8FE3FF">releaseStoredValue   &rarr; F25 step 8</div>
+                <div style="height:8px"></div>
+                <div style="white-space:pre;color:#6B7484">F25 named the deposit operations and</div>
+                <div style="white-space:pre;color:#6B7484">the screen did not. The checker refused.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#194975">The screen that was corrected by a flow check</div>
+            <div style="font-size:11.5px;color:#194975;line-height:1.6;text-wrap:pretty">Flow <span style="font-family:'IBM Plex Mono',monospace">F25</span> named <span style="font-family:'IBM Plex Mono',monospace">authoriseStoredValue</span> and <span style="font-family:'IBM Plex Mono',monospace">releaseStoredValue</span> at steps 4 and 5; the screen declared neither, and the checker refused it. <b>A step calling an operation its screen does not declare is one of the two out of step, and in this case it was the screen.</b> The opposite of the residue on the queue cluster: there, the operations exist and the screen does not need them.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#1E5AA8;line-height:1.7">see &middot; CF-125, CF-126<br>4 operations &middot; 2 resources, 2 orders</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Offline, and the only one</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The one screen in either cluster declaring an <span style="font-family:'IBM Plex Mono',monospace">offline</span> state, and it needs it: a poolside kiosk at the far end of a park is where connectivity goes. The deposit reconciles on sync.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">states &middot; 6, including offline<br>P08 is not offline-capable &mdash; raise it</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">It had no way out until 4 September</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The screen declared where it is reached from and no exit, so whoever landed on it was stuck. The return path is the same edge travelled the other way, not a guess about the product.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">entry &middot; BO-095, BO-096<br>exit &middot; BO-095, BO-096 &middot; stated 4 Sep</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">TEMPLATE</b> &middot; detail &nbsp; <b style="color:#4A5566;font-weight:600">COMPONENTS</b> &middot; detailPanel &middot; textField &middot; fileUpload &middot; primaryButton &middot; secondaryButton</div>
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; checkOutResource &middot; checkInResource &middot; authoriseStoredValue &middot; releaseStoredValue</div>
+        <div><b style="color:#4A5566;font-weight:600">FLAGGED</b> &middot; <span style="color:#B98900">declares offline on a platform not marked offlineCapable &middot; no screen owns damage assessment or deposit capture</span></div>
+      </div>
+    </div>
+
+    <div id="gap" style="display:flex;flex-direction:column;gap:16px;scroll-margin-top:24px">
+      <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap;padding-bottom:9px;border-bottom:1px solid #DCE3ED">
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">CF-125</span>
+        <span style="font-size:16.5px;font-weight:800;letter-spacing:-.02em">Three screens is not a bounded context</span>
+        <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#B98900;margin-left:auto">47 requirements · 3 screens · 5 named below</span>
+      </div>
+      <p style="margin:0;font-size:12.5px;color:#3D4756;line-height:1.65;max-width:96ch;text-wrap:pretty">The three frames above are drawn as declared, and drawing them is what makes the gap legible: <b>every one of the five missing screens is something the three already reference and none of them owns.</b> A first-class bookable resource needs a type registry, availability rules, conflict handling and a maintenance state. This is the same shape as the <span style="font-family:'IBM Plex Mono',monospace">seatp</span> finding &mdash; design and specification disagreeing about whether something exists &mdash; except here the specification is the one asking.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px">
+        <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:15px 17px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-size:13px;font-weight:800;letter-spacing:-.015em">Resource Types &amp; Deposit Policy</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">gap 1</div></div>
+          <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Referenced by the <span style="font-family:'IBM Plex Mono',monospace">Kind</span> filter on <a href="#bo-095">BO-095</a> and by every deposit figure on <a href="#bo-097">BO-097</a>. A type carries the deposit amount, the turnaround, and whether a condition photo is mandatory.</div>
+          <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">would be &middot; list + form<br>reuses &middot; BP-001 once corrected</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:15px 17px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-size:13px;font-weight:800;letter-spacing:-.015em">Availability Rules</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">gap 2</div></div>
+          <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Setup and teardown durations, opening hours, blackout dates. Three of the five bands on <a href="#bo-096">BO-096</a> are rendered from rules nothing creates, and the 30-minute turnaround in its conflict banner is a number with no home.</div>
+          <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">would be &middot; form<br>blocks &middot; conflict detection correctness</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:15px 17px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-size:13px;font-weight:800;letter-spacing:-.015em">Maintenance &amp; Damage</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">gap 3</div></div>
+          <div style="font-size:11.5px;color:#5A6577;line-height:1.6"><a href="#bo-097">BO-097</a> routes a damaged resource <i>straight to maintenance</i> and <a href="#bo-095">BO-095</a> shows <i>under repair</i> with a reason and a duration. <b>No screen puts a resource into that state deliberately, or takes it out.</b></div>
+          <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">would be &middot; split<br>adjacent &middot; the maintenance module</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:15px 17px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-size:13px;font-weight:800;letter-spacing:-.015em">Damage Assessment &amp; Deposit Capture</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">gap 4</div></div>
+          <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The deposit is held on check-out and released on a clean check-in. <b>Nothing decides to charge it.</b> That decision needs a permission, an amount, a stated reason and an audit line, and no surface in the package has them.</div>
+          <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">would be &middot; detail + confirmDialog<br>touches &middot; orders, CF-36 threshold class</div>
+        </div>
+        <div style="background:#fff;border:1px solid #E8ECF3;border-radius:12px;padding:15px 17px;display:flex;flex-direction:column;gap:9px">
+          <div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px"><div style="font-size:13px;font-weight:800;letter-spacing:-.015em">Waitlist &amp; Reassignment</div><div style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">gap 5</div></div>
+          <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A cabana goes under repair with two bookings on it. <a href="#bo-096">BO-096</a> can show the conflict; nothing moves those guests. On a Saturday at a full venue this is the screen a duty manager actually needs.</div>
+          <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">would be &middot; split<br>reuses &middot; the queue vocabulary above</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:12px;padding:15px 17px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+        <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+        <div><b>Not a recommendation to draw five more screens.</b> <span style="font-family:'IBM Plex Mono',monospace">CF-149</span> records that the register called resource management a client decision while the position note called it ours, and that is unresolved. The three screens that exist are drawn; the five that do not are named with what already references them, so the decision can be taken on evidence rather than on a count of requirements.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:14px;margin-top:46px;padding-top:24px;border-top:1px solid #DCE3ED">
+    <div style="font-size:16.5px;font-weight:800;letter-spacing:-.02em">What these seven frames turned up</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+      <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The 24 August cleanup was never finished</div>
+        <div style="font-size:11.5px;color:#5A6577;line-height:1.6">BO-003 lost 15 order operations. BO-001 still carries 6 catalogue, BO-002 carries 4 catalogue and 2 seating, BO-005 carries 12 marketing. <b>24 operations across three screens</b>, all the same class of defect, all findable by the check that already exists.</div>
+      </div>
+      <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A sixth vocabulary defect</div>
+        <div style="font-size:11.5px;color:#5A6577;line-height:1.6"><a href="#bo-096">BO-096</a> declares <span style="font-family:'IBM Plex Mono',monospace">template: calendar</span>, which is not in the schema enum, so it fails CI as written. <a href="#bo-097">BO-097</a> declares an <span style="font-family:'IBM Plex Mono',monospace">offline</span> state on a platform not marked <span style="font-family:'IBM Plex Mono',monospace">offlineCapable</span> &mdash; correct for the screen, wrong for the platform flag.</div>
+      </div>
+      <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The vendor question was smaller than the plan thought</div>
+        <div style="font-size:11.5px;color:#5A6577;line-height:1.6">ADR-0012 already answers it for three of the four screens: adaptor-first, and a vendor is one of seven sources. <span style="font-family:'IBM Plex Mono',monospace">CF-33a</span> decides whether <a href="#bo-005">BO-005</a> exists and nothing else. <b>One screen at risk, not four.</b></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:12px;padding:14px 16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+      <div><b>Phase 1 is now the eight strays.</b> BP-023's <span style="font-family:'IBM Plex Mono',monospace">scanTarget</span> on Interactive Seat Selection is still unchecked &mdash; a guest picking a seat is not scanning anything, so either the component is wrong or the screen is two screens. After that, Phase 2: P08 has 363 screens and no board, and these seven frames plus the eight on <a href="Pattern%20Boards.dc.html">Pattern Boards</a> cover the patterns its screens declare.</div>
+    </div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>

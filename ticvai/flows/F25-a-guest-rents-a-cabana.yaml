@@ -85,7 +85,7 @@ steps:
   action: The guest leaves; the attendant checks it in and settles the deposit.
   operations:
   - checkInResource
-  - releaseStoredValue
+  - relinquishStoredValue
   outcome: 'Released in full, or partly captured against damage. **Partial capture is the normal case
     for a damaged item** and the reason two-phase spend was worth building.
 

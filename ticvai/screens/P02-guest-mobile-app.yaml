@@ -70,7 +70,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-001
   capability: C02
   openQuestions:
@@ -149,7 +150,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-002
   capability: C02
   openQuestions:
@@ -210,7 +212,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-003
   capability: C02
   implementation:
@@ -293,7 +296,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-004
   capability: C02
   implementation:
@@ -374,7 +378,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Guest Mobile Board 1.dc.html#gm-1b
     generatedFallback: wireframes/P02 Guest App.dc.html#gst-005
   capability: C84
@@ -451,7 +456,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-006
   capability: C84
   implementation:
@@ -515,7 +521,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-007
   capability: C02
   openQuestions:
@@ -578,7 +585,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-008
   capability: C02
   openQuestions:
@@ -640,7 +648,8 @@ screens:
     offline: '**Not available.** A payment needs the gateway, and pretending otherwise takes money we
       cannot confirm'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-009
   capability: C47
   apis:
@@ -724,7 +733,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-010
   capability: C02
   apis:
@@ -797,7 +807,8 @@ screens:
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-011
   capability: C37
   openQuestions:
@@ -855,7 +866,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-012
   capability: C02
   openQuestions:
@@ -936,7 +948,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-013
   capability: C02
   openQuestions:
@@ -1005,7 +1018,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-014
   capability: C02
   openQuestions:
@@ -1081,7 +1095,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-015
   capability: C03
   openQuestions:
@@ -1185,7 +1200,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-016
   capability: C02
   implementation:
@@ -1258,7 +1274,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-017
   capability: C02
   implementation:
@@ -1327,7 +1344,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-018
   capability: C02
   openQuestions:
@@ -1393,7 +1411,8 @@ screens:
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-019
   capability: C21
   apis:
@@ -1471,7 +1490,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-020
   capability: C58
   openQuestions:
@@ -1564,7 +1584,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 4.dc.html#seat-4b
     generatedFallback: wireframes/P02 Guest App.dc.html#gst-021
   capability: C39
@@ -1648,7 +1669,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-022
   capability: C82
   openQuestions:
@@ -1702,7 +1724,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-023
   capability: C82
   apis:
@@ -1774,7 +1797,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-024
   capability: C05
   apis:
@@ -1861,7 +1885,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-025
   capability: C05
   apis:
@@ -1938,7 +1963,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-026
   capability: C08
   openQuestions:
@@ -2003,7 +2029,8 @@ screens:
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-027
   capability: C23
   openQuestions:
@@ -2081,7 +2108,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-028
   capability: C23
   openQuestions:
@@ -2141,7 +2169,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-029
   capability: C17
   openQuestions:
@@ -2201,7 +2230,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-030
   capability: C61
   openQuestions:
@@ -2264,7 +2294,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-031
   capability: AI-02
   openQuestions:
@@ -2351,7 +2382,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-032
   capability: AI-02
   openQuestions:
@@ -2453,7 +2485,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-033
   capability: AI-02
   openQuestions:
@@ -2518,7 +2551,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-034
   capability: C18
   openQuestions:
@@ -2603,7 +2637,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-035
   capability: C62
   apis:
@@ -2661,7 +2696,8 @@ screens:
     error: Could not load. **Redeeming is blocked** rather than attempted against an unknown balance
     offline: Last known balance with its age. **Points earned since are not shown**, and that is said
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-036
   capability: C64
   openQuestions:
@@ -2735,7 +2771,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-037
   capability: C86
   openQuestions:
@@ -2810,7 +2847,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-038
   capability: C105
   apis:
@@ -2872,7 +2910,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-039
   capability: C58
   openQuestions:
@@ -2935,7 +2974,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-040
   capability: C17
   openQuestions:
@@ -3008,7 +3048,8 @@ screens:
       retries, and nothing is issued until it resolves'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-041
   capability: C56
   openQuestions:
@@ -3067,7 +3108,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-042
   capability: C56
   apis:
@@ -3202,7 +3244,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-043
   capability: C57
   openQuestions:
@@ -3253,7 +3296,8 @@ screens:
     offline: '**Last known rates, with their age shown.** A rate is a number a guest may act on, and an
       undated one they cannot judge'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-044
   capability: C107
   openQuestions:
@@ -3310,7 +3354,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-045
   capability: C02
   openQuestions:
@@ -3366,7 +3411,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-046
   capability: C98
   openQuestions:
@@ -3434,7 +3480,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-047
   capability: C57
   apis:
@@ -3490,7 +3537,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-048
   capability: C88
   openQuestions:
@@ -3565,7 +3613,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 4.dc.html#seat-4a
     generatedFallback: wireframes/P02 Guest App.dc.html#gst-049
   capability: C53
@@ -3642,7 +3691,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-050
   capability: C78
   openQuestions:
@@ -3715,7 +3765,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-051
   capability: AI-35
   openQuestions:
@@ -3778,7 +3829,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-052
   capability: AI-35
   openQuestions:
@@ -3857,7 +3909,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-053
   capability: C02
   openQuestions:
@@ -3934,7 +3987,8 @@ screens:
       a plan should get one, optimised or not'
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-054
   capability: AI-35
   openQuestions:
@@ -4018,7 +4072,8 @@ screens:
     error: Availability unavailable. **Selection is blocked** — overselling is worse than waiting
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-055
   capability: C09
   openQuestions:
@@ -4081,7 +4136,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-056
   capability: C87
   implementation:
@@ -4152,7 +4208,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-057
   capability: C17
   openQuestions:
@@ -4211,7 +4268,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-058
   capability: C78
   openQuestions:
@@ -4275,7 +4333,8 @@ screens:
     error: Could not load
     offline: Cached content with its age. **Nothing that spends money or holds capacity works offline**
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-059
   capability: C02
   openQuestions:
@@ -4358,7 +4417,8 @@ screens:
     offline: Cached menu shown with a staleness warning. Ordering is refused — availability changes by
       the minute
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-061
   notes: 'P02-019.1 in the client hierarchy. Absent from my page inventory until 14 August. **Cross-surface
     parity, 31 August**: added listModifierGroups. **The same screen on web and app was calling different
@@ -4418,7 +4478,8 @@ screens:
     error: Lookup unavailable — the collection point can still find it by receipt
     offline: Cannot look up. Shows the drop reference held locally so a guest can quote it
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-062
   notes: 4.4.7. Claimed by the entitlement the guest is already carrying, not a paper slip.
   implementation:
@@ -4485,7 +4546,8 @@ screens:
     component: apps/guest-app/src/routes/Search.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-063
   notes: Added 17 August for parity with WEB-003. **Not on the wireframe board** — needs drawing. CF-93.
   density: comfortable
@@ -4551,7 +4613,8 @@ screens:
     component: apps/guest-app/src/routes/NewsletterPreferences.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-065
   notes: Added 17 August for parity with WEB-027. **Not on the wireframe board** — needs drawing. CF-93.
   density: comfortable
@@ -4631,7 +4694,8 @@ screens:
     starts it and shows where it has got to. **A request that silently fails is a regulatory failure with
     a timestamp on it** (ADR-0033).'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-066
   offline: false
 - id: GST-067
@@ -4692,7 +4756,8 @@ screens:
     so a venue may be stricter than its tenant — the screen shows the answer rather than arguing with
     it.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-067
   offline: false
 - id: GST-068
@@ -4753,7 +4818,8 @@ screens:
     **The AI concierge and a human case are one thread here.** A conversation that could not answer becomes
     a case rather than a dead end, which is what `listAiConversations` beside `listCases` is for.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-068
   offline: false
 - id: GST-069
@@ -4815,7 +4881,8 @@ screens:
     \ so consent and erasure differ per kind.** Revocation sits beside enrolment for the same reason —\
     \ a face a guest cannot withdraw is a face they did not really consent to."
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-069
   offline: false
 - id: GST-070
@@ -4898,7 +4965,8 @@ screens:
     **Leaving a waitlist matters as much as joining one.** A guest who has given up and walked away still
     holds a place, and a queue full of people who left is a queue nobody trusts.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-070
   offline: false
 - id: GST-071
@@ -4963,7 +5031,8 @@ screens:
     **Wallet transfer and loyalty redemption sit here** because to a guest they are all *how I pay*, whatever
     the contracts call them.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-071
   offline: false
 - id: GST-072
@@ -5038,7 +5107,8 @@ screens:
     writes. This screen is where the reward would be visible, and it stays an open question until the
     wallet session settles what a referral credit is.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-072
   offline: false
 - id: GST-073
@@ -5085,6 +5155,7 @@ screens:
   notes: '**A guest could enrol a second factor and not manage it.** Small screen, and it is the one a
     guest reaches after losing a phone.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P02 Guest App.dc.html#gst-073
   offline: false

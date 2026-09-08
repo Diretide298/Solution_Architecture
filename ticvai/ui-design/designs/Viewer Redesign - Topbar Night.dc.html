@@ -14,8 +14,8 @@
 <style>
   html, body { margin: 0; padding: 0; background: #1A1A1A; overflow-x: auto; }
   body { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
-  a { color: #48CFCB; text-decoration: none; }
-  a:hover { color: #48CFCB; }
+  a { color: #1AD3EA; text-decoration: none; }
+  a:hover { color: #1AD3EA; }
   @keyframes asterFlow { to { stroke-dashoffset: -100; } }
   @keyframes asterComet { to { stroke-dashoffset: -104; } }
   @keyframes asterOrbit { to { stroke-dashoffset: -60; } }
@@ -31,10 +31,10 @@
 </helmet>
 <div style="display:flex;flex-direction:column;height:100vh;min-width:1180px;background:#1A1A1A;color:#EDEDED;font-size:14px">
 
-  <header style="background:#111111;display:flex;align-items:center;gap:20px;padding:0 22px;height:64px;flex:none">
+  <header style="background:#000000;display:flex;align-items:center;gap:20px;padding:0 22px;height:64px;flex:none">
     <img src="brand/aster-lockup-night.png" alt="Aster — the context layer for AI-assisted development" style="height:46px;width:auto;display:block;flex:none" />
     <span style="width:1px;height:26px;background:rgba(255,255,255,.13);flex:none"></span>
-    <nav style="display:flex;align-items:center;gap:3px;background:#0C0C0C;border-radius:11px;padding:4px;flex:none">
+    <nav style="display:flex;align-items:center;gap:3px;background:#000000;border-radius:11px;padding:4px;flex:none">
       <sc-for list="{{ layers }}" as="l" hint-placeholder-count="5">
         <a href="#" onClick="{{ l.pick }}" style="display:flex;align-items:center;gap:8px;padding:8px 14px;border-radius:8px;font-size:13px;font-weight:600;white-space:nowrap;background:{{ l.bg }};color:{{ l.fg }};box-shadow:{{ l.shadow }}" style-hover="color:#FFFFFF">
           {{ l.name }}
@@ -49,16 +49,16 @@
       <kbd style="font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;color:#B5B5B5;background-color:#3A3A3A;border-radius:5px;padding:3px 6px;flex:none">⌘K</kbd>
     </label>
     <span style="display:flex;align-items:center;gap:10px;flex:none">
-      <span style="width:7px;height:7px;border-radius:50%;background:#48CFCB;box-shadow:0 0 0 4px rgba(72,207,203,.2);display:block" title="Watching for changes"></span>
+      <span style="width:7px;height:7px;border-radius:50%;background:#1AD3EA;box-shadow:0 0 0 4px rgba(72,207,203,.2);display:block" title="Watching for changes"></span>
       <span style="display:flex;flex-direction:column;text-align:right">
         <span style="font-size:12.5px;font-weight:700;color:#EDEDED">hamza</span>
         <span style="font-size:9.5px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:#9A9A9A">reviewer</span>
       </span>
-      <span style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#2BB3B0,#48CFCB);color:#FFFFFF;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center">HA</span>
+      <span style="width:32px;height:32px;border-radius:50%;background:#1AD3EA;color:#FFFFFF;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center">HA</span>
     </span>
   </header>
 
-  <div style="background:#111111;border-bottom:1px solid #2E2E2E;display:flex;align-items:center;gap:20px;padding:0 22px;height:52px;flex:none">
+  <div style="background:#000000;border-bottom:1px solid #2E2E2E;display:flex;align-items:center;gap:20px;padding:0 22px;height:52px;flex:none">
     <nav style="display:flex;align-items:stretch;gap:2px;height:100%">
       <sc-for list="{{ views }}" as="v" hint-placeholder-count="5">
         <a href="#" onClick="{{ v.pick }}" style="display:flex;align-items:center;gap:8px;padding:0 14px;font-size:13.5px;font-weight:600;white-space:nowrap;border-bottom:2.5px solid {{ v.line }};color:{{ v.fg }}" style-hover="color:#FFFFFF">
@@ -79,14 +79,14 @@
 
   <div style="flex:1;display:grid;grid-template-columns:272px minmax(440px,1fr) 296px;min-height:0">
 
-    <aside style="background:#242424;border-right:1px solid #111111;display:flex;flex-direction:column;overflow:hidden">
+    <aside style="background:#242424;border-right:1px solid #000000;display:flex;flex-direction:column;overflow:hidden">
       <div style="padding:15px 15px 12px;display:flex;flex-direction:column;gap:11px;border-bottom:1px solid #1A1A1A">
         <div style="display:flex;background:#1A1A1A;border-radius:10px;padding:3px;gap:2px">
           <sc-for list="{{ groupings }}" as="g" hint-placeholder-count="3">
             <button onClick="{{ g.pick }}" style="flex:1;border:0;padding:7px 0;border-radius:8px;font:inherit;font-size:12px;font-weight:600;cursor:pointer;background:{{ g.bg }};color:{{ g.fg }};box-shadow:{{ g.shadow }}" style-hover="color:#EDEDED">{{ g.name }}</button>
           </sc-for>
         </div>
-        <label style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:#242424;border:1px solid #111111">
+        <label style="display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;background:#242424;border:1px solid #000000">
           <span style="width:13px;height:13px;border:1.6px solid #787878;border-radius:50%;display:block;flex:none"></span>
           <input type="search" placeholder="{{ filterHint }}" style="border:0;background:transparent;outline:none;font:inherit;font-size:13px;width:100%;color:#EDEDED" />
         </label>
@@ -115,14 +115,14 @@
         </sc-for>
       </div>
 
-      <div style="padding:13px 16px;display:flex;align-items:center;gap:10px;flex:none;background:#111111">
+      <div style="padding:13px 16px;display:flex;align-items:center;gap:10px;flex:none;background:#000000">
         <span style="display:flex;align-items:center;flex:none">
-          <span style="width:14px;height:14px;border-radius:50%;border:2.2px solid #48CFCB;display:block"></span>
-          <span style="width:14px;height:14px;border-radius:50%;border:2.2px solid #2BB3B0;display:block;margin-left:-5px"></span>
+          <span style="width:14px;height:14px;border-radius:50%;border:2.2px solid #1AD3EA;display:block"></span>
+          <span style="width:14px;height:14px;border-radius:50%;border:2.2px solid #0FA8BE;display:block;margin-left:-5px"></span>
         </span>
         <span style="display:flex;flex-direction:column;line-height:1.25">
           <span style="font-size:8.5px;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:#9A9A9A">Powered by</span>
-          <span style="font-size:12.5px;font-weight:700;letter-spacing:-0.01em;color:#EDEDED">Ainfinite<span style="color:#48CFCB">Core</span></span>
+          <span style="font-size:12.5px;font-weight:700;letter-spacing:-0.01em;color:#EDEDED">Ainfinite<span style="color:#1AD3EA">Core</span></span>
         </span>
         <span style="flex:1"></span>
         <span style="width:1px;height:22px;background:rgba(255,255,255,.14);flex:none"></span>
@@ -131,14 +131,14 @@
     </aside>
 
     <main style="display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#1A1A1A">
-      <div style="background:#202020;border-bottom:1px solid #111111;padding:14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:11px 18px;flex:none">
+      <div style="background:#202020;border-bottom:1px solid #000000;padding:14px 24px;display:flex;flex-wrap:wrap;align-items:center;gap:11px 18px;flex:none">
         <div style="flex:1 1 250px;min-width:0">
           <h1 style="margin:0;font-size:20px;font-weight:800;letter-spacing:-0.02em;color:#EDEDED">{{ title }}</h1>
           <div style="margin-top:3px;font-size:12.5px;font-weight:500;color:#787878">{{ sub }}</div>
         </div>
         <div style="display:flex;flex-wrap:wrap;gap:7px;align-items:center">
           <sc-for list="{{ chips }}" as="c" hint-placeholder-count="4">
-            <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;background:#242424;border:1px solid #111111;font-size:11.5px;font-weight:600;color:#EDEDED;white-space:nowrap">
+            <span style="display:inline-flex;align-items:center;gap:7px;padding:6px 11px;border-radius:9px;background:#242424;border:1px solid #000000;font-size:11.5px;font-weight:600;color:#EDEDED;white-space:nowrap">
               <span style="font-size:9.5px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#8A8A8A">{{ c.k }}</span>{{ c.v }}
             </span>
           </sc-for>
@@ -149,21 +149,21 @@
 
         <sc-if value="{{ isScreen }}" hint-placeholder-val="{{ true }}">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(350px,1fr));gap:16px;align-items:start">
-            <section style="background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);overflow:hidden">
+            <section style="background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);overflow:hidden">
               <div style="padding:16px 19px 13px;display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#242424;border-bottom:1px solid #1A1A1A">
                 <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Layout</h2>
                 <span style="font-size:11px;font-weight:600;color:#787878">contentBody · 4 components</span>
                 <span style="flex:1"></span>
-                <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#48CFCB;background:#123A3A;border-radius:7px;padding:4px 9px">region</span>
+                <span style="font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#1AD3EA;background:#0A3B42;border-radius:7px;padding:4px 9px">region</span>
               </div>
               <div style="padding:5px 19px 18px;display:flex;flex-direction:column">
                 <sc-for list="{{ components }}" as="c" hint-placeholder-count="4">
                   <div style="padding:13px 0;border-bottom:1px dashed #1A1A1A;display:flex;flex-direction:column;gap:5px">
                     <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
-                      <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;color:#2BB3B0">{{ c.kind }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:12.5px;font-weight:500;color:#0FA8BE">{{ c.kind }}</span>
                       <span style="font-size:13.5px;font-weight:600;color:#EDEDED">{{ c.label }}</span>
                       <span style="flex:1"></span>
-                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#48CFCB;background:#123A3A;border-radius:6px;padding:3px 8px">{{ c.binds }}</span>
+                      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#1AD3EA;background:#0A3B42;border-radius:6px;padding:3px 8px">{{ c.binds }}</span>
                     </div>
                     <div style="font-size:12.5px;line-height:1.5;color:#787878;max-width:52ch">{{ c.note }}</div>
                   </div>
@@ -172,7 +172,7 @@
             </section>
 
             <div style="display:flex;flex-direction:column;gap:16px">
-              <section style="background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
+              <section style="background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:13px">
                   <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">States</h2>
                   <span style="font-size:11px;font-weight:600;color:#787878">3 of 4 declared</span>
@@ -193,7 +193,7 @@
                 </div>
               </section>
 
-              <section style="background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
+              <section style="background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
                 <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px">
                   <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Reaches</h2>
                   <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#D0AE6A;background:#2B2418;border-radius:7px;padding:4px 9px">finding</span>
@@ -203,7 +203,7 @@
             </div>
           </div>
 
-          <section style="background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 20px">
+          <section style="background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 20px">
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:14px">
               <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Deployment</h2>
               <span style="font-size:11px;font-weight:600;color:#787878">whole platform · P01 Guest Web — Storefront</span>
@@ -212,7 +212,7 @@
               <sc-for list="{{ deployment }}" as="d" hint-placeholder-count="8">
                 <div style="padding:13px 14px;border-radius:11px;background:#202020;border:1px solid #1A1A1A;display:flex;flex-direction:column;gap:5px">
                   <span style="font-size:9.5px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8A8A8A">{{ d.k }}</span>
-                  <span style="font-size:13px;font-weight:600;color:#111111;line-height:1.4">{{ d.v }}</span>
+                  <span style="font-size:13px;font-weight:600;color:#000000;line-height:1.4">{{ d.v }}</span>
                 </div>
               </sc-for>
             </div>
@@ -234,15 +234,15 @@
                 </sc-for>
               </div>
               <span style="flex:1"></span>
-              <button style="border:1px solid #111111;background:#242424;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#B5B5B5;cursor:pointer" style-hover="border-color:#333333">Fit</button>
+              <button style="border:1px solid #000000;background:#242424;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#B5B5B5;cursor:pointer" style-hover="border-color:#333333">Fit</button>
             </div>
 
-            <div style="position:relative;background:radial-gradient(118% 88% at 50% 44%,#1D3037 0%,#17232A 34%,#13191D 66%,#0F1214 100%);border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);height:520px;overflow:hidden">
+            <div style="position:relative;background:#000000;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);height:520px;overflow:hidden">
               <canvas ref="{{ bindGalaxy }}" style="position:absolute;inset:0;width:100%;height:100%;display:block"></canvas>
-              <div style="position:absolute;inset:0;pointer-events:none;background:radial-gradient(126% 98% at 50% 46%,transparent 46%,rgba(5,8,10,.66) 100%)"></div>
-              <div style="position:absolute;left:0;right:0;bottom:0;z-index:90;display:flex;flex-wrap:wrap;align-items:center;gap:7px 20px;padding:14px 18px;background:linear-gradient(to top,rgba(7,11,13,.94) 0%,rgba(7,11,13,.72) 62%,transparent 100%)">
+              <div style="position:absolute;inset:0;pointer-events:none;background:transparent"></div>
+              <div style="position:absolute;left:0;right:0;bottom:0;z-index:90;display:flex;flex-wrap:wrap;align-items:center;gap:7px 20px;padding:14px 18px;background:#000000">
                 <sc-for list="{{ graphLegend }}" as="l" hint-placeholder-count="5">
-                  <span style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:#A0B4B3;white-space:nowrap">
+                  <span style="display:flex;align-items:center;gap:8px;font-size:11.5px;color:#A5AEAF;white-space:nowrap">
                     <span style="width:8px;height:8px;border-radius:50%;background:{{ l.color }};display:block;flex:none"></span>{{ l.text }}
                   </span>
                 </sc-for>
@@ -256,14 +256,14 @@
         <sc-if value="{{ isER }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:14px">
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
-              <span style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border-radius:10px;background:#242424;border:1px solid #111111;font-size:12.5px;font-weight:600;color:#EDEDED">satellite / fnb <span style="color:#8A8A8A">▾</span></span>
+              <span style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border-radius:10px;background:#242424;border:1px solid #000000;font-size:12.5px;font-weight:600;color:#EDEDED">satellite / fnb <span style="color:#8A8A8A">▾</span></span>
               <span style="font-size:11.5px;font-weight:600;color:#787878">37 entities · 1 referenced from other contracts · 29 relationships</span>
               <span style="flex:1"></span>
-              <button style="border:1px solid #111111;background:#242424;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#B5B5B5;cursor:pointer" style-hover="border-color:#333333">Fit</button>
+              <button style="border:1px solid #000000;background:#242424;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#B5B5B5;cursor:pointer" style-hover="border-color:#333333">Fit</button>
             </div>
 
-            <div style="position:relative;background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:20px;overflow:auto">
-              <div style="position:absolute;inset:0;background-image:radial-gradient(#111111 1px,transparent 1px);background-size:22px 22px;opacity:.9"></div>
+            <div style="position:relative;background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:20px;overflow:auto">
+              <div style="position:absolute;inset:0;background-image:radial-gradient(#000000 1px,transparent 1px);background-size:22px 22px;opacity:.9"></div>
               <div style="position:relative;display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:20px">
                 <sc-for list="{{ entities }}" as="e" hint-placeholder-count="8">
                   <div style="background:#242424;border:1.5px solid {{ e.border }};border-radius:12px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.30)">
@@ -287,7 +287,7 @@
               </div>
             </div>
 
-            <div style="display:flex;flex-wrap:wrap;gap:16px;padding:13px 16px;background:#242424;border:1px solid #111111;border-radius:12px">
+            <div style="display:flex;flex-wrap:wrap;gap:16px;padding:13px 16px;background:#242424;border:1px solid #000000;border-radius:12px">
               <sc-for list="{{ erLegend }}" as="l" hint-placeholder-count="3">
                 <span style="display:flex;align-items:center;gap:9px;font-size:11.5px;color:#A8A8A8">
                   <span style="width:9px;height:9px;border-radius:50%;background:{{ l.color }};display:block;flex:none"></span>{{ l.text }}
@@ -302,14 +302,14 @@
         <sc-if value="{{ isStates }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:14px">
             <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px">
-              <span style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border-radius:10px;background:#242424;border:1px solid #111111;font-size:12.5px;font-weight:600;color:#EDEDED">Order — 9 states <span style="color:#8A8A8A">▾</span></span>
+              <span style="display:inline-flex;align-items:center;gap:9px;padding:8px 13px;border-radius:10px;background:#242424;border:1px solid #000000;font-size:12.5px;font-weight:600;color:#EDEDED">Order — 9 states <span style="color:#8A8A8A">▾</span></span>
               <span style="font-size:11.5px;font-weight:600;color:#787878">9 states · 14 transitions · 5 reversals · checked against orders.OrderStatus</span>
               <span style="flex:1"></span>
-              <button style="border:1px solid #111111;background:#242424;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#B5B5B5;cursor:pointer" style-hover="border-color:#333333">Fit</button>
+              <button style="border:1px solid #000000;background:#242424;border-radius:9px;padding:7px 14px;font:inherit;font-size:12px;font-weight:600;color:#B5B5B5;cursor:pointer" style-hover="border-color:#333333">Fit</button>
             </div>
 
-            <div style="position:relative;background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);height:480px;overflow:hidden">
-              <div style="position:absolute;inset:0;background-image:radial-gradient(#111111 1px,transparent 1px);background-size:22px 22px;opacity:.9"></div>
+            <div style="position:relative;background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);height:480px;overflow:hidden">
+              <div style="position:absolute;inset:0;background-image:radial-gradient(#000000 1px,transparent 1px);background-size:22px 22px;opacity:.9"></div>
               <span style="position:absolute;inset:0">{{ transitionSvg }}</span>
               <sc-for list="{{ transLabels }}" as="l" hint-placeholder-count="5">
                 <span style="position:absolute;left:{{ l.left }};top:{{ l.top }};transform:translate(-50%,-50%);font-size:11px;font-weight:600;color:{{ l.color }};background:rgba(26,26,26,.92);padding:1px 5px;border-radius:4px;white-space:nowrap">{{ l.text }}</span>
@@ -322,7 +322,7 @@
                   </sc-if>
                 </span>
               </sc-for>
-              <div style="position:absolute;left:16px;bottom:16px;background:rgba(32,32,32,.94);border:1px solid #111111;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="position:absolute;left:16px;bottom:16px;background:rgba(32,32,32,.94);border:1px solid #000000;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
                 <sc-for list="{{ stateLegend }}" as="l" hint-placeholder-count="5">
                   <span style="display:flex;align-items:center;gap:9px;font-size:11.5px;color:#A8A8A8">
                     <span style="width:9px;height:9px;border-radius:50%;background:{{ l.color }};display:block;flex:none"></span>{{ l.text }}
@@ -332,7 +332,7 @@
               </div>
             </div>
 
-            <section style="background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
+            <section style="background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
               <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:8px">
                 <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Note</h2>
                 <span style="font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:#D0AE6A;background:#2B2418;border-radius:7px;padding:4px 9px">defect</span>
@@ -344,7 +344,7 @@
 
         <sc-if value="{{ isJourney }}" hint-placeholder-val="{{ false }}">
           <div style="display:flex;flex-direction:column;gap:14px">
-            <section style="background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px;display:flex;flex-direction:column;gap:12px">
+            <section style="background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px;display:flex;flex-direction:column;gap:12px">
               <div style="display:flex;flex-direction:column;gap:7px">
                 <span style="font-size:9.5px;font-weight:700;letter-spacing:0.13em;text-transform:uppercase;color:#8A8A8A">Trigger</span>
                 <p style="margin:0;font-size:13px;line-height:1.6;color:#D8D8D8;max-width:88ch">A guest arrives wanting to visit. Most arrive on a product page from a search engine or a campaign link rather than the homepage, so the flow must work from any entry point.</p>
@@ -359,9 +359,9 @@
             <div style="display:flex;align-items:stretch;overflow-x:auto;padding-bottom:6px">
               <sc-for list="{{ journeySteps }}" as="s" hint-placeholder-count="4">
                 <div style="display:flex;align-items:center;flex:none">
-                  <div style="width:258px;background:#242424;border:1px solid #111111;border-radius:13px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:14px 15px 15px;display:flex;flex-direction:column;gap:9px">
+                  <div style="width:258px;background:#242424;border:1px solid #000000;border-radius:13px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:14px 15px 15px;display:flex;flex-direction:column;gap:9px">
                     <div style="display:flex;align-items:center;gap:9px">
-                      <span style="width:21px;height:21px;border-radius:7px;background:#123A3A;color:#48CFCB;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.n }}</span>
+                      <span style="width:21px;height:21px;border-radius:7px;background:#0A3B42;color:#1AD3EA;font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center">{{ s.n }}</span>
                       <span style="font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:#787878">{{ s.id }}</span>
                       <span style="flex:1"></span>
                       <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8A8A">{{ s.platform }}</span>
@@ -372,8 +372,8 @@
                     </div>
                     <div style="display:flex;flex-direction:column;gap:5px">
                       <sc-for list="{{ s.ops }}" as="o" hint-placeholder-count="2">
-                        <span style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#202020;border:1px solid #1A1A1A;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#111111">
-                          <span style="width:5px;height:5px;border-radius:50%;background:#2BB3B0;display:block;flex:none"></span>{{ o }}
+                        <span style="display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:8px;background:#202020;border:1px solid #1A1A1A;font-family:'JetBrains Mono',monospace;font-size:11.5px;color:#000000">
+                          <span style="width:5px;height:5px;border-radius:50%;background:#0FA8BE;display:block;flex:none"></span>{{ o }}
                         </span>
                       </sc-for>
                     </div>
@@ -386,7 +386,7 @@
               </sc-for>
             </div>
 
-            <section style="background:#242424;border:1px solid #111111;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
+            <section style="background:#242424;border:1px solid #000000;border-radius:15px;box-shadow:0 1px 2px rgba(0,0,0,.06);padding:16px 19px 18px">
               <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:13px">
                 <h2 style="margin:0;font-size:15px;font-weight:700;letter-spacing:-0.01em">Branches</h2>
                 <span style="font-size:11px;font-weight:600;color:#787878">7 across the flow · 2 on this step</span>
@@ -394,12 +394,12 @@
               <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:11px">
                 <sc-for list="{{ branches }}" as="b" hint-placeholder-count="2">
                   <div style="display:grid;grid-template-columns:4px minmax(0,1fr);gap:13px;padding:13px 15px;border-radius:11px;background:#202020;border:1px solid #1A1A1A">
-                    <span style="border-radius:99px;background:#2BB3B0;display:block"></span>
+                    <span style="border-radius:99px;background:#0FA8BE;display:block"></span>
                     <span style="display:flex;flex-direction:column;gap:6px">
                       <b style="font-size:13px;font-weight:700;line-height:1.45;color:#EDEDED">{{ b.title }}</b>
                       <span style="font-size:12.5px;line-height:1.55;color:#A8A8A8">{{ b.body }}</span>
                       <span style="display:flex;align-items:center;gap:8px;margin-top:1px">
-                        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.11em;text-transform:uppercase;color:#48CFCB;background:#123A3A;border-radius:6px;padding:3px 8px">{{ b.tag }}</span>
+                        <span style="font-size:9.5px;font-weight:700;letter-spacing:0.11em;text-transform:uppercase;color:#1AD3EA;background:#0A3B42;border-radius:6px;padding:3px 8px">{{ b.tag }}</span>
                         <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8A8A8A">{{ b.res }}</span>
                       </span>
                     </span>
@@ -412,7 +412,7 @@
       </div>
     </main>
 
-    <aside style="background:#242424;border-left:1px solid #111111;display:flex;flex-direction:column;overflow:hidden">
+    <aside style="background:#242424;border-left:1px solid #000000;display:flex;flex-direction:column;overflow:hidden">
       <div style="padding:18px 19px 14px;border-bottom:1px solid #1A1A1A;display:flex;align-items:center;gap:9px">
         <h2 style="margin:0;font-size:12px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#EDEDED">Links</h2>
         <span style="flex:1"></span>
@@ -430,7 +430,7 @@
               <p style="margin:0;padding:2px 2px 0;font-size:12.5px;line-height:1.55;color:#8A8A8A">{{ g.emptyNote }}</p>
             </sc-if>
             <sc-for list="{{ g.items }}" as="i" hint-placeholder-count="2">
-              <a href="#" onClick="{{ noop }}" style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:#2C2C2C;border:1px solid #383838;color:#EDEDED" style-hover="border-color:#2BB3B0;background:#143E3E">
+              <a href="#" onClick="{{ noop }}" style="display:flex;align-items:center;gap:9px;padding:9px 11px;border-radius:10px;background:#2C2C2C;border:1px solid #383838;color:#EDEDED" style-hover="border-color:#0FA8BE;background:#0C4046">
                 <span style="font-family:'JetBrains Mono',monospace;font-size:10.5px;color:#8A8A8A;flex:none">{{ i.id }}</span>
                 <span style="font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ i.name }}</span>
                 <span style="flex:1"></span>
@@ -671,7 +671,7 @@ class Component extends DCLogic {
       return { ...o, pick: (e) => { noop(e);
           const first = { Frontend: 'Screen', Contracts: 'Graph', Domain: 'States', Backend: 'Services', Decisions: 'Register' }[o.name];
           this.setState({ layer: o.name, view: first }); },
-        bg: on ? 'linear-gradient(135deg,#2BB3B0,#48CFCB)' : 'transparent',
+        bg: on ? '#000000' : 'transparent',
         fg: on ? '#242424' : '#B5B5B5', shadow: on ? '0 4px 12px rgba(34,151,153,.35)' : 'none' };
     });
 
@@ -685,7 +685,7 @@ class Component extends DCLogic {
     const views = (viewSets[L] || viewSets.Frontend).map(([name, key]) => {
       const on = name === V;
       return { name, key, pick: set('view', name),
-        line: on ? '#48CFCB' : 'transparent', fg: on ? '#FFFFFF' : '#9A9A9A' };
+        line: on ? '#1AD3EA' : 'transparent', fg: on ? '#FFFFFF' : '#9A9A9A' };
     });
 
     const groupSets = {
@@ -706,12 +706,12 @@ class Component extends DCLogic {
     const row = (id, name, meta, idw) => {
       const on = id === this.state.screen;
       return { id, name, meta, idw: idw || '54px', pick: set('screen', id),
-        bg: on ? '#123A3A' : 'transparent', fg: on ? '#48CFCB' : '#D8D8D8', weight: on ? 700 : 500 };
+        bg: on ? '#0A3B42' : 'transparent', fg: on ? '#1AD3EA' : '#D8D8D8', weight: on ? 700 : 500 };
     };
 
     const groupsByLayer = {
       Frontend: [
-        { title: 'Guest Web — Storefront', count: 'P01 · 29', tone: '#2BB3B0', items: [
+        { title: 'Guest Web — Storefront', count: 'P01 · 29', tone: '#0FA8BE', items: [
           row('WEB-001','Home / Landing','3'), row('WEB-002','Event & Attraction Listing','2'),
           row('WEB-003','Search Results','0'), row('WEB-004','Event / Attraction Detail','2'),
           row('WEB-005','Ticket Type Selection','2'), row('WEB-006','Date & Session Selection','1'),
@@ -720,18 +720,18 @@ class Component extends DCLogic {
           row('WEB-011','Guest Details & Attendees','2'), row('WEB-012','Checkout — Payment','3'),
           row('WEB-013','Order Confirmation','2'), row('WEB-014','Payment Link Landing','1'),
         ]},
-        { title: 'Guest Mobile App', count: 'P02 · 24', tone: '#48CFCB', items: [
+        { title: 'Guest Mobile App', count: 'P02 · 24', tone: '#1AD3EA', items: [
           row('APP-001','Splash & Onboarding','2'), row('APP-002','Home Feed','4'),
           row('APP-003','My Tickets — Wallet','3'), row('APP-004','Scan & Enter','2'),
         ]},
       ],
       Contracts: [
-        { title: 'Spine', count: '8', tone: '#2BB3B0', items: [
+        { title: 'Spine', count: '8', tone: '#0FA8BE', items: [
           row('','access','35','0'), row('','catalogue','73','0'), row('','cross-cell','24','0'),
           row('','finance','83','0'), row('','identity','59','0'), row('','orders','71','0'),
           row('','shift','24','0'), row('','tenancy','34','0'),
         ]},
-        { title: 'Satellite', count: '14', tone: '#48CFCB', items: [
+        { title: 'Satellite', count: '14', tone: '#1AD3EA', items: [
           row('','assets','22','0'), row('','fnb','78','0'), row('','games','22','0'),
           row('','inventory','73','0'), row('','maintenance','58','0'), row('','marketing-crm','88','0'),
           row('','platform-ops','44','0'), row('','promotions','61','0'), row('','queue','40','0'),
@@ -743,7 +743,7 @@ class Component extends DCLogic {
         ]},
       ],
       Domain: [
-        { title: 'Entities', count: '39 models', tone: '#2BB3B0', items: [
+        { title: 'Entities', count: '39 models', tone: '#0FA8BE', items: [
           row('','Order','9/9','0'), row('','Payment','7/7','0'), row('','Ticket','6/6','0'),
           row('','Report execution','6/6','0'), row('','Seat map','4/6','0'),
           row('','Stock transfer','5/6','0'), row('','White-label content','3/5','0'),
@@ -759,12 +759,12 @@ class Component extends DCLogic {
         ]},
       ],
       Backend: [
-        { title: 'Services', count: '18', tone: '#2BB3B0', items: [
+        { title: 'Services', count: '18', tone: '#0FA8BE', items: [
           row('','order-service','24','0'), row('','payment-service','19','0'),
           row('','catalogue-service','31','0'), row('','access-service','14','0'),
           row('','inventory-service','22','0'), row('','reporting-service','17','0'),
         ]},
-        { title: 'Tables', count: '224', tone: '#2BB3B0', items: [
+        { title: 'Tables', count: '224', tone: '#0FA8BE', items: [
           row('','orders','18 cols','0'), row('','order_lines','14 cols','0'),
           row('','payments','16 cols','0'), row('','tickets','12 cols','0'),
           row('','seat_holds','9 cols','0'),
@@ -790,8 +790,8 @@ class Component extends DCLogic {
       const on = !!this.state.toggles[name];
       return { name,
         pick: (e) => { noop(e); this.setState(s => ({ toggles: { ...s.toggles, [name]: !s.toggles[name] } })); },
-        bg: on ? '#1F5F60' : '#2E2E2E', fg: on ? '#8FE5E2' : '#D2D2D2',
-        border: on ? '#2C7C7D' : '#3A3A3A' };
+        bg: on ? '#12626D' : '#2E2E2E', fg: on ? '#7EE8F6' : '#D2D2D2',
+        border: on ? '#1C808D' : '#3A3A3A' };
     });
 
     const dimTabs = ['3D', '2D'].map(name => {
@@ -816,14 +816,14 @@ class Component extends DCLogic {
       vectorEffect: 'non-scaling-stroke',
     })));
 
-    const F = (n, t, key) => ({ n, t, nameFg: key ? '#48CFCB' : '#D8D8D8', weight: key ? 700 : 400 });
+    const F = (n, t, key) => ({ n, t, nameFg: key ? '#1AD3EA' : '#D8D8D8', weight: key ? 700 : 400 });
     const ent = (name, count, kind, fields) => ({
       name, count, fields,
-      border: kind === 'enum' ? '#D6CBE8' : kind === 'ext' ? '#E4D6BC' : '#CBE4E3',
-      head: kind === 'enum' ? '#F3EFFA' : kind === 'ext' ? '#FAF3E6' : '#EAF7F6',
-      headFg: kind === 'enum' ? '#4C3B70' : kind === 'ext' ? '#6E5423' : '#175E60',
-      countFg: kind === 'enum' ? '#8B7BB0' : kind === 'ext' ? '#A08A5C' : '#5E9C9B',
-      dot: kind === 'enum' ? '#7C5FC0' : kind === 'ext' ? '#D9A143' : '#2BB3B0',
+      border: kind === 'enum' ? '#D6CBE8' : kind === 'ext' ? '#E4D6BC' : '#C6E5E9',
+      head: kind === 'enum' ? '#F3EFFA' : kind === 'ext' ? '#FAF3E6' : '#E7F7FA',
+      headFg: kind === 'enum' ? '#4C3B70' : kind === 'ext' ? '#6E5423' : '#08636F',
+      countFg: kind === 'enum' ? '#8B7BB0' : kind === 'ext' ? '#A08A5C' : '#529EA8',
+      dot: kind === 'enum' ? '#7C5FC0' : kind === 'ext' ? '#D9A143' : '#0FA8BE',
     });
 
     const entities = [
@@ -853,7 +853,7 @@ class Component extends DCLogic {
 
     // state machine layout
     const sn = (name, x, y, kind, offline) => ({ name, left: x + '%', top: y + '%',
-      border: kind === 'initial' ? '#2BB3B0' : kind === 'terminal' ? '#7C5FC0' : '#333333',
+      border: kind === 'initial' ? '#0FA8BE' : kind === 'terminal' ? '#7C5FC0' : '#333333',
       offline: offline ? true : false });
     const stateNodes = [
       sn('pending', 13, 52, 'initial', 1), sn('held', 34, 30, 'mid', 1),
@@ -864,7 +864,7 @@ class Component extends DCLogic {
     ];
     const tr = (x1, y1, x2, y2, kind) => ({
       x1, y1, x2, y2,
-      color: kind === 'reversal' ? '#D9A143' : kind === 'job' ? '#2BB3B0' : '#A8A8A8',
+      color: kind === 'reversal' ? '#D9A143' : kind === 'job' ? '#0FA8BE' : '#A8A8A8',
       dash: kind === 'job' ? '5 4' : undefined, width: 1.8,
     });
     const transitionSvg = svgLayer([
@@ -880,7 +880,7 @@ class Component extends DCLogic {
       mid('holdOrder', [13,52], [34,30], '#787878'),
       mid('createPayment', [13,52], [34,52], '#787878'),
       mid('resumeOrder', [13,52], [34,74], '#787878'),
-      mid('job', [34,74], [68,88], '#48CFCB'),
+      mid('job', [34,74], [68,88], '#1AD3EA'),
       mid('✓ createRefund', [34,52], [68,32], '#8A6420'),
       mid('✓ createRefund', [68,88], [68,14], '#8A6420'),
     ];
@@ -947,7 +947,7 @@ class Component extends DCLogic {
         { kind: 'cardList', label: 'Results', binds: 'Product[]', note: 'Cursor pagination. Infinite scroll with an explicit load-more fallback.' },
       ],
       screenStates: [
-        { name: 'loading', when: 'while the data is on its way', tone: '#48CFCB', body: 'Card skeletons at the current page size.' },
+        { name: 'loading', when: 'while the data is on its way', tone: '#1AD3EA', body: 'Card skeletons at the current page size.' },
         { name: 'empty', when: 'when there is nothing to show', tone: '#D9A143', body: 'No products match. Names the most restrictive filter and offers to clear it — an empty state with no action is a dead end.' },
         { name: 'error', when: 'when the call fails', tone: '#D96C63', body: 'Retry with filters preserved. Filters are never silently reset.' },
         { name: 'offline', when: 'not required here', tone: '#2E2E2E', body: 'The platform is not offline-capable, so the rule does not apply.' },
@@ -982,21 +982,21 @@ class Component extends DCLogic {
           tag: 'recoverable', res: 'resolved by WEB-006' },
       ],
       graphLegend: [
-        { color: '#48CFCB', text: 'spine — the bright cluster' },
-        { color: '#2BB3B0', text: 'satellite — the outer shell' },
+        { color: '#1AD3EA', text: 'spine — the bright cluster' },
+        { color: '#0FA8BE', text: 'satellite — the outer shell' },
         { color: '#D9A143', text: 'shared — the core, refd by all 22' },
         { color: '#D9A143', text: 'an event with a critical consumer' },
         { color: '#A8A8A8', text: 'an event — the packet runs publisher → consumer' },
       ],
       erLegend: [
-        { color: '#2BB3B0', text: 'entity in this contract' },
+        { color: '#0FA8BE', text: 'entity in this contract' },
         { color: '#7C5FC0', text: 'enum' },
         { color: '#D9A143', text: 'entity from another contract' },
       ],
       stateLegend: [
-        { color: '#2BB3B0', text: 'initial' }, { color: '#7C5FC0', text: 'terminal' },
+        { color: '#0FA8BE', text: 'initial' }, { color: '#7C5FC0', text: 'terminal' },
         { color: '#A8A8A8', text: 'operation moves it' },
-        { color: '#2BB3B0', text: 'timer or job — dashed, because no operation causes it' },
+        { color: '#0FA8BE', text: 'timer or job — dashed, because no operation causes it' },
         { color: '#D9A143', text: 'reversal — value moving backwards' },
       ],
       linkGroups: [

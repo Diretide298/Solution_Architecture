@@ -7,8 +7,26 @@
   "suggestion": "`requestSuggestion` with a `kind`. **Seventeen panels, one operation** \u2014 the boards drew each as its own endpoint, and six endpoints is six places to change when a model changes.",
   "build": "Genuinely new. Four, all in Board 2's three newest frames."
  },
- "generated": "24 August 2026",
+ "generated": "8 September 2026",
  "panels": {
+  "addGuestNote": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4G"
+   ]
+  },
+  "addWalkIn": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4F"
+   ]
+  },
+  "adjustStock": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5B"
+   ]
+  },
   "allocateToOutlets": {
    "shape": "filter",
    "frames": [
@@ -18,12 +36,84 @@
    "servedBy": "createStockTransfer",
    "exists": true
   },
+  "applyMenuActions": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2K"
+   ]
+  },
+  "approveAction": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-6K"
+   ]
+  },
+  "approveScenario": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-6J"
+   ]
+  },
+  "approveWriteOff": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5E"
+   ]
+  },
+  "archiveProduct": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2C"
+   ]
+  },
+  "askAssistant": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-6K"
+   ]
+  },
+  "attachEvidence": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5E"
+   ]
+  },
+  "attachModifierGroup": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2E"
+   ]
+  },
   "buildProductionPlan": {
    "shape": "build",
    "frames": [
     "FNB-2M"
    ],
    "note": "**Genuinely new.** Forecast demand against recipes to produce a prep list. Sits on `requestSuggestion(kind=prepPlan)` for the forecast and needs a plan artefact to hold it."
+  },
+  "bulkUpdateProducts": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2C"
+   ]
+  },
+  "callGuest": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3G"
+   ]
+  },
+  "chaseStation": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3F"
+   ]
+  },
+  "checkTableAvailability": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4E"
+   ]
   },
   "classifyMenuItems": {
    "shape": "suggestion",
@@ -34,6 +124,12 @@
    "note": "`kind=menuEngineering`.",
    "servedBy": "requestSuggestion",
    "exists": true
+  },
+  "compItem": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4J"
+   ]
   },
   "consolidateOutletDemand": {
    "shape": "derive",
@@ -52,6 +148,69 @@
    "note": "A batch is a planned run.",
    "servedBy": "planProductionRun",
    "exists": true
+  },
+  "createCombo": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2G"
+   ]
+  },
+  "createModifierGroup": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2E"
+   ]
+  },
+  "createOutlet": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1B",
+    "FNB-1C",
+    "FNB-1D"
+   ]
+  },
+  "createProduct": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2C"
+   ]
+  },
+  "createRequisition": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5B",
+    "FNB-5F"
+   ]
+  },
+  "createRequisitionsBulk": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5K"
+   ]
+  },
+  "createReservation": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4E"
+   ]
+  },
+  "createTable": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4C"
+   ]
+  },
+  "enterCountLine": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5H"
+   ]
+  },
+  "fireCourse": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3C"
+   ]
   },
   "forecastDemand": {
    "shape": "suggestion",
@@ -225,6 +384,12 @@
    "servedBy": "getGuestProfile",
    "exists": true
   },
+  "getGuestMenu": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1G"
+   ]
+  },
   "getGuestMix": {
    "shape": "report",
    "frames": [
@@ -233,6 +398,12 @@
    "note": "New against returning, by segment.",
    "servedBy": "runReport",
    "exists": true
+  },
+  "getHaccpStatus": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5J"
+   ]
   },
   "getIngredientCoverage": {
    "shape": "derive",
@@ -346,6 +517,12 @@
    "servedBy": "runReport",
    "exists": true
   },
+  "getOrder": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3D"
+   ]
+  },
   "getOrderCourses": {
    "shape": "filter",
    "frames": [
@@ -390,6 +567,12 @@
    "note": "The plan's lines.",
    "servedBy": "getProductionRun",
    "exists": true
+  },
+  "getProduct": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2D"
+   ]
   },
   "getProductAllergens": {
    "shape": "filter",
@@ -618,6 +801,18 @@
    "servedBy": "runReport",
    "exists": true
   },
+  "holdCourse": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3C"
+   ]
+  },
+  "list86Events": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2H"
+   ]
+  },
   "listActionQueue": {
    "shape": "filter",
    "frames": [
@@ -681,6 +876,17 @@
    "servedBy": "runReport",
    "exists": true
   },
+  "listDiningOutlets": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1B",
+    "FNB-1D",
+    "FNB-1E",
+    "FNB-1F",
+    "FNB-1G",
+    "FNB-1K"
+   ]
+  },
   "listExecutiveInsights": {
    "shape": "suggestion",
    "frames": [
@@ -727,6 +933,44 @@
    "servedBy": "requestSuggestion",
    "exists": true
   },
+  "listKitchenStations": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1B",
+    "FNB-1C",
+    "FNB-1D",
+    "FNB-1F",
+    "FNB-1H",
+    "FNB-1J",
+    "FNB-3E"
+   ]
+  },
+  "listKitchenTickets": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1H",
+    "FNB-3A",
+    "FNB-3B"
+   ]
+  },
+  "listMenus": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1B",
+    "FNB-1C",
+    "FNB-1E",
+    "FNB-1G",
+    "FNB-1K",
+    "FNB-2A",
+    "FNB-2B"
+   ]
+  },
+  "listModifierGroups": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2E"
+   ]
+  },
   "listOrderLog": {
    "shape": "filter",
    "frames": [
@@ -763,6 +1007,13 @@
    "servedBy": "listProductionRuns",
    "exists": true
   },
+  "listProducts": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2A",
+    "FNB-2C"
+   ]
+  },
   "listRecommendations": {
    "shape": "suggestion",
    "frames": [
@@ -771,6 +1022,13 @@
    "note": "Open suggestions for this scope.",
    "servedBy": "requestSuggestion",
    "exists": true
+  },
+  "listReservations": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4A",
+    "FNB-4D"
+   ]
   },
   "listSeatedTables": {
    "shape": "filter",
@@ -820,6 +1078,12 @@
    "servedBy": "listStockTransfers",
    "exists": true
   },
+  "listUnavailableItems": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5J"
+   ]
+  },
   "listWaitlist": {
    "shape": "filter",
    "frames": [
@@ -840,6 +1104,102 @@
    "servedBy": "listStockMovements",
    "exists": true
   },
+  "logBatchWaste": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5D"
+   ]
+  },
+  "logColdChain": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5G"
+   ]
+  },
+  "logKitchenException": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3H"
+   ]
+  },
+  "logTemperature": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5J"
+   ]
+  },
+  "logWastage": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5E"
+   ]
+  },
+  "markOrderCollected": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3G"
+   ]
+  },
+  "matchGuest": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4E"
+   ]
+  },
+  "mergeGuests": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4G"
+   ]
+  },
+  "mergeTables": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4B"
+   ]
+  },
+  "moveTable": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4B"
+   ]
+  },
+  "notifyServer": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4H"
+   ]
+  },
+  "notifyWaitlistParty": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4F"
+   ]
+  },
+  "postStockAdjustment": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5C"
+   ]
+  },
+  "postStockCount": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5H"
+   ]
+  },
+  "printBill": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4J"
+   ]
+  },
+  "printOrderLabel": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3F"
+   ]
+  },
   "printPrepSheets": {
    "shape": "filter",
    "frames": [
@@ -848,6 +1208,15 @@
    "note": "A render of the plan. **Not an endpoint** \u2014 the same rule that made `printOrderLabel` the exception, and it is the exception because of allergens.",
    "servedBy": "getProductionRun",
    "exists": true
+  },
+  "prioritiseKitchenTicket": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1H",
+    "FNB-1J",
+    "FNB-3B",
+    "FNB-3D"
+   ]
   },
   "publishDemandPlan": {
    "shape": "suggestion",
@@ -858,6 +1227,13 @@
    "servedBy": "requestSuggestion",
    "exists": true
   },
+  "publishMenu": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2B",
+    "FNB-2J"
+   ]
+  },
   "queueAction": {
    "shape": "filter",
    "frames": [
@@ -866,6 +1242,36 @@
    "note": "**A suggestion becomes a proposed action and the queue is already there.** One queue, not one per domain.",
    "servedBy": "decideProposedAction",
    "exists": true
+  },
+  "quoteWaitTime": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4F"
+   ]
+  },
+  "raiseTransferClaim": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5G"
+   ]
+  },
+  "reassignServer": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4H"
+   ]
+  },
+  "reassignTable": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4D"
+   ]
+  },
+  "rebalanceStationLoad": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3E"
+   ]
   },
   "recalculateNutrition": {
    "shape": "derive",
@@ -876,12 +1282,66 @@
    "servedBy": "setRecipe",
    "exists": true
   },
+  "recallKitchenTicket": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3B"
+   ]
+  },
+  "receiveTransfer": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5G"
+   ]
+  },
+  "recordBatchOutput": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5D"
+   ]
+  },
+  "refireItem": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3H"
+   ]
+  },
+  "rejectTransferLine": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5G"
+   ]
+  },
   "releaseProductionPlan": {
    "shape": "build",
    "frames": [
     "FNB-2M"
    ],
    "note": "**Genuinely new.** A plan becomes production runs. **Separate from building it because a plan is edited before it is released**, and a plan that creates runs as it is drafted creates runs nobody asked for."
+  },
+  "requestApproval": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2J"
+   ]
+  },
+  "requestRecount": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5H"
+   ]
+  },
+  "resolveBookingConflict": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4D"
+   ]
+  },
+  "rollbackMenu": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2J"
+   ]
   },
   "scheduleCommissaryRun": {
    "shape": "filter",
@@ -892,12 +1352,153 @@
    "servedBy": "planProductionRun",
    "exists": true
   },
+  "scheduleMenuPublish": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2J"
+   ]
+  },
+  "seatParty": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4B",
+    "FNB-4F"
+   ]
+  },
+  "sendBookingConfirmation": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4E"
+   ]
+  },
+  "sendOrderNotification": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3G"
+   ]
+  },
+  "setAlertRules": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5K"
+   ]
+  },
+  "setChannelPrices": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2D"
+   ]
+  },
+  "setComboSlots": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2G"
+   ]
+  },
+  "setCourseRules": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3C"
+   ]
+  },
+  "setDailyCount": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2H"
+   ]
+  },
+  "setItemAvailability": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2H",
+    "FNB-3H",
+    "FNB-5J"
+   ]
+  },
+  "setKitchenSla": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3J"
+   ]
+  },
+  "setKitchenStations": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1H",
+    "FNB-1J",
+    "FNB-1K",
+    "FNB-3E"
+   ]
+  },
+  "setKitchenTicketStatus": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1J",
+    "FNB-3B",
+    "FNB-3F"
+   ]
+  },
+  "setMenuSections": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1E",
+    "FNB-2B"
+   ]
+  },
+  "setModifierOptions": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2E"
+   ]
+  },
+  "setPosLayout": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2B"
+   ]
+  },
+  "setPriorityWeights": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3J"
+   ]
+  },
+  "setRecipeLines": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2F"
+   ]
+  },
+  "setSectionLayout": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4C"
+   ]
+  },
+  "setServiceStage": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4H"
+   ]
+  },
   "setSubstitutionRules": {
    "shape": "build",
    "frames": [
     "FNB-2L"
    ],
    "note": "**Genuinely new.** What may replace what, and under what conditions \u2014 and it is the input `verifyAllergens` checks against."
+  },
+  "setTableCombinations": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4C"
+   ]
+  },
+  "signCorrectiveAction": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5J"
+   ]
   },
   "simulateScenario": {
    "shape": "suggestion",
@@ -917,6 +1518,24 @@
    "servedBy": "requestSuggestion",
    "exists": true
   },
+  "splitCheck": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4J"
+   ]
+  },
+  "startStockCount": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5H"
+   ]
+  },
+  "submitForApproval": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5F"
+   ]
+  },
   "suggestPrice": {
    "shape": "suggestion",
    "frames": [
@@ -935,12 +1554,79 @@
    "servedBy": "requestSuggestion",
    "exists": true
   },
+  "suggestRequisition": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5F"
+   ]
+  },
+  "takePayment": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4J"
+   ]
+  },
+  "transferOrderItems": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3D"
+   ]
+  },
+  "updateGuestPreferences": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4G"
+   ]
+  },
+  "updateOutlet": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-1C",
+    "FNB-1D",
+    "FNB-1E",
+    "FNB-1F",
+    "FNB-1G",
+    "FNB-1K"
+   ]
+  },
+  "updateProduct": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-2C",
+    "FNB-2D"
+   ]
+  },
+  "updateRequisitionLines": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-5F"
+   ]
+  },
+  "updateReservation": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4E"
+   ]
+  },
+  "updateTable": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-4C"
+   ]
+  },
   "verifyAllergens": {
    "shape": "build",
    "frames": [
     "FNB-2L"
    ],
    "note": "**Genuinely new, and the one that matters in this frame.** A substituted ingredient changes the allergen claim, and BL-127 built allergens without linking substitution. **A dish declared nut-free after a substitution nobody checked is the failure this prevents.**"
+  },
+  "voidOrderItem": {
+   "shape": "unmapped",
+   "frames": [
+    "FNB-3D",
+    "FNB-3H"
+   ]
   }
  },
  "summary": {
@@ -949,6 +1635,6 @@
   "derive": 10,
   "suggestion": 14,
   "build": 4,
-  "unmapped": 0
+  "unmapped": 107
  }
 }

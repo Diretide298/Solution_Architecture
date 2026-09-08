@@ -32,8 +32,11 @@ def main() -> int:
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
         doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         p = doc["platform"]
+        # **`designed` is provenance, not status.** It moved out of `status` on 8 September,
+        # where it had never been a legal value and where four consumers read four different
+        # numbers off it. The count this publishes is unchanged: 133 across the package.
         drawn = sum(1 for s in doc["screens"]
-                    if (s.get("wireframe") or {}).get("status") == "designed")
+                    if (s.get("wireframe") or {}).get("provenance") == "designed")
         rows.append({
             "code": p["code"],
             "short": p.get("shortName", ""),

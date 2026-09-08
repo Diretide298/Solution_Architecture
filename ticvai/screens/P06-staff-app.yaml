@@ -91,7 +91,8 @@ screens:
     fromFlows: true
     isEntryPoint: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-001
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Sign in.** A shared device between shifts shows nothing until somebody identifies
@@ -185,7 +186,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-002
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRole, forceLogout, listActiveSessions, revokeAllSessions.
@@ -309,7 +311,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-003
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **createCashMovement removed 18 August** — attached by module resemblance, not by what
@@ -460,7 +463,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-048
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -541,7 +545,8 @@ screens:
     - EMP-003
     inferred: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-009
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -682,7 +687,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-010
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **Absorbed EMP-011, EMP-012, EMP-013, EMP-016 on 18 August.** A scanner is one screen
@@ -805,7 +811,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-014
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -946,7 +953,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-015
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -1058,7 +1066,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-017
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -1166,7 +1175,8 @@ screens:
       Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside
       the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-018
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: publishBundle. **Bulk-attach residue, found by walking
@@ -1275,7 +1285,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-004
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createWorkOrder. **Bulk-attach residue** — the 18 August
@@ -1433,7 +1444,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-005
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Cross-platform navigation removed 24 August**: BO-030, BO-078. **A till does
@@ -1598,7 +1610,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-006
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -1712,6 +1725,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: publishAnnouncement
+      - kind: publishGate
+        impliedBy: publishAnnouncement
+        notes: >
+          Declares `publishAnnouncement`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Notes load
     emptyFirstRun: No notes from the previous shift
@@ -1738,7 +1756,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-007
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -1832,7 +1851,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-008
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: acceptShiftVariance, approveShiftOpen, closeShift, createCashMovement.
@@ -1936,7 +1956,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-019
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. Pulled to Wave 1 (CF-101). CF-57: the client named AI configuration assistance
@@ -2029,7 +2050,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-020
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. Pulled to Wave 1 (CF-101) with EMP-019 — **the question and the answer are one
@@ -2124,7 +2146,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-031
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createQueue, updateQueue. **A handheld reads a queue and
@@ -2239,7 +2262,8 @@ screens:
       Stated on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside
       the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-032
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Cross-platform navigation removed 24 August**: BO-005. **A till does not navigate
@@ -2347,7 +2371,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-033
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -2369,7 +2394,7 @@ screens:
     contract: catalogue
     purpose: Create a capacity envelope
     trigger: onAction
-  - operationId: releaseChannelAllocation
+  - operationId: relinquishChannelAllocation
     contract: catalogue
     purpose: Return unsold channel allocation to the general pool
     trigger: onAction
@@ -2471,7 +2496,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-034
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createProduct, updateProduct. **Bulk-attach residue, found
@@ -2638,7 +2664,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-035
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. Card on a handheld. **Tender currency equals base currency** — a staff member taking
@@ -2728,7 +2755,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-036
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **9 assets operations removed 18 August (CF-114).** The whole media contract
@@ -2794,6 +2822,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: acknowledgeAnnouncement
+      - kind: publishGate
+        impliedBy: publishAnnouncement
+        notes: >
+          Declares `publishAnnouncement`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Notifications load
     emptyFirstRun: Nothing new
@@ -2823,7 +2856,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-037
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -2888,6 +2922,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: acknowledgeAnnouncement
+      - kind: publishGate
+        impliedBy: publishAnnouncement
+        notes: >
+          Declares `publishAnnouncement`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Announcements load
     emptyFirstRun: None
@@ -2918,7 +2957,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-039
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -2983,6 +3023,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: acknowledgeAnnouncement
+      - kind: publishGate
+        impliedBy: publishAnnouncement
+        notes: >
+          Declares `publishAnnouncement`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Instant. This screen preempts everything
     emptyFirstRun: Not applicable
@@ -3012,7 +3057,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-047
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -3110,7 +3156,8 @@ screens:
       September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation
       graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-050
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: reportIncident. **Bulk-attach residue.** A device-settings
@@ -3205,7 +3252,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-021
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach
@@ -3293,7 +3341,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-022
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach
@@ -3385,7 +3434,8 @@ screens:
       on 4 September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation
       graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-023
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: createRotaAssignment, updateRotaAssignment. **Bulk-attach
@@ -3479,7 +3529,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-024
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -3569,7 +3620,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-025
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: amendAttendance. **Bulk-attach residue, found by walking
@@ -3664,7 +3716,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-026
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -3767,7 +3820,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-027
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: reportIncident. **Bulk-attach residue, found by walking
@@ -3868,7 +3922,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-028
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -3979,7 +4034,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-029
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4101,7 +4157,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 4.dc.html#seat-4c
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-030
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
@@ -4181,6 +4238,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: publishAnnouncement
+      - kind: publishGate
+        impliedBy: publishAnnouncement
+        notes: >
+          Declares `publishAnnouncement`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: —
     emptyFirstRun: —
@@ -4210,7 +4272,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-038
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4298,7 +4361,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-040
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4365,7 +4429,8 @@ screens:
       September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation
       graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-041
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4428,7 +4493,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-042
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: forceLogout, listActiveSessions, revokeAllSessions. **Bulk-attach
@@ -4524,7 +4590,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-043
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Removed 24 August**: listGuestDevices, adjustLoyaltyPoints, getConsentHistory,
@@ -4586,7 +4653,8 @@ screens:
     notes: '**Reached from EMP-043** — accessibility is a device setting. Stated on 4 September: this
       screen exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-044
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4626,7 +4694,8 @@ screens:
     notes: '**Reached from EMP-043** — language is a device setting. Stated on 4 September: this screen
       exited to the hubs and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-045
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4677,7 +4746,8 @@ screens:
       this screen exited to the hubs and nothing exited to it, so it was outside the navigation graph
       entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-046
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4746,7 +4816,8 @@ screens:
       September: this screen exited to the hubs and nothing exited to it, so it was outside the navigation
       graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P06 Venue Staff App.dc.html#emp-049
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
@@ -4835,7 +4906,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/RestaurantServiceCommandCenterDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4a
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-051
   provenance: client board, named only
@@ -4915,7 +4987,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/FloorPlanTableMapDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4b
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-052
   provenance: client board, specified
@@ -4990,7 +5063,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/TableSeatingConfigurationDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4c
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-053
   provenance: client board, named only
@@ -5064,7 +5138,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/ReservationCalendarTimelineDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4d
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-054
   provenance: client board, specified
@@ -5137,7 +5212,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/CreateEditReservationDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4e
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-055
   provenance: client board, named only
@@ -5211,7 +5287,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/WalkInWaitlistManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4f
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-056
   provenance: client board, specified
@@ -5290,7 +5367,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/GuestProfileDiningHistoryDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4g
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-057
   provenance: client board, named only
@@ -5435,7 +5513,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/LiveTableServiceManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4a
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-4A, FNB-4B, FNB-4H in the client F&B pack.**'
@@ -5533,7 +5612,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/TableOrderBillPaymentManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4j
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-4J in the client F&B pack.**'
@@ -5611,7 +5691,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/ReservationTablePerformanceDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4c
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-4C in the client F&B pack.**'
@@ -5685,7 +5766,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/RetailInventoryCommandCenterDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4d
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-4D, FNB-4E in the client F&B pack.**'
@@ -5766,7 +5848,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/StoreStockSkuAvailabilityDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 5.dc.html#fnb-5j
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-5J in the client F&B pack.**'
@@ -5843,7 +5926,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/RequisitionSmartStoreReplenishmentDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4f
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-4F in the client F&B pack.**'
@@ -5917,7 +6001,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/StoreToStoreWarehouseTransfersDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 4.dc.html#fnb-4g
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-4G in the client F&B pack.**'
@@ -6006,7 +6091,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/ReceivingStorePutAwayDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 5.dc.html#fnb-5g
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-5G in the client F&B pack.**'
@@ -6099,7 +6185,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/StockCountCycleCountManagementDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4f
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-066
   provenance: client board, specified
@@ -6193,7 +6280,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/DamageLossShrinkageStockAdjustmentDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 5.dc.html#fnb-5e
     source: Claude Design F&B pack, 24 August
     note: '**Drawn as FNB-5E in the client F&B pack.**'
@@ -6270,7 +6358,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/ReservationAllocationOmnichannelInDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4h
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-068
   provenance: client board, named only
@@ -6348,7 +6437,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/BarcodeRfidSerializedStockTraceabiDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 4.dc.html#ret-4j
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-069
   provenance: client board, specified
@@ -6431,7 +6521,8 @@ screens:
     component: apps/venue-staff-app/src/routes/operations/InventoryExceptionsAiReplenishmentDetail.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Inventory Board 1.dc.html#inv-10
     generatedFallback: wireframes/P06 Venue Staff App.dc.html#emp-070
   provenance: client board, named only

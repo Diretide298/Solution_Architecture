@@ -64,11 +64,20 @@ screens:
       The screen this app sits on. Everything else is entered from here and returns to it.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-001
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /applicant-journey/landing-programme-overview
@@ -127,11 +136,20 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-002
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
@@ -179,11 +197,20 @@ screens:
       review & submit.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-003
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-review-and-submit
@@ -224,11 +251,20 @@ screens:
       Find application status tracking for this venue.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-004
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-status-tracking
@@ -288,11 +324,20 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-005
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /applicant-journey/accreditation-badge
@@ -345,11 +390,20 @@ screens:
       Find the right one quickly, and act on it without opening it.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-006
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-queue
@@ -424,11 +478,20 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-007
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail
@@ -488,11 +551,20 @@ screens:
       Get a guest into the app, fast, on a device that may be shared.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P11 Accreditation Web.dc.html#acc-008
   openQuestions:
-  - Blocked on the Accreditation workshop. 58 requirements, zero MoM coverage. No capability or API mapping
-    until the domain is discussed.
+  - 'Unblocked by the 7 September workshop
+    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
+    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
+    data is stored as structured fields rather than only the image, because expiry tracking and renewal
+    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
+    submission is blocked; the web portal is primary with the mobile app a secondary route for
+    individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
+    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
+    design corpus and no operation has been drafted from them yet.'
   implementation:
     app: accreditation-web
     route: /reviewer-internal/credential-register

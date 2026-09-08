@@ -209,7 +209,7 @@ paths:
         type: string
         format: uuid
     delete:
-      operationId: releaseCustomDomain
+      operationId: relinquishCustomDomain
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"

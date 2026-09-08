@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">P14 Developer — the portal over the contracts <span style="font-weight:600;color:#6B7280">(8 screens · 1 module)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>developer-portal-web · partner audience · DEV codes</div>
+      <div>1280 &times; 880 frames &middot; <a href="TICVAI%20Board%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:84ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Eight screens, one module, one contract. The source calls this <i>a portal over artefacts that already exist</i> — the 28 contract files are the documentation, so this platform is frontend scope rather than a contract gap. Northbridge Systems is the stand-in integrator: a ticketing reseller building against the public API.</p>
+
+  <div style="display:flex;gap:12px;padding:13px 16px;margin-top:16px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+    <div><b>Drawn against a domain with no workshop.</b> Developer &amp; API is one of CF-21's three unblocked-nowhere domains — 94 requirements, and the workshop has never been held. CF-135 records that the contract landed anyway and that the twelve domain-13 rows still open are all these eight screens. So the board is real design against real operations, and the commercial questions behind it — rate limits, licensing tiers, what certification costs — are CF-135c and still the client's to answer. Where a screen depends on one of those, it says so rather than inventing a number.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">Developer &amp; API · 8 screens · waves 2 and 3</div>
+
+    <div id="dev-001" data-screen-label="DEV-001" data-screen-id="DEV-001" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-001</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">API Reference</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">entry point · docs before sign-up</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Read the contract, and call it without leaving the page. A developer arrives at the documentation, not at a registration form — registration is what they do after reading.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#FAFBFD">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800">TICVAI developers</span><span style="font-size:12px;color:#0D6EFD;font-weight:700">Reference</span><span style="font-size:12px;color:#5A6577">Guides</span><span style="font-size:12px;color:#5A6577">Changelog</span></div>
+            <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;padding:4px 9px;border-radius:7px;background:#EDF3FF;color:#0A4FB8">v2 current</span><span style="font-size:12px;font-weight:700;color:#5A6577">Sign in</span></div>
+          </div>
+          <div style="flex:1;display:flex;min-height:0">
+            <div style="flex:none;width:230px;border-right:1px solid #E8ECF3;padding:14px;display:flex;flex-direction:column;gap:11px;background:#FAFBFD">
+              <div style="height:32px;border-radius:8px;border:1px solid #DCE3ED;background:#fff;display:flex;align-items:center;padding:0 10px;font-size:11.5px;color:#8494A8">Search operations</div>
+              <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+                <div style="padding:6px 8px;border-radius:6px;font-weight:700">ticketing <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">42</span></div>
+                <div style="padding:6px 8px 6px 18px;border-radius:6px;background:#EDF3FF;color:#0A4FB8;font-weight:700">createOrder</div>
+                <div style="padding:6px 8px 6px 18px;color:#5A6577">getOrder</div>
+                <div style="padding:6px 8px 6px 18px;color:#5A6577">createRefund</div>
+                <div style="padding:6px 8px;border-radius:6px;font-weight:700">access <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">18</span></div>
+                <div style="padding:6px 8px;border-radius:6px;font-weight:700">catalogue <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">31</span></div>
+                <div style="padding:6px 8px;border-radius:6px;font-weight:700">fnb <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">54</span></div>
+              </div>
+              <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">grouped by contract<br>28 files, loaded apart</div>
+            </div>
+            <div style="flex:1;display:flex;min-width:0">
+              <div style="flex:1;padding:18px 20px;display:flex;flex-direction:column;gap:13px;min-width:0">
+                <div style="display:flex;align-items:center;gap:10px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;padding:4px 8px;border-radius:6px;background:#E7F4F2;color:#0B5B41">POST</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600">/v2/orders</span></div>
+                <div style="font-size:17px;font-weight:800;letter-spacing:-.015em">createOrder</div>
+                <div style="font-size:12px;color:#5A6577;line-height:1.6">Create an order from a basket of lines. Idempotent on <span style="font-family:'IBM Plex Mono',monospace">Idempotency-Key</span>; a repeat within 24 hours returns the original order rather than a second one.</div>
+                <div style="display:flex;gap:8px"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">scope orders:write</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">rate 60/min</span></div>
+                <div style="flex:none;border-radius:10px;background:#0F1E33;padding:13px 15px;font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.75;color:#9FB6CF">
+                  <div style="color:#7FA3C9">curl -X POST https://api.ticvai.com/v2/orders \</div>
+                  <div>&nbsp;&nbsp;-H "Authorization: Bearer $TOKEN" \</div>
+                  <div>&nbsp;&nbsp;-H "Idempotency-Key: 8f2c-4a11" \</div>
+                  <div>&nbsp;&nbsp;-d '{"tenantId":"riverside","lines":[{"sku":"TN-A","qty":2}]}'</div>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:7px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">errors</div>
+                  <div style="display:flex;flex-direction:column;gap:5px;font-size:11.5px">
+                    <div style="display:flex;gap:12px"><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E;width:44px">409</span><span style="color:#5A6577"><span style="font-family:'IBM Plex Mono',monospace">capacity_gone</span> — the hold expired between quote and order</span></div>
+                    <div style="display:flex;gap:12px"><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E;width:44px">422</span><span style="color:#5A6577"><span style="font-family:'IBM Plex Mono',monospace">price_changed</span> — re-quote and show the guest the new total</span></div>
+                    <div style="display:flex;gap:12px"><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E;width:44px">429</span><span style="color:#5A6577">quota — <span style="font-family:'IBM Plex Mono',monospace">Retry-After</span> in seconds, always present</span></div>
+                  </div>
+                </div>
+              </div>
+              <div style="flex:none;width:250px;border-left:1px solid #E8ECF3;padding:18px 16px;display:flex;flex-direction:column;gap:11px;background:#FAFBFD">
+                <div style="font-size:12.5px;font-weight:800">Try it</div>
+                <div style="padding:10px 11px;border-radius:9px;background:#FFF7E6;border:1px solid #F0DFB8;font-size:11px;color:#7A5F14;line-height:1.5">Runs against <b>your sandbox</b>. Nothing here can touch production data.</div>
+                <div style="height:36px;border-radius:9px;background:#0D6EFD;color:#fff;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800">Run in sandbox</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577;padding-top:9px;border-top:1px solid #EDF1F6">
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Environment</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">sandbox-3</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Token</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">test · 12 min left</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:11px;color:#5A6577;line-height:1.6">No sandbox yet? <span style="color:#0D6EFD;font-weight:700">Register</span> — it takes one form and no approval.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The environment is on the button</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">The source is unambiguous about it: a try-it that quietly hits production is how somebody refunds a real order while reading the docs. So the button names the sandbox, the panel names which sandbox, and there is no way to point it at production from this screen — not a setting, not a dropdown.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">try it &middot; sandbox only<br>production &middot; not reachable here</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Error codes are what they come back for</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Most documentation buries them. Here they sit under the example with the recovery in plain words, because <span style="font-family:'IBM Plex Mono',monospace">capacity_gone</span> is a design decision for the integrator, not a status code to log.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">per error &middot; cause + what to do<br>429 &middot; Retry-After always</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Search covers the description</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A developer looking for <i>how do I refund</i> does not know it is called <span style="font-family:'IBM Plex Mono',monospace">createRefund</span>. Empty is an error state rather than a first run — the contracts ship with the platform, so an empty reference means a file failed to load, and the message names which.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">search &middot; summary + description<br>error &middot; names the contract</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listApiVersions</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyNoResults</b> &middot; emptyFirstRun <span style="color:#9AA5B6">(never in practice)</span> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; <span style="color:#9AA5B6">entry point · no session required</span></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-002">DEV-002</a> &middot; <a href="#dev-004">DEV-004</a></div>
+      </div>
+    </div>
+
+    <div id="dev-002" data-screen-label="DEV-002" data-screen-id="DEV-002" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-002</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Register &amp; Organisation</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E7F4F2;color:#0B5B41">one form, no approval</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">An organisation rather than a person, because credentials outlive the developer who created them. Members are managed here from the first day, not added later when somebody leaves.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#FAFBFD">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800">TICVAI developers</span><span style="font-size:12px;color:#5A6577">Reference</span><span style="font-size:12px;color:#0D6EFD;font-weight:700">Organisation</span></div>
+            <span style="font-size:12px;font-weight:700;color:#5A6577">N. Okonjo · Northbridge</span>
+          </div>
+          <div style="flex:1;display:flex;gap:20px;padding:22px;min-height:0;background:#FAFBFD">
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;min-width:0">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:13px">
+                <div style="font-size:14.5px;font-weight:800">Northbridge Systems</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">organisation</span><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12.5px">Northbridge Systems Ltd</div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">technical contact</span><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12.5px">api@northbridge.example</div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">what you are building</span><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12.5px">Reseller · ticketing</div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">region</span><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12.5px">UAE</div></div>
+                </div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.55">Region decides which cell issues your credentials and where sandbox data lives. It cannot be changed afterwards — a new region is a new organisation.</div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:12px;min-height:0">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:13px;font-weight:800">Members</span><span style="padding:5px 11px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Invite</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px"><div style="flex:1"><div style="font-size:12px;font-weight:700">N. Okonjo</div><div style="font-size:10.5px;color:#5A6577">api@northbridge.example</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#0B1324">owner</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px"><div style="flex:1"><div style="font-size:12px;font-weight:700">R. Farid</div><div style="font-size:10.5px;color:#5A6577">rf@northbridge.example</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">developer</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px dashed #DCE3ED;border-radius:10px;background:#FAFBFD"><div style="flex:1"><div style="font-size:12px;font-weight:700;color:#5A6577">j.mensah@northbridge.example</div><div style="font-size:10.5px;color:#8494A8">invited 2 Sep · not accepted</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">pending</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:11px;color:#5A6577;line-height:1.55">Removing a member never revokes a credential. Credentials belong to the organisation and are rotated on <a href="#dev-003">DEV-003</a> — the two acts are separate because doing them together is how a live integration dies on somebody's last day.</div>
+              </div>
+            </div>
+            <div style="flex:none;width:280px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800">What you get immediately</div>
+                <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Sandbox</span><span style="font-family:'IBM Plex Mono',monospace;color:#0E9F6E">yes</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Test credentials</span><span style="font-family:'IBM Plex Mono',monospace;color:#0E9F6E">yes</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Production access</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">after certification</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Marketplace listing</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">after certification</span></div>
+                </div>
+              </div>
+              <div style="margin-top:auto;padding:12px 13px;border-radius:11px;background:#FFF7E6;border:1px solid #F0DFB8;font-size:11px;color:#5A4A20;line-height:1.55">Whether registration is free, and what a certified integration costs, is CF-135c. The screen states the steps and never a price.</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">An organisation, not an account</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">registerDeveloper</span> creates the organisation and <span style="font-family:'IBM Plex Mono',monospace">setDeveloperMembers</span> maintains who is in it. Two operations, and they are the whole screen. Credentials, quotas and certification all hang off the organisation — which is why a developer leaving is a membership change and never a credential event.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">owns credentials &middot; organisation<br>member removal &middot; no revoke</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Region is a cell decision</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A cell is tenant × jurisdiction, so where an organisation registers decides which cell issues its credentials and holds its sandbox data. Stated as permanent at the point of choosing rather than discovered later in a support thread.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">region &middot; immutable<br>new region &middot; new organisation</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">No approval to start</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Sandbox and test credentials are immediate; production and the marketplace wait for certification on <a href="#dev-008">DEV-008</a>. A programme that reviews before anyone can write a line of code has no developers to certify.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">immediate &middot; sandbox, test keys<br>gated &middot; production, listing</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; registerDeveloper &middot; setDeveloperMembers</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun</b> &middot; emptyNoResults &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; <a href="#dev-001">DEV-001</a> &middot; organisationId&larr;session <span style="color:#9AA5B6">(after registering)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-003">DEV-003</a> &middot; <a href="#dev-004">DEV-004</a></div>
+      </div>
+    </div>
+
+    <div id="dev-003" data-screen-label="DEV-003" data-screen-id="DEV-003" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-003</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Clients &amp; Credentials</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">rotation overlaps, revocation does not</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">One client per integration, and the secret is shown once. Rotation issues a second credential and leaves the first working for a stated window, because a rotation that breaks production is one nobody performs.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#FAFBFD">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800">TICVAI developers</span><span style="font-size:12px;color:#5A6577">Reference</span><span style="font-size:12px;color:#0D6EFD;font-weight:700">Clients</span><span style="font-size:12px;color:#5A6577">Sandbox</span><span style="font-size:12px;color:#5A6577">Webhooks</span></div>
+            <span style="padding:5px 11px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">New client</span>
+          </div>
+          <div style="flex:1;display:flex;gap:20px;padding:22px;min-height:0;background:#FAFBFD">
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div><div style="font-size:13.5px;font-weight:800">Northbridge web checkout</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8494A8">cli_7f21a8 · production</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:7px;background:#E7F4F2;color:#0B5B41">certified</span></div>
+                <div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">orders:write</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">catalogue:read</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">access:read</span></div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px"><div style="flex:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:12px">sk_live_••••••••4d19</div><div style="font-size:10.5px;color:#5A6577">created 14 Mar · last used 2 minutes ago</div></div><span style="padding:5px 10px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11px;font-weight:700">Rotate</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid #F0DFB8;border-radius:10px;background:#FFFCF4"><div style="flex:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#7A5F14">sk_live_••••••••9b02</div><div style="font-size:10.5px;color:#7A5F14">rotated in 2 Sep · old key stops working 9 Sep</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">7 days left</span></div>
+                </div>
+              </div>
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div><div style="font-size:13.5px;font-weight:800">Kiosk pilot</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8494A8">cli_2c04e1 · sandbox</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:7px;background:#F2F5F9;color:#5A6577">test only</span></div>
+                <div style="display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px"><div style="flex:1"><div style="font-family:'IBM Plex Mono',monospace;font-size:12px">sk_test_••••••••11c7</div><div style="font-size:10.5px;color:#5A6577">created 28 Aug · never used</div></div><span style="padding:5px 10px;border-radius:8px;border:1px solid #F5C9C9;color:#8A2020;font-size:11px;font-weight:700">Revoke</span></div>
+              </div>
+              <div style="margin-top:auto;padding:12px 14px;border-radius:11px;background:#fff;border:1px solid #E3E8F0;font-size:11px;color:#5A6577;line-height:1.6">A secret is shown once, at creation, and never again — not to the owner, not to Softlabs support. Losing it is a rotation, which is why rotation is one click and lives beside the key rather than in a settings page.</div>
+            </div>
+            <div style="flex:none;width:290px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800">Revoking is immediate</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6">No grace window and no overlap. The confirmation names the client, the environment and what called it in the last hour, so nobody revokes the wrong key while reading a table of masked strings.</div>
+                <div style="display:flex;flex-direction:column;gap:6px;font-size:11px;color:#5A6577;padding-top:9px;border-top:1px solid #EDF1F6">
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Rotate</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">7-day overlap</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Revoke</span><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E">at once</span></div>
+                </div>
+              </div>
+              <div style="margin-top:auto;padding:12px 13px;border-radius:11px;background:#F2F5F9;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;line-height:1.75">listApiClients &middot; onLoad<br>createApiClient<br>rotateApiCredential<br>revokeApiCredential</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">The overlap window is drawn and not specified</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty">Seven days is on this screen because a rotation needs a stated window, and nothing in the contracts says what it is. <span style="font-family:'IBM Plex Mono',monospace">rotateApiCredential</span> declares no duration, no configuration level and no event for <i>the old key stopped working</i>. It belongs with CF-85's four holding windows — a default set by a designer that is really a commercial and security decision.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">drawn &middot; 7 days<br>specified &middot; nowhere</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Scopes are the smallest interesting thing on the row</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A client is defined by what it may call, so the scopes sit on the card rather than behind an edit screen. Adding one is a change a certified integration has re-reviewed, which is the link back to <a href="#dev-008">DEV-008</a>.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">scopes &middot; on the card<br>widening &middot; re-certification</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Last used is the safety net</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><i>Never used</i> on a key created a week ago says an integration is not live; <i>two minutes ago</i> says do not touch this one. It is the field that makes revocation a considered act rather than a guess between two masked strings.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">shown &middot; created, last used<br>confirm &middot; names recent callers</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listApiClients &middot; createApiClient &middot; rotateApiCredential &middot; revokeApiCredential</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun</b> &middot; emptyNoResults &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; organisationId&larr;session &middot; <a href="#dev-002">DEV-002</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-004">DEV-004</a> &middot; <a href="#dev-005">DEV-005</a> &middot; <a href="#dev-006">DEV-006</a></div>
+      </div>
+    </div>
+
+    <div id="dev-004" data-screen-label="DEV-004" data-screen-id="DEV-004" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-004</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Sandbox</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E7F4F2;color:#0B5B41">a venue that behaves like a venue</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Seeded with a real-shaped venue — performances, seats, F&amp;B, a guest with a booking — because a sandbox full of empty catalogues teaches an integrator nothing about the errors they will meet.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#FAFBFD">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800">TICVAI developers</span><span style="font-size:12px;color:#5A6577">Clients</span><span style="font-size:12px;color:#0D6EFD;font-weight:700">Sandbox</span><span style="font-size:12px;color:#5A6577">Webhooks</span></div>
+            <span style="padding:5px 11px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">New sandbox</span>
+          </div>
+          <div style="flex:1;display:flex;gap:20px;padding:22px;min-height:0;background:#FAFBFD">
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:13px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div><div style="font-size:13.5px;font-weight:800">sandbox-3 · Riverside Arts (fixture)</div><div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8494A8">created 28 Aug · reset 2 Sep 09:12</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:7px;background:#E7F4F2;color:#0B5B41">active</span></div>
+                <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px">
+                  <div style="padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">performances</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600">24</span></div>
+                  <div style="padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">seats</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600">1 840</span></div>
+                  <div style="padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">guests</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600">40</span></div>
+                  <div style="padding:11px 12px;border:1px solid #E8ECF3;border-radius:10px;display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">orders made</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#0D6EFD">312</span></div>
+                </div>
+                <div style="display:flex;gap:9px"><span style="padding:8px 14px;border-radius:9px;border:1px solid #DCE3ED;font-size:12px;font-weight:700;color:#26303F">Reset to fixture</span><span style="padding:8px 14px;border-radius:9px;border:1px solid #DCE3ED;font-size:12px;font-weight:700;color:#26303F">Download fixture</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:11px;min-height:0">
+                <div style="font-size:13px;font-weight:800">What you can make happen</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px">
+                  <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid #E8ECF3;border-radius:10px"><span style="flex:1;font-weight:700">Sell out a performance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">→ 409 capacity_gone</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid #E8ECF3;border-radius:10px"><span style="flex:1;font-weight:700">Move a price mid-basket</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">→ 422 price_changed</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid #E8ECF3;border-radius:10px"><span style="flex:1;font-weight:700">Decline a payment</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">→ 402 payment_declined</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:10px 12px;border:1px solid #E8ECF3;border-radius:10px"><span style="flex:1;font-weight:700">Exceed your quota</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">→ 429 + Retry-After</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:11px;color:#5A6577;line-height:1.55">Each one is a fixture command, not a wait. An integrator who cannot reproduce an error on demand ships code that has never seen it.</div>
+              </div>
+            </div>
+            <div style="flex:none;width:290px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800">Reset is destructive and says so</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6">It restores the fixture and discards everything made since — orders, webhooks delivered, tokens issued. The confirmation states the last reset and what will go, and there is no undo.</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800">One sandbox per client, at most three</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6">Enough for a build, a demo and a regression run. The cap is drawn here and is not in the contract — another CF-135c number.</div>
+              </div>
+              <div style="margin-top:auto;padding:12px 13px;border-radius:11px;background:#F2F5F9;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;line-height:1.75">listSandboxes &middot; onLoad<br>createSandbox<br>resetSandbox</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The fixture is the documentation nobody reads</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">A seeded venue with 24 performances and a real seat map teaches the shape of the API faster than a guide does. It also makes the reference's <i>try it</i> meaningful — the example on <a href="#dev-001">DEV-001</a> runs against this data, so a copied snippet returns a real order rather than a validation error about an empty catalogue.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">fixture &middot; Riverside Arts<br>used by &middot; DEV-001 try it</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Errors on demand, not on luck</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The four commands are the four failures every ticketing integration meets in its first week. None of them is declared in the contract — <span style="font-family:'IBM Plex Mono',monospace">resetSandbox</span> is the only write. Drawn because a sandbox without them is a happy path with a login.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">drawn &middot; 4 fixture commands<br>declared &middot; reset only</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Sandbox data lives in the same cell</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The region chosen on <a href="#dev-002">DEV-002</a> decides where it sits. Test data is still data, and a fixture in the wrong jurisdiction is the sort of thing found later rather than sooner.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">cell &middot; from the organisation<br>production &middot; never reachable</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listSandboxes &middot; createSandbox &middot; resetSandbox</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun</b> &middot; emptyNoResults &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; organisationId&larr;session &middot; <a href="#dev-001">DEV-001</a> &middot; <a href="#dev-003">DEV-003</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-001">DEV-001</a> &middot; <a href="#dev-005">DEV-005</a></div>
+      </div>
+    </div>
+
+    <div id="dev-005" data-screen-label="DEV-005" data-screen-id="DEV-005" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-005</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Webhooks</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">29 events, replayable</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Subscribe, watch what was delivered, and send it again. The delivery log is the screen — a subscription that says <i>active</i> and nothing else is a subscription nobody trusts.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#FAFBFD">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800">TICVAI developers</span><span style="font-size:12px;color:#5A6577">Clients</span><span style="font-size:12px;color:#5A6577">Sandbox</span><span style="font-size:12px;color:#0D6EFD;font-weight:700">Webhooks</span></div>
+            <span style="padding:5px 11px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Add endpoint</span>
+          </div>
+          <div style="flex:1;display:flex;gap:20px;padding:22px;min-height:0;background:#FAFBFD">
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:11px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><div><div style="font-family:'IBM Plex Mono',monospace;font-size:12.5px;font-weight:600">https://api.northbridge.example/ticvai</div><div style="font-size:10.5px;color:#5A6577">4 events · signing secret rotated 14 Aug</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:7px;background:#E7F4F2;color:#0B5B41">98.9% ok</span></div>
+                <div style="display:flex;gap:7px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">order.completed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">order.refunded</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">entitlement.admitted</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:6px;background:#F2F5F9;color:#5A6577">performance.cancelled</span></div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:0">
+                <div style="flex:none;display:grid;grid-template-columns:1.4fr 100px 70px 90px 110px;gap:10px;padding:10px 15px;border-bottom:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4;background:#FAFBFD"><span>event</span><span>at</span><span>code</span><span>attempts</span><span></span></div>
+                <div style="display:grid;grid-template-columns:1.4fr 100px 70px 90px 110px;gap:10px;align-items:center;padding:11px 15px;border-bottom:1px solid #F4F6FA"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">order.completed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">19:41:02</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0E9F6E">200</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">1</span><span></span></div>
+                <div style="display:grid;grid-template-columns:1.4fr 100px 70px 90px 110px;gap:10px;align-items:center;padding:11px 15px;border-bottom:1px solid #F4F6FA;background:#FEF7F7"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">order.refunded</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A5A5A">19:38:55</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#A81E1E">504</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A2020">5 · gave up</span><span style="text-align:right"><span style="padding:5px 10px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11px;font-weight:700">Replay</span></span></div>
+                <div style="display:grid;grid-template-columns:1.4fr 100px 70px 90px 110px;gap:10px;align-items:center;padding:11px 15px;border-bottom:1px solid #F4F6FA"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">entitlement.admitted</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">19:36:11</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0E9F6E">200</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">2</span><span></span></div>
+                <div style="display:grid;grid-template-columns:1.4fr 100px 70px 90px 110px;gap:10px;align-items:center;padding:11px 15px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px">order.completed</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">19:35:40</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#0E9F6E">200</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">1</span><span></span></div>
+                <div style="margin-top:auto;padding:10px 15px;border-top:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">retries &middot; 5 attempts over 6 hours, exponential &middot; then it waits for you</div>
+              </div>
+            </div>
+            <div style="flex:none;width:290px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800">Replay is a range, not a row</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6">An endpoint that was down for an hour needs the hour back, so <span style="font-family:'IBM Plex Mono',monospace">replayEvents</span> takes a window and an event type. Replays are marked as replays in the payload — an integrator has to be able to tell a re-delivery from a new sale.</div>
+              </div>
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:12.5px;font-weight:800">Signed, and verifiable offline</div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6">Every delivery carries a signature over the raw body with a timestamp, so a receiver can reject a replayed request it did not ask for.</div>
+              </div>
+              <div style="margin-top:auto;padding:12px 13px;border-radius:11px;background:#F2F5F9;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;line-height:1.75">listWebhookSubscriptions &middot; onLoad<br>createWebhookSubscription<br>listWebhookDeliveries<br>replayEvents</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">The delivery log is declared as an action</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">listWebhookDeliveries</span> carries <span style="font-family:'IBM Plex Mono',monospace">trigger: onAction</span> while <span style="font-family:'IBM Plex Mono',monospace">listWebhookSubscriptions</span> is <span style="font-family:'IBM Plex Mono',monospace">onLoad</span>. The log is the reason a developer opens this screen; behind a button it is a screen that opens showing subscriptions and no evidence. Milder than a write on load, and the same class of mistake.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">declared &middot; deliveries onAction<br>correct &middot; onLoad</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Which events, and who owns them</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The subscribable set is the platform's 29 domain events, each with a publisher and an idempotency key. A developer picks from that list rather than describing a condition — there is no rules engine here, and pretending otherwise would promise one.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">events &middot; 29, published<br>filtering &middot; by type only</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Giving up is a state, and it is shown</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Five attempts over six hours, then the platform stops and the row says <i>gave up</i>. Silent abandonment after a retry schedule nobody published is how an integrator loses a refund and finds out from a guest.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">retry &middot; 5 over 6h<br>then &middot; replay, by hand</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listWebhookSubscriptions &middot; createWebhookSubscription &middot; listWebhookDeliveries <span style="color:#B98900">(onAction · flagged)</span> &middot; replayEvents</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; <b style="color:#0A4FB8">emptyNoResults</b> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; organisationId&larr;session &middot; clientId&larr;<a href="#dev-003">DEV-003</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-003">DEV-003</a> &middot; <a href="#dev-006">DEV-006</a></div>
+      </div>
+    </div>
+
+    <div id="dev-006" data-screen-label="DEV-006" data-screen-id="DEV-006" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-006</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Usage &amp; Limits</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">one read · limits set elsewhere</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What was called, what was throttled, and how close the ceiling is. A developer cannot change the ceiling from here — that is <a href="#dev-008">DEV-008</a>, and deliberately.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#FAFBFD">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800">TICVAI developers</span><span style="font-size:12px;color:#5A6577">Clients</span><span style="font-size:12px;color:#0D6EFD;font-weight:700">Usage</span></div>
+            <span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;font-size:11.5px;font-weight:700;color:#5A6577">Last 7 days</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:22px;min-height:0;background:#FAFBFD">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:14px 15px;display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">calls</span><span style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;line-height:1">184k</span><span style="font-size:10.5px;color:#5A6577">+12% on last week</span></div>
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:14px 15px;display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">throttled</span><span style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;line-height:1;color:#8A6D00">412</span><span style="font-size:10.5px;color:#5A6577">all on Saturday 10:00</span></div>
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:14px 15px;display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">errors 5xx</span><span style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;line-height:1">18</span><span style="font-size:10.5px;color:#5A6577">ours, not yours</span></div>
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:14px 15px;display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">p95 latency</span><span style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;line-height:1">240ms</span><span style="font-size:10.5px;color:#5A6577">createOrder 410ms</span></div>
+            </div>
+            <div style="flex:1;display:flex;gap:14px;min-height:0">
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:12px;min-width:0">
+                <div style="font-size:13px;font-weight:800">Against your quota</div>
+                <div style="display:flex;flex-direction:column;gap:11px">
+                  <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="font-weight:700">createOrder</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">58 / 60 per min · peak</span></div><div style="height:9px;border-radius:5px;background:#EEF2F7"><div style="width:97%;height:9px;border-radius:5px;background:#E0A03A"></div></div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="font-weight:700">listCatalogue</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">180 / 600 per min</span></div><div style="height:9px;border-radius:5px;background:#EEF2F7"><div style="width:30%;height:9px;border-radius:5px;background:#0E9F6E"></div></div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;font-size:11.5px"><span style="font-weight:700">getOrder</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">240 / 600 per min</span></div><div style="height:9px;border-radius:5px;background:#EEF2F7"><div style="width:40%;height:9px;border-radius:5px;background:#0E9F6E"></div></div></div>
+                </div>
+                <div style="margin-top:auto;padding:11px 12px;border-radius:10px;background:#FFF7E6;border:1px solid #F0DFB8;font-size:11px;color:#7A5F14;line-height:1.55">You hit the <span style="font-family:'IBM Plex Mono',monospace">createOrder</span> ceiling at Saturday's on-sale. Ask for more — the request goes to the programme team with this week's numbers attached.</div>
+              </div>
+              <div style="flex:none;width:300px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800">Busiest calls</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px">
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-family:'IBM Plex Mono',monospace">listCatalogue</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">96k</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-family:'IBM Plex Mono',monospace">getOrder</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">44k</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-family:'IBM Plex Mono',monospace">createOrder</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">18k</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span style="font-family:'IBM Plex Mono',monospace">createRefund</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">1.2k</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:11px;color:#5A6577;line-height:1.6">96k catalogue reads against 18k orders suggests caching rather than a quota problem. Said here, because a ceiling raised on a call that should be cached is a bill nobody wanted.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">One operation, and the ask has nowhere to go</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">getApiUsage</span> is the only declared operation, which is right for a read-only screen. But the panel's <i>ask for more</i> has no operation behind it: <span style="font-family:'IBM Plex Mono',monospace">setApiQuota</span> exists and is staff-only on <a href="#dev-008">DEV-008</a>, and nothing lets a developer request a change. Drawn as a request because the alternative is an email address in documentation.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">needed &middot; requestQuotaChange<br>exists &middot; setApiQuota (staff)</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Throttling is dated, not totalled</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><i>412 throttled</i> is useless; <i>all on Saturday 10:00</i> is a diagnosis. Usage is drawn against the moment it happened because an on-sale is the only time most integrations meet their ceiling.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">throttled &middot; when, not how many<br>ceiling &middot; per operation</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">5xx is named as ours</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Platform errors are separated from the developer's own 4xx and labelled. A usage screen that mixes them lets an integrator spend a day debugging code that was working.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">4xx &middot; theirs<br>5xx &middot; ours, stated</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getApiUsage <span style="color:#B98900">(no quota-request operation)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun</b> &middot; emptyNoResults &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; organisationId&larr;session &middot; clientId&larr;<a href="#dev-003">DEV-003</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-003">DEV-003</a> &middot; <a href="#dev-005">DEV-005</a></div>
+      </div>
+    </div>
+
+    <div id="dev-007" data-screen-label="DEV-007" data-screen-id="DEV-007" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-007</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Marketplace Listing</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">wave 3 · the only one</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What a venue sees when it considers an integration. Submitted here, reviewed on <a href="#dev-008">DEV-008</a>, and published only against a certified client.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#FAFBFD">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800">TICVAI developers</span><span style="font-size:12px;color:#5A6577">Clients</span><span style="font-size:12px;color:#0D6EFD;font-weight:700">Marketplace</span></div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:7px;background:#FFF7E6;color:#8A6D00">in review · 2 Sep</span>
+          </div>
+          <div style="flex:1;display:flex;gap:20px;padding:22px;min-height:0;background:#FAFBFD">
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:18px;display:flex;flex-direction:column;gap:13px">
+                <div style="font-size:13px;font-weight:800">Your listing</div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">name</span><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12.5px">Northbridge Reseller Connector</div></div>
+                <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">what it does, in a venue's words</span><div style="min-height:64px;border-radius:9px;border:1px solid #DCE3ED;padding:10px 11px;font-size:12px;color:#26303F;line-height:1.5">Sells your performances through 40 travel agents and writes every booking back into TICVAI as it happens. No manual allocation files.</div></div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+                  <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">category</span><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12.5px">Distribution</div></div>
+                  <div style="display:flex;flex-direction:column;gap:5px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">regions</span><div style="height:36px;border-radius:9px;border:1px solid #DCE3ED;display:flex;align-items:center;padding:0 11px;font-size:12.5px">UAE · KSA</div></div>
+                </div>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                <div style="font-size:13px;font-weight:800">What a venue will be told about you</div>
+                <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Scopes this integration requests</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">3</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Data it reads</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">catalogue, orders</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Personal data it receives</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">name, email</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Certification</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">pending</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:11px;color:#5A6577;line-height:1.55">The scopes and the personal-data line are derived from the client, not typed here. A listing that describes itself as read-only while requesting <span style="font-family:'IBM Plex Mono',monospace">orders:write</span> is the thing this panel exists to prevent.</div>
+              </div>
+            </div>
+            <div style="flex:none;width:290px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:12.5px;font-weight:800">Where it is</div>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:5px;background:#0E9F6E"></span><span style="font-size:11.5px;font-weight:700">Submitted · 2 Sep</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:5px;background:#E0A03A"></span><span style="font-size:11.5px;font-weight:700">In review</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:5px;border:2px solid #DCE3ED"></span><span style="font-size:11.5px;color:#8494A8">Certified</span></div>
+                  <div style="display:flex;align-items:center;gap:9px"><span style="width:9px;height:9px;border-radius:5px;border:2px solid #DCE3ED"></span><span style="font-size:11.5px;color:#8494A8">Published</span></div>
+                </div>
+                <div style="font-size:11px;color:#5A6577;line-height:1.6;padding-top:9px;border-top:1px solid #EDF1F6">A rejection arrives with a reason you can act on. There is no resubmission counter and no cooling-off period.</div>
+              </div>
+              <div style="margin-top:auto;padding:12px 13px;border-radius:11px;background:#F2F5F9;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577;line-height:1.75">listIntegrationListings &middot; onLoad<br>submitIntegrationListing</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">The one screen in a later wave</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">Seven of these eight screens are wave 2 and this one is wave 3 — the platform's own gap note flags the module as split across waves. It means certification ships before there is anywhere to be listed: a developer can be certified in wave 2 and cannot be found by a venue until wave 3. Not necessarily wrong, and worth a decision rather than a discovery.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">wave 2 &middot; DEV-001…006, 008<br>wave 3 &middot; DEV-007</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Derived, not declared</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Scopes, the data read and the personal data received all come from the client record. A venue deciding whether to trust an integration should read facts about it rather than its own marketing copy.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">from the client &middot; scopes, data<br>typed &middot; name, description</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Published means certified</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A listing cannot go live against a sandbox-only client. The two states are drawn as one ladder so it is obvious that the marketplace is downstream of certification, not beside it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">gate &middot; certifyIntegration<br>reviewed on &middot; <a href="#dev-008">DEV-008</a></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listIntegrationListings &middot; submitIntegrationListing</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun</b> &middot; emptyNoResults &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; organisationId&larr;session &middot; listingId&larr;deepLink</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-003">DEV-003</a> &middot; <a href="#dev-008">DEV-008</a> <span style="color:#9AA5B6">(staff only)</span></div>
+      </div>
+    </div>
+
+    <div id="dev-008" data-screen-label="DEV-008" data-screen-id="DEV-008" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">DEV-008</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Programme Administration</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">staff screen on a partner platform</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Quotas, the certification queue, licensing and version sunsets. <span style="font-family:'IBM Plex Mono',monospace">DEVELOPER_ADMIN</span> throughout, and never shown to a developer — a developer who could set their own quota has no quota.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;background:#fff">
+          <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;display:flex;align-items:center;justify-content:space-between;padding:0 18px;background:#0F1E33">
+            <div style="display:flex;align-items:center;gap:16px"><span style="font-size:13px;font-weight:800;color:#fff">Programme administration</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#7FA3C9">Softlabs · DEVELOPER_ADMIN</span></div>
+            <span style="font-size:12px;color:#9FB6CF">C. Mehta</span>
+          </div>
+          <div style="flex:1;display:flex;min-height:0">
+            <div style="flex:none;width:200px;border-right:1px solid #E8ECF3;padding:14px;display:flex;flex-direction:column;gap:3px;background:#FAFBFD;font-size:11.5px">
+              <div style="padding:7px 9px;border-radius:6px;background:#EDF3FF;color:#0A4FB8;font-weight:700">Certification queue <span style="font-family:'IBM Plex Mono',monospace;font-size:10px">3</span></div>
+              <div style="padding:7px 9px;color:#5A6577">Quotas</div>
+              <div style="padding:7px 9px;color:#5A6577">Licensing</div>
+              <div style="padding:7px 9px;color:#5A6577">Versions</div>
+              <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">audience &middot; staff<br>read before platform</div>
+            </div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;padding:20px 22px;min-height:0;background:#FAFBFD">
+              <div style="flex:none;padding:13px 15px;border-radius:11px;background:#fff;border:1px solid #F0DFB8;display:flex;align-items:center;gap:14px">
+                <div style="flex:1;font-size:11.5px;color:#7A5F14;line-height:1.55"><b>v1 sunset announcement is drafted.</b> 14 clients still call it, using 6 operations between them — <span style="font-family:'IBM Plex Mono',monospace">createOrder</span>, <span style="font-family:'IBM Plex Mono',monospace">getOrder</span> and four catalogue reads.</div>
+                <span style="padding:7px 13px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Review announcement</span>
+              </div>
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-height:0">
+                <div style="flex:none;display:grid;grid-template-columns:1.5fr 1fr 90px 190px;gap:10px;padding:10px 15px;border-bottom:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4;background:#FAFBFD"><span>organisation &amp; listing</span><span>scopes</span><span>waiting</span><span></span></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 90px 190px;gap:10px;align-items:center;padding:12px 15px;border-bottom:1px solid #F4F6FA"><div><div style="font-size:12px;font-weight:700">Northbridge Systems</div><div style="font-size:10.5px;color:#5A6577">Reseller Connector · distribution</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">orders:write +2</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">2 days</span><div style="display:flex;gap:7px;justify-content:flex-end"><span style="padding:6px 12px;border-radius:8px;background:#0E9F6E;color:#fff;font-size:11.5px;font-weight:700">Approve</span><span style="padding:6px 12px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:700">Reject</span></div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 90px 190px;gap:10px;align-items:center;padding:12px 15px;border-bottom:1px solid #F4F6FA"><div><div style="font-size:12px;font-weight:700">Halcyon Events</div><div style="font-size:10.5px;color:#5A6577">Door scanner · access</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">access:write +4</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">6 days</span><div style="display:flex;gap:7px;justify-content:flex-end"><span style="padding:6px 12px;border-radius:8px;background:#0E9F6E;color:#fff;font-size:11.5px;font-weight:700">Approve</span><span style="padding:6px 12px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:700">Reject</span></div></div>
+                <div style="display:grid;grid-template-columns:1.5fr 1fr 90px 190px;gap:10px;align-items:center;padding:12px 15px"><div><div style="font-size:12px;font-weight:700">Marlow Travel</div><div style="font-size:10.5px;color:#5A6577">Agent portal · distribution</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">catalogue:read</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5A6577">1 day</span><div style="display:flex;gap:7px;justify-content:flex-end"><span style="padding:6px 12px;border-radius:8px;background:#0E9F6E;color:#fff;font-size:11.5px;font-weight:700">Approve</span><span style="padding:6px 12px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:700">Reject</span></div></div>
+                <div style="margin-top:auto;padding:10px 15px;border-top:1px solid #EDF1F6;font-size:11px;color:#5A6577;line-height:1.5">A rejection requires a reason the developer can act on. There is no bare reject.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A staff screen on a partner platform, deliberately</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">Every operation here is Softlabs administering the programme rather than a developer self-serving. The audience is declared on the screen instead of the platform, because moving it to P09 would separate the console from the catalogue it governs — and <span style="font-family:'IBM Plex Mono',monospace">check-screens</span> reads <span style="font-family:'IBM Plex Mono',monospace">screen.audience</span> before the platform's. Its no-access state says so in plain words: <i>this is a Softlabs screen and you are a developer.</i></div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">audience &middot; staff, on the screen<br>permission &middot; DEVELOPER_ADMIN</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A sunset names who it breaks</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The banner carries how many clients call the version and which operations they use. A generic <i>v1 is retiring</i> sent to somebody using three of two hundred endpoints is a message they will ignore, and then a support incident.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">deprecateApiVersion &middot; with impact<br>drawn &middot; 14 clients, 6 operations</div>
+          </div>
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">The rates themselves are still open</div>
+            <div style="font-size:11px;color:#5A4A20;line-height:1.6">Decision D5 makes the commercial model configuration rather than code, and this is the surface for it. What the tiers are, what certification costs and which modules a licence includes remain CF-135c — so the screen shows the controls and never a price list.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">D5 &middot; configuration, not code<br>CF-135c &middot; the numbers</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; setApiQuota &middot; certifyIntegration &middot; setApiLicensing &middot; deprecateApiVersion</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; <b style="color:#0A4FB8">emptyNoAccess · says it is a staff screen</b> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; listingId&larr;deepLink &middot; version&larr;deepLink &middot; <a href="#dev-001">DEV-001</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#dev-007">DEV-007</a> &middot; <a href="#dev-003">DEV-003</a></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;padding:14px 16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+      <div><b>What this board found.</b> Four. <b>The one operation P15-style gap tables would call missing is not missing:</b> <span style="font-family:'IBM Plex Mono',monospace">issueApiToken</span> reaches no screen because it is a machine call — a developer's <i>code</i> exchanges a credential for a token, and a screen for it would be wrong. The gap table cannot tell a machine endpoint from a screen-backed one, and this is the case to say so out loud rather than draw a screen to satisfy a report. <b>Three that are real:</b> <a href="#dev-005">DEV-005</a> declares the delivery log as <span style="font-family:'IBM Plex Mono',monospace">onAction</span> when it is the reason the screen exists; <a href="#dev-006">DEV-006</a> has no operation for a developer to request a quota change, while <span style="font-family:'IBM Plex Mono',monospace">setApiQuota</span> sits staff-only on <a href="#dev-008">DEV-008</a>; and <a href="#dev-003">DEV-003</a>'s credential-rotation overlap window is a number this drawing invented — CF-85's problem, one screen along.</div>
+    </div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #DCE3ED;display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">
+      <span>P14 Developer · 8 screens · 1 module · drawn 4 September 2026</span>
+      <span><a href="TICVAI%20Board%20Index.dc.html">board index</a></span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

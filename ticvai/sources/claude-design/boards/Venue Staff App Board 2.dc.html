@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1500px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">P06 Venue Staff App — Board 2 · Gate ops, AI, comms, emergency <span style="font-weight:600;color:#6B7280">(12 of 45 screens)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>staff · handheld · 390 &times; 844 · offline-first</div>
+      <div>EMP codes &middot; <a href="TICVAI%20Board%20Index.dc.html">board index</a> &middot; <a href="Venue%20Staff%20App%20Board%201.dc.html">board 1</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:84ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">Board 1 got the person onto shift and through the scan and task loop. This board is the rest of what happens at the gate: the queue in front of them, a sale with no till, the assistant they ask instead of the radio, and the two screens that matter on the worst night of the year. Same dark shell, same <span style="font-family:'IBM Plex Mono',monospace">Home &middot; Tasks &middot; Scan &middot; AI &middot; More</span> tabs, same 44px floor. Riverside Arts throughout.</p>
+
+  <div style="display:flex;gap:12px;padding:13px 16px;margin-top:16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+    <div><b>Twelve screens here, not seventeen.</b> The split follows the work rather than the count: gate operations, the assistant, announcements and emergency belong together and stop at <span style="font-family:'IBM Plex Mono',monospace">EMP-050</span>. People, incidents and device settings — seventeen screens — are on <a href="Venue%20Staff%20App%20Board%203.dc.html">Board 3</a>. <a href="Venue%20Staff%20App%20Board%201.dc.html">Board 1</a> holds the first sixteen. 16 + 12 + 17 = 45; the other 21 of P06’s 66 are hosted by the client packs.</div>
+  </div>
+
+  <div style="display:flex;gap:12px;padding:13px 16px;margin-top:12px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+    <div><b>Two contract problems are drawn rather than smoothed over.</b> <span style="font-family:'IBM Plex Mono',monospace">EMP-033</span> Capacity view carries <span style="font-family:'IBM Plex Mono',monospace">createChannelCapacity</span>, <span style="font-family:'IBM Plex Mono',monospace">setChannelAllocations</span> and <span style="font-family:'IBM Plex Mono',monospace">updateChannelCapacity</span> — capacity authoring on a steward's handheld, the same shape of residue that took <span style="font-family:'IBM Plex Mono',monospace">createQueue</span> off <span style="font-family:'IBM Plex Mono',monospace">EMP-031</span> on 24 August. The frame reads capacity and does not author it. And <span style="font-family:'IBM Plex Mono',monospace">EMP-037</span> Notifications, <span style="font-family:'IBM Plex Mono',monospace">EMP-039</span> Announcements and <span style="font-family:'IBM Plex Mono',monospace">EMP-047</span> Emergency mode hold an <b>identical</b> four-operation announcement set — three screens against one contract, and only the emergency one is clearly its own thing. Flagged, not resolved.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:44px;margin-top:40px">
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">04 — Gate operations · 6 screens</div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:34px">
+
+      <div id="emp-031" data-screen-label="EMP-031" data-screen-id="EMP-031" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-031</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Queue monitor</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">reads, never configures</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">See the queue from the floor. A supervisor standing in it needs the number the concourse screens are showing, and the ability to pause a lane that has run out of staff.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:41</span><span>venue wifi &middot; 61%</span></div>
+            <div style="flex:none;padding:6px 20px 14px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12.5px;color:#8A94A3">Riverside Arts &middot; all queues</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Queues</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 9px;border-radius:8px;background:#151D18;border:1px solid #24402F;color:#8FD3B0">live &middot; 4s</span></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14.5px;font-weight:700">Gate B &mdash; general</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">3 lanes open &middot; 2 stewards</div></div><div style="text-align:right"><div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;letter-spacing:-.02em">18<span style="font-size:12px;color:#8A94A3">min</span></div><div style="font-size:10.5px;color:#E8BE7A">rising</div></div></div>
+                <div style="height:6px;border-radius:3px;background:#262C36;overflow:hidden"><div style="width:74%;height:100%;background:#E8A33D"></div></div>
+                <div style="display:flex;gap:9px"><div style="flex:1;height:44px;border-radius:12px;background:#141E2C;border:1px solid #33507A;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#9CC7FF">Call next 20</div><div style="width:44px;height:44px;border-radius:12px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:12px;color:#C4CCD8">II</div></div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">Gate A &mdash; accessible</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">1 lane &middot; no wait</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:18px;color:#8FD3B0">2min</div></div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between;opacity:.6"><div><div style="font-size:14px;font-weight:700">Box office</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Paused 14:31 by D. Okonjo</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 8px;border-radius:7px;background:#241C10;border:1px solid #4A3617;color:#E8BE7A">paused</span></div>
+              <div style="padding:14px;border-radius:14px;background:#131C27;border:1.5px dashed #33507A;display:flex;flex-direction:column;gap:6px"><div style="font-size:13px;font-weight:700;color:#9CC7FF">Feed for Gate C stopped 6 minutes ago</div><div style="font-size:11.5px;color:#8A94A3;line-height:1.5">No sensor data. Enter the wait by hand so the concourse screens stop showing a stale number.</div><div style="height:44px;border-radius:12px;background:#4DA3FF;color:#08101B;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:800;margin-top:2px">Enter wait manually</div></div>
+              <div style="margin-top:auto;padding-bottom:14px;display:flex;gap:10px;padding-top:10px;font-size:11px;color:#8A94A3;line-height:1.5"><div style="width:3px;border-radius:2px;background:#3A424F;flex:none"></div><div>Lanes and queues are set up in the back office. This device opens, pauses and calls forward.</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The wait is the headline, the trend is the decision</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">Eighteen minutes and falling is a different shift instruction from eighteen minutes and rising. One word next to the number saves a supervisor watching it for ninety seconds to find out.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A paused queue says who paused it and when</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Three people hold this device over a shift. A pause with no name attached is reopened by somebody who does not know why it was closed.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Offline shows the last synced view with its age</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A wait time is only useful if you know how old it is. The live badge becomes a timestamp, and <b>Call next</b> greys out — calling parties forward is a write.</div>
+            </div>
+            <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Queue authoring removed 24 August</div>
+              <div style="font-size:11.5px;color:#5A4A20;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">createQueue</span> and <span style="font-family:'IBM Plex Mono',monospace">updateQueue</span> came off this screen and <a href="#emp-032">EMP-032</a>, which had carried identical sets. A handheld reads a queue and records a wait; a queue is venue configuration.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listQueues &middot; getQueue &middot; listQueueEntries &middot; getWaitTimes &middot; callNextParties &middot; setQueueStatus &middot; setWaitTime</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; <b style="color:#0A4FB8">offlineLastSynced</b> &middot; feedStopped &middot; emptyNoResults &middot; emptyNoAccess</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; queueId&larr;deepLink &middot; scope from session, never the link</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-032">EMP-032</a> &middot; <a href="#emp-033">EMP-033</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; QUEUE_VIEW &middot; QUEUE_MANAGE &middot; module <span style="color:#0A4FB8">queue</span></div>
+        </div>
+      </div>
+
+      <div id="emp-032" data-screen-label="EMP-032" data-screen-id="EMP-032" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-032</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Manual wait entry</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF6EF;color:#1B6B45">offline by definition</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Take over when the wait feed dies. This screen exists because a sensor failed, so it cannot need the network that sensor lost.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:43</span><span>no signal</span></div>
+            <div style="flex:none;padding:6px 20px 14px;display:flex;align-items:center;gap:12px"><span style="font-size:15px;color:#8A94A3">&larr;</span><div><div style="font-size:12.5px;color:#8A94A3">Gate C &mdash; general</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Set the wait</div></div></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:14px;min-height:0;overflow:hidden">
+              <div style="display:flex;gap:10px;padding:12px 14px;border-radius:12px;background:#241C10;border:1px solid #4A3617;font-size:11.5px;color:#E8BE7A;line-height:1.5"><div style="width:3px;border-radius:2px;background:#E8A33D;flex:none"></div><div>Sensor feed stopped 14:37. The concourse screens are still showing <b>9 min</b> from before it died.</div></div>
+              <div style="padding:18px 16px;border-radius:16px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:14px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6B7484">Wait to publish</div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px"><div style="width:72px;height:72px;border-radius:20px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:300">&minus;</div><div style="text-align:center"><div style="font-family:'IBM Plex Mono',monospace;font-size:46px;font-weight:600;letter-spacing:-.03em;line-height:1">25</div><div style="font-size:12px;color:#8A94A3;margin-top:2px">minutes</div></div><div style="width:72px;height:72px;border-radius:20px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:300">+</div></div>
+                <div style="display:flex;gap:8px"><span style="flex:1;height:44px;border-radius:11px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#C4CCD8">5</span><span style="flex:1;height:44px;border-radius:11px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#C4CCD8">15</span><span style="flex:1;height:44px;border-radius:11px;background:#141E2C;border:1px solid #33507A;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#9CC7FF">25</span><span style="flex:1;height:44px;border-radius:11px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#C4CCD8">40</span><span style="flex:1;height:44px;border-radius:11px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:700;color:#C4CCD8">60+</span></div>
+              </div>
+              <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13.5px;font-weight:700">Counted by</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Amina Yusuf &middot; head count at the barrier</div></div><span style="font-size:12px;color:#4DA3FF">Change</span></div>
+              <div style="padding:12px 14px;border-radius:12px;background:#151D18;border:1px solid #24402F;display:flex;gap:10px;font-size:11.5px;color:#8FD3B0;line-height:1.55"><div style="width:3px;border-radius:2px;background:#2FBE86;flex:none"></div><div>Saves on this device and publishes when signal returns. Queued entries carry the time they were taken, not the time they sent.</div></div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;flex-direction:column;gap:9px"><div style="height:56px;border-radius:14px;background:#4DA3FF;color:#08101B;display:flex;align-items:center;justify-content:center;font-size:15.5px;font-weight:800">Save 25 min for Gate C</div><div style="height:48px;border-radius:13px;border:1px solid #262C36;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;color:#C4CCD8">Cancel</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Presets before the stepper</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">Nobody publishes 23 minutes. A person estimating a queue by eye works in fives, so the five buttons are the real control and the stepper is for the rare correction.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The button says what it publishes and where</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">This number goes onto public screens within seconds. <b>Save 25 min for Gate C</b> is the last chance to notice it is the wrong gate, which is the mistake somebody makes at 14:43 with a queue in front of them.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Error keeps the entry</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A failed submit retries rather than discarding. The person has already walked away from the barrier; asking them to type it again loses the number.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; setWaitTime &middot; getWaitTimes &middot; getQueue &middot; listQueueEntries &middot; listQueues</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; ready &middot; <b style="color:#0A4FB8">offlineQueuesLocally</b> &middot; errorKeptAndRetried &middot; emptyNoAccess</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; queueId&larr;<a href="#emp-031">EMP-031</a></div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-031">EMP-031</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; QUEUE_MANAGE &middot; module <span style="color:#0A4FB8">queue</span></div>
+        </div>
+      </div>
+
+      <div id="emp-033" data-screen-label="EMP-033" data-screen-id="EMP-033" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-033</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Capacity view</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF1E6;color:#9A5B00">residue flagged</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Know whether the next session can take a walk-up. One question, asked at a barrier with a family waiting: is there room, and for how many.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:46</span><span>venue wifi &middot; 60%</span></div>
+            <div style="flex:none;padding:6px 20px 14px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12.5px;color:#8A94A3">Today &middot; Riverside Arts</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Capacity</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 9px;border-radius:8px;background:#171B22;border:1px solid #262C36;color:#8A94A3">synced 14:45</span></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="padding:16px;border-radius:16px;background:#151D18;border:1.5px solid #24402F;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:14.5px;font-weight:700">15:00 Main Hall</div><span style="font-size:11px;color:#8FD3B0;font-weight:700">SELLING</span></div>
+                <div style="display:flex;align-items:flex-end;gap:8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;letter-spacing:-.03em;line-height:1;color:#8FD3B0">62</div><div style="font-size:12px;color:#8A94A3;padding-bottom:5px">places left of 420</div></div>
+                <div style="height:8px;border-radius:4px;background:#262C36;overflow:hidden;display:flex"><div style="width:78%;height:100%;background:#2FBE86"></div><div style="width:7%;height:100%;background:#4A5261"></div></div>
+                <div style="display:flex;justify-content:space-between;font-size:11px;color:#8A94A3"><span>328 sold &middot; 30 held for online</span><span>walk-up welcome</span></div>
+              </div>
+              <div style="padding:16px;border-radius:16px;background:#241C10;border:1.5px solid #4A3617;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><div style="font-size:14.5px;font-weight:700;color:#E8BE7A">17:30 Main Hall</div><span style="font-size:11px;color:#E8BE7A;font-weight:700">NEARLY FULL</span></div>
+                <div style="display:flex;align-items:flex-end;gap:8px"><div style="font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;letter-spacing:-.03em;line-height:1;color:#E8BE7A">9</div><div style="font-size:12px;color:#8A94A3;padding-bottom:5px">places left of 420</div></div>
+                <div style="font-size:11.5px;color:#E8BE7A;line-height:1.5">Nine seats and they are single. A party of four cannot be seated together — send them to 19:45.</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">19:45 Main Hall</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Sold 96 of 420</div></div><div style="font-family:'IBM Plex Mono',monospace;font-size:20px;color:#8FD3B0">324</div></div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between;opacity:.55"><div><div style="font-size:14px;font-weight:700">15:00 Studio</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Doors closed 14:55</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A94A3">closed</span></div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;flex-direction:column;gap:10px"><div style="height:56px;border-radius:14px;background:#4DA3FF;color:#08101B;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">Sell into 15:00 &mdash; 62 left</div><div style="font-size:11px;color:#8A94A3;line-height:1.5;text-align:center">Envelopes and channel splits are set in the back office.</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Nine seats is not the same as room for nine</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">The number alone gets a family sold into four scattered singles. When the remainder cannot be seated together the screen says so and names the session that can, because that is the sentence the steward has to say out loud.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Held-back allocation is shown, not hidden in the total</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Thirty places held for online look like availability until somebody tries to sell them. The bar has two segments so the sellable number is the one in large type.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Offline shows the last sync with its age</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A five-minute-old capacity figure is worth having; one presented as live is not. The timestamp is in the header on every state, not only the offline one.</div>
+            </div>
+            <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Authoring operations flagged, not drawn</div>
+              <div style="font-size:11.5px;color:#5A4A20;line-height:1.6">The definition carries <span style="font-family:'IBM Plex Mono',monospace">createChannelCapacity</span>, <span style="font-family:'IBM Plex Mono',monospace">setChannelAllocations</span>, <span style="font-family:'IBM Plex Mono',monospace">releaseChannelAllocation</span> and <span style="font-family:'IBM Plex Mono',monospace">updateChannelCapacity</span>, plus a <span style="font-family:'IBM Plex Mono',monospace">CAPACITY_CONFIGURE</span> requirement — capacity authoring on a steward's handheld. Same shape as the queue residue removed on 24 August. The frame reads.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listChannelCapacities &middot; getChannelAllocations &middot; <span style="color:#B98900">+4 authoring ops flagged</span></div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; selling &middot; <b style="color:#0A4FB8">nearlyFullNotSeatable</b> &middot; closed &middot; offlineLastSynced &middot; emptyNoAccess</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; channelCapacityId&larr;deepLink</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-034">EMP-034</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; PRODUCT_VIEW &middot; module <span style="color:#0A4FB8">ticketing</span></div>
+        </div>
+      </div>
+
+      <div id="emp-034" data-screen-label="EMP-034" data-screen-id="EMP-034" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-034</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Walk-up sale</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">handles money</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Sell at the gate without a till. A short list of what this device may sell, priced, with the capacity check already done.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:49</span><span>venue wifi &middot; 59%</span></div>
+            <div style="flex:none;padding:6px 20px 12px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12.5px;color:#8A94A3">15:00 Main Hall &middot; 62 left</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Walk-up</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 9px;border-radius:8px;background:#171B22;border:1px solid #262C36;color:#8A94A3">RA-114</span></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:9px;min-height:0;overflow:hidden">
+              <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1.5px solid #4DA3FF;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">Adult</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">&pound;18.00</div></div><div style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:12px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:300">&minus;</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;width:16px;text-align:center">2</span><span style="width:44px;height:44px;border-radius:12px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:300">+</span></div></div>
+              <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">Child (5&ndash;15)</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">&pound;9.00</div></div><div style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:12px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:300;color:#4A5261">&minus;</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;width:16px;text-align:center;color:#8A94A3">0</span><span style="width:44px;height:44px;border-radius:12px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:300">+</span></div></div>
+              <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">Concession</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">&pound;14.00 &middot; proof at the gate</div></div><div style="display:flex;align-items:center;gap:12px"><span style="width:44px;height:44px;border-radius:12px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:300;color:#4A5261">&minus;</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;width:16px;text-align:center;color:#8A94A3">0</span><span style="width:44px;height:44px;border-radius:12px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:300">+</span></div></div>
+              <div style="padding:13px 14px;border-radius:13px;background:#12161C;border:1px dashed #262C36;font-size:11.5px;color:#6B7484;line-height:1.5">Membership, gift vouchers and reserved seating are not sellable from a handheld.</div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;flex-direction:column;gap:11px">
+                <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:7px">
+                  <div style="display:flex;justify-content:space-between;font-size:13px"><span style="color:#8A94A3">2 &times; Adult</span><span style="font-family:'IBM Plex Mono',monospace">&pound;36.00</span></div>
+                  <div style="display:flex;justify-content:space-between;font-size:15px;font-weight:800"><span>Total</span><span style="font-family:'IBM Plex Mono',monospace">&pound;36.00</span></div>
+                </div>
+                <div style="height:56px;border-radius:14px;background:#4DA3FF;color:#08101B;display:flex;align-items:center;justify-content:center;font-size:15.5px;font-weight:800">Take &pound;36.00</div>
+                <div style="height:44px;display:flex;align-items:center;justify-content:center;font-size:13px;color:#8A94A3">Clear</div>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Steppers, not a grid of tiles</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">A gate sale is two adults and a child, priced from a list of four. Quantity steppers at 44px let one thumb build the basket without the tap-count of a till grid, and the running total sits above the pay button where the guest can see it.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">What this device cannot sell is written down</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A steward asked for a membership needs to know it is not available here rather than search for it. Naming the exclusions is faster than an empty search result.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Cash only offline</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Card completes nowhere the acquirer saw it. Offline the pay button reads <b>Take &pound;36.00 in cash</b> and the card path is gone, not greyed — a disabled button at a barrier gets pressed four times.</div>
+            </div>
+            <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Void is real, and silent in the ledger</div>
+              <div style="font-size:11.5px;color:#5A4A20;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">voidOrder</span> writes the order, its lines and its payments but emits no event, so the ledger is not told until <span style="font-family:'IBM Plex Mono',monospace">order.voided</span> exists. The confirmation names the order, its line count, its value and what happens to money already taken. <span style="font-family:'IBM Plex Mono',monospace">createProduct</span> and <span style="font-family:'IBM Plex Mono',monospace">updateProduct</span> were removed 24 August.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listProducts &middot; createOrder &middot; voidOrder</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyNothingSellable &middot; <b style="color:#0A4FB8">offlineCashOnly</b> &middot; errorSellingBlocked &middot; confirmVoid &middot; emptyNoAccess</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; sessionId&larr;<a href="#emp-033">EMP-033</a> &middot; deviceId&larr;device</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-035">EMP-035</a> &middot; <a href="#emp-036">EMP-036</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; ORDER_CREATE &middot; module <span style="color:#0A4FB8">ticketing</span></div>
+        </div>
+      </div>
+
+      <div id="emp-035" data-screen-label="EMP-035" data-screen-id="EMP-035" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-035</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Payment on device</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEE;color:#9B2C36">unknown is the state that matters</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Take a card payment on the handheld. The screen a guest is looking at, held out at arm's length, while the terminal talks to an acquirer.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0A0D11;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:50</span><span>venue wifi &middot; 59%</span></div>
+            <div style="flex:1;padding:20px;display:flex;flex-direction:column;min-height:0">
+              <div style="text-align:center;padding-top:16px"><div style="font-size:12.5px;color:#8A94A3">Riverside Arts &middot; 2 &times; Adult</div><div style="font-family:'IBM Plex Mono',monospace;font-size:52px;font-weight:600;letter-spacing:-.04em;margin-top:8px">&pound;36.00</div></div>
+              <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;min-height:0">
+                <div style="width:150px;height:150px;border-radius:50%;border:2px solid #33507A;background:#101923;display:flex;align-items:center;justify-content:center"><div style="width:112px;height:112px;border-radius:50%;border:2px dashed #4DA3FF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#9CC7FF;text-align:center;line-height:1.3">Tap<br>or insert</div></div>
+                <div style="font-size:16px;font-weight:700">Present the card to the guest side</div>
+                <div style="font-size:12.5px;color:#8A94A3;text-align:center;max-width:24ch;line-height:1.5">Contactless, chip and phone wallets. Charged in GBP.</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:11px;padding-bottom:8px">
+                <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13.5px;font-weight:700">Add a tip</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Optional &middot; asked before the tap</div></div><div style="display:flex;gap:7px"><span style="padding:9px 12px;border-radius:10px;background:#1F242C;border:1px solid #333B47;font-size:12px;font-weight:700;color:#C4CCD8">0%</span><span style="padding:9px 12px;border-radius:10px;background:#1F242C;border:1px solid #333B47;font-size:12px;font-weight:700;color:#C4CCD8">5%</span><span style="padding:9px 12px;border-radius:10px;background:#1F242C;border:1px solid #333B47;font-size:12px;font-weight:700;color:#C4CCD8">10%</span></div></div>
+                <div style="height:52px;border-radius:13px;border:1px solid #262C36;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;color:#C4CCD8">Cancel payment</div>
+                <div style="display:flex;gap:10px;padding:12px 14px;border-radius:12px;background:#2A1418;border:1px solid #5C2830;font-size:11.5px;color:#F0A8AD;line-height:1.55"><div style="width:3px;border-radius:2px;background:#E2545F;flex:none"></div><div><b>If the reply never comes</b>, this screen asks the provider what happened. It does not retry &mdash; a second attempt is a second charge.</div></div>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The amount is the largest thing on the screen</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">This is the one screen in the app a guest reads, from about half a metre away, at an angle. The figure and the currency come before anything the staff member needs.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The tip is asked before the tap, or not at all</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A tip prompt after authorisation is a second transaction. Offering it here keeps one charge, and 0% is a real button rather than a dismissal the guest has to find.</div>
+            </div>
+            <div style="background:#FDECEE;border:1px solid #F3CDD1;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7C2531">Charged with no response</div>
+              <div style="font-size:11.5px;color:#7C2531;line-height:1.6">The failure worth designing for is not <i>declined</i>, it is <i>unknown</i>: money may have moved. That state runs <span style="font-family:'IBM Plex Mono',monospace">inquirePaymentStatus</span> and shows what the provider says, blocking a second attempt until it answers. Retrying here is how a guest gets charged twice at a gate.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">One currency, because there is no float</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Tender currency equals base currency. A staff member away from a till cannot give change in a second currency, so the app does not offer one.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; createPayment &middot; capturePayment &middot; addTip &middot; inquirePaymentStatus</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; terminalReady &middot; authorising &middot; approved &middot; declined &middot; <b style="color:#B0343E">unknownInquiring</b> &middot; offlineNoCard</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; orderId&larr;<a href="#emp-034">EMP-034</a> &middot; paymentId&larr;deepLink</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-036">EMP-036</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; ORDER_CREATE &middot; ORDER_MODIFY &middot; module <span style="color:#0A4FB8">ticketing</span></div>
+        </div>
+      </div>
+
+      <div id="emp-036" data-screen-label="EMP-036" data-screen-id="EMP-036" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-036</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Issue media</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF6EF;color:#1B6B45">local range</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Give the guest something the gate can read. A wristband, a printed slip, or an entitlement appended to a ticket they already hold.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:51</span><span>venue wifi &middot; 58%</span></div>
+            <div style="flex:none;padding:6px 20px 14px;display:flex;align-items:center;gap:12px"><span style="font-size:15px;color:#8A94A3">&larr;</span><div><div style="font-size:12.5px;color:#8A94A3">Order RA-88421 &middot; paid &pound;36.00</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Issue media</div></div></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden">
+              <div style="padding:14px;border-radius:14px;background:#151D18;border:1px solid #24402F;display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:8px;background:#2FBE86;flex:none"></span><div><div style="font-size:13.5px;font-weight:700;color:#8FD3B0">Payment approved 14:50</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">2 &times; Adult &middot; 15:00 Main Hall</div></div></div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6B7484">How they will get in</div>
+                <div style="padding:14px;border-radius:14px;background:#171B22;border:1.5px solid #4DA3FF;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">Wristband from this device</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Range RA114-0412 &middot; 38 left on device</div></div><span style="width:22px;height:22px;border-radius:50%;border:2px solid #4DA3FF;flex:none"></span></div>
+                <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:14px;font-weight:700">Print a slip</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Belt printer &middot; paired</div></div><span style="width:22px;height:22px;border-radius:50%;border:2px solid #3A424F;flex:none"></span></div>
+                <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between;opacity:.55"><div><div style="font-size:14px;font-weight:700">Send to the guest's phone</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Needs signal &middot; unavailable</div></div><span style="width:22px;height:22px;border-radius:50%;border:2px solid #3A424F;flex:none"></span></div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#131C27;border:1px solid #33507A;display:flex;flex-direction:column;gap:8px"><div style="font-size:13px;font-weight:700;color:#9CC7FF">Or add to media they already hold</div><div style="height:52px;border-radius:13px;background:#171B22;border:1px solid #262C36;display:flex;align-items:center;justify-content:space-between;padding:0 15px;font-size:13.5px"><span style="color:#8A94A3">Scan their wristband or ticket</span><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#4DA3FF">SCAN</span></div><div style="font-size:11px;color:#8A94A3;line-height:1.5">Appends the new entitlement rather than issuing a second band. One guest, one thing to carry.</div></div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;flex-direction:column;gap:9px"><div style="font-size:11px;color:#8A94A3;line-height:1.5;text-align:center">Nothing is written if the issue fails. The band stays unallocated.</div><div style="height:56px;border-radius:14px;background:#4DA3FF;color:#08101B;display:flex;align-items:center;justify-content:center;font-size:15.5px;font-weight:800">Encode wristband</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Appending beats issuing</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">A guest already wearing a band who buys an add-on should not leave with two. The append path is given its own block with the scan target in it, because the alternative is a gate that has to read two things per person.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The local range is on screen, with a count</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Offline issue works from a range allocated at shift start. A steward who does not know they have thirty-eight bands left finds out when they run out mid-queue.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A failed issue writes nothing</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Half-issued media is worse than none: the guest holds a band the gate rejects and the range has a hole in it. The sentence sits above the button, not in an error toast after the fact.</div>
+            </div>
+            <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">A whole contract came off this screen</div>
+              <div style="font-size:11.5px;color:#5A4A20;line-height:1.6">Nine <span style="font-family:'IBM Plex Mono',monospace">assets</span> operations were removed on 18 August (CF-114) — the entire media library was attached here. It reads the one asset it needs. Same shape as CF-87, one level up.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getMediaEntitlements &middot; appendEntitlementToMedia &middot; getMediaAsset</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; ready &middot; encoding &middot; <b style="color:#0A4FB8">offlineLocalRange</b> &middot; rangeExhausted &middot; errorNothingWritten</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; mediaCode&larr;scan &middot; mediaId&larr;deepLink &middot; orderId&larr;<a href="#emp-035">EMP-035</a></div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; EMP-010 (Scan, <a href="Venue%20Staff%20App%20Board%201.dc.html#emp-010">Board 1</a>)</div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; ORDER_VIEW &middot; ASSET_LIBRARY_VIEW &middot; module <span style="color:#0A4FB8">ticketing</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">05 — Ask the app · 2 screens</div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:34px">
+
+      <div id="emp-019" data-screen-label="EMP-019" data-screen-id="EMP-019" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-019</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">AI assistant — home</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">tab root</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">The tab that is already in the shell. It has to earn the slot on first open by saying what it can answer, in the words a steward would use.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:55</span><span>venue wifi &middot; 57%</span></div>
+            <div style="flex:none;padding:6px 20px 14px"><div style="font-size:12.5px;color:#8A94A3">Riverside Arts &middot; steward</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Ask</div></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden">
+              <div style="display:flex;flex-direction:column;gap:9px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6B7484">Things people ask on this shift</div>
+                <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;font-size:13.5px">Can I let a party of four into 17:30?</div>
+                <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;font-size:13.5px">What is the policy on re-entry?</div>
+                <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;font-size:13.5px">Who is the duty manager right now?</div>
+                <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1px solid #262C36;font-size:13.5px">Where do lost property items go?</div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:9px;margin-top:4px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#6B7484">Earlier today</div>
+                <div style="padding:13px 14px;border-radius:13px;background:#12161C;border:1px solid #1E242D;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px">Refund rules for a cancelled session</div><div style="font-size:11px;color:#6B7484;margin-top:2px">11:20 &middot; 4 messages</div></div><span style="font-size:14px;color:#4A5261">&rsaquo;</span></div>
+                <div style="padding:13px 14px;border-radius:13px;background:#12161C;border:1px solid #1E242D;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px">Accessible seating in the Studio</div><div style="font-size:11px;color:#6B7484;margin-top:2px">09:48 &middot; 2 messages</div></div><span style="font-size:14px;color:#4A5261">&rsaquo;</span></div>
+              </div>
+              <div style="margin-top:auto;padding-bottom:12px;display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;gap:10px;padding:12px 14px;border-radius:12px;background:#241C10;border:1px solid #4A3617;font-size:11.5px;color:#E8BE7A;line-height:1.55"><div style="width:3px;border-radius:2px;background:#E8A33D;flex:none"></div><div>Needs signal. Offline this tab says so rather than answering from an old index.</div></div>
+                <div style="height:56px;border-radius:14px;background:#171B22;border:1px solid #333B47;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:14px;color:#8A94A3"><span>Ask about this shift&hellip;</span><span style="width:36px;height:36px;border-radius:10px;background:#4DA3FF;display:flex;align-items:center;justify-content:center;font-size:14px;color:#08101B">&uarr;</span></div>
+              </div>
+            </div>
+            <div style="flex:none;height:84px;border-top:1px solid #1E242D;background:#12161C;display:flex;align-items:center;justify-content:space-around;padding:0 12px;position:relative">
+              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:56px"><span style="width:20px;height:20px;border-radius:5px;background:#3A424F"></span><span style="font-size:10.5px;color:#8A94A3">Home</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:56px"><span style="width:20px;height:20px;border-radius:5px;background:#3A424F"></span><span style="font-size:10.5px;color:#8A94A3">Tasks</span></div>
+              <div style="width:76px;display:flex;flex-direction:column;align-items:center"><div style="width:66px;height:66px;border-radius:50%;background:#4DA3FF;border:5px solid #12161C;margin-top:-30px;display:flex;align-items:center;justify-content:center;font-size:12.5px;font-weight:800;color:#08101B">SCAN</div></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:56px"><span style="width:20px;height:20px;border-radius:5px;background:#4DA3FF"></span><span style="font-size:10.5px;font-weight:700;color:#4DA3FF">AI</span></div>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:56px"><span style="width:20px;height:20px;border-radius:5px;background:#3A424F"></span><span style="font-size:10.5px;color:#8A94A3">More</span></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">First run is four real questions, not a description</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">An empty assistant that explains its capabilities in a paragraph gets closed. Four questions from this shift, tappable, teach the same thing and answer something on the way.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">History is short and today-first</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Yesterday's conversations are not useful at a gate. The list is cursor-paginated, never offset — under concurrent writes on a busy night an offset list skips rows.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Offline says no, in the tab</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Retrieval needs the index, so an offline assistant cannot answer. Saying so beats answering from a stale cache, which is how a steward quotes last season's re-entry policy to a guest.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two ways in with different answers</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">No <span style="font-family:'IBM Plex Mono',monospace">AI_USE</span> permission and no <span style="font-family:'IBM Plex Mono',monospace">ai</span> licence look identical as an empty tab and are not: one is a supervisor, the other is a purchase. The tab names which.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listAiConversations &middot; createAiConversation &middot; sendAiMessage</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun</b> &middot; emptyNoAccess &middot; notLicensed &middot; error &middot; offlineUnavailable</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; conversationId&larr;deepLink &middot; cold from a notification</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-020">EMP-020</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; AI_USE &middot; module <span style="color:#0A4FB8">ai</span> &middot; wave 1 (CF-101)</div>
+        </div>
+      </div>
+
+      <div id="emp-020" data-screen-label="EMP-020" data-screen-id="EMP-020" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-020</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">AI assistant — answer</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">shows its source</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Answer with the operation behind it visible. A steward is about to repeat this to a guest, so they need to know where it came from.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>14:56</span><span>venue wifi &middot; 57%</span></div>
+            <div style="flex:none;padding:6px 20px 14px;display:flex;align-items:center;gap:12px"><span style="font-size:15px;color:#8A94A3">&larr;</span><div style="font-size:16px;font-weight:800;letter-spacing:-.02em">Party of four into 17:30</div></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden">
+              <div style="align-self:flex-end;max-width:80%;padding:12px 14px;border-radius:14px 14px 4px 14px;background:#141E2C;border:1px solid #33507A;font-size:13.5px;color:#DCE9FA;line-height:1.5">Can I let a party of four into 17:30?</div>
+              <div style="max-width:88%;padding:14px;border-radius:14px 14px 14px 4px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:14px;line-height:1.55">No. 17:30 Main Hall has <b>9 places</b> left and they are not adjacent, so a party of four cannot be seated together.</div>
+                <div style="font-size:13.5px;line-height:1.55;color:#C4CCD8">19:45 has 324 places and can take them.</div>
+                <div style="height:1px;background:#262C36"></div>
+                <div style="display:flex;flex-direction:column;gap:6px">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7484">Read from</div>
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8FD3B0">getChannelAllocations &middot; 14:55</div>
+                  <div style="font-size:11px;color:#8A94A3;line-height:1.5">Live figures, one minute old. Capacity moves.</div>
+                </div>
+              </div>
+              <div style="display:flex;gap:9px;flex-wrap:wrap"><span style="padding:10px 13px;border-radius:20px;background:#131C27;border:1px solid #33507A;font-size:12px;font-weight:700;color:#9CC7FF">Open 19:45 capacity</span><span style="padding:10px 13px;border-radius:20px;background:#131C27;border:1px solid #33507A;font-size:12px;font-weight:700;color:#9CC7FF">Sell into 19:45</span></div>
+              <div style="padding:12px 14px;border-radius:12px;background:#12161C;border:1px solid #1E242D;font-size:11.5px;color:#8A94A3;line-height:1.55">Answers about policy quote the document and its date. Answers about numbers name the operation and the time it was read.</div>
+              <div style="margin-top:auto;padding-bottom:12px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:14px;align-items:center;font-size:11.5px;color:#6B7484"><span>Was this right?</span><span style="padding:7px 12px;border-radius:10px;background:#171B22;border:1px solid #262C36;color:#C4CCD8">Yes</span><span style="padding:7px 12px;border-radius:10px;background:#171B22;border:1px solid #262C36;color:#C4CCD8">No</span></div><div style="height:56px;border-radius:14px;background:#171B22;border:1px solid #333B47;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-size:14px;color:#8A94A3"><span>Ask a follow-up&hellip;</span><span style="width:36px;height:36px;border-radius:10px;background:#4DA3FF;display:flex;align-items:center;justify-content:center;font-size:14px;color:#08101B">&uarr;</span></div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The provenance line is the feature</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">A number a steward repeats to a guest becomes venue policy for the next thirty seconds. Naming the operation and the read time lets them decide whether to trust it, and gives a supervisor something to check afterwards.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The answer ends in a next action</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A no with nowhere to go sends the steward back to the tab bar. The two chips are the screens the answer implies, <a href="#emp-033">EMP-033</a> and <a href="#emp-034">EMP-034</a>.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Failure is stated, never invented</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">An assistant that fails silently teaches people not to use it; one that answers from nothing gets a guest turned away wrongly. Both states say the assistant could not answer and leave the question in the box.</div>
+            </div>
+            <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Cross-device links removed 24 August</div>
+              <div style="font-size:11.5px;color:#5A4A20;line-height:1.6">A navigation to <span style="font-family:'IBM Plex Mono',monospace">BO-058</span> came off this screen. A handheld does not navigate to a back office — that is a device handover, declared by a flow with <span style="font-family:'IBM Plex Mono',monospace">crossesDevice</span>, not a link pretending to work.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; sendAiMessage &middot; createAiConversation &middot; listAiConversations</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; streaming &middot; answered &middot; <b style="color:#0A4FB8">couldNotAnswer</b> &middot; error &middot; offlineUnavailable</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; conversationId&larr;<a href="#emp-019">EMP-019</a> or deepLink</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-033">EMP-033</a> &middot; <a href="#emp-034">EMP-034</a> &middot; <a href="#emp-019">EMP-019</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; AI_USE &middot; module <span style="color:#0A4FB8">ai</span> &middot; wave 1, paired with <a href="#emp-019">EMP-019</a></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">06 — Being told things · 2 screens</div>
+
+    <div style="display:flex;gap:12px;padding:13px 16px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+      <div><b>These two screens hold the same four operations.</b> <span style="font-family:'IBM Plex Mono',monospace">listAnnouncements</span>, <span style="font-family:'IBM Plex Mono',monospace">acknowledgeAnnouncement</span>, <span style="font-family:'IBM Plex Mono',monospace">getAnnouncementReach</span> and <span style="font-family:'IBM Plex Mono',monospace">publishAnnouncement</span> appear on <span style="font-family:'IBM Plex Mono',monospace">EMP-037</span>, <span style="font-family:'IBM Plex Mono',monospace">EMP-039</span> and <span style="font-family:'IBM Plex Mono',monospace">EMP-047</span> identically, and <span style="font-family:'IBM Plex Mono',monospace">EMP-007</span> on Board 1 carries them under the name <i>Handover notes</i>. Drawn as two different jobs — what is addressed to me, and what the venue told everybody — on the assumption that the operation list is the thing that is wrong. Worth one decision from the client rather than four screens of guesswork.</div>
+    </div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:34px">
+
+      <div id="emp-037" data-screen-label="EMP-037" data-screen-id="EMP-037" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-037</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Notifications</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">addressed to me</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Tell the right person the right thing. What has arrived for this person on this shift, and which of it needs an acknowledgement before they carry on.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>15:02</span><span>venue wifi &middot; 55%</span></div>
+            <div style="flex:none;padding:6px 20px 14px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12.5px;color:#8A94A3">Amina Yusuf &middot; Gate B</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">For you</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 9px;border-radius:8px;background:#2A1418;border:1px solid #5C2830;color:#F0A8AD">1 to confirm</span></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="padding:14px;border-radius:14px;background:#2A1418;border:1.5px solid #5C2830;display:flex;flex-direction:column;gap:11px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#F0A8AD">must acknowledge</span><span style="font-size:11px;color:#8A94A3">14:58</span></div>
+                <div style="font-size:14.5px;font-weight:700;line-height:1.4">Gate B lane 3 barrier is faulty &mdash; do not use until engineering confirms</div>
+                <div style="font-size:12px;color:#C4CCD8;line-height:1.5">From D. Okonjo, duty manager. Affects 6 stewards.</div>
+                <div style="height:48px;border-radius:12px;background:#E2545F;color:#20090C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800">I have read this</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:7px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7484">shift</span><span style="font-size:11px;color:#8A94A3">14:40</span></div>
+                <div style="font-size:13.5px;font-weight:600;line-height:1.45">Your break moved to 16:15. Cover from J. Halden.</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:7px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7484">task</span><span style="font-size:11px;color:#8A94A3">13:12</span></div>
+                <div style="font-size:13.5px;font-weight:600;line-height:1.45">Lost property handover logged &mdash; nothing needed from you.</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#12161C;border:1px solid #1E242D;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px;color:#C4CCD8">Acknowledged earlier today</div><div style="font-size:11px;color:#6B7484;margin-top:2px">3 items</div></div><span style="font-size:14px;color:#4A5261">&rsaquo;</span></div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:10px;padding:12px 14px;border-radius:12px;background:#151D18;border:1px solid #24402F;font-size:11.5px;color:#8FD3B0;line-height:1.55"><div style="width:3px;border-radius:2px;background:#2FBE86;flex:none"></div><div>Cached with its age. Acknowledgements queue and send with the shift's other writes.</div></div><div style="height:48px;border-radius:12px;border:1px solid #262C36;display:flex;align-items:center;justify-content:center;font-size:13.5px;font-weight:600;color:#C4CCD8">Everything the venue posted</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Acknowledgement is the sort order</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">The one item that blocks the shift is first, in red, with its own button. Everything else is reverse chronological. A steward glancing at this between guests should see the count in the header and nothing else.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Every item says who sent it and who else got it</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A faulty barrier notice matters differently if six stewards have it than if it was sent to one person by mistake. Reach is on the item, not behind a supervisor view.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Acknowledgements queue offline</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The confirm button works without signal and the item stops blocking immediately. An acknowledgement that needs a network does not arrive when it matters.</div>
+            </div>
+            <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Publishing is drawn out</div>
+              <div style="font-size:11.5px;color:#5A4A20;line-height:1.6">The definition carries <span style="font-family:'IBM Plex Mono',monospace">publishAnnouncement</span> and an <span style="font-family:'IBM Plex Mono',monospace">ANNOUNCEMENT_PUBLISH</span> requirement, which would let any holder of this device post to the whole venue. Reading and acknowledging is what a steward's inbox does.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listAnnouncements &middot; acknowledgeAnnouncement &middot; getAnnouncementReach &middot; <span style="color:#B98900">publishAnnouncement flagged</span></div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">mustAcknowledge</b> &middot; emptyNothingNew &middot; offlineCachedQueued &middot; emptyNoResults</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; announcementId&larr;deepLink &middot; push open</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-039">EMP-039</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; WORKFORCE_VIEW &middot; module <span style="color:#0A4FB8">core</span> &middot; wave 1</div>
+        </div>
+      </div>
+
+      <div id="emp-039" data-screen-label="EMP-039" data-screen-id="EMP-039" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-039</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Announcements</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#F1F3F7;color:#5A6577">the venue's record</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Read what the venue told everybody. The same feed a steward joining at 18:00 needs to catch up on, without the personal items.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>18:04</span><span>no signal</span></div>
+            <div style="flex:none;padding:6px 20px 14px;display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:12.5px;color:#8A94A3">Riverside Arts &middot; all staff</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Announcements</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;padding:5px 9px;border-radius:8px;background:#241C10;border:1px solid #4A3617;color:#E8BE7A">cached 17:41</span></div>
+            <div style="flex:none;padding:0 20px 12px;display:flex;gap:8px"><span style="padding:8px 12px;border-radius:20px;background:#141E2C;border:1px solid #33507A;font-size:11.5px;font-weight:700;color:#9CC7FF">Today</span><span style="padding:8px 12px;border-radius:20px;background:#171B22;border:1px solid #262C36;font-size:11.5px;color:#8A94A3">This week</span><span style="padding:8px 12px;border-radius:20px;background:#171B22;border:1px solid #262C36;font-size:11.5px;color:#8A94A3">Safety</span></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7484">safety &middot; 14:58</span><span style="font-size:10.5px;color:#8FD3B0">you confirmed</span></div>
+                <div style="font-size:13.5px;font-weight:600;line-height:1.45">Gate B lane 3 barrier faulty &mdash; do not use</div>
+                <div style="font-size:11.5px;color:#8A94A3">D. Okonjo &middot; 6 of 6 acknowledged</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7484">operations &middot; 13:20</span><span style="font-size:10.5px;color:#8A94A3">no action</span></div>
+                <div style="font-size:13.5px;font-weight:600;line-height:1.45">17:30 Main Hall is nearly sold out. Send walk-ups to 19:45.</div>
+                <div style="font-size:11.5px;color:#8A94A3">Box office &middot; all staff</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:8px">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7484">safety &middot; 09:05</span><span style="font-size:10.5px;color:#E8BE7A">confirm queued</span></div>
+                <div style="font-size:13.5px;font-weight:600;line-height:1.45">Wet floor procedure &mdash; refresher before doors</div>
+                <div style="font-size:11.5px;color:#8A94A3">Health &amp; safety &middot; 41 of 58 acknowledged</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#171B22;border:1px solid #262C36;display:flex;flex-direction:column;gap:8px;opacity:.65">
+                <div style="display:flex;align-items:center;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#6B7484">general &middot; 08:12</span></div>
+                <div style="font-size:13.5px;font-weight:600;line-height:1.45">Staff canteen closes at 20:00 tonight</div>
+              </div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;gap:10px;padding-top:10px;border-top:1px solid #1E242D;font-size:11px;color:#E8BE7A;line-height:1.5"><div style="width:3px;border-radius:2px;background:#E8A33D;flex:none"></div><div>Offline since 17:52. This is the 17:41 copy &mdash; anything posted since is not here, and one acknowledgement is waiting to send.</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Drawn offline, because that is the honest case</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">Announcements are read in stairwells and loading bays. The frame shows the cached state with its age, what is missing, and the queued acknowledgement, rather than a clean online list that hides all three.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Reach is stated plainly</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Forty-one of fifty-eight tells a supervisor there is a briefing to repeat. <span style="font-family:'IBM Plex Mono',monospace">getAnnouncementReach</span> is on the item because the number is only useful next to the message.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Filters are named and clearable here</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">An empty list with the filter state hidden on another screen is a person who thinks the announcements are gone. The chips stay visible in the empty state and say which one is hiding the rest.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Not the same screen as <a href="#emp-037">EMP-037</a></div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Same contract, different question: <i>what do I have to deal with</i> against <i>what has the venue said</i>. If the client wants one screen, this is the one to keep and the inbox becomes a filter on it.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listAnnouncements &middot; acknowledgeAnnouncement &middot; getAnnouncementReach &middot; <span style="color:#B98900">publishAnnouncement flagged</span></div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyNone &middot; <b style="color:#0A4FB8">offlineCachedAckQueued</b> &middot; emptyNoResults &middot; error</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; announcementId&larr;deepLink</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-037">EMP-037</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; WORKFORCE_VIEW &middot; module <span style="color:#0A4FB8">core</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">07 — When it goes wrong · 2 screens</div>
+
+    <div style="display:flex;flex-wrap:wrap;gap:34px">
+
+      <div id="emp-047" data-screen-label="EMP-047" data-screen-id="EMP-047" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-047</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Emergency mode</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDECEE;color:#9B2C36">preempts everything</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Evacuate, and stop pretending to be a ticketing app. One instruction, one route, one thing to press when the area is clear.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #5C2830;overflow:hidden;display:flex;flex-direction:column;background:#17070A;color:#FFE9EB">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#E5A0A7"><span>19:12</span><span>no signal &middot; 34%</span></div>
+            <div style="flex:none;padding:8px 20px 16px"><div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:#F0A8AD">evacuation &middot; declared 19:11</div><div style="font-size:29px;font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-top:6px">Clear Gate B<br>to muster C</div></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:12px;min-height:0;overflow:hidden">
+              <div style="padding:16px;border-radius:16px;background:#2A1418;border:1.5px solid #7C2531;display:flex;flex-direction:column;gap:9px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#F0A8AD">your instruction</div>
+                <div style="font-size:16px;font-weight:700;line-height:1.4">Move everyone through the east doors. Do not use lane 3. Leave the barriers open.</div>
+                <div style="font-size:12.5px;color:#E5A0A7">D. Okonjo, incident commander</div>
+              </div>
+              <div style="padding:14px;border-radius:14px;background:#20090C;border:1px solid #5C2830;display:flex;flex-direction:column;gap:10px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#E5A0A7">muster point c &middot; east lawn</div>
+                <div style="height:110px;border-radius:12px;background:#2A1418;border:1px dashed #7C2531;display:flex;align-items:center;justify-content:center;font-size:11.5px;color:#E5A0A7">stored route diagram &middot; on device</div>
+                <div style="font-size:12px;color:#E5A0A7;line-height:1.5">Held locally. This screen renders with no network by design.</div>
+              </div>
+              <div style="display:flex;gap:10px">
+                <div style="flex:1;padding:13px;border-radius:13px;background:#20090C;border:1px solid #5C2830;text-align:center"><div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600">6</div><div style="font-size:10.5px;color:#E5A0A7;margin-top:2px">stewards on Gate B</div></div>
+                <div style="flex:1;padding:13px;border-radius:13px;background:#20090C;border:1px solid #5C2830;text-align:center"><div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600">4</div><div style="font-size:10.5px;color:#E5A0A7;margin-top:2px">confirmed clear</div></div>
+              </div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;flex-direction:column;gap:10px">
+                <div style="height:64px;border-radius:15px;background:#E2545F;color:#20090C;display:flex;align-items:center;justify-content:center;font-size:16.5px;font-weight:800">My area is clear</div>
+                <div style="height:52px;border-radius:13px;border:1px solid #7C2531;background:#20090C;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#F0A8AD">I need help here</div>
+                <div style="font-size:11px;color:#E5A0A7;line-height:1.5;text-align:center">Both queue if there is no signal and send the moment there is. Scanning, sales and tasks are suspended.</div>
+              </div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">It takes the whole screen, including the tab bar</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">The shell is gone. Nothing about this device should suggest a person can go back to scanning tickets, and nothing on screen competes with the instruction and the two buttons.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The instruction is specific to this person's post</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">A general evacuation notice makes six stewards decide for themselves which doors to use. Naming the gate, the exclusion and the muster point removes the decision.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two answers, both one tap</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">Clear and not-clear are the only things command needs from a steward mid-evacuation. Both queue offline; the counts above them are the last synced picture, which is why they are labelled rather than presented as live.</div>
+            </div>
+            <div style="background:#FDECEE;border:1px solid #F3CDD1;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#7C2531">Announcement operations do not fit this screen</div>
+              <div style="font-size:11.5px;color:#7C2531;line-height:1.6">It is defined against the same four announcement operations as <a href="#emp-037">EMP-037</a> and <a href="#emp-039">EMP-039</a>, with an <span style="font-family:'IBM Plex Mono',monospace">emptyNoResults</span> filter state and a permission gate. An evacuation screen cannot have a no-access state, and cannot need a licence check. Drawn as what it must do; the contract needs writing.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listAnnouncements &middot; acknowledgeAnnouncement &middot; <span style="color:#B0343E">contract mismatch flagged</span></div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; <b style="color:#B0343E">declared</b> &middot; areaClearQueued &middot; helpRequested &middot; offlineByDesign &middot; localDataOnly</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; incidentId&larr;push &middot; preempts any screen &middot; postId&larr;shift</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#emp-050">EMP-050</a></div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; no gate &mdash; module <span style="color:#0A4FB8">core</span> &middot; wave 1</div>
+        </div>
+      </div>
+
+      <div id="emp-050" data-screen-label="EMP-050" data-screen-id="EMP-050" style="width:690px;display:flex;flex-direction:column;gap:12px;scroll-margin-top:24px">
+        <div>
+          <div style="display:flex;align-items:baseline;gap:9px;flex-wrap:wrap"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">EMP-050</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Post-incident restore</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EAF6EF;color:#1B6B45">offline by design</span></div>
+          <div style="font-size:12px;color:#6B7280;margin-top:3px">Put the venue back to how it was. A checklist held by whoever is standing there, ending in a decision a duty manager has to make.</div>
+        </div>
+        <div style="padding:18px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09);display:flex;gap:18px">
+          <div style="flex:none;width:390px;height:844px;border-radius:26px;border:1px solid #262C36;overflow:hidden;display:flex;flex-direction:column;background:#0E1116;color:#E8ECF2">
+            <div style="flex:none;height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#8A94A3"><span>19:48</span><span>no signal &middot; 28%</span></div>
+            <div style="flex:none;padding:6px 20px 14px"><div style="font-size:12.5px;color:#8A94A3">Incident RA-INC-0117 &middot; stood down 19:41</div><div style="font-size:20px;font-weight:800;letter-spacing:-.02em">Restore Gate B</div></div>
+            <div style="flex:1;padding:0 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden">
+              <div style="padding:13px 14px;border-radius:13px;background:#151D18;border:1px solid #24402F;display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:8px;background:#2FBE86;flex:none"></span><div><div style="font-size:13.5px;font-weight:700;color:#8FD3B0">Muster C accounted for</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">19:38 &middot; 6 of 6 stewards</div></div></div>
+              <div style="padding:13px 14px;border-radius:13px;background:#151D18;border:1px solid #24402F;display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:8px;background:#2FBE86;flex:none"></span><div><div style="font-size:13.5px;font-weight:700;color:#8FD3B0">Lane 3 barrier isolated</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Engineering, 19:44</div></div></div>
+              <div style="padding:13px 14px;border-radius:13px;background:#171B22;border:1.5px solid #4DA3FF;display:flex;flex-direction:column;gap:10px"><div style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:8px;border:1.5px solid #4DA3FF;flex:none"></span><div><div style="font-size:13.5px;font-weight:700">East doors returned to normal</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Held open during the evacuation</div></div></div><div style="height:44px;border-radius:11px;background:#141E2C;border:1px solid #33507A;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#9CC7FF">Mark done</div></div>
+              <div style="padding:13px 14px;border-radius:13px;background:#241C10;border:1.5px solid #4A3617;display:flex;flex-direction:column;gap:9px"><div style="display:flex;align-items:center;gap:12px"><span style="width:26px;height:26px;border-radius:8px;border:1.5px solid #E8A33D;flex:none"></span><div><div style="font-size:13.5px;font-weight:700;color:#E8BE7A">Fire service notified of stand-down</div><div style="font-size:11.5px;color:#8A94A3;margin-top:2px">Required. Recorded against the incident.</div></div></div><div style="height:44px;border-radius:11px;background:#E8A33D;color:#241C10;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800">Record notification</div></div>
+              <div style="padding:13px 14px;border-radius:13px;background:#12161C;border:1px solid #1E242D;font-size:12px;color:#8A94A3;line-height:1.5">Reopening the gate for the 19:45 session is a duty manager's call, not a checklist item. Two items are still open.</div>
+              <div style="margin-top:auto;padding-bottom:16px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:10px;padding:12px 14px;border-radius:12px;background:#151D18;border:1px solid #24402F;font-size:11.5px;color:#8FD3B0;line-height:1.55"><div style="width:3px;border-radius:2px;background:#2FBE86;flex:none"></div><div>Everything here is recorded on the device with its timestamp and sends when signal returns.</div></div><div style="height:56px;border-radius:14px;background:#1F242C;border:1px solid #333B47;display:flex;align-items:center;justify-content:center;font-size:14.5px;font-weight:700;color:#8A94A3">Escalate to duty manager</div></div>
+            </div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A checklist, because nobody remembers at 19:48</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">Restoring is a list of physical acts done by tired people in the dark. Each item carries who did it and when, so the item that was missed is visible rather than assumed.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The authority notification is a first-class item</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">recordAuthorityNotification</span> is the one write on this screen with an outside party on the end of it. It gets its own colour and its own button, and stays open until somebody presses it.</div>
+            </div>
+            <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Reopening is not on this screen</div>
+              <div style="font-size:11.5px;color:#5A6577;line-height:1.6">The checklist tells a duty manager what is outstanding; it does not let a steward decide the gate is open. Failure escalates to that person rather than retrying.</div>
+            </div>
+            <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:7px">
+              <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">reportIncident removed 24 August</div>
+              <div style="font-size:11.5px;color:#5A4A20;line-height:1.6">Bulk-attach residue: authority notification belongs where the incident is read, but raising one belongs where it happens. The screen reads and closes incidents, and does not open them.</div>
+            </div>
+          </div>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+          <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listIncidents &middot; getIncident &middot; recordAuthorityNotification &middot; updateIncident</div>
+          <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; checklistOpen &middot; itemsOutstanding &middot; <b style="color:#0A4FB8">offlineByDesign</b> &middot; errorEscalates &middot; emptyNoAccess</div>
+          <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; incidentId&larr;<a href="#emp-047">EMP-047</a> or deepLink</div>
+          <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; EMP-003 (Home, <a href="Venue%20Staff%20App%20Board%201.dc.html#emp-003">Board 1</a>)</div>
+          <div><b style="color:#4A5566;font-weight:600">NEEDS</b> &middot; INCIDENT_VIEW &middot; INCIDENT_MANAGE &middot; module <span style="color:#0A4FB8">maintenance</span></div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div style="margin-top:52px;padding-top:16px;border-top:1px solid #DCE3ED;display:flex;justify-content:space-between;align-items:baseline;gap:20px;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">
+    <div>P06 &middot; board 2 of 3 &middot; 12 screens &middot; EMP-019, 020, 031&ndash;037, 039, 047, 050</div>
+    <div><a href="Venue%20Staff%20App%20Board%201.dc.html">&larr; board 1</a> &middot; <a href="Venue%20Staff%20App%20Board%203.dc.html">board 3 &rarr;</a> people, incidents, settings (17)</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{}"></script>
+</body>
+</html>

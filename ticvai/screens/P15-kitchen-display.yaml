@@ -133,7 +133,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/KitchenOperationsCommandCenterBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 3.dc.html#fnb-3a
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3A in the client pack.** The pack''s frame is the specification for this screen
@@ -253,7 +254,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/KitchenDisplaySystemKdsBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 3.dc.html#fnb-3b
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3B in the client pack.** The pack''s frame is the specification for this screen
@@ -366,7 +368,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/OrderFiringCourseManagementBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 3.dc.html#fnb-3c
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3C in the client pack.** The pack''s frame is the specification for this screen
@@ -462,7 +465,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/ActiveOrderManagementFulfilmentJouBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P15 Kitchen Display.dc.html#kit-004
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3D in the client pack.** The pack''s frame is the specification for this screen
@@ -547,7 +551,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/KitchenStationWorkloadDynamicRoutiBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 3.dc.html#fnb-3e
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3E in the client pack.** The pack''s frame is the specification for this screen
@@ -654,7 +659,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/ExpeditorOrderAssemblyBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 3.dc.html#fnb-3f
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3F in the client pack.** The pack''s frame is the specification for this screen
@@ -750,7 +756,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/GuestCollectionBuzzerDigitalNotifiBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P15 Kitchen Display.dc.html#kit-007
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3G in the client pack.** The pack''s frame is the specification for this screen
@@ -855,7 +862,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/ExceptionsReFireUnavailableItemsBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 3.dc.html#fnb-3h
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3H in the client pack.** The pack''s frame is the specification for this screen
@@ -952,7 +960,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/SlaPriorityServiceRulesBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/FnB Board 3.dc.html#fnb-3j
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3J in the client pack.** The pack''s frame is the specification for this screen
@@ -1045,7 +1054,8 @@ screens:
     component: apps/kitchen-display/src/routes/kitchen/KitchenPerformanceAiOperationalOptBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P15 Kitchen Display.dc.html#kit-010
     source: Claude Design F&B pack, 20 August
     note: '**Drawn as FNB-3K in the client pack.** The pack''s frame is the specification for this screen

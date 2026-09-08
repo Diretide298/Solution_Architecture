@@ -101,7 +101,8 @@ screens:
     offline: Opens locally and syncs. A gate that cannot open a till because the network is down is a
       gate that does not sell
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/TICVAI Boards v2.dc.html#pos-2a
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-2A, POS-3D in the client POS pack.** The pack''s frame is the specification
@@ -305,7 +306,8 @@ screens:
       a till selling yesterday’s prices is a real exposure, and `maxOfflineHours` bounds how long it can
       last.'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 3.dc.html#ret-3b
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-3B, RET-3C, RET-3D in the client Retail pack.**'
@@ -589,7 +591,8 @@ screens:
     offline: '**Availability is never served from the bundle.** A lease is acquired against the server;
       without one the terminal sells only from its allocated lease and refuses beyond it (ADR-0013)'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-003
   permission: ORDER_CREATE
   apis:
@@ -621,7 +624,7 @@ screens:
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  - operationId: releaseInventoryHold
+  - operationId: relinquishInventoryHold
     contract: catalogue
     purpose: Return unsold units
     trigger: onAction
@@ -712,7 +715,8 @@ screens:
     offline: '**Not available offline.** Seat holds require the primary; two terminals selling the same
       seat is unrecoverable'
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Seat Board 3.dc.html#seat-3a
     generatedFallback: wireframes/P04 Venue POS.dc.html#pos-004
   permission: ORDER_CREATE
@@ -741,7 +745,7 @@ screens:
     contract: seating
     purpose: Recommend seats for a party
     trigger: onAction
-  - operationId: releaseSeatHold
+  - operationId: relinquishSeatHold
     contract: seating
     purpose: Release a hold
     trigger: onAction
@@ -867,7 +871,8 @@ screens:
     offline: Cash completes locally and journals. **Card does not** — an offline card approval the acquirer
       never saw is a sale that vanishes at settlement
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 3.dc.html#ret-3e
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-3E in the client Retail pack.**'
@@ -1004,7 +1009,8 @@ screens:
     offline: Orders held at this terminal are listed. Those held elsewhere are not — resuming another
       till's sale needs the server
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Retail Board 3.dc.html#ret-3f
     source: Claude Design Retail pack, 24 August
     note: '**Drawn as RET-3F in the client Retail pack.**'
@@ -1135,7 +1141,8 @@ screens:
     offline: Cannot close. Closing requires the server total, and a locally computed variance is not a
       variance
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/TICVAI Boards v2.dc.html#pos-2f
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-2F, POS-3F in the client POS pack.** The pack''s frame is the specification
@@ -1292,7 +1299,8 @@ screens:
     offline: '**Not available.** Reporting reads the analytical replica (ADR-0016) and a terminal-local
       figure would disagree with the back office'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-008
   permission: REPORT_VIEW
   apis:
@@ -1384,7 +1392,8 @@ screens:
     error: Roster unavailable
     offline: Last known roster, with its age shown
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 3.dc.html#pos-3a
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-3A in the client POS pack.** The pack''s frame is the specification — it carries
@@ -1568,7 +1577,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/AddToExistingTicketDetail.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-010
   notes: 'CF-58, from the 14 August MoM. Not in the delivered mockups. **9 assets operations removed 18
     August (CF-114).** The whole media contract was attached to this screen. **A till adding an item to
@@ -1683,7 +1693,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/ReturnsRefundsExchangesBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Frontline Board 2.dc.html#pos-2b
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-2B in the client POS pack.** The pack''s frame is the specification — it carries
@@ -1783,7 +1794,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/OmnichannelOrderFulfilmentCenterBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Frontline Board 2.dc.html#pos-2c
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-2C in the client POS pack.** The pack''s frame is the specification — it carries
@@ -1884,7 +1896,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/MobilePosEventSalesOfflineOperatioBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Frontline Board 2.dc.html#pos-2d
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-2D, POS-2E in the client POS pack.** The pack''s frame is the specification
@@ -1967,7 +1980,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/SalesExceptionsControlsOperationalBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-014
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -2034,7 +2048,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/CashOperationsDashboardBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-015
   provenance: client board, specified
   notes: '**Added 20 August from the client design board.** The operations existed and no screen called
@@ -2099,7 +2114,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/TillConfigurationBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Frontline Board 2.dc.html#pos-2b
     generatedFallback: wireframes/P04 Venue POS.dc.html#pos-016
   provenance: client board, named only
@@ -2170,7 +2186,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/CashInCashOutOperationsBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Frontline Board 2.dc.html#pos-2d
     generatedFallback: wireframes/P04 Venue POS.dc.html#pos-017
   provenance: client board, specified
@@ -2258,7 +2275,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/SafeDropCashTransferManagementBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 3.dc.html#pos-3b
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-3B in the client POS pack.** The pack''s frame is the specification — it carries
@@ -2337,7 +2355,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/ShiftTemplatesPoliciesBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 3.dc.html#pos-3c
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-3C in the client POS pack.** The pack''s frame is the specification — it carries
@@ -2429,7 +2448,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/ShiftExceptionsAlertsBoard.tsx
     status: notStarted
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/POS Board 3.dc.html#pos-3e
     source: Claude Design POS pack, 24 August
     note: '**Drawn as POS-3E in the client POS pack.** The pack''s frame is the specification — it carries
@@ -2531,7 +2551,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/SellFoodDrinkBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-021
   provenance: gap found 24 August — no counter-service F&B on any till
   notes: '**Built 24 August. P04 had no F&B screens at all** — a venue licensing `fnb` and running a coffee
@@ -2618,7 +2639,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/SendToKitchenBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-022
   provenance: gap found 24 August — no counter-service F&B on any till
   notes: '**The counter half of F29 and F83.** The kitchen ticket already exists and P15 already renders
@@ -2702,7 +2724,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/SellMerchandiseBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-023
   provenance: gap found 24 August — no counter-service F&B on any till
   notes: '**Built 24 August.** `RetailService` has 35 operations and F34 walks a retail sale from scan
@@ -2785,7 +2808,8 @@ screens:
     component: apps/venue-pos/src/routes/sell/OutletSetupBoard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P04 Venue POS.dc.html#pos-024
   provenance: gap found 24 August — no counter-service F&B on any till
   notes: '**Configuration on the till, gated by permission rather than by device.** P04 is *Terminal and

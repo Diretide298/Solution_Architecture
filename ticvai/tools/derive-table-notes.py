@@ -36,6 +36,32 @@ except Exception:
 # **Written by hand, because a name cannot be derived into a meaning.** These are the tables whose
 # name does not say what they hold — the rest get a note assembled from their shape alone.
 WHAT = {
+    "approvals.accreditation_badge": (
+        "**The badge an approved accreditation actually issues**, held apart from the request "
+        "that granted it. `zones` is the access it carries and `state` walks issued, expired "
+        "and revoked — **a badge outlives the decision behind it**, which is why revoking one "
+        "is a row here and not an edit to `approvals.request`. `revoked_reason` is required in "
+        "practice for the same reason an empty state is: a badge that stops working without "
+        "saying why sends someone to a gate to find out."),
+    "control.archival_job": (
+        "**One archival run against one table in one cell**, with what it moved and what it "
+        "destroyed counted separately. `rows_archived` and `rows_purged` are two numbers because "
+        "they are two different consequences — copying rows out is reversible and deleting them "
+        "is not, and a single `rows_processed` would hide which of the two happened. `error` "
+        "holds the failure text, because **an archival job that fails silently is a table that "
+        "grows until something else breaks.**"),
+    "control.backup_run": (
+        "**One backup, and whether anyone has proved it restores.** `restore_tested_at` is the "
+        "column that matters: a backup nobody has restored from is a belief, not a backup, and "
+        "it is null far more often than `state` being `completed` suggests. `scope` names what "
+        "was taken — a cell, a tenant database — because ADR-0038 makes those different sizes "
+        "of loss."),
+    "control.scaling_policy": (
+        "**The bounds a service scales within inside one cell**, not the scaling itself. "
+        "`replica_floor` and `replica_ceiling` are the decision; `target_utilisation_pct` and "
+        "`scale_step_pct` are how fast it moves between them. **A ceiling is a cost limit and a "
+        "floor is an availability one**, and a cell that hits its ceiling under load is a "
+        "capacity decision someone has to take rather than a fault to page on."),
     "control.cell_tenant": (
         "**Which tenants live in which cell, and under what database name** (ADR-0038). The "
         "relation that replaced `control.cell.tenant_id`: a cell is a region and holds many "

@@ -3,9 +3,10 @@
 **Status:** Accepted — pooling amended by [ADR-0038](0038-cell-is-a-region-database-per-tenant.md).
 Shedding, backpressure and breakers stand as written. **The connection arithmetic below is per
 database, and there is now one database per tenant** — *"four hundred client connections share forty
-server ones"* is a statement about one tenant. **Re-derived 5 September against ten tenants at
-go-live: the ceiling is eleven**, because `control` takes a pool of its own and 500 / 40 is twelve
-databases. ADR-0038 estimated twenty-five by leaving the control database out of the division.
+server ones"* is a statement about one tenant. **The cap is a per-tenant limit, not a reservation,
+and the primary's connections are a shared budget** — amended again by
+[ADR-0040](0040-a-cell-may-hold-more-than-one-instance.md), which also gives the region a second
+instance when one is not enough.
 **Date:** 31 August 2026
 **Related:** [ADR-0016](0016-read-write-separation.md) · [ADR-0028](0028-service-decomposition.md) · [ADR-0031](0031-contention-and-locking.md) · CF-161
 
@@ -63,10 +64,15 @@ growing.**
 | 11 | 12 | 480 | 97% |
 | 12 | 13 | 520 | **over** |
 
-**At today's `default_pool_size = 40` the ceiling is eleven tenants, and go-live is ten.** The
-configuration runs out one client after launch. That is not a capacity problem to watch; it is a
-number that was chosen when a cell held one tenant and never re-derived when a cell began holding
-many.
+**Read that as a worst case, not a ceiling.** It is the column where every tenant peaks at full
+pool depth in the same moment. **`MIN_POOL_SIZE` is unset in every configuration**, so pgbouncer's
+default of zero applies: a provisioned tenant holds no server connection until it transacts and
+gives it back at idle timeout. Ten tenants at three in the morning hold nothing.
+
+**So the sum of the caps is deliberately allowed to exceed `max_connections`.** A cap is what one
+tenant may take, not what it has taken, and sizing the sum to fit would give each tenant less on the
+day a single one is busy — which is the day it matters. **What is monitored is concurrent server
+connections against the primary's limit**, because tenant count says nothing about load.
 
 **Idle tenants are free, and that is what makes this sizeable.** `min_pool_size` is unset, so
 pgbouncer opens server connections on demand and returns them at `server_idle_timeout`. A
@@ -74,16 +80,18 @@ provisioned tenant that is not transacting holds nothing. **So the figure to siz
 concurrent busy tenants, not provisioned ones** — and 440 is the Saturday-evening worst case where
 every venue is trading at once, which is exactly when they do.
 
-**The lever is `default_pool_size`, not `max_connections`.** Halving it to twenty puts the ceiling
-at twenty-four tenants inside the same primary; raising `max_connections` instead buys the same
-headroom and pays for it in memory on every backend, whether or not it is used. **Twenty is enough
-per tenant database precisely because transaction mode returns the connection at commit** — the
-same property this decision already rests on.
+**A sustained approach to that limit is the signal, and there are three answers to it.** Raise
+`max_connections`, which is bounded — every backend is a process costing memory used or not. Lower
+`default_pool_size`, which is bounded differently and worse: it trades a platform limit for a
+per-tenant one. Or **add an instance to the region**, which is unbounded and is what
+[ADR-0040](0040-a-cell-may-hold-more-than-one-instance.md) decides. The first two are tuning; only
+the third changes the shape of the limit.
 
-**Reopening trigger: a tenant count where halving is not enough.** Twenty-four is roughly two
-years of the stated growth. Past that the question is no longer pool arithmetic but whether one
-primary should hold every tenant in a region, which is ADR-0038's own reopening trigger and not
-this one's.
+**Connections size against load, not tenancy — and the package already knows this.**
+`derive-burst-scope.py` computes `connectionsAtFloor = floor × POOL_MAX_PER_REPLICA` with the floor
+derived from RPS. **The tenant pools are the only place capacity is a function of how many tenants
+exist rather than how much work they do**, and that asymmetry is the thing to remove, not the
+number.
 
 ### Backpressure: refuse early with a number the caller can use
 

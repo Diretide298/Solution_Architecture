@@ -2,7 +2,7 @@
 
 Generated 17 August 2026
 
-**1626 operations · 386 tables · 1091 screens · 124 state models · 29 events · 94 flows · 39 ADRs**
+**1626 operations · 386 tables · 1091 screens · 124 state models · 29 events · 94 flows · 41 ADRs**
 
 **Conflicts: 92 raised, 0 blocking.** See `conflict-status.md`.
 
@@ -34,7 +34,7 @@ provenance and what each one rules out — including the six that were wrong fir
 | `states/` · `events/` | 124 state models · 29 events, cross-checked |
 | `flows/` | 23 user journeys with 137 unhappy paths |
 | `handoff/` | Registers240 indexes and the schema workbook |
-| `docs/` | Architecture, 39 ADRs, the conflict register |
+| `docs/` | Architecture, 41 ADRs, the conflict register |
 | `tools/` | **7 validators** and two generators |
 | `wireframes/` | 12 boards from Claude Code, linked to every definition |
 | `sources/` | The matrix, the minutes, the client design references |

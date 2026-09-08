@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">P16 Venue Analytics — ten dashboards and one question box <span style="font-weight:600;color:#6B7280">(10 screens · 1 module)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>venue-management-web · venue · wave 3 · ANL codes</div>
+      <div>1280 &times; 880 frames &middot; <a href="TICVAI%20Board%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:84ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">All ten screens, one module, all wave 3. Every one is derived from a frame in the client packs — POS Board 6 <i>Analytics &amp; AI</i> and Retail Board 6 — and every one declares the same pair, <span style="font-family:'IBM Plex Mono',monospace">getDashboard</span> on load and <span style="font-family:'IBM Plex Mono',monospace">runReport</span> on action, with one or two domain reads added. Riverside Arts is the stand-in tenant; the figures are a September week.</p>
+
+  <div style="display:flex;gap:12px;padding:13px 16px;margin-top:16px;background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;font-size:12px;color:#5A4A20;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#B98900;flex:none"></div>
+    <div><b>The 91-operation gap on this platform is mostly not P16's.</b> The derived page lists 91 operations <i>callable by this platform's audience and reaching no screen here</i> — and the list is <span style="font-family:'IBM Plex Mono',monospace">createLoyaltyProgramme</span>, <span style="font-family:'IBM Plex Mono',monospace">bulkChangePrices</span>, <span style="font-family:'IBM Plex Mono',monospace">setPasswordPolicy</span>, <span style="font-family:'IBM Plex Mono',monospace">ingestKnowledgeDocument</span>. Those are configuration, and they belong to <span style="font-family:'IBM Plex Mono',monospace">P08 Venue Management</span> and <span style="font-family:'IBM Plex Mono',monospace">P13 Venue CMS</span>. They appear against P16 because all three share the app <span style="font-family:'IBM Plex Mono',monospace">venue-management-web</span>, so the gap query cannot separate them. Reading it as <i>91 missing analytics screens</i> would be wrong; the number to act on is the handful named on the frames below.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">Analytics · 10 screens · wave 3</div>
+
+    <div id="anl-001" data-screen-label="ANL-001" data-screen-id="ANL-001" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-001</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Executive Command Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">one screen, four domains</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Across F&amp;B, retail, ticketing and frontline, filtered by domain. The screen a general manager opens on Monday, and the only one here that leads with alerts rather than numbers.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Sales</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Operations</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Products</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Margin</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Forecast</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Assistant</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">week to 3 Sep<br>all venues</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Overview</span><div style="display:flex;gap:8px"><span style="padding:5px 11px;border-radius:8px;background:#0F1E33;color:#fff;font-size:11.5px;font-weight:700">All domains</span><span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:600">Week</span><span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:600">Export</span></div></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:none;display:flex;flex-direction:column;gap:9px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">needs a decision</div>
+                <div style="display:flex;flex-direction:column;gap:8px">
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid #F5C9C9;border-radius:10px;background:#FEF7F7"><span style="flex:1;font-size:12px;font-weight:700;color:#8A2020">Gross margin on F&amp;B fell 4.1 points this week</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A5A5A">waste, not price</span></div>
+                  <div style="display:flex;align-items:center;gap:12px;padding:11px 13px;border:1px solid #F0DFB8;border-radius:10px;background:#FFFCF4"><span style="flex:1;font-size:12px;font-weight:700;color:#7A5F14">Saturday matinee sold 62% against a 90% forecast</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">2 days out</span></div>
+                </div>
+              </div>
+              <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">revenue</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£184k</span><span style="font-size:10.5px;color:#0E9F6E">+6% vs last week</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">admissions</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">9 412</span><span style="font-size:10.5px;color:#5A6577">84% of capacity</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">spend per head</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£8.40</span><span style="font-size:10.5px;color:#8A6D00">−3% vs last week</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">gross margin</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1;color:#A81E1E">61.2%</span><span style="font-size:10.5px;color:#5A6577">target 65%</span></div>
+              </div>
+              <div style="flex:1;display:flex;gap:14px;min-height:0">
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:12px;min-width:0">
+                  <div style="font-size:12.5px;font-weight:800">Revenue by domain</div>
+                  <div style="display:flex;flex-direction:column;gap:10px">
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:78px;font-size:11.5px;font-weight:700">Ticketing</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:68%;height:14px;border-radius:8px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:52px;text-align:right">£126k</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:78px;font-size:11.5px;font-weight:700">F&amp;B</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:21%;height:14px;border-radius:8px;background:#00B8FF"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:52px;text-align:right">£38k</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:78px;font-size:11.5px;font-weight:700">Retail</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:9%;height:14px;border-radius:8px;background:#0E9F6E"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:52px;text-align:right">£16k</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:78px;font-size:11.5px;font-weight:700">Parking</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:2%;height:14px;border-radius:8px;background:#8494A8"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:52px;text-align:right">£4k</span></div>
+                  </div>
+                  <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Every bar links into the domain screen with this week's filter carried across — a manager who has found a number should not have to re-find the week.</div>
+                </div>
+                <div style="flex:none;width:290px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12.5px;font-weight:800">Ask about this week</div>
+                  <div style="height:36px;border-radius:9px;border:1px solid #C7D7EE;background:#F5F9FF;display:flex;align-items:center;padding:0 11px;font-size:11.5px;color:#5A6577">why did margin fall?</div>
+                  <div style="padding:11px 12px;border-radius:10px;background:#F7F9FC;font-size:11px;color:#5A6577;line-height:1.55">Answers open as a saved report rather than a chat bubble, so the working is visible and the query can be run again next week.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">requestSuggestion &middot; onAction<br>runReport &middot; onAction</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Alerts above numbers, deliberately</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">This is the only screen in P16 that declares <span style="font-family:'IBM Plex Mono',monospace">listAlerts</span> alongside the dashboard, and it leads with them. A weekly overview whose first row is a revenue tile answers a question nobody asked; the two rows above the tiles are the reason a general manager opened it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">getDashboard &middot; onLoad<br>listAlerts &middot; onLoad</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Drawn from POS Board 6</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Provenance is <span style="font-family:'IBM Plex Mono',monospace">POS Board 6</span> panel A, one of the client's own <i>Analytics &amp; AI</i> frames, matched to this screen by title. The pack is the specification for what a venue expects to see.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">derivedFrom &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">POS-6A</span><br>status &middot; generated here</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">One domain filter, nine screens</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The filter set — F&amp;B, retail, ticketing, frontline — is the same on every screen here and carries when you move between them. A venue that runs one outlet sees the same shell with one option.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">filter &middot; carried across<br>scope &middot; venue or all</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; listAlerts &middot; runReport &middot; requestSuggestion</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; <b style="color:#0A4FB8">emptyNoAccess</b> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; window&larr;screen state</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-002">ANL-002</a> &middot; <a href="#anl-003">ANL-003</a> &middot; <a href="#anl-005">ANL-005</a> &middot; <a href="#anl-009">ANL-009</a></div>
+      </div>
+    </div>
+
+    <div id="anl-002" data-screen-label="ANL-002" data-screen-id="ANL-002" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-002</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Sales, Revenue &amp; Channel</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">channel is the whole point</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Where the money came from, by channel and by day. Two declared operations — the generic pair — and the screen's value is entirely in which cut it defaults to.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Sales</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Operations</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Products</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Margin</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Forecast</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">week to 3 Sep<br>ticketing + F&amp;B</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Sales, revenue &amp; channel</span><div style="display:flex;gap:8px"><span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:600">Week</span><span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:600">Save as report</span></div></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">net sales</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£184k</span><span style="font-size:10.5px;color:#5A6577">3 214 orders</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">avg order</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£57.30</span><span style="font-size:10.5px;color:#0E9F6E">+£2.10</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">refunded</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£2.4k</span><span style="font-size:10.5px;color:#5A6577">1.3% of sales</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">discount given</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£6.1k</span><span style="font-size:10.5px;color:#8A6D00">3.3% — concessions</span></div>
+              </div>
+              <div style="flex:1;display:flex;gap:14px;min-height:0">
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:12px;min-width:0">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:12.5px;font-weight:800">By channel</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">net, ex VAT</span></div>
+                  <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+                    <div style="display:grid;grid-template-columns:1.3fr 80px 80px 80px;gap:8px;padding:7px 0;border-bottom:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4"><span>channel</span><span style="text-align:right">net</span><span style="text-align:right">orders</span><span style="text-align:right">share</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 80px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Guest web</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£92k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">1 480</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">50%</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 80px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Guest app</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£41k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">910</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">22%</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 80px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Box office POS</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£28k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">520</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">15%</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 80px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Kiosk</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£14k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">240</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">8%</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 80px 80px 80px;gap:8px;padding:8px 0"><span style="font-weight:700">Partner / reseller</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£9k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">64</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">5%</span></div>
+                  </div>
+                  <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Partner is 5% of revenue on 2% of orders — a channel mix question rather than a volume one, and the only row here a commercial team acts on.</div>
+                </div>
+                <div style="flex:none;width:300px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px">
+                  <div style="font-size:12.5px;font-weight:800">By day</div>
+                  <div style="display:flex;align-items:flex-end;gap:8px;height:120px">
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:100%;height:38%;border-radius:5px 5px 0 0;background:#C7D7EE"></div><span style="font-size:9.5px;color:#8494A8">M</span></div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:100%;height:44%;border-radius:5px 5px 0 0;background:#C7D7EE"></div><span style="font-size:9.5px;color:#8494A8">T</span></div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:100%;height:52%;border-radius:5px 5px 0 0;background:#C7D7EE"></div><span style="font-size:9.5px;color:#8494A8">W</span></div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:100%;height:58%;border-radius:5px 5px 0 0;background:#C7D7EE"></div><span style="font-size:9.5px;color:#8494A8">T</span></div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:100%;height:82%;border-radius:5px 5px 0 0;background:#0D6EFD"></div><span style="font-size:9.5px;color:#8494A8">F</span></div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:100%;height:100%;border-radius:5px 5px 0 0;background:#0D6EFD"></div><span style="font-size:9.5px;color:#8494A8">S</span></div>
+                    <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px"><div style="width:100%;height:64%;border-radius:5px 5px 0 0;background:#C7D7EE"></div><span style="font-size:9.5px;color:#8494A8">S</span></div>
+                  </div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55">Performance days are shaded, dark days are not. A revenue chart without the schedule behind it invites the wrong conclusion about a quiet Tuesday.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">getDashboard &middot; onLoad<br>runReport &middot; onAction</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The generic pair, and what has to fill the gap</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">Nine of these ten screens declare <span style="font-family:'IBM Plex Mono',monospace">getDashboard</span> and <span style="font-family:'IBM Plex Mono',monospace">runReport</span> and differ only in the one or two domain reads they add. That makes the <i>dashboard key</i> the real specification — which cuts, which comparisons, which default window — and none of it is in the screen file. Each frame here states the cut it opens on, because a screen described only by its operations is ten identical screens.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">declared &middot; 2 operations<br>unspecified &middot; the dashboard itself</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Net, and it says so</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Every figure is net of VAT and refunds, labelled on the panel rather than in a footnote. A revenue screen where gross and net are not distinguished is one finance will not use twice.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">basis &middot; net, ex VAT<br>refunds &middot; separate tile</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Discount is not a rounding line</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">£6.1k given away in a week, almost all concessions, sits beside revenue rather than three screens away in <a href="#anl-005">ANL-005</a>. It is the number that explains an average order price moving without anybody changing a price.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">shown here &middot; discount, refunds<br>margin &middot; ANL-005</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; runReport</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; <b style="color:#0A4FB8">emptyNoResults</b> &middot; emptyNoAccess &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; window &amp; domain&larr;<a href="#anl-001">ANL-001</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-004">ANL-004</a> &middot; <a href="#anl-005">ANL-005</a> &middot; <a href="#anl-007">ANL-007</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">RET-6L</span></div>
+      </div>
+    </div>
+
+    <div id="anl-003" data-screen-label="ANL-003" data-screen-id="ANL-003" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-003</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Operational Performance</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">reads people and devices</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Throughput, queues and till performance — the only analytics screen that reads <span style="font-family:'IBM Plex Mono',monospace">listPrincipals</span> and <span style="font-family:'IBM Plex Mono',monospace">listDevices</span>, which is what makes it the one with a governance question attached.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Sales</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Operations</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Products</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Margin</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">Sat 30 Aug<br>19:00 performance</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Operational performance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">busiest night of the week</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">admitted in 30 min</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">1 204</span><span style="font-size:10.5px;color:#5A6577">40 per minute peak</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">longest gate queue</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1;color:#8A6D00">9 min</span><span style="font-size:10.5px;color:#5A6577">east gate, 18:42</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">F&amp;B avg to pass</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">11:40</span><span style="font-size:10.5px;color:#A81E1E">14% late</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">devices offline</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">2</span><span style="font-size:10.5px;color:#5A6577">both scanners, 6 min</span></div>
+              </div>
+              <div style="flex:1;display:flex;gap:14px;min-height:0">
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:12px;min-width:0">
+                  <div style="font-size:12.5px;font-weight:800">By station and till</div>
+                  <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+                    <div style="display:grid;grid-template-columns:1.3fr 90px 90px 90px;gap:8px;padding:7px 0;border-bottom:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4"><span>point</span><span style="text-align:right">served</span><span style="text-align:right">avg</span><span style="text-align:right">longest</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 90px 90px 90px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Main gate · 4 scanners</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">842</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">1.9s</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">4 min</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 90px 90px 90px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA;background:#FFFCF4"><span style="font-weight:700">East gate · 2 scanners</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">362</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">2.4s</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A6D00">9 min</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 90px 90px 90px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Bridge bar · 3 tills</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">514</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">48s</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">6 min</span></div>
+                    <div style="display:grid;grid-template-columns:1.3fr 90px 90px 90px;gap:8px;padding:8px 0"><span style="font-weight:700">Kiosks · 4</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">240</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">92s</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">3 min</span></div>
+                  </div>
+                  <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">East gate has half the scanners and a third of the traffic, and still the worst queue — a staffing answer, visible only because devices and throughput are on one screen.</div>
+                </div>
+                <div style="flex:none;width:300px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12.5px;font-weight:800">By team, not by name</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px">
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Front of house</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">14 on</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Bars</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">9 on</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Kitchen</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">6 on</span></div>
+                  </div>
+                  <div style="padding:11px 12px;border-radius:10px;background:#FFF7E6;border:1px solid #F0DFB8;font-size:11px;color:#7A5F14;line-height:1.55">Aggregated to the team. Per-person throughput is not shown here and is not a filter — see the panel below.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">listPrincipals &middot; onLoad<br>listDevices &middot; onLoad</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">An analytics screen that reads the staff list</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">listPrincipals</span> on a performance dashboard is one query away from per-person productivity scoring, which is an employment matter in every jurisdiction this platform runs in and is not a decision a wireframe should make silently. Drawn aggregated to the team, with no per-person filter. If the venue wants individual figures that is a policy to write down, not a column to add.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">drawn &middot; team aggregate<br>needs a decision &middot; per-person</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Devices belong on this screen</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Two scanners offline for six minutes explains a nine-minute queue better than any staffing table. Device management has no contract yet — CF-136 — so this is a read of what <span style="font-family:'IBM Plex Mono',monospace">tenancy</span> already knows.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">CF-136 &middot; device management<br>read &middot; listDevices</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A night, not a week</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Alone here, this screen defaults to a single performance. Doors, queues and kitchen pace are properties of an evening; averaging them across a week hides every one of them.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">default &middot; one performance<br>others &middot; a week</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; listAlerts &middot; listDevices &middot; listPrincipals <span style="color:#B98900">(aggregate only)</span> &middot; runReport</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; <b style="color:#0A4FB8">emptyNoAccess</b> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; performanceId&larr;deepLink</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-001">ANL-001</a> &middot; <a href="#anl-006">ANL-006</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">POS-6B</span></div>
+      </div>
+    </div>
+
+    <div id="anl-004" data-screen-label="ANL-004" data-screen-id="ANL-004" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-004</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Product Performance</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">reads the catalogue, changes nothing</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What sold, what did not, and what was taken off. Every row links into the catalogue screen that can act on it — repricing lives on P08, and none of it is declared here.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Sales</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Operations</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Products</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Margin</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">week to 3 Sep<br>F&amp;B + retail</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Product performance</span><div style="display:flex;gap:8px"><span style="padding:5px 11px;border-radius:8px;background:#0F1E33;color:#fff;font-size:11.5px;font-weight:700">F&amp;B</span><span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:600">Retail</span></div></div>
+            <div style="flex:1;display:flex;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:12px;min-width:0">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:12.5px;font-weight:800">Best and worst by contribution</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">units × margin</span></div>
+                <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+                  <div style="display:grid;grid-template-columns:1.5fr 70px 80px 80px;gap:8px;padding:7px 0;border-bottom:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4"><span>product</span><span style="text-align:right">units</span><span style="text-align:right">net</span><span style="text-align:right">margin</span></div>
+                  <div style="display:grid;grid-template-columns:1.5fr 70px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">House red, 175ml</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">1 412</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£9.9k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0E9F6E">74%</span></div>
+                  <div style="display:grid;grid-template-columns:1.5fr 70px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Interval package</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">380</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£7.6k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0E9F6E">68%</span></div>
+                  <div style="display:grid;grid-template-columns:1.5fr 70px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Programme</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">640</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£3.2k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">52%</span></div>
+                  <div style="display:grid;grid-template-columns:1.5fr 70px 80px 80px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA;background:#FEF7F7"><span style="font-weight:700">Sharing board</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">96</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£1.2k</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">21%</span></div>
+                  <div style="display:grid;grid-template-columns:1.5fr 70px 80px 80px;gap:8px;padding:8px 0"><span style="font-weight:700">Souvenir tote</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">18</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">£290</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">44%</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Sorted by contribution rather than revenue. The sharing board is the fourth best seller and the worst thing on the menu to sell, which is only visible when units and margin sit in one row.</div>
+              </div>
+              <div style="flex:none;width:310px;display:flex;flex-direction:column;gap:12px">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12.5px;font-weight:800">Off the menu this week</div>
+                  <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Sea bass</span><span style="font-family:'IBM Plex Mono',monospace">4 nights</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Chocolate tart</span><span style="font-family:'IBM Plex Mono',monospace">3 nights</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Mussels</span><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E">quality</span></div>
+                  </div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55;padding-top:9px;border-top:1px solid #EDF1F6">Sold out four nights of seven is a purchasing decision, not a menu one. The 86 events come from the kitchen — <a href="Kitchen%20Display%20Board.dc.html#kit-008">KIT-008</a>.</div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:9px">
+                  <div style="font-size:12.5px;font-weight:800">Acting on a row</div>
+                  <div style="font-size:11px;color:#5A6577;line-height:1.6">Reprice, clone or retire all live on the catalogue screens in P08. This screen links out with the product and the week attached and declares no write of its own.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">listProducts &middot; onLoad<br>writes &middot; none</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Contribution, not revenue</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">A best-seller list ordered by revenue tells a venue what is popular; ordered by contribution it tells them what to do. The two orderings disagree on the fourth row here, which is the whole argument for the default this screen opens on — and it is a choice nothing in the screen file records.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">default sort &middot; contribution<br>declared &middot; nowhere</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Availability is performance</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A product cannot sell on a night it was off. Without the 86 panel, four nights of stock-outs read as falling demand — the most common wrong conclusion a product report produces.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">86 events &middot; from the kitchen<br>joins &middot; units sold</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">No writes, on purpose</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">bulkChangePrices</span>, <span style="font-family:'IBM Plex Mono',monospace">cloneProduct</span> and <span style="font-family:'IBM Plex Mono',monospace">assessProductChange</span> all sit in P16's 91-operation gap list. They belong to catalogue management, and putting a repricing control on an analytics screen is how a report becomes an outage.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">acts on &middot; P08 catalogue<br>carries &middot; product + window</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; listProducts &middot; runReport</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; <b style="color:#0A4FB8">emptyNoResults</b> &middot; emptyNoAccess &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; domain&larr;<a href="#anl-002">ANL-002</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-005">ANL-005</a> &middot; <a href="#anl-006">ANL-006</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">RET-6C</span></div>
+      </div>
+    </div>
+
+    <div id="anl-005" data-screen-label="ANL-005" data-screen-id="ANL-005" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-005</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Cost, Margin &amp; Profitability</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">valuation basis is not stated anywhere</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Where the 4.1 points went. Cost of sales against revenue, by category, with the stock valuation this all depends on read from inventory.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Sales</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Products</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Margin</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">week to 3 Sep<br>valuation 3 Sep 23:59</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Cost, margin &amp; profitability</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">weighted average cost</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:12px">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">gross margin</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1;color:#A81E1E">61.2%</span><span style="font-size:10.5px;color:#5A6577">−4.1 pts</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">cost of sales</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£71k</span><span style="font-size:10.5px;color:#8A6D00">+£9k</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">waste</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1;color:#A81E1E">£5.8k</span><span style="font-size:10.5px;color:#5A6577">3.1% of sales</span></div>
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:11px;padding:13px 14px;display:flex;flex-direction:column;gap:4px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">stock on hand</span><span style="font-family:'IBM Plex Mono',monospace;font-size:25px;font-weight:600;line-height:1">£38k</span><span style="font-size:10.5px;color:#5A6577">at 3 Sep</span></div>
+              </div>
+              <div style="flex:1;display:flex;gap:14px;min-height:0">
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:12px;min-width:0">
+                  <div style="font-size:12.5px;font-weight:800">Margin by category, and what moved it</div>
+                  <div style="display:flex;flex-direction:column;gap:11px">
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:96px;font-size:11.5px;font-weight:700">Ticketing</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:92%;height:14px;border-radius:8px;background:#0E9F6E"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:44px;text-align:right">92%</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:96px;font-size:11.5px;font-weight:700">Drinks</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:71%;height:14px;border-radius:8px;background:#0E9F6E"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:44px;text-align:right">71%</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:96px;font-size:11.5px;font-weight:700">Food</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:34%;height:14px;border-radius:8px;background:#E0483A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:44px;text-align:right;color:#A81E1E">34%</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:96px;font-size:11.5px;font-weight:700">Retail</span><div style="flex:1;height:14px;border-radius:8px;background:#EEF2F7"><div style="width:48%;height:14px;border-radius:8px;background:#E0A03A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:44px;text-align:right">48%</span></div>
+                  </div>
+                  <div style="margin-top:auto;padding:11px 12px;border-radius:10px;background:#FEF7F7;border:1px solid #F5C9C9;font-size:11px;color:#8A2020;line-height:1.55">Food margin fell 11 points. £5.8k of waste against £8.9k of food sales — the fall is spoilage, not pricing, and the evidence is one screen along in <a href="#anl-006">ANL-006</a>.</div>
+                </div>
+                <div style="flex:none;width:300px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12.5px;font-weight:800">What the margin is calculated on</div>
+                  <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Cost basis</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">weighted avg</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Valuation at</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">3 Sep 23:59</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Waste</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">in cost of sales</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Labour</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">excluded</span></div>
+                  </div>
+                  <div style="margin-top:auto;padding:11px 12px;border-radius:10px;background:#FFF7E6;border:1px solid #F0DFB8;font-size:10.5px;color:#7A5F14;line-height:1.55">Four assumptions, stated because none of them is in a contract. Gross margin means four different numbers depending on these.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">The costing method is undecided and this screen depends on it</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">getStockValuation</span> is declared and nothing says whether valuation is weighted average, FIFO or standard cost — a decision that moves every number on this screen and is a finance policy rather than a design one. Drawn as weighted average and labelled, so the assumption is visible instead of embedded. Whether waste sits in cost of sales or below the line is the same kind of open question.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">drawn &middot; weighted average<br>needs &middot; a costing policy</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Ticketing at 92% distorts the total</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A blended margin across ticketing and food is a number with no meaning. The category split is the default view here, and the headline tile is drawn beside its target rather than alone.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">default &middot; by category<br>headline &middot; with target</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The answer is on another screen and it says so</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Margin screens end in a question. This one names where the evidence is — waste detail in <a href="#anl-006">ANL-006</a> — instead of leaving a manager to guess which of nine dashboards holds it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">links &middot; with the same window<br>reads &middot; getStockValuation</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; getStockValuation &middot; runReport</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; <b style="color:#0A4FB8">emptyNoAccess</b> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; window&larr;<a href="#anl-001">ANL-001</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-006">ANL-006</a> &middot; <a href="#anl-004">ANL-004</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">RET-6F</span></div>
+      </div>
+    </div>
+
+    <div id="anl-006" data-screen-label="ANL-006" data-screen-id="ANL-006" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-006</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Inventory &amp; Waste Intelligence</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">expiry is a list of dates, not a rate</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Count variance, what is about to go out of date, and where the £5.8k went. The only analytics screen whose output is a task for tomorrow morning rather than a number for a meeting.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Products</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Margin</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Inventory</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Forecast</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">last count 1 Sep<br>Bridge Kitchen store</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Inventory &amp; waste</span><span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:600">Export for the count</span></div>
+            <div style="flex:1;display:flex;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:12.5px;font-weight:800">Where the waste was</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#A81E1E">£5.8k</span></div>
+                  <div style="display:flex;flex-direction:column;gap:9px">
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:110px;font-size:11.5px;font-weight:700">Spoilage</span><div style="flex:1;height:13px;border-radius:7px;background:#EEF2F7"><div style="width:64%;height:13px;border-radius:7px;background:#E0483A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:50px;text-align:right">£3.7k</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:110px;font-size:11.5px;font-weight:700">Over-prep</span><div style="flex:1;height:13px;border-radius:7px;background:#EEF2F7"><div style="width:22%;height:13px;border-radius:7px;background:#E0A03A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:50px;text-align:right">£1.3k</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:110px;font-size:11.5px;font-weight:700">Re-fires</span><div style="flex:1;height:13px;border-radius:7px;background:#EEF2F7"><div style="width:9%;height:13px;border-radius:7px;background:#8494A8"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:50px;text-align:right">£0.5k</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:110px;font-size:11.5px;font-weight:700">Unexplained</span><div style="flex:1;height:13px;border-radius:7px;background:#EEF2F7"><div style="width:5%;height:13px;border-radius:7px;background:#0F1E33"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:50px;text-align:right">£0.3k</span></div>
+                  </div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px;min-height:0">
+                  <div style="font-size:12.5px;font-weight:800">Count variance · 1 September</div>
+                  <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+                    <div style="display:grid;grid-template-columns:1.4fr 80px 80px 90px;gap:8px;padding:7px 0;border-bottom:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4"><span>line</span><span style="text-align:right">expected</span><span style="text-align:right">counted</span><span style="text-align:right">value</span></div>
+                    <div style="display:grid;grid-template-columns:1.4fr 80px 80px 90px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA;background:#FEF7F7"><span style="font-weight:700">House red</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">84</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">71</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#A81E1E">−£104</span></div>
+                    <div style="display:grid;grid-template-columns:1.4fr 80px 80px 90px;gap:8px;padding:8px 0;border-bottom:1px solid #F4F6FA"><span style="font-weight:700">Lager keg</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">6</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">6</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#0E9F6E">—</span></div>
+                    <div style="display:grid;grid-template-columns:1.4fr 80px 80px 90px;gap:8px;padding:8px 0"><span style="font-weight:700">Chicken, kg</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">22</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right">18.4</span><span style="font-family:'IBM Plex Mono',monospace;text-align:right;color:#8A6D00">−£31</span></div>
+                  </div>
+                  <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Thirteen bottles of house red missing on a week it sold 1 412 glasses. At 4.6 glasses a bottle that is a pouring question, not a theft one.</div>
+                </div>
+              </div>
+              <div style="flex:none;width:300px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:12.5px;font-weight:800">Use by Friday</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px">
+                  <div style="display:flex;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:9px;background:#FEF7F7;border:1px solid #F5C9C9"><span style="font-weight:700;color:#8A2020">Mussels · 4 kg</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A2020">tomorrow</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:9px;background:#FFFCF4;border:1px solid #F0DFB8"><span style="font-weight:700;color:#7A5F14">Cream · 6 L</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">Thu</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px;padding:9px 10px;border-radius:9px;border:1px solid #E8ECF3"><span style="font-weight:700">Sourdough · 20</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">Fri</span></div>
+                </div>
+                <div style="font-size:10.5px;color:#5A6577;line-height:1.55;padding-top:9px;border-top:1px solid #EDF1F6">Dates, in order, with quantities — not an expiry rate. A chef can act on this list; nobody can act on <i>4% of stock expires within 7 days</i>.</div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">getCountVariance &middot; onLoad<br>listExpiringBatches &middot; onLoad</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Four reads, and the two that matter are not the dashboard</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">getCountVariance</span> and <span style="font-family:'IBM Plex Mono',monospace">listExpiringBatches</span> are the reason this screen exists, and both are declared <span style="font-family:'IBM Plex Mono',monospace">onLoad</span> — correctly. It is the one screen in P16 where the domain reads carry the content and the generic dashboard is the frame around them.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">content &middot; variance + expiry<br>frame &middot; getDashboard</div>
+          </div>
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">The count itself cannot be submitted here</div>
+            <div style="font-size:11px;color:#5A4A20;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">submitCountLines</span> sits in the 91-operation gap list for this platform. That is right — counting is an inventory task on P08 — but it means the export button is the only path from <i>variance found</i> to <i>count again</i>, and the loop is drawn rather than declared.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">reads &middot; variance<br>counting &middot; P08 inventory</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Unexplained is its own row</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">£300 nobody can attribute is more useful named than distributed across three categories that look tidy. It is also the row that grows when a process is failing quietly.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">waste &middot; 4 causes<br>unattributed &middot; never hidden</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; getCountVariance &middot; listExpiringBatches &middot; runReport</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; <b style="color:#0A4FB8">emptyNoAccess</b> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; storeId&larr;deepLink</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-005">ANL-005</a> &middot; <a href="Kitchen%20Display%20Board.dc.html#kit-008">KIT-008</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">RET-6D</span></div>
+      </div>
+    </div>
+
+    <div id="anl-007" data-screen-label="ANL-007" data-screen-id="ANL-007" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-007</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Guest &amp; Conversion Intelligence</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">writes a segment from an analytics screen</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The funnel, and who is in it. The only screen in P16 that creates something — <span style="font-family:'IBM Plex Mono',monospace">createSegment</span> — which is what makes it the one with a consent question attached.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Sales</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Margin</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Guests</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Forecast</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">week to 3 Sep<br>guest web + app</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Guest &amp; conversion</span><span style="padding:5px 11px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Save as segment</span></div>
+            <div style="flex:1;display:flex;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:12px">
+                  <div style="font-size:12.5px;font-weight:800">Booking funnel · guest web</div>
+                  <div style="display:flex;flex-direction:column;gap:8px">
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-size:11.5px;font-weight:700">Viewed an event</span><div style="flex:1;height:22px;border-radius:6px;background:#EEF2F7"><div style="width:100%;height:22px;border-radius:6px;background:#C7D7EE"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:56px;text-align:right">18 400</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-size:11.5px;font-weight:700">Chose a date</span><div style="flex:1;height:22px;border-radius:6px;background:#EEF2F7"><div style="width:41%;height:22px;border-radius:6px;background:#9FC0EA"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:56px;text-align:right">7 540</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-size:11.5px;font-weight:700">Held seats</span><div style="flex:1;height:22px;border-radius:6px;background:#EEF2F7"><div style="width:24%;height:22px;border-radius:6px;background:#5C9AE0"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:56px;text-align:right">4 410</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-size:11.5px;font-weight:700">Reached payment</span><div style="flex:1;height:22px;border-radius:6px;background:#EEF2F7"><div style="width:12%;height:22px;border-radius:6px;background:#0D6EFD"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:56px;text-align:right">2 180</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-size:11.5px;font-weight:700">Paid</span><div style="flex:1;height:22px;border-radius:6px;background:#EEF2F7"><div style="width:8%;height:22px;border-radius:6px;background:#0E9F6E"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:11.5px;width:56px;text-align:right">1 480</span></div>
+                  </div>
+                  <div style="padding:11px 12px;border-radius:10px;background:#FFF7E6;border:1px solid #F0DFB8;font-size:11px;color:#7A5F14;line-height:1.55">700 guests reached payment and did not pay — 32% of that step. The hold expiry is 10 minutes and the median time on the payment page is 4:40, which is the pair worth looking at.</div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                  <div style="font-size:12.5px;font-weight:800">This week's guests</div>
+                  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;font-size:11.5px">
+                    <div style="display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">first visit</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">62%</span></div>
+                    <div style="display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">members</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">14%</span></div>
+                    <div style="display:flex;flex-direction:column;gap:3px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">app bookings</span><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600">31%</span></div>
+                  </div>
+                  <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Aggregate only. No guest is named on this screen and there is no drill to an individual — the guest record lives in the CRM, behind its own permission.</div>
+                </div>
+              </div>
+              <div style="flex:none;width:300px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:12.5px;font-weight:800">Segment from this view</div>
+                <div style="padding:11px 12px;border-radius:10px;border:1px solid #E8ECF3;font-size:11.5px;color:#26303F;line-height:1.5">Reached payment, did not pay, last 7 days</div>
+                <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Matches</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">700</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>Contactable</span><span style="font-family:'IBM Plex Mono',monospace;color:#0E9F6E">412</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:8px"><span>No marketing consent</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">288</span></div>
+                </div>
+                <div style="padding:11px 12px;border-radius:10px;background:#FEF7F7;border:1px solid #F5C9C9;font-size:10.5px;color:#8A2020;line-height:1.55">The preview counts everybody who matches and states how many may be contacted. Consent is checked at send, not here — a segment is not permission.</div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">previewSegment &middot; onAction<br>createSegment &middot; onAction</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">A cart-abandonment segment is CF-83, and it is built here</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty"><i>Reached payment, did not pay</i> is exactly the abandoned-cart audience CF-83 raised: identifying incomplete purchases and recovering them may not be lawful as specified, and it was built once already without asking. This screen can create that segment in two clicks. Drawn with the consent split on the preview and a stated rule that a segment is not permission — the lawful-basis question is still open and this is where it becomes concrete.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">CF-83 &middot; open<br>drawn &middot; consent split, no send</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Preview before create, always</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">previewSegment</span> exists so nobody saves a definition they have not seen the size of. A segment created blind is a campaign sent to four people or forty thousand.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">preview &middot; count first<br>create &middot; named, dated</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The funnel is the platform's own steps</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Viewed, chose a date, held, reached payment, paid — the five states the booking flow actually has, not a marketing funnel invented for a chart. That is why the hold expiry is on the same panel.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">steps &middot; from the flow<br>hold expiry &middot; CF-85</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; listSegments &middot; previewSegment &middot; createSegment <span style="color:#B98900">(CF-83)</span> &middot; runReport</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; <b style="color:#0A4FB8">emptyNoAccess</b> &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; window&larr;<a href="#anl-002">ANL-002</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-002">ANL-002</a> &middot; <a href="#anl-008">ANL-008</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">RET-6E</span></div>
+      </div>
+    </div>
+
+    <div id="anl-008" data-screen-label="ANL-008" data-screen-id="ANL-008" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-008</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Demand Forecasting</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">no season of history to forecast from</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">What the platform expects to sell, and how wrong it has been. Drawn with its own accuracy on the screen, because a forecast without a track record is a number a venue will either ignore or over-trust.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Sales</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Forecast</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Assistant</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">next 14 days<br>model v0 · 11 weeks data</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Demand forecasting</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;padding:4px 9px;border-radius:7px;background:#FFF7E6;color:#8A6D00">low confidence · 11 weeks of history</span></div>
+            <div style="flex:1;display:flex;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:12px">
+                  <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:12.5px;font-weight:800">Next 14 days · expected admissions</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">range, not a point</span></div>
+                  <div style="display:flex;flex-direction:column;gap:9px;font-size:11.5px">
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-weight:700">Fri 5 · Twelfth Night</span><div style="flex:1;height:16px;border-radius:8px;background:#EEF2F7;position:relative"><div style="width:74%;height:16px;border-radius:8px;background:#C7D7EE"></div></div><span style="font-family:'IBM Plex Mono',monospace;width:96px;text-align:right">780–940</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-weight:700">Sat 6 · matinee</span><div style="flex:1;height:16px;border-radius:8px;background:#EEF2F7"><div style="width:48%;height:16px;border-radius:8px;background:#E0A03A"></div></div><span style="font-family:'IBM Plex Mono',monospace;width:96px;text-align:right">400–720</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-weight:700">Sat 6 · evening</span><div style="flex:1;height:16px;border-radius:8px;background:#EEF2F7"><div style="width:88%;height:16px;border-radius:8px;background:#C7D7EE"></div></div><span style="font-family:'IBM Plex Mono',monospace;width:96px;text-align:right">920–1 010</span></div>
+                    <div style="display:flex;align-items:center;gap:12px"><span style="width:120px;font-weight:700">Wed 10 · schools</span><div style="flex:1;height:16px;border-radius:8px;background:#EEF2F7"><div style="width:30%;height:16px;border-radius:8px;background:#8494A8"></div></div><span style="font-family:'IBM Plex Mono',monospace;width:96px;text-align:right">no basis</span></div>
+                  </div>
+                  <div style="padding:11px 12px;border-radius:10px;background:#F7F9FC;font-size:11px;color:#5A6577;line-height:1.55">A schools matinee has never run here, so the model says <i>no basis</i> instead of a number. The Saturday matinee's range is 320 wide because two of the eleven weeks disagree.</div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px;min-height:0">
+                  <div style="font-size:12.5px;font-weight:800">How wrong it has been</div>
+                  <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Evening performances</span><span style="font-family:'IBM Plex Mono',monospace;color:#0E9F6E">±6%</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Matinees</span><span style="font-family:'IBM Plex Mono',monospace;color:#A81E1E">±31%</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>F&amp;B covers</span><span style="font-family:'IBM Plex Mono',monospace;color:#8A6D00">±18%</span></div>
+                  </div>
+                  <div style="margin-top:auto;font-size:10.5px;color:#5A6577;line-height:1.5">Accuracy per segment, shown beside the forecast rather than in a model page nobody opens. ±31% on matinees is why last Saturday's alert on <a href="#anl-001">ANL-001</a> is worded as a miss against forecast, not a demand collapse.</div>
+                </div>
+              </div>
+              <div style="flex:none;width:300px;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:12.5px;font-weight:800">Ask about the forecast</div>
+                <div style="height:36px;border-radius:9px;border:1px solid #C7D7EE;background:#F5F9FF;display:flex;align-items:center;padding:0 11px;font-size:11.5px;color:#5A6577">why is Saturday's range so wide?</div>
+                <div style="padding:11px 12px;border-radius:10px;background:#F7F9FC;font-size:11px;color:#5A6577;line-height:1.55">The answer names the weeks it disagreed on and links to them. An explanation that cannot be checked is a guess with better grammar.</div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">getDashboard &middot; onLoad<br>askReportingQuestion &middot; onAction</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Parked until there is a season of history</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty">194 AI requirements — forecasting among them — are parked for exactly this reason, and CF-45 names two Phase 1 screens that require operating history the platform does not have. This is one of them. Drawn with the constraint on the screen: a confidence badge in the header, ranges instead of points, <i>no basis</i> where there is none, and accuracy per segment next to the numbers. What is not drawn is a forecast that looks certain.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">CF-45 &middot; needs history<br>drawn &middot; ranges + accuracy</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two operations, one of them a model call</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Alone with <a href="#anl-009">ANL-009</a>, this screen declares <span style="font-family:'IBM Plex Mono',monospace">askReportingQuestion</span> and not <span style="font-family:'IBM Plex Mono',monospace">runReport</span> — the only two P16 screens where the AI call replaces the report call. CF-78 applies to both.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">CF-78 &middot; ai.interaction record<br>no runReport &middot; here and ANL-009</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Nothing here orders stock</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A forecast at ±31% must not auto-raise a purchase order, and no write is declared. When the accuracy earns it, the action belongs on <a href="#anl-009">ANL-009</a> as a proposal a human decides.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">writes &middot; none<br>actions &middot; ANL-009, decided</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; askReportingQuestion <span style="color:#B98900">(CF-78)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun · no basis</b> &middot; emptyNoResults &middot; emptyNoAccess &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; horizon&larr;screen state</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-009">ANL-009</a> &middot; <a href="#anl-006">ANL-006</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">RET-6G</span></div>
+      </div>
+    </div>
+
+    <div id="anl-009" data-screen-label="ANL-009" data-screen-id="ANL-009" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-009</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">AI Assistant &amp; Action Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">AI proposes, a person decides</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Eight operations, the most in P16, and the only screen where the platform asks for permission to do something. A proposed action carries what it would change and who decided.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Inventory</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Forecast</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Assistant</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Suggestions</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">3 proposed<br>2 alerts unread</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Assistant &amp; actions</span><span style="padding:5px 11px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:600">Alert rules</span></div>
+            <div style="flex:1;display:flex;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0">
+                <div style="flex:none;height:40px;border-radius:10px;border:1px solid #C7D7EE;background:#F5F9FF;display:flex;align-items:center;gap:10px;padding:0 13px"><span style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#0A4FB8">ask</span><span style="font-size:12px;color:#5A6577">what should I do about Saturday's matinee?</span></div>
+                <div style="flex:1;display:flex;flex-direction:column;gap:10px;min-height:0">
+                  <div style="font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:#94A0B4">proposed · needs a decision</div>
+                  <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:14px 15px;display:flex;flex-direction:column;gap:10px">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><span style="font-size:12.5px;font-weight:800">Release 120 held seats for Saturday matinee</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">from forecast</span></div>
+                    <div style="font-size:11.5px;color:#5A6577;line-height:1.55">62% sold against a 90% forecast with two days to go. The house hold is 120 seats and has not been drawn on for three weeks. Releasing them adds inventory at the current price.</div>
+                    <div style="display:flex;gap:8px;align-items:center"><span style="padding:7px 14px;border-radius:8px;background:#0E9F6E;color:#fff;font-size:11.5px;font-weight:700">Approve</span><span style="padding:7px 14px;border-radius:8px;border:1px solid #DCE3ED;color:#5A6577;font-size:11.5px;font-weight:700">Decline</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8">would write · seating.hold_pool</span></div>
+                  </div>
+                  <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:14px 15px;display:flex;flex-direction:column;gap:9px">
+                    <div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px"><span style="font-size:12.5px;font-weight:800">Take the sharing board off the interval menu</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">from margin</span></div>
+                    <div style="font-size:11.5px;color:#5A6577;line-height:1.55">96 sold at 21% margin, and it is the slowest item at the pass on a night with a 20-minute interval. Declining keeps it and records why.</div>
+                  </div>
+                  <div style="margin-top:auto;padding:11px 12px;border-radius:10px;background:#F7F9FC;font-size:11px;color:#5A6577;line-height:1.55">Every proposal names the table it would write and the screen the evidence came from. Nothing here applies itself, and a decline is recorded with a reason — a proposal nobody answered is not the same as one that was rejected.</div>
+                </div>
+              </div>
+              <div style="flex:none;width:300px;display:flex;flex-direction:column;gap:12px">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12.5px;font-weight:800">Alerts</div>
+                  <div style="display:flex;flex-direction:column;gap:8px;font-size:11.5px">
+                    <div style="padding:10px 11px;border-radius:9px;background:#FEF7F7;border:1px solid #F5C9C9"><div style="font-weight:700;color:#8A2020">Food margin −11 pts</div><div style="font-size:10.5px;color:#8A5A5A">unread · 2 Sep</div></div>
+                    <div style="padding:10px 11px;border-radius:9px;background:#FFFCF4;border:1px solid #F0DFB8"><div style="font-weight:700;color:#7A5F14">Matinee behind forecast</div><div style="font-size:10.5px;color:#8A6D00">unread · 3 Sep</div></div>
+                    <div style="padding:10px 11px;border-radius:9px;border:1px solid #E8ECF3"><div style="font-weight:700">East gate queue 9 min</div><div style="font-size:10.5px;color:#5A6577">acknowledged by P. Nair</div></div>
+                  </div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:9px">
+                  <div style="font-size:12.5px;font-weight:800">Acknowledging is not fixing</div>
+                  <div style="font-size:11px;color:#5A6577;line-height:1.6">An acknowledged alert keeps its history and names who took it. It stops repeating and does not disappear.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">listProposedActions &middot; onLoad<br>decideProposedAction &middot; onAction<br>acknowledgeAlert &middot; setAlertRule</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The propose-and-decide pair is the safeguard</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">listProposedActions</span> and <span style="font-family:'IBM Plex Mono',monospace">decideProposedAction</span> are the only place in P16 where AI output can change anything, and it can only do so through a person. That is the AI-isolation rule holding at the surface: CF-94 caught a model writing directly into <span style="font-family:'IBM Plex Mono',monospace">seating.import_job</span>, and this screen is the shape that prevents the same thing happening to a hold pool.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">CF-94 &middot; AI never writes direct<br>drawn &middot; names the table</div>
+          </div>
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Alert rules can be set and not listed</div>
+            <div style="font-size:11px;color:#5A4A20;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">setAlertRule</span> is declared here; <span style="font-family:'IBM Plex Mono',monospace">listAlertRules</span> — <i>what raises an alert, and when</i> — reaches no screen on this platform. A venue can create rules and never see the set it has, which is how the same alert ends up configured three times.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">declared &middot; setAlertRule<br>missing &middot; listAlertRules</div>
+          </div>
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Why does an analytics screen list orders?</div>
+            <div style="font-size:11px;color:#5A4A20;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">listOrders</span> is declared <span style="font-family:'IBM Plex Mono',monospace">onLoad</span> and nothing on the screen shows an order. It looks like bulk-attach residue rather than a designed read — and an order list is the sort of thing that pulls personal data onto a dashboard nobody meant to put it on.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">flagged &middot; listOrders onLoad<br>drawn &middot; not used</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listProposedActions &middot; decideProposedAction &middot; listAlerts &middot; acknowledgeAlert &middot; setAlertRule &middot; askReportingQuestion &middot; runReport &middot; listOrders <span style="color:#B98900">(flagged)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun · nothing proposed</b> &middot; emptyNoResults &middot; emptyNoAccess &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; alertId&larr;deepLink</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-010">ANL-010</a> &middot; <a href="#anl-001">ANL-001</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">POS-6E</span></div>
+      </div>
+    </div>
+
+    <div id="anl-010" data-screen-label="ANL-010" data-screen-id="ANL-010" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">ANL-010</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Suggestions &amp; Advice</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">no list operation for a list screen</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Every open suggestion, what it is based on, and whether the venue took it. The outcome column is the point: advice nobody records the result of is advice that never improves.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;background:#FAFBFD">
+          <div style="flex:none;width:174px;background:#0F1E33;padding:16px 13px;display:flex;flex-direction:column;gap:14px">
+            <div style="font-size:10px;font-weight:800;letter-spacing:.16em;color:#7FA3C9">RIVERSIDE ARTS</div>
+            <div style="display:flex;flex-direction:column;gap:2px;font-size:11.5px">
+              <div style="padding:7px 9px;color:#9FB6CF">Overview</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Guests</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Forecast</div>
+              <div style="padding:7px 9px;color:#9FB6CF">Assistant</div>
+              <div style="padding:7px 9px;border-radius:7px;background:rgba(255,255,255,.12);color:#fff;font-weight:700">Suggestions</div>
+            </div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7E93A8;line-height:1.7">7 open<br>19 closed this quarter</div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0">
+            <div style="flex:none;height:46px;border-bottom:1px solid #E8ECF3;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 18px"><span style="font-size:13px;font-weight:800">Suggestions &amp; advice</span><span style="padding:5px 11px;border-radius:8px;background:#0D6EFD;color:#fff;font-size:11.5px;font-weight:700">Ask for a suggestion</span></div>
+            <div style="flex:1;display:flex;gap:14px;padding:18px 20px;min-height:0">
+              <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;overflow:hidden;display:flex;flex-direction:column;min-width:0">
+                <div style="flex:none;display:grid;grid-template-columns:1.8fr 110px 110px 130px;gap:10px;padding:10px 15px;border-bottom:1px solid #EDF1F6;font-family:'IBM Plex Mono',monospace;font-size:9.5px;letter-spacing:.08em;text-transform:uppercase;color:#94A0B4;background:#FAFBFD"><span>suggestion</span><span>based on</span><span>raised</span><span>outcome</span></div>
+                <div style="display:grid;grid-template-columns:1.8fr 110px 110px 130px;gap:10px;align-items:center;padding:12px 15px;border-bottom:1px solid #F4F6FA"><div><div style="font-size:12px;font-weight:700">Move two chefs to the pass after 20:00</div><div style="font-size:10.5px;color:#5A6577">assembly is the constraint, not the grill</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">station load</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">1 Sep</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">open</span></div>
+                <div style="display:grid;grid-template-columns:1.8fr 110px 110px 130px;gap:10px;align-items:center;padding:12px 15px;border-bottom:1px solid #F4F6FA"><div><div style="font-size:12px;font-weight:700">Reprice the sharing board or retire it</div><div style="font-size:10.5px;color:#5A6577">21% margin, slowest at the pass</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">margin</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">2 Sep</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A6D00">open</span></div>
+                <div style="display:grid;grid-template-columns:1.8fr 110px 110px 130px;gap:10px;align-items:center;padding:12px 15px;border-bottom:1px solid #F4F6FA;background:#F7FBF8"><div><div style="font-size:12px;font-weight:700">Second scanner at the east gate</div><div style="font-size:10.5px;color:#5A6577">9-minute queue on two devices</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">throughput</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">24 Aug</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#0E9F6E">taken · worked</span></div>
+                <div style="display:grid;grid-template-columns:1.8fr 110px 110px 130px;gap:10px;align-items:center;padding:12px 15px;border-bottom:1px solid #F4F6FA"><div><div style="font-size:12px;font-weight:700">Raise interval package price to £14</div><div style="font-size:10.5px;color:#5A6577">sells out every performance</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">product</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">18 Aug</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#A81E1E">declined</span></div>
+                <div style="display:grid;grid-template-columns:1.8fr 110px 110px 130px;gap:10px;align-items:center;padding:12px 15px"><div><div style="font-size:12px;font-weight:700">Email the 412 contactable non-payers</div><div style="font-size:10.5px;color:#5A6577">held seats, did not pay</div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">conversion</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#5A6577">3 Sep</span><span style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8A2020">blocked · CF-83</span></div>
+                <div style="margin-top:auto;padding:10px 15px;border-top:1px solid #EDF1F6;font-size:11px;color:#5A6577;line-height:1.5">A declined suggestion keeps its reason — the interval package was declined because the price is set by the producer, not the venue. The same suggestion will not be raised again without new evidence.</div>
+              </div>
+              <div style="flex:none;width:300px;display:flex;flex-direction:column;gap:12px">
+                <div style="background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                  <div style="font-size:12.5px;font-weight:800">Did it work?</div>
+                  <div style="display:flex;flex-direction:column;gap:7px;font-size:11.5px;color:#5A6577">
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Taken</span><span style="font-family:'IBM Plex Mono',monospace;color:#0B1324">11</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Worked</span><span style="font-family:'IBM Plex Mono',monospace;color:#0E9F6E">7</span></div>
+                    <div style="display:flex;justify-content:space-between;gap:8px"><span>Declined</span><span style="font-family:'IBM Plex Mono',monospace;color:#5A6577">8</span></div>
+                  </div>
+                  <div style="font-size:10.5px;color:#5A6577;line-height:1.55;padding-top:9px;border-top:1px solid #EDF1F6">Seven of eleven is the number that decides whether a venue reads this screen next quarter.</div>
+                </div>
+                <div style="flex:1;background:#fff;border:1px solid #E3E8F0;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:9px">
+                  <div style="font-size:12.5px;font-weight:800">Blocked is a real outcome</div>
+                  <div style="font-size:11px;color:#5A6577;line-height:1.6">A suggestion the platform cannot lawfully act on is shown as blocked with the conflict named, rather than quietly dropped. CF-83 is the reason the last row cannot be taken.</div>
+                  <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">requestSuggestion &middot; onAction<br>recordSuggestionOutcome &middot; onAction</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Its purpose is a list and it declares no list</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty">The screen file's own words are <i>every open suggestion, what it is based on, and whether the venue took it</i>, and the two declared operations are <span style="font-family:'IBM Plex Mono',monospace">requestSuggestion</span> and <span style="font-family:'IBM Plex Mono',monospace">recordSuggestionOutcome</span> — both <span style="font-family:'IBM Plex Mono',monospace">onAction</span>. Nothing reads the suggestions. Same shape as SUP-006 on <a href="Venue%20Support%20Board.dc.html#sup-006">P12</a>, where a search screen had no search: the read is the screen, and it is the one operation missing.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">needed &middot; listSuggestions (onLoad)<br>declared &middot; two writes</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The outcome column is the whole design</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">recordSuggestionOutcome</span> is what separates this from a feed of tips. Taken, declined with a reason, or blocked by a conflict — and the tally at the side is the venue's own answer to whether any of it is worth reading.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">outcomes &middot; taken, declined, blocked<br>tally &middot; 7 of 11 worked</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Every row names its evidence screen</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Station load, margin, throughput, conversion — the <i>based on</i> column is a link back into the dashboard the suggestion came from. Advice a manager cannot audit is advice they will not act on twice.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">based on &middot; links to ANL-003…007<br>proposals &middot; <a href="#anl-009">ANL-009</a></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; requestSuggestion &middot; recordSuggestionOutcome <span style="color:#B98900">(no read declared)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; <b style="color:#0A4FB8">emptyFirstRun · nothing suggested yet</b> &middot; emptyNoResults &middot; emptyNoAccess &middot; error</div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; <a href="#anl-009">ANL-009</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#anl-009">ANL-009</a> &middot; <a href="#anl-005">ANL-005</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">POS-6F</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;padding:14px 16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+      <div><b>What this board found.</b> Six, and the biggest one is about the report rather than the screens. <b>The 91-operation gap is an artefact of a shared app</b> — P08, P13 and P16 all run on <span style="font-family:'IBM Plex Mono',monospace">venue-management-web</span>, so every configuration operation in the other two is attributed to analytics. <b>Nine of ten screens declare the same two operations</b>, which makes the dashboard definition — the cuts, the defaults, the basis — the real specification, and none of it is written down. <b><a href="#anl-010">ANL-010</a> has no read</b> for a screen whose purpose is a list. <b><a href="#anl-009">ANL-009</a></b> can set an alert rule and not list them, and declares <span style="font-family:'IBM Plex Mono',monospace">listOrders</span> for nothing. <b><a href="#anl-005">ANL-005</a></b> depends on a costing method nobody has chosen. <b><a href="#anl-007">ANL-007</a></b> builds the CF-83 abandoned-cart segment in two clicks, and <b><a href="#anl-008">ANL-008</a></b> forecasts from eleven weeks of history against CF-45. The last two are drawn with the constraint visible rather than designed around.</div>
+    </div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #DCE3ED;display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">
+      <span>P16 Venue Analytics · 10 screens · 1 module · drawn 4 September 2026</span>
+      <span><a href="TICVAI%20Board%20Index.dc.html">board index</a></span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

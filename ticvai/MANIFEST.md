@@ -4,7 +4,7 @@
 
 ```
 1626 operations · 28 contracts · 386 tables · 975 relationships
-124 state models · 29 events · 94 flows · 39 ADRs
+124 state models · 29 events · 94 flows · 41 ADRs
 1091 screens · 15 platforms · 12 apps · 83 boards
 ```
 
@@ -55,7 +55,7 @@ docs/adr/       37 architecture decisions
 docs/active/    the working documents — audits, briefs, handoffs
 docs/registers/ conflicts (CF-*), backlog, decisions
 
-backend/        DDL, generated — 386 tables, 0 foreign keys, 0 indexes
+backend/        DDL, generated — 386 tables, 574 foreign keys, 276 indexes
 services/       16 FastAPI skeletons for topology benchmarking
 deploy/         four deployment configurations plus three burst variants
 tools/          the generators and the checks

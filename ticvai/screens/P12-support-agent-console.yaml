@@ -77,7 +77,8 @@ screens:
       terminal is the way through.'
     error: Could not load. Editing is blocked
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-001
   capability: C35
   apis:
@@ -165,7 +166,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Dashboards Board.dc.html#sup-002
     generatedFallback: wireframes/P12 Venue Support.dc.html#sup-002
   capability: C32
@@ -269,7 +271,8 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
       what someone else set'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-003
   openQuestions:
   - No contract — agent routing not modelled
@@ -329,7 +332,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-004
   capability: C32
   apis:
@@ -450,7 +454,8 @@ screens:
       **Added 25 August with the derived list component**: a screen that lists has to say what it shows
       when the list is empty, and this screen gained the list before it gained the sentence.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-005
   capability: C32
   apis:
@@ -552,7 +557,8 @@ screens:
       with the wrong question.'
     error: Could not load
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-006
   capability: C105
   apis:
@@ -633,7 +639,8 @@ screens:
     error: '**Could not load. Saving is blocked**, because a value saved over an unread one silently overwrites
       what someone else set'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-007
   capability: C60
   apis:
@@ -693,7 +700,8 @@ screens:
       is a commercial answer and not a permission one — say which, because the person to ask is different.'
     error: Could not load. Editing is blocked
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-008
   capability: C21
   apis:
@@ -811,7 +819,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/CustomerServiceCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-009
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-009
   source:
@@ -876,7 +885,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/Customer360ServiceProfile.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-010
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-010
   source:
@@ -910,8 +920,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first unified entry, and this
-      state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -928,7 +938,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/UnifiedInteractionCommunicationHistory.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-011
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-011
   source:
@@ -982,7 +993,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/CaseCreationClassificationIntelligentRouting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-012
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-012
   source:
@@ -1036,7 +1048,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/CaseInvestigationResolutionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-013
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-013
   source:
@@ -1091,7 +1104,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/OrderBookingTicketServiceWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-014
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-014
   source:
@@ -1145,7 +1159,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/RefundCompensationServiceExceptionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-015
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-015
   source:
@@ -1200,7 +1215,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/EscalationCollaborationInternalResolution.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-016
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-016
   source:
@@ -1254,7 +1270,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/CaseResolutionClosureCustomerFeedback.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-017
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-017
   source:
@@ -1310,7 +1327,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/AiCustomerServiceCopilotKnowledgeWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-018
     workshopBoard: wireframes/WS17 Customer Service Board 1.dc.html#sup-018
   source:
@@ -1372,7 +1390,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/ContactCenterOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-019
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-019
   source:
@@ -1436,7 +1455,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/QueueConfigurationManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-020
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-020
   source:
@@ -1490,7 +1510,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/IntelligentRoutingSkillsAssignmentEngine.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-021
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-021
   source:
@@ -1544,7 +1565,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/SlaPolicyServiceLevelManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-022
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-022
   source:
@@ -1598,7 +1620,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/AgentWorkloadAvailabilityWorkforceControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-023
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-023
   source:
@@ -1660,7 +1683,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/EscalationCriticalCaseMonitor.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-024
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-024
   source:
@@ -1714,7 +1738,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/QualityManagementAgentEvaluation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-025
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-025
   source:
@@ -1768,7 +1793,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/CustomerSatisfactionFeedbackVoiceOfCustomer.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-026
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-026
   source:
@@ -1821,7 +1847,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/ServiceAnalyticsRootCauseIntelligence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-027
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-027
   source:
@@ -1875,7 +1902,8 @@ screens:
     component: apps/venue-support-web/src/routes/support/AiContactCenterIntelligenceAutomationStudio.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P12 Venue Support.dc.html#sup-028
     workshopBoard: wireframes/WS18 Customer Service Board 2.dc.html#sup-028
   source:

@@ -1,19 +1,20 @@
 {
  "scope": "platform",
- "generated": "2026-09-04",
+ "generated": "2026-09-08",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
   "operations": 1626,
   "contracts": 28,
   "tables": 386,
-  "stores": 9,
-  "foreignKeys": 0,
-  "indexes": 0,
+  "stores": 5,
+  "foreignKeys": 574,
+  "indexes": 276,
+  "tablesWritten": 386,
   "relationships": 975,
   "states": 124,
   "events": 29,
   "flows": 94,
-  "adrs": 39,
+  "adrs": 41,
   "screens": 1091,
   "platforms": 15,
   "apps": 12
@@ -122,10 +123,10 @@
   "build": [
    {
     "name": "Tables written",
-    "done": 0,
+    "done": 386,
     "total": 386,
-    "percent": 0,
-    "note": "DDL is generated when the design stops moving (ADR-0024)."
+    "percent": 100,
+    "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
    {
     "name": "Sprint 0",
@@ -169,7 +170,7 @@
  },
  "headline": {
   "design": 90,
-  "build": 0
+  "build": 33
  },
  "waves": {
   "wave1": 170,
@@ -284,12 +285,12 @@
   }
  ],
  "conflicts": {
-  "open": 12,
+  "open": 14,
   "closed": 149,
   "withdrawn": 6,
   "blocking": 0,
   "byOwner": {
-   "Chinmay + Dinesh": 1,
+   "Chinmay + Dinesh": 3,
    "Dinesh": 1,
    "Chinmay": 1,
    "Chinmay + Allam": 1,
@@ -313,7 +314,9 @@
    "CF-164",
    "CF-165",
    "CF-166",
-   "CF-167"
+   "CF-167",
+   "CF-168",
+   "CF-169"
   ]
  },
  "stores": [

@@ -1622,7 +1622,7 @@ paths:
         type: string
         format: uuid
     post:
-      operationId: releaseStoredValue
+      operationId: relinquishStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
       summary: Give a hold back
@@ -4360,7 +4360,7 @@ paths:
     get:
       operationId: listUpgradeConversion
       x-ticvai-consumed-by:
-        - P09 ADM-308 Upgrade & Conversion Command Center
+        - "P09 ADM-308 Upgrade & Conversion Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4430,7 +4430,7 @@ paths:
     put:
       operationId: setUpgradeConversionPath
       x-ticvai-consumed-by:
-        - P09 ADM-309 Upgrade & Conversion Path Builder
+        - "P09 ADM-309 Upgrade & Conversion Path Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4472,7 +4472,7 @@ paths:
     get:
       operationId: listUpgradeEligibilityQualification
       x-ticvai-consumed-by:
-        - P09 ADM-310 Upgrade Eligibility & Qualification Rules
+        - "P09 ADM-310 Upgrade Eligibility & Qualification Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4511,7 +4511,7 @@ paths:
     get:
       operationId: listUpgradeTimingUsage
       x-ticvai-consumed-by:
-        - P09 ADM-311 Upgrade Timing, Usage & Ticket Status Rules
+        - "P09 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4550,7 +4550,7 @@ paths:
     get:
       operationId: listUpgradeFinancialTreatment
       x-ticvai-consumed-by:
-        - P09 ADM-312 Upgrade Financial Treatment & Price Difference Rules
+        - "P09 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4588,7 +4588,7 @@ paths:
     put:
       operationId: setProRataResidual
       x-ticvai-consumed-by:
-        - P09 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration
+        - "P09 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4630,7 +4630,7 @@ paths:
     get:
       operationId: listPersonTypeProduct
       x-ticvai-consumed-by:
-        - P09 ADM-314 Person-Type, Product & Entitlement Conversion Rules
+        - "P09 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4668,7 +4668,7 @@ paths:
     get:
       operationId: listBulkGroupAssisted
       x-ticvai-consumed-by:
-        - P09 ADM-315 Bulk, Group & Assisted Upgrade Operations
+        - "P09 ADM-315 Bulk, Group & Assisted Upgrade Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4706,7 +4706,7 @@ paths:
     post:
       operationId: createUpgradeCredentialRegeneration
       x-ticvai-consumed-by:
-        - P09 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls
+        - "P09 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4748,7 +4748,7 @@ paths:
     get:
       operationId: listUpgradeException
       x-ticvai-consumed-by:
-        - P09 ADM-317 Upgrade History, Exception Management & Audit Explorer
+        - "P09 ADM-317 Upgrade History, Exception Management & Audit Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4817,7 +4817,7 @@ paths:
     get:
       operationId: listGroupSale
       x-ticvai-consumed-by:
-        - P08 BO-264 Group Sales Command Center
+        - "P08 BO-264 Group Sales Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4855,7 +4855,7 @@ paths:
     get:
       operationId: listGroupEnquiryOpportunity
       x-ticvai-consumed-by:
-        - P08 BO-265 Group Enquiry & Opportunity Capture
+        - "P08 BO-265 Group Enquiry & Opportunity Capture"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4893,7 +4893,7 @@ paths:
     get:
       operationId: listGroupCustomerOrganization
       x-ticvai-consumed-by:
-        - P08 BO-266 Group Customer & Organization Profile
+        - "P08 BO-266 Group Customer & Organization Profile"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4931,7 +4931,7 @@ paths:
     get:
       operationId: listGroupRequirementAvailability
       x-ticvai-consumed-by:
-        - P08 BO-267 Group Requirements, Availability & Capacity Planner
+        - "P08 BO-267 Group Requirements, Availability & Capacity Planner"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -4969,7 +4969,7 @@ paths:
     put:
       operationId: setGroupPackageExperience
       x-ticvai-consumed-by:
-        - P08 BO-268 Group Package & Experience Builder
+        - "P08 BO-268 Group Package & Experience Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5011,7 +5011,7 @@ paths:
     put:
       operationId: setGroupQuotationProposal
       x-ticvai-consumed-by:
-        - P08 BO-269 Group Quotation Builder & Proposal Generation
+        - "P08 BO-269 Group Quotation Builder & Proposal Generation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5054,7 +5054,7 @@ paths:
     get:
       operationId: listQuoteRevisionNegotiation
       x-ticvai-consumed-by:
-        - P08 BO-270 Quote Revision, Negotiation & Version Management
+        - "P08 BO-270 Quote Revision, Negotiation & Version Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5092,7 +5092,7 @@ paths:
     put:
       operationId: approveGroupDiscountException
       x-ticvai-consumed-by:
-        - P08 BO-271 Group Discount, Exception & Approval Workflow
+        - "P08 BO-271 Group Discount, Exception & Approval Workflow"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5134,7 +5134,7 @@ paths:
     get:
       operationId: listQuoteBookingConversion
       x-ticvai-consumed-by:
-        - P08 BO-272 Quote-to-Booking Conversion & Confirmation
+        - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5172,7 +5172,7 @@ paths:
     put:
       operationId: setGroupBookingHandover
       x-ticvai-consumed-by:
-        - P08 BO-273 Group Booking 360° & Handover Workspace
+        - "P08 BO-273 Group Booking 360° & Handover Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5215,7 +5215,7 @@ paths:
     get:
       operationId: listGroupBooking
       x-ticvai-consumed-by:
-        - P08 BO-274 Group Booking Operations Command Center
+        - "P08 BO-274 Group Booking Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5253,7 +5253,7 @@ paths:
     put:
       operationId: setGroupOperationalPlanning
       x-ticvai-consumed-by:
-        - P08 BO-275 Group Operational Planning & Task Workspace
+        - "P08 BO-275 Group Operational Planning & Task Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5295,7 +5295,7 @@ paths:
     get:
       operationId: listParticipantGuestList
       x-ticvai-consumed-by:
-        - P08 BO-276 Participants, Guest Lists & Group Structure
+        - "P08 BO-276 Participants, Guest Lists & Group Structure"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5333,7 +5333,7 @@ paths:
     get:
       operationId: listGroupPaymentDeposit
       x-ticvai-consumed-by:
-        - P08 BO-277 Group Payment, Deposit & Balance Management
+        - "P08 BO-277 Group Payment, Deposit & Balance Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5371,7 +5371,7 @@ paths:
     get:
       operationId: listGroupTicketSeat
       x-ticvai-consumed-by:
-        - P08 BO-278 Group Ticket, Seat & Entitlement Allocation
+        - "P08 BO-278 Group Ticket, Seat & Entitlement Allocation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5409,7 +5409,7 @@ paths:
     get:
       operationId: listGroupTicketFulfillment
       x-ticvai-consumed-by:
-        - P08 BO-279 Group Ticket Fulfillment & Distribution
+        - "P08 BO-279 Group Ticket Fulfillment & Distribution"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5447,7 +5447,7 @@ paths:
     get:
       operationId: listGroupArrivalCheck
       x-ticvai-consumed-by:
-        - P08 BO-280 Group Arrival, Check-In & Admission Operations
+        - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5485,7 +5485,7 @@ paths:
     get:
       operationId: listGroupAmendmentCancellation
       x-ticvai-consumed-by:
-        - P08 BO-281 Group Amendments, Cancellation & Refund Operations
+        - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5523,7 +5523,7 @@ paths:
     get:
       operationId: listGroupBookingReconciliation
       x-ticvai-consumed-by:
-        - P08 BO-282 Group Booking Reconciliation, Closure & Performance
+        - "P08 BO-282 Group Booking Reconciliation, Closure & Performance"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5561,7 +5561,7 @@ paths:
     get:
       operationId: listGroupSale2
       x-ticvai-consumed-by:
-        - P08 BO-283 Group Sales Analytics & AI Intelligence Center
+        - "P08 BO-283 Group Sales Analytics & AI Intelligence Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5649,7 +5649,7 @@ paths:
     get:
       operationId: listOrderReservation
       x-ticvai-consumed-by:
-        - P08 BO-304 Order & Reservation Command Center
+        - "P08 BO-304 Order & Reservation Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5736,7 +5736,7 @@ paths:
     put:
       operationId: setOrderDetailTransaction
       x-ticvai-consumed-by:
-        - P08 BO-305 Order Detail & Transaction Workspace
+        - "P08 BO-305 Order Detail & Transaction Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5778,7 +5778,7 @@ paths:
     put:
       operationId: setReservationHoldPolicy
       x-ticvai-consumed-by:
-        - P08 BO-306 Reservation & Hold Policy Configuration
+        - "P08 BO-306 Reservation & Hold Policy Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5821,7 +5821,7 @@ paths:
     put:
       operationId: setOrderReservationStatus
       x-ticvai-consumed-by:
-        - P08 BO-307 Order & Reservation Status Lifecycle Configuration
+        - "P08 BO-307 Order & Reservation Status Lifecycle Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5864,7 +5864,7 @@ paths:
     post:
       operationId: createOrderSourceChannel
       x-ticvai-consumed-by:
-        - P08 BO-308 Order Creation & Source/Channel Configuration
+        - "P08 BO-308 Order Creation & Source/Channel Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5906,7 +5906,7 @@ paths:
     put:
       operationId: setCustomerGuestAccount
       x-ticvai-consumed-by:
-        - P08 BO-309 Customer, Guest & Account Assignment
+        - "P08 BO-309 Customer, Guest & Account Assignment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5948,7 +5948,7 @@ paths:
     get:
       operationId: listOrderLineProduct
       x-ticvai-consumed-by:
-        - P08 BO-310 Order Line, Product & Entitlement Composition
+        - "P08 BO-310 Order Line, Product & Entitlement Composition"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -5986,7 +5986,7 @@ paths:
     get:
       operationId: listCapacityReservationInventory
       x-ticvai-consumed-by:
-        - P08 BO-311 Capacity Reservation & Inventory Commitment
+        - "P08 BO-311 Capacity Reservation & Inventory Commitment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6025,7 +6025,7 @@ paths:
     get:
       operationId: listReservationConfirmationExpiry
       x-ticvai-consumed-by:
-        - P08 BO-312 Reservation Confirmation, Expiry & Fulfillment Readiness
+        - "P08 BO-312 Reservation Confirmation, Expiry & Fulfillment Readiness"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6063,7 +6063,7 @@ paths:
     get:
       operationId: listOrderLifecycleTimeline
       x-ticvai-consumed-by:
-        - P08 BO-313 Order Lifecycle Timeline, SLA, Exceptions & AI Operations
+        - "P08 BO-313 Order Lifecycle Timeline, SLA, Exceptions & AI Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6101,7 +6101,7 @@ paths:
     get:
       operationId: listAmendmentAfterSale
       x-ticvai-consumed-by:
-        - P08 BO-314 Amendment & After-Sales Command Center
+        - "P08 BO-314 Amendment & After-Sales Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6182,7 +6182,7 @@ paths:
     put:
       operationId: setOrderAmendment
       x-ticvai-consumed-by:
-        - P08 BO-315 Order Amendment Workspace
+        - "P08 BO-315 Order Amendment Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6225,7 +6225,7 @@ paths:
     put:
       operationId: setAmendmentEligibilityPolicy
       x-ticvai-consumed-by:
-        - P08 BO-316 Amendment Eligibility & Policy Rule Builder
+        - "P08 BO-316 Amendment Eligibility & Policy Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6268,7 +6268,7 @@ paths:
     put:
       operationId: setCancellationPartialPolicy
       x-ticvai-consumed-by:
-        - P08 BO-317 Cancellation & Partial Cancellation Policy Configuration
+        - "P08 BO-317 Cancellation & Partial Cancellation Policy Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6311,7 +6311,7 @@ paths:
     get:
       operationId: listVoidReversalSame
       x-ticvai-consumed-by:
-        - P08 BO-319 Void, Reversal & Same-Day Correction Management
+        - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6349,7 +6349,7 @@ paths:
     get:
       operationId: listTicketReissueFulfillment
       x-ticvai-consumed-by:
-        - P08 BO-320 Ticket Reissue & Fulfillment Regeneration
+        - "P08 BO-320 Ticket Reissue & Fulfillment Regeneration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6387,7 +6387,7 @@ paths:
     put:
       operationId: setAfterSaleFinancial
       x-ticvai-consumed-by:
-        - P08 BO-321 After-Sales Financial Settlement & Adjustment Workspace
+        - "P08 BO-321 After-Sales Financial Settlement & Adjustment Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6430,7 +6430,7 @@ paths:
     put:
       operationId: approveExceptionServiceRecovery
       x-ticvai-consumed-by:
-        - P08 BO-322 Approval, Exception & Service Recovery Management
+        - "P08 BO-322 Approval, Exception & Service Recovery Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6472,7 +6472,7 @@ paths:
     get:
       operationId: listAmendmentAfterSale2
       x-ticvai-consumed-by:
-        - P08 BO-323 Amendment History, Audit & After-Sales Analytics
+        - "P08 BO-323 Amendment History, Audit & After-Sales Analytics"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6553,7 +6553,7 @@ paths:
     get:
       operationId: listPaymentOrderFinancial
       x-ticvai-consumed-by:
-        - P08 BO-324 Payment & Order Financial Command Center
+        - "P08 BO-324 Payment & Order Financial Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6591,7 +6591,7 @@ paths:
     get:
       operationId: listOrderPaymentDetail
       x-ticvai-consumed-by:
-        - P08 BO-325 Order Payment Detail & Transaction Ledger
+        - "P08 BO-325 Order Payment Detail & Transaction Ledger"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6629,7 +6629,7 @@ paths:
     put:
       operationId: setMultiPaymentSplit
       x-ticvai-consumed-by:
-        - P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration
+        - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6671,7 +6671,7 @@ paths:
     get:
       operationId: listDepositPartialPayment
       x-ticvai-consumed-by:
-        - P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management
+        - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6709,7 +6709,7 @@ paths:
     get:
       operationId: listOrderSplitMerge
       x-ticvai-consumed-by:
-        - P08 BO-328 Order Split, Merge & Transaction Relationship Management
+        - "P08 BO-328 Order Split, Merge & Transaction Relationship Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6747,7 +6747,7 @@ paths:
     get:
       operationId: listRelatedOrderTransaction
       x-ticvai-consumed-by:
-        - P08 BO-329 Related Order & Transaction Relationship Explorer
+        - "P08 BO-329 Related Order & Transaction Relationship Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6817,7 +6817,7 @@ paths:
     get:
       operationId: listExternalPaymentPartner
       x-ticvai-consumed-by:
-        - P08 BO-330 External Payment, Partner & Settlement Reference Mapping
+        - "P08 BO-330 External Payment, Partner & Settlement Reference Mapping"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6855,7 +6855,7 @@ paths:
     get:
       operationId: listPaymentReconciliationException
       x-ticvai-consumed-by:
-        - P08 BO-331 Payment Reconciliation & Exception Management
+        - "P08 BO-331 Payment Reconciliation & Exception Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6893,7 +6893,7 @@ paths:
     get:
       operationId: listFinancialTraceability
       x-ticvai-consumed-by:
-        - P08 BO-332 Financial Traceability, Control & Audit Explorer
+        - "P08 BO-332 Financial Traceability, Control & Audit Explorer"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -6931,7 +6931,7 @@ paths:
     get:
       operationId: listOrderFinancialReconciliation
       x-ticvai-consumed-by:
-        - P08 BO-333 Order Financial Analytics & AI Reconciliation Intelligence
+        - "P08 BO-333 Order Financial Analytics & AI Reconciliation Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7018,7 +7018,7 @@ paths:
     get:
       operationId: listResaleMarketplace
       x-ticvai-consumed-by:
-        - P09 ADM-278 Resale Marketplace Command Center
+        - "P09 ADM-278 Resale Marketplace Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7105,7 +7105,7 @@ paths:
     put:
       operationId: setResaleEligibilityRule
       x-ticvai-consumed-by:
-        - P09 ADM-279 Resale Eligibility Rule Configuration
+        - "P09 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7148,7 +7148,7 @@ paths:
     get:
       operationId: listResalePolicyMarketplace
       x-ticvai-consumed-by:
-        - P09 ADM-280 Resale Policy & Marketplace Settings
+        - "P09 ADM-280 Resale Policy & Marketplace Settings"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7186,7 +7186,7 @@ paths:
     post:
       operationId: createListingSeller
       x-ticvai-consumed-by:
-        - P09 ADM-281 Listing Creation & Seller Configuration
+        - "P09 ADM-281 Listing Creation & Seller Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7228,7 +7228,7 @@ paths:
     get:
       operationId: listResalePricingPrice
       x-ticvai-consumed-by:
-        - P09 ADM-282 Resale Pricing & Price Guardrails
+        - "P09 ADM-282 Resale Pricing & Price Guardrails"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7266,7 +7266,7 @@ paths:
     get:
       operationId: listResaleFeeCommission
       x-ticvai-consumed-by:
-        - P09 ADM-283 Resale Fees, Commission & Seller Proceeds
+        - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7304,7 +7304,7 @@ paths:
     put:
       operationId: approveListingModeration
       x-ticvai-consumed-by:
-        - P09 ADM-284 Listing Approval & Moderation
+        - "P09 ADM-284 Listing Approval & Moderation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7346,7 +7346,7 @@ paths:
     get:
       operationId: listResaleInventoryAvailability
       x-ticvai-consumed-by:
-        - P09 ADM-285 Resale Inventory & Availability Management
+        - "P09 ADM-285 Resale Inventory & Availability Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7384,7 +7384,7 @@ paths:
     get:
       operationId: listListingLifecycleExpiry
       x-ticvai-consumed-by:
-        - P09 ADM-286 Listing Lifecycle, Expiry & Cancellation
+        - "P09 ADM-286 Listing Lifecycle, Expiry & Cancellation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7422,7 +7422,7 @@ paths:
     put:
       operationId: setResaleMarketplaceRecommendation
       x-ticvai-consumed-by:
-        - P09 ADM-287 AI Resale Configuration & Marketplace Recommendations
+        - "P09 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7464,7 +7464,7 @@ paths:
     get:
       operationId: listResale
       x-ticvai-consumed-by:
-        - P09 ADM-288 Resale Operations Command Center
+        - "P09 ADM-288 Resale Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7502,7 +7502,7 @@ paths:
     get:
       operationId: listBuyerPurchaseResale
       x-ticvai-consumed-by:
-        - P09 ADM-289 Buyer Purchase & Resale Order Management
+        - "P09 ADM-289 Buyer Purchase & Resale Order Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7540,7 +7540,7 @@ paths:
     get:
       operationId: listTicketOwnershipTransfer
       x-ticvai-consumed-by:
-        - P09 ADM-290 Ticket Ownership Transfer Management
+        - "P09 ADM-290 Ticket Ownership Transfer Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7578,7 +7578,7 @@ paths:
     get:
       operationId: listCredentialRevocationRegeneration
       x-ticvai-consumed-by:
-        - P09 ADM-291 Credential Revocation & Regeneration
+        - "P09 ADM-291 Credential Revocation & Regeneration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7617,7 +7617,7 @@ paths:
     get:
       operationId: listResaleFraudDuplicate
       x-ticvai-consumed-by:
-        - P09 ADM-292 Resale Fraud & Duplicate Sale Protection
+        - "P09 ADM-292 Resale Fraud & Duplicate Sale Protection"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7655,7 +7655,7 @@ paths:
     get:
       operationId: listCapacityInventoryReconciliation
       x-ticvai-consumed-by:
-        - P09 ADM-293 Capacity & Inventory Reconciliation
+        - "P09 ADM-293 Capacity & Inventory Reconciliation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7693,7 +7693,7 @@ paths:
     get:
       operationId: listSellerSettlementPayout
       x-ticvai-consumed-by:
-        - P09 ADM-294 Seller Settlement & Payout Management
+        - "P09 ADM-294 Seller Settlement & Payout Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7731,7 +7731,7 @@ paths:
     get:
       operationId: listRefundDisputeResale
       x-ticvai-consumed-by:
-        - P09 ADM-295 Refunds, Disputes & Resale Exceptions
+        - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7769,7 +7769,7 @@ paths:
     get:
       operationId: listResaleOwnership
       x-ticvai-consumed-by:
-        - P09 ADM-296 Resale Audit & Ownership History
+        - "P09 ADM-296 Resale Audit & Ownership History"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7807,7 +7807,7 @@ paths:
     get:
       operationId: listResale2
       x-ticvai-consumed-by:
-        - P09 ADM-297 Resale Analytics & AI Intelligence
+        - "P09 ADM-297 Resale Analytics & AI Intelligence"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7894,7 +7894,7 @@ paths:
     get:
       operationId: listTicketResaleMarketplace
       x-ticvai-consumed-by:
-        - P09 ADM-298 My Tickets & Resale Marketplace Entry
+        - "P09 ADM-298 My Tickets & Resale Marketplace Entry"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7934,7 +7934,7 @@ paths:
     get:
       operationId: listResaleEligibilityTicket
       x-ticvai-consumed-by:
-        - P09 ADM-299 Resale Eligibility & Ticket Selection
+        - "P09 ADM-299 Resale Eligibility & Ticket Selection"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -7972,7 +7972,7 @@ paths:
     get:
       operationId: listCreateListingResale
       x-ticvai-consumed-by:
-        - P09 ADM-300 Create Listing & Resale Price Selection
+        - "P09 ADM-300 Create Listing & Resale Price Selection"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -8010,7 +8010,7 @@ paths:
     get:
       operationId: listFeeSellerProceed
       x-ticvai-consumed-by:
-        - P09 ADM-301 Fees, Seller Proceeds & Listing Confirmation
+        - "P09 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -8048,7 +8048,7 @@ paths:
     get:
       operationId: listResaleListingSeller
       x-ticvai-consumed-by:
-        - P09 ADM-302 My Resale Listings & Seller Dashboard
+        - "P09 ADM-302 My Resale Listings & Seller Dashboard"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -8086,7 +8086,7 @@ paths:
     get:
       operationId: listOfficialResaleMarketplace
       x-ticvai-consumed-by:
-        - P09 ADM-303 Official Resale Marketplace & Buyer Discovery
+        - "P09 ADM-303 Official Resale Marketplace & Buyer Discovery"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -8124,7 +8124,7 @@ paths:
     get:
       operationId: listResaleTicketDetail
       x-ticvai-consumed-by:
-        - P09 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
+        - "P09 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -8162,7 +8162,7 @@ paths:
     get:
       operationId: listBuyerCheckoutInventory
       x-ticvai-consumed-by:
-        - P09 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment
+        - "P09 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -8200,7 +8200,7 @@ paths:
     get:
       operationId: listResaleConfirmationOwnership
       x-ticvai-consumed-by:
-        - P09 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery
+        - "P09 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -8238,7 +8238,7 @@ paths:
     get:
       operationId: listWhiteLabelMarketplace
       x-ticvai-consumed-by:
-        - P09 ADM-307 White-Label Marketplace Deployment & Experience Architecture
+        - "P09 ADM-307 White-Label Marketplace Deployment & Experience Architecture"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true

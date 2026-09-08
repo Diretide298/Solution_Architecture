@@ -27,7 +27,7 @@ steps:
   - createChannelCapacity
   - listChannelListings
   - publishBundle
-  - releaseChannelAllocation
+  - relinquishChannelAllocation
   - setChannelListing
   - updateChannelCapacity
   outcome: '**Drawn by the client as RET-5G.** 6 operations on this step.'

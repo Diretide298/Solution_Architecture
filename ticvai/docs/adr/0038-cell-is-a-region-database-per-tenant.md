@@ -1,6 +1,6 @@
 # ADR-0038: A cell is a region, and a database per tenant inside it
 
-**Status:** Accepted
+**Status:** Accepted — the one-instance-per-region half is amended by [ADR-0040](0040-a-cell-may-hold-more-than-one-instance.md), which lets a region hold more than one. A cell is still a region; it is no longer the instance.
 **Date:** 3 September 2026
 **Supersedes:** [ADR-0014](0014-cell-per-region.md) — a cell held one tenant · [ADR-0036](0036-burst-cell-database-segregation.md) — a burst cell held a database per service
 **Closes:** **CF-161**
@@ -43,6 +43,8 @@ there is no migration, because there is nothing to migrate.
 ## Decision
 
 **One Postgres instance per region. The instance is the cell. One database per tenant inside it.**
+
+**Amended 7 September by [ADR-0040](0040-a-cell-may-hold-more-than-one-instance.md): a region may hold more than one instance when one is not enough.** The cell is still the region, and a tenant database still sits whole inside one instance. What no longer holds is the middle sentence — the instance is something a cell has rather than something it is.
 
 ```
 postgres instance  ·  region  ·  the cell

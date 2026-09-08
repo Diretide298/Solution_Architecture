@@ -123,7 +123,8 @@ screens:
     inferred: true
     isEntryPoint: true
   wireframe:
-    status: designed
+    status: notStarted
+    provenance: designed
     board: wireframes/Marketing Board 7.dc.html#crm-7f
     generatedFallback: wireframes/P13 Venue CMS.dc.html#cms-001
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
@@ -277,7 +278,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-002
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -358,7 +360,8 @@ screens:
     - CMS-004
     inferred: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-003
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -466,7 +469,8 @@ screens:
     - CMS-003
     inferred: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-004
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -561,7 +565,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-005
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -611,6 +616,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: createPreview
+      - kind: publishGate
+        impliedBy: publishTenantConfig
+        notes: >
+          Declares `publishTenantConfig`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -638,7 +648,8 @@ screens:
     notes: '**Reached from CMS-005** — a preview shows the component being edited. Stated on 4 September:
       this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-006
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -734,7 +745,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-007
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -801,7 +813,8 @@ screens:
     notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-008
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -882,7 +895,8 @@ screens:
     notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-009
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1005,7 +1019,8 @@ screens:
     notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-010
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1108,7 +1123,8 @@ screens:
     notes: '**Reached from CMS-016** — metadata is a site setting. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-013
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1171,7 +1187,8 @@ screens:
     notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-011
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1232,7 +1249,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-012
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1277,6 +1295,11 @@ screens:
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: publishTenantConfig
+      - kind: publishGate
+        impliedBy: publishTenantConfig
+        notes: >
+          Declares `publishTenantConfig`. **The gate names what the publish will affect before it
+          happens** — a disabled Publish with no reason is the state operators escalate.
   states:
     loading: Detail loads
     emptyFirstRun: Not found — it may have been deleted or moved out of scope
@@ -1298,7 +1321,8 @@ screens:
     inferred: true
     fromFlows: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-014
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1374,7 +1398,8 @@ screens:
     - CMS-003
     inferred: true
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-015
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1445,7 +1470,8 @@ screens:
     notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-016
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1491,7 +1517,8 @@ screens:
     notes: '**Reached from CMS-016** — a domain is a site setting. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-017
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1516,7 +1543,7 @@ screens:
     contract: white-label
     purpose: Prove control before it serves traffic
     trigger: onAction
-  - operationId: releaseCustomDomain
+  - operationId: relinquishCustomDomain
     contract: white-label
     purpose: Release a domain
     trigger: onAction
@@ -1589,7 +1616,8 @@ screens:
     notes: '**Reached from CMS-016** — consent and legal are site settings. Stated on 4 September: this
       screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-018
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1697,7 +1725,8 @@ screens:
     notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-019
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1764,7 +1793,8 @@ screens:
     notes: '**Reached from CMS-001** — a top-level workspace section. Stated on 4 September: this screen
       exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-020
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. States derived from the screen pattern on 17 August, not individually considered —
@@ -1819,7 +1849,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/PrivacyConsentConfigurationCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-021
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-021
   source:
@@ -1884,7 +1915,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DataProcessingPurposeLawfulBasisRegistry.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-022
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-022
   source:
@@ -1938,7 +1970,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/ConsentPurposeConsentTypeBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-023
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-023
   source:
@@ -1993,7 +2026,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/CommunicationPreferenceMarketingPermissionConfig.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-024
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-024
   source:
@@ -2048,7 +2082,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/CookieTrackingDigitalTechnologyRegistry.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-025
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-025
   source:
@@ -2102,7 +2137,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/CookieBannerPreferenceCenterDesigner.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-026
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-026
   source:
@@ -2157,7 +2193,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/ConsentCapturePointCustomerJourneyConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-027
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-027
   source:
@@ -2212,7 +2249,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/PrivacyNoticePolicyTermsVersionManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-028
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-028
   source:
@@ -2268,7 +2306,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/MinorGuardianAgeBasedPrivacyConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-029
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-029
   source:
@@ -2323,7 +2362,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/PrivacyConfigurationTestingApprovalPublication.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-030
     workshopBoard: wireframes/WS33 Privacy  Consent   Preference Management Board 1.dc.html#cms-030
   source:
@@ -2386,7 +2426,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/PrivacyOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-031
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-031
   source:
@@ -2451,7 +2492,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/CustomerPrivacyConsentPreference360.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-032
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-032
   source:
@@ -2486,8 +2528,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first consent entry, and this
-      state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -2504,7 +2546,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/ConsentEvidenceHistoryWithdrawalManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-033
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-033
   source:
@@ -2558,7 +2601,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DataSubjectCustomerPrivacyRequestManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-034
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-034
   source:
@@ -2613,7 +2657,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DataDiscoveryAccessExportCorrectionWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-035
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-035
   source:
@@ -2669,7 +2714,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DeletionAnonymizationRestrictionOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-036
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-036
   source:
@@ -2723,7 +2769,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DataRetentionExpiryLegalHoldOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-037
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-037
   source:
@@ -2778,7 +2825,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/PrivacyComplianceExceptionInvestigationWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-038
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-038
   source:
@@ -2812,8 +2860,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first privacy entry, and this
-      state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -2830,7 +2878,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/PrivacyAuditEvidenceComplianceReporting.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-039
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-039
   source:
@@ -2883,7 +2932,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/PrivacyAnalyticsAiComplianceIntelligence.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-040
     workshopBoard: wireframes/WS34 Privacy  Consent   Preference Management Board 2.dc.html#cms-040
   source:
@@ -2946,7 +2996,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/WaiverConsentCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-041
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-041
   source:
@@ -3011,7 +3062,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/WaiverTemplateLibraryMasterSetup.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-042
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-042
   source:
@@ -3066,7 +3118,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DigitalWaiverFormBuilder.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-043
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-043
   source:
@@ -3090,14 +3143,20 @@ screens:
   wave: 3
   density: compact
   layout:
-    template: dashboard
+    template: split
     regions:
     - name: contentBody
       components:
-      - kind: timeline
-        notes: What changed, when, and by whom
       - kind: searchField
-        notes: Find a change
+        notes: Find a field
+      - kind: dataTable
+        notes: Every dynamic field and question with the form it belongs to.
+      - kind: detailPanel
+        notes: The selected field, read-only.
+      - kind: selectField
+        notes: >
+          The condition that shows or hides the field. **Conditional logic is the screen's
+          subject**, and it cannot be authored from a timeline.
   states:
     loading: Skeleton while the configuration loads
     emptyFirstRun: '**Nothing configured yet.** The action is to create the first dynamic entry, and this
@@ -3118,7 +3177,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DynamicFieldsQuestionsConditionalLogic.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-044
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-044
   source:
@@ -3172,7 +3232,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/SignatorySignatureGuardianRuleConfiguration.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-045
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-045
   source:
@@ -3226,7 +3287,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/ProductEventExperienceAssociation.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-046
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-046
   source:
@@ -3280,7 +3342,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/WaiverTriggerEligibilityCompletionRules.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-047
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-047
   source:
@@ -3335,7 +3398,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/VersioningEffectiveDatesLegalChangeControl.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-048
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-048
   source:
@@ -3389,7 +3453,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/LocalizationBrandingCustomerExperienceConfigurat.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-049
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-049
   source:
@@ -3443,7 +3508,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/WaiverApprovalTestingPublicationWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-050
     workshopBoard: wireframes/WS58 Waiver, Consent & Digital Form Management Board 1.dc.html#cms-050
   source:
@@ -3506,7 +3572,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/WaiverOperationsCommandCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-051
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-051
   source:
@@ -3570,7 +3637,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/ParticipantWaiverStatusTracking.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-052
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-052
   source:
@@ -3624,7 +3692,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/DigitalSigningCollectionOperations.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-053
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-053
   source:
@@ -3679,7 +3748,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/MinorGuardianGroupConsentManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-054
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-054
   source:
@@ -3734,7 +3804,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/WaiverVerificationValidationWorkspace.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-055
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-055
   source:
@@ -3788,7 +3859,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/MissingExpiredInvalidWaiverManagement.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-056
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-056
   source:
@@ -3842,7 +3914,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/OnSiteWaiverExceptionHandling.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-057
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-057
   source:
@@ -3876,8 +3949,8 @@ screens:
         notes: Find a change
   states:
     loading: Skeleton while the configuration loads
-    emptyFirstRun: '**Nothing configured yet.** The action is to create the first compliance entry, and
-      this state carries it'
+    emptyNoEvents: '**The record is complete and nothing has happened yet.** No action: an
+      audit trail that offers to create its first entry is offering to author evidence'
     emptyNoResults: '**Nothing matched.** The filter or the scope narrowed it — naming which is what stops
       somebody concluding the record does not exist'
     emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** An empty
@@ -3894,7 +3967,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/ComplianceEvidenceAuditWaiverRepository.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-058
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-058
   source:
@@ -3946,7 +4020,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/WaiverAnalyticsComplianceOperationalInsights.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-059
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-059
   source:
@@ -3999,7 +4074,8 @@ screens:
     component: apps/venue-management-web/src/routes/policy/AiWaiverComplianceRiskIntelligenceCenter.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P13 Venue CMS.dc.html#cms-060
     workshopBoard: wireframes/WS59 Waiver, Consent & Digital Form Management Board 2.dc.html#cms-060
   source:

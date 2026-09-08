@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;padding:0;background:#EEF1F6;-webkit-font-smoothing:antialiased}
+*{box-sizing:border-box}
+a{color:#0D6EFD;text-decoration:none}a:hover{color:#0A55C7}
+</style>
+</helmet>
+
+<div style="font-family:Manrope,system-ui,sans-serif;color:#0B1324;padding:26px 34px 90px;max-width:1420px;margin:0 auto">
+
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:24px;padding-bottom:14px;border-bottom:2px solid #0B1324">
+    <div>
+      <div style="font-size:12px;font-weight:800;letter-spacing:.18em;background:linear-gradient(90deg,#0D6EFD,#00B8FF);-webkit-background-clip:text;background-clip:text;color:transparent">TICVAI</div>
+      <h1 style="font-size:21px;font-weight:800;letter-spacing:-.02em;margin:5px 0 0">P15 Kitchen Display — the pass and the stations <span style="font-weight:600;color:#6B7280">(10 screens · 1 module)</span></h1>
+    </div>
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#6B7280;text-align:right;line-height:1.7">
+      <div>kitchen-display · wall screen · touchLarge · offline-capable</div>
+      <div>1280 &times; 880 frames &middot; <a href="TICVAI%20Board%20Index.dc.html">board index</a></div>
+    </div>
+  </div>
+
+  <p style="font-size:12.5px;color:#5A6577;max-width:84ch;margin:16px 0 0;line-height:1.65;text-wrap:pretty">All ten screens of P15, drawn dark and large because of what the source says about them: <i>bumped by somebody with flour on their hands, read from two metres, in a room where nobody is sitting down</i>. Every screen is <span style="font-family:'IBM Plex Mono',monospace">density: touchLarge</span> and every one keeps working offline except the last. Riverside Arts is the stand-in tenant — the Bridge Kitchen, two stations and a pass.</p>
+
+  <div style="display:flex;gap:12px;padding:13px 16px;margin-top:16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+    <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+    <div><b>These ten screens are drawn twice, on purpose.</b> Each one carries a <span style="font-family:'IBM Plex Mono',monospace">derivedFrom</span> pointing at a frame in the client F&amp;B pack — <span style="font-family:'IBM Plex Mono',monospace">FnB Board 3</span>, <i>Kitchen &amp; Orders</i>, drawn 20 August and matched to these screens by frame title. That pack is the specification: it carries operations, states, entry params and exits, and it is better specified than anything derived from the screen file. What it is not is a kitchen display — the pack draws back-office frames at 1280&times;700 for someone sitting down. This board draws the same ten screens as the device they run on. The mapping is one to one: <span style="font-family:'IBM Plex Mono',monospace">KIT-001</span>–<span style="font-family:'IBM Plex Mono',monospace">008</span> to <span style="font-family:'IBM Plex Mono',monospace">FNB-3A</span>–<span style="font-family:'IBM Plex Mono',monospace">3H</span>, then <span style="font-family:'IBM Plex Mono',monospace">KIT-009</span> to <span style="font-family:'IBM Plex Mono',monospace">3J</span> and <span style="font-family:'IBM Plex Mono',monospace">KIT-010</span> to <span style="font-family:'IBM Plex Mono',monospace">3K</span>.</div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:52px;margin-top:40px">
+
+    <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:#8494A8;padding-bottom:9px;border-bottom:1px solid #DCE3ED">Kitchen · 10 screens · wave 2</div>
+
+    <div id="kit-001" data-screen-label="KIT-001" data-screen-id="KIT-001" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-001</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Kitchen Operations Command Center</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">cold is the only way in</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Nobody logs into a kitchen display. It is on when the kitchen is open and resolves its station from the device assignment rather than from a person. Three numbers, glanceable, and the rail beneath them.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff;letter-spacing:-.01em">Bridge Kitchen</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">pass · all stations</span></div>
+            <div style="display:flex;align-items:center;gap:16px"><span style="display:flex;align-items:center;gap:8px"><span style="width:10px;height:10px;border-radius:6px;background:#22A06B"></span><span style="font-size:13px;color:#9FB6CF">live</span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#fff">19:24</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:20px 22px;min-height:0">
+            <div style="flex:none;display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+              <div style="background:#16202B;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">on the rail</span><span style="font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;line-height:1;color:#fff">14</span></div>
+              <div style="background:#16202B;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">oldest ticket</span><span style="font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;line-height:1;color:#E0A03A">9:40</span></div>
+              <div style="background:#16202B;border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">grill load</span><span style="font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;line-height:1;color:#E0483A">128%</span></div>
+            </div>
+            <div style="flex:1;display:flex;gap:16px;min-height:0">
+              <div style="flex:1;display:flex;flex-direction:column;gap:11px;min-width:0">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">next out · by promise time</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="border-radius:12px;background:#16202B;border-left:5px solid #E0483A;padding:14px 16px;display:flex;align-items:center;gap:16px"><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#fff;width:64px">T12</span><div style="flex:1"><div style="font-size:17px;font-weight:700;color:#fff">2× Burger, 1× Halloumi</div><div style="font-size:13px;color:#8FA6BD">grill · due now · 12 min on the rail</div></div><span style="padding:10px 18px;border-radius:9px;background:#22A06B;color:#fff;font-size:15px;font-weight:800">Bump</span></div>
+                  <div style="border-radius:12px;background:#16202B;border-left:5px solid #E0A03A;padding:14px 16px;display:flex;align-items:center;gap:16px"><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#fff;width:64px">T04</span><div style="flex:1"><div style="font-size:17px;font-weight:700;color:#fff">Sharing board, 2× fries</div><div style="font-size:13px;color:#8FA6BD">cold · due in 2 min</div></div><span style="padding:10px 18px;border-radius:9px;background:#22A06B;color:#fff;font-size:15px;font-weight:800">Bump</span></div>
+                  <div style="border-radius:12px;background:#16202B;border-left:5px solid #2E4459;padding:14px 16px;display:flex;align-items:center;gap:16px"><span style="font-family:'IBM Plex Mono',monospace;font-size:20px;font-weight:600;color:#fff;width:64px">K02</span><div style="flex:1"><div style="font-size:17px;font-weight:700;color:#fff">Kiosk · 3× wrap</div><div style="font-size:13px;color:#8FA6BD">grill · due in 6 min</div></div><span style="padding:10px 18px;border-radius:9px;background:#1D2733;color:#8FA6BD;font-size:15px;font-weight:800">Bump</span></div>
+                </div>
+              </div>
+              <div style="flex:none;width:300px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">stations</div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="background:#16202B;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:700;color:#fff">Grill</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#E0483A">9</span></div><div style="height:8px;border-radius:5px;background:#0B0F14"><div style="width:100%;height:8px;border-radius:5px;background:#E0483A"></div></div></div>
+                  <div style="background:#16202B;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:700;color:#fff">Cold</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#22A06B">3</span></div><div style="height:8px;border-radius:5px;background:#0B0F14"><div style="width:38%;height:8px;border-radius:5px;background:#22A06B"></div></div></div>
+                  <div style="background:#16202B;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:8px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-size:15px;font-weight:700;color:#fff">Pass</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#E0A03A">2</span></div><div style="height:8px;border-radius:5px;background:#0B0F14"><div style="width:60%;height:8px;border-radius:5px;background:#E0A03A"></div></div></div>
+                </div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7E93A8;line-height:1.7">device &middot; KDS-02, assigned<br>station &middot; from assignment</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Ordered by when food is wanted, not when it arrived</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">The source is explicit: one ticket per card, ordered by promise time rather than arrival. A ticket due in two minutes sits above one that came in first, because a kitchen works backwards from the pass. The count renders before the tickets — a kitchen wants to know how deep it is before it reads anything.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">sort &middot; promise time<br>loading &middot; count first, then rail</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Empty rail says the kitchen is clear</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A blank rail and a broken screen are the same picture. The empty state says it in words, and a narrow station filter says <i>the rail is not empty, the filter is</i> — on a kitchen screen that distinction is the difference between calm and panic.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">emptyFirstRun &middot; kitchen clear<br>emptyNoResults &middot; filter named</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A display does not choose what it shows</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The no-access state is <i>this display is not assigned to a station</i> — assignment is a back-office act. There is no sign-in, no station picker and no way for a chef to point the screen somewhere else mid-service.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">arrives &middot; venueId, stationId&larr;session<br>assignment &middot; back office</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listKitchenTickets &middot; listKitchenStations &middot; listFnbOrders</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; stationId&larr;session &middot; <span style="color:#9AA5B6">entry point</span></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-002">KIT-002</a> &middot; <a href="#kit-003">KIT-003</a> &middot; <a href="#kit-005">KIT-005</a> &middot; <a href="#kit-006">KIT-006</a> &middot; <a href="#kit-008">KIT-008</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3A</span></div>
+      </div>
+    </div>
+
+    <div id="kit-002" data-screen-label="KIT-002" data-screen-id="KIT-002" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-002</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Kitchen Display System (KDS)</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E7F4F2;color:#0B5B41">seven operations, one thumb</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The screen the kitchen actually works from. Every action is a button on a card — bump, hold, fire, re-fire, recall, call the server — because a chef cannot open a menu with the back of a wrist.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:center;gap:12px"><span style="font-size:19px;font-weight:800;color:#fff">Grill</span><span style="padding:6px 13px;border-radius:8px;background:#1D2733;color:#9FB6CF;font-size:13px;font-weight:700">All</span><span style="padding:6px 13px;border-radius:8px;background:#E0A03A;color:#0B0F14;font-size:13px;font-weight:800">Late 3</span></div>
+            <div style="display:flex;align-items:center;gap:14px"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">9 tickets</span><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#fff">19:26</span></div>
+          </div>
+          <div style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;padding:18px 22px;min-height:0">
+            <div style="background:#16202B;border-radius:12px;border-top:6px solid #E0483A;padding:14px 15px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#fff">T12</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#E0483A">12:04</span></div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:15px;color:#fff">
+                <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;color:#8FA6BD">2</span><span style="font-weight:700">Burger</span></div>
+                <div style="font-size:13px;color:#E0A03A;padding-left:22px">no pickle · one rare</div>
+                <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;color:#8FA6BD">1</span><span style="font-weight:700">Halloumi</span></div>
+              </div>
+              <div style="margin-top:auto;display:flex;gap:8px"><span style="flex:1;height:40px;border-radius:9px;background:#22A06B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">Bump</span><span style="width:52px;height:40px;border-radius:9px;background:#1D2733;color:#9FB6CF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">Hold</span></div>
+            </div>
+            <div style="background:#16202B;border-radius:12px;border-top:6px solid #E0A03A;padding:14px 15px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#fff">T04</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#E0A03A">6:12</span></div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:15px;color:#fff">
+                <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;color:#8FA6BD">1</span><span style="font-weight:700">Sharing board</span></div>
+                <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;color:#8FA6BD">2</span><span style="font-weight:700">Fries</span></div>
+                <div style="font-size:13px;color:#6C8299;padding-top:3px">course 1 of 2 · main held</div>
+              </div>
+              <div style="margin-top:auto;display:flex;gap:8px"><span style="flex:1;height:40px;border-radius:9px;background:#22A06B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">Bump</span><span style="width:52px;height:40px;border-radius:9px;background:#1D2733;color:#9FB6CF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">Fire</span></div>
+            </div>
+            <div style="background:#16202B;border-radius:12px;border-top:6px solid #2E4459;padding:14px 15px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#fff">K02</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#8FA6BD">1:48</span></div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:15px;color:#fff">
+                <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;color:#8FA6BD">3</span><span style="font-weight:700">Wrap</span></div>
+                <div style="font-size:13px;color:#6C8299;padding-top:3px">kiosk · collection</div>
+              </div>
+              <div style="margin-top:auto;display:flex;gap:8px"><span style="flex:1;height:40px;border-radius:9px;background:#22A06B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">Bump</span><span style="width:52px;height:40px;border-radius:9px;background:#1D2733;color:#9FB6CF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">Hold</span></div>
+            </div>
+            <div style="background:#101822;border-radius:12px;border-top:6px solid #1D2733;padding:14px 15px;display:flex;flex-direction:column;gap:10px;opacity:.75">
+              <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#8FA6BD">T08</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#22A06B">bumped 19:24</span></div>
+              <div style="font-size:14px;color:#8FA6BD">2× Fish, 1× Salad</div>
+              <div style="margin-top:auto;display:flex;gap:8px"><span style="flex:1;height:40px;border-radius:9px;background:#1D2733;color:#9FB6CF;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700">Recall</span></div>
+            </div>
+            <div style="background:#16202B;border-radius:12px;border-top:6px solid #E0483A;padding:14px 15px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#fff">T09</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#E0483A">14:31</span></div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:15px;color:#fff">
+                <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;color:#8FA6BD">1</span><span style="font-weight:700">Steak</span></div>
+                <div style="font-size:13px;color:#E0483A;padding-left:22px">re-fired · sent back</div>
+              </div>
+              <div style="margin-top:auto;display:flex;gap:8px"><span style="flex:1;height:40px;border-radius:9px;background:#22A06B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">Bump</span><span style="width:52px;height:40px;border-radius:9px;background:#1D2733;color:#9FB6CF;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">Call</span></div>
+            </div>
+            <div style="background:#16202B;border-radius:12px;border-top:6px solid #2E4459;padding:14px 15px;display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:19px;font-weight:600;color:#fff">T15</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#8FA6BD">0:36</span></div>
+              <div style="display:flex;flex-direction:column;gap:7px;font-size:15px;color:#fff">
+                <div style="display:flex;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;color:#8FA6BD">4</span><span style="font-weight:700">Pizza</span></div>
+                <div style="font-size:13px;color:#6C8299;padding-top:3px">interval · 19:45 promise</div>
+              </div>
+              <div style="margin-top:auto;display:flex;gap:8px"><span style="flex:1;height:40px;border-radius:9px;background:#1D2733;color:#9FB6CF;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:800">Bump</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">A bump is journalled before it is sent</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">The platform refused this app without <span style="font-family:'IBM Plex Mono',monospace">offline-core</span>, and correctly. Every bump, hold and re-fire writes to the local journal first and syncs when the network returns; the header goes amber and the rail keeps working. A display that blanks mid-service is worse than one that says it is behind.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">depends on &middot; offline-core<br>offline &middot; journal, then sync</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Recall is the undo a kitchen needs</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A bumped ticket stays on the rail, dimmed, with its bump time — because the most common mistake at a pass is bumping the wrong card. <span style="font-family:'IBM Plex Mono',monospace">recallKitchenTicket</span> brings it back rather than requiring a new order.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">bumped &middot; dimmed, kept<br>recall &middot; one tap</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Modifiers are the line that gets read</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Amber, indented under the item, never abbreviated. <i>No pickle, one rare</i> is the whole reason a ticket comes back, so it is drawn at the same size as the item and above the fold on every card.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">modifiers &middot; amber, full text<br>allergen &middot; never truncated</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listKitchenTickets &middot; setKitchenTicketStatus &middot; fireCourse &middot; holdCourse &middot; refireItem &middot; recallKitchenTicket &middot; notifyServer</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; stationId&larr;session</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-003">KIT-003</a> &middot; <a href="#kit-006">KIT-006</a> &middot; <a href="#kit-008">KIT-008</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3B</span></div>
+      </div>
+    </div>
+
+    <div id="kit-003" data-screen-label="KIT-003" data-screen-id="KIT-003" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-003</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Order Firing &amp; Course Management</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">a table, not a ticket</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The only screen here organised by table rather than by station. Firing a main is a decision about a party's evening, and it is made once for the whole table.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff">Firing</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">6 tables in service</span></div>
+            <div style="display:flex;align-items:center;gap:12px"><span style="padding:6px 13px;border-radius:8px;background:#1D2733;color:#9FB6CF;font-size:13px;font-weight:700">Course rules</span><span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#fff">19:31</span></div>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:18px 22px;min-height:0">
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;min-height:0">
+              <div style="background:#16202B;border-radius:12px;padding:15px 17px;display:flex;align-items:center;gap:18px">
+                <div style="flex:none;width:78px"><div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:#fff">T04</div><div style="font-size:12px;color:#6C8299">4 covers</div></div>
+                <div style="flex:1;display:flex;gap:10px">
+                  <div style="flex:1;padding:11px 13px;border-radius:10px;background:#0B0F14;border-left:4px solid #22A06B"><div style="font-size:14px;font-weight:700;color:#fff">Starters</div><div style="font-size:12px;color:#22A06B">away 19:12</div></div>
+                  <div style="flex:1;padding:11px 13px;border-radius:10px;background:#0B0F14;border-left:4px solid #E0A03A"><div style="font-size:14px;font-weight:700;color:#fff">Mains</div><div style="font-size:12px;color:#E0A03A">held · plates cleared 2 min ago</div></div>
+                  <div style="flex:1;padding:11px 13px;border-radius:10px;background:#0B0F14;border-left:4px solid #2E4459"><div style="font-size:14px;font-weight:700;color:#8FA6BD">Dessert</div><div style="font-size:12px;color:#6C8299">not ordered</div></div>
+                </div>
+                <span style="flex:none;padding:12px 22px;border-radius:9px;background:#E0A03A;color:#0B0F14;font-size:16px;font-weight:800">Fire mains</span>
+              </div>
+              <div style="background:#16202B;border-radius:12px;padding:15px 17px;display:flex;align-items:center;gap:18px">
+                <div style="flex:none;width:78px"><div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:#fff">T12</div><div style="font-size:12px;color:#6C8299">2 covers</div></div>
+                <div style="flex:1;display:flex;gap:10px">
+                  <div style="flex:1;padding:11px 13px;border-radius:10px;background:#0B0F14;border-left:4px solid #E0483A"><div style="font-size:14px;font-weight:700;color:#fff">Mains</div><div style="font-size:12px;color:#E0483A">on the rail 12 min · due now</div></div>
+                  <div style="flex:1;padding:11px 13px;border-radius:10px;background:#0B0F14;border-left:4px solid #2E4459"><div style="font-size:14px;font-weight:700;color:#8FA6BD">Dessert</div><div style="font-size:12px;color:#6C8299">ordered · auto-fire on bump</div></div>
+                  <div style="flex:1"></div>
+                </div>
+                <span style="flex:none;padding:12px 22px;border-radius:9px;background:#1D2733;color:#9FB6CF;font-size:16px;font-weight:800">Priority</span>
+              </div>
+              <div style="background:#16202B;border-radius:12px;padding:15px 17px;display:flex;align-items:center;gap:18px">
+                <div style="flex:none;width:78px"><div style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:#fff">T15</div><div style="font-size:12px;color:#6C8299">6 covers · interval</div></div>
+                <div style="flex:1;display:flex;gap:10px">
+                  <div style="flex:1;padding:11px 13px;border-radius:10px;background:#0B0F14;border-left:4px solid #6C8299"><div style="font-size:14px;font-weight:700;color:#fff">Pizza ×4</div><div style="font-size:12px;color:#8FA6BD">promise 19:45 · interval starts 19:50</div></div>
+                  <div style="flex:1"></div><div style="flex:1"></div>
+                </div>
+                <span style="flex:none;padding:12px 22px;border-radius:9px;background:#1D2733;color:#9FB6CF;font-size:16px;font-weight:800">Hold</span>
+              </div>
+            </div>
+            <div style="flex:none;background:#101822;border-radius:12px;padding:14px 17px;display:flex;align-items:center;gap:20px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">course rules</div>
+              <div style="display:flex;gap:22px;font-size:13px;color:#9FB6CF"><span>Mains fire on <b style="color:#fff">plates cleared</b></span><span>Dessert fires on <b style="color:#fff">mains bumped</b></span><span>Interval tables fire <b style="color:#fff">15 min before curtain</b></span></div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The rule is visible where it fires</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">setCourseRules</span> is on this screen rather than in a settings page, and the current rules sit along the bottom in the room where they take effect. A kitchen that cannot see why a main fired on its own does not trust the automation and holds everything manually.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">rules &middot; shown, not hidden<br>fire &middot; manual overrides always</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Interval is a hard promise</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A theatre kitchen has a curtain to work to, so an interval table's promise time comes from the performance and not from when the order was placed. It is the one case where the rail's ordering is set by something outside the kitchen.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">promise &middot; from the performance<br>fires &middot; 15 min before curtain</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Priority is a write, and it is logged</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">prioritiseKitchenTicket</span> reorders the rail for everybody, so it records who did it. A pass that can jump the queue silently is a pass where the queue means nothing.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">priority &middot; attributed<br>also on &middot; <a href="#kit-009">KIT-009</a></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; setKitchenTicketStatus &middot; fireCourse &middot; holdCourse &middot; prioritiseKitchenTicket &middot; setCourseRules</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; stationId&larr;session</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-002">KIT-002</a> &middot; <a href="#kit-004">KIT-004</a> &middot; <a href="#kit-009">KIT-009</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3C</span></div>
+      </div>
+    </div>
+
+    <div id="kit-004" data-screen-label="KIT-004" data-screen-id="KIT-004" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-004</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Active Order Management &amp; Fulfilment Journey</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">named management, declared read-only</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">One order, end to end, with the time it spent in each state. This is the screen somebody opens when a guest asks where their food is — and the screen the duty manager opens the morning after to see where the evening went.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff">Order RA-88214</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">T12 · 2 covers · placed 19:14</span></div>
+            <span style="padding:7px 14px;border-radius:8px;background:#E0483A;color:#fff;font-size:13px;font-weight:800">12 min · late</span>
+          </div>
+          <div style="flex:1;display:flex;gap:18px;padding:20px 22px;min-height:0">
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">journey</div>
+              <div style="display:flex;flex-direction:column;gap:0">
+                <div style="display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid #16202B"><span style="width:12px;height:12px;border-radius:7px;background:#22A06B;flex:none"></span><span style="flex:1;font-size:16px;font-weight:700;color:#fff">Placed at the table</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#8FA6BD">19:14</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299;width:64px;text-align:right">—</span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid #16202B"><span style="width:12px;height:12px;border-radius:7px;background:#22A06B;flex:none"></span><span style="flex:1;font-size:16px;font-weight:700;color:#fff">Accepted by the kitchen</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#8FA6BD">19:14</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299;width:64px;text-align:right">0:12</span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid #16202B"><span style="width:12px;height:12px;border-radius:7px;background:#22A06B;flex:none"></span><span style="flex:1;font-size:16px;font-weight:700;color:#fff">Fired to grill</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#8FA6BD">19:19</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#E0A03A;width:64px;text-align:right">5:04</span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid #16202B"><span style="width:12px;height:12px;border-radius:7px;background:#E0483A;flex:none"></span><span style="flex:1;font-size:16px;font-weight:700;color:#fff">In preparation</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#8FA6BD">now</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#E0483A;width:64px;text-align:right">12:04</span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:13px 0;border-bottom:1px solid #16202B;opacity:.45"><span style="width:12px;height:12px;border-radius:7px;border:2px solid #2E4459;flex:none"></span><span style="flex:1;font-size:16px;font-weight:700;color:#8FA6BD">At the pass</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#6C8299">—</span><span style="width:64px"></span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:13px 0;opacity:.45"><span style="width:12px;height:12px;border-radius:7px;border:2px solid #2E4459;flex:none"></span><span style="flex:1;font-size:16px;font-weight:700;color:#8FA6BD">Away to the table</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#6C8299">—</span><span style="width:64px"></span></div>
+              </div>
+              <div style="margin-top:auto;padding:13px 15px;border-radius:11px;background:#101822;font-size:13px;color:#8FA6BD;line-height:1.55">Five minutes between accepted and fired is the wait for the starters to clear. It is drawn as elapsed time rather than hidden, because a table asking <i>where is our food</i> is usually asking about that gap.</div>
+            </div>
+            <div style="flex:none;width:320px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:10px">
+                <div style="font-size:15px;font-weight:800;color:#fff">Items</div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;color:#fff">
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>2× Burger</span><span style="font-family:'IBM Plex Mono',monospace;color:#E0483A">grill</span></div>
+                  <div style="font-size:12px;color:#E0A03A">no pickle · one rare</div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>1× Halloumi</span><span style="font-family:'IBM Plex Mono',monospace;color:#22A06B">plated</span></div>
+                </div>
+              </div>
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:9px">
+                <div style="font-size:15px;font-weight:800;color:#fff">Where it came from</div>
+                <div style="display:flex;flex-direction:column;gap:7px;font-size:13px;color:#8FA6BD">
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Channel</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">table order</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Taken by</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">POS 3</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Server</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">A. Byrne</span></div>
+                </div>
+              </div>
+              <div style="margin-top:auto;padding:13px 15px;border-radius:11px;background:#101822;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7E93A8;line-height:1.7">read-only screen<br>listKitchenTickets &middot; getFnbOrder</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">Two reads on a screen called management</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">The declared operations are <span style="font-family:'IBM Plex Mono',monospace">listKitchenTickets</span> and <span style="font-family:'IBM Plex Mono',monospace">getFnbOrder</span>, both <span style="font-family:'IBM Plex Mono',monospace">onLoad</span>, and nothing else. Drawn as read-only on that basis, which may be the right answer — every action already exists on <a href="#kit-002">KIT-002</a> and <a href="#kit-003">KIT-003</a>. If it is, the name is wrong; if it is not, the operations are missing. Either way it is one line in the source.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">declared &middot; 2 reads<br>question &middot; name or operations</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Elapsed, not timestamps alone</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Every state carries how long the order sat in it. A list of clock times makes a reader do arithmetic in a room where nobody has a spare hand, and the number that matters is the one that is still growing.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">per state &middot; elapsed + at<br>current &middot; live, amber then red</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Same journey, three channels</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A table order, a kiosk order and a guest app order run the same six states, and the channel is a field rather than a different screen. The only difference is the last step: away to a table, or collected at a counter.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">channel &middot; field<br>collection &middot; <a href="#kit-007">KIT-007</a></div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listKitchenTickets &middot; getFnbOrder <span style="color:#B98900">(reads only — no write declared)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; orderId&larr;<a href="#kit-002">KIT-002</a> &middot; venueId&larr;session</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-002">KIT-002</a> &middot; <a href="#kit-007">KIT-007</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3D</span></div>
+      </div>
+    </div>
+
+    <div id="kit-005" data-screen-label="KIT-005" data-screen-id="KIT-005" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-005</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Kitchen Station Workload &amp; Dynamic Routing</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">the routing operation reaches no screen</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Where the work is and where it should go. The load is drawn live; the rebalance the screen is named for is drawn against an operation that exists in the contract and reaches nothing.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff">Stations</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">14 tickets across 3</span></div>
+            <span style="padding:7px 14px;border-radius:8px;background:#E0483A;color:#fff;font-size:13px;font-weight:800">grill over capacity</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:20px 22px;min-height:0">
+            <div style="flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:16px;min-height:0">
+              <div style="background:#16202B;border-radius:12px;padding:17px 18px;display:flex;flex-direction:column;gap:13px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:18px;font-weight:800;color:#fff">Grill</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#E0483A">128%</span></div>
+                <div style="height:12px;border-radius:7px;background:#0B0F14"><div style="width:100%;height:12px;border-radius:7px;background:#E0483A"></div></div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;color:#8FA6BD">
+                  <div style="display:flex;justify-content:space-between"><span>On the station</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">9</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Avg prep</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">11:20</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Chefs on</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">2</span></div>
+                </div>
+                <div style="margin-top:auto;padding:11px 12px;border-radius:9px;background:#0B0F14;font-size:13px;color:#E0A03A;line-height:1.5">3 tickets could be prepared on the pass station</div>
+              </div>
+              <div style="background:#16202B;border-radius:12px;padding:17px 18px;display:flex;flex-direction:column;gap:13px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:18px;font-weight:800;color:#fff">Cold</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#22A06B">38%</span></div>
+                <div style="height:12px;border-radius:7px;background:#0B0F14"><div style="width:38%;height:12px;border-radius:7px;background:#22A06B"></div></div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;color:#8FA6BD">
+                  <div style="display:flex;justify-content:space-between"><span>On the station</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">3</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Avg prep</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">3:05</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Chefs on</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">1</span></div>
+                </div>
+                <div style="margin-top:auto;padding:11px 12px;border-radius:9px;background:#0B0F14;font-size:13px;color:#8FA6BD;line-height:1.5">capacity for 4 more</div>
+              </div>
+              <div style="background:#16202B;border-radius:12px;padding:17px 18px;display:flex;flex-direction:column;gap:13px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-size:18px;font-weight:800;color:#fff">Pass</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#E0A03A">60%</span></div>
+                <div style="height:12px;border-radius:7px;background:#0B0F14"><div style="width:60%;height:12px;border-radius:7px;background:#E0A03A"></div></div>
+                <div style="display:flex;flex-direction:column;gap:8px;font-size:14px;color:#8FA6BD">
+                  <div style="display:flex;justify-content:space-between"><span>Awaiting assembly</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">2</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Avg at pass</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">1:40</span></div>
+                  <div style="display:flex;justify-content:space-between"><span>Expeditor</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">1</span></div>
+                </div>
+                <div style="margin-top:auto;padding:11px 12px;border-radius:9px;background:#0B0F14;font-size:13px;color:#8FA6BD;line-height:1.5">assembly is the constraint after 20:00</div>
+              </div>
+            </div>
+            <div style="flex:none;background:#101822;border-radius:12px;padding:15px 18px;display:flex;align-items:center;justify-content:space-between;gap:20px">
+              <div style="display:flex;flex-direction:column;gap:4px"><span style="font-size:15px;font-weight:800;color:#fff">Move 3 grill tickets to pass</span><span style="font-size:13px;color:#8FA6BD">wraps and salads only · nothing already fired</span></div>
+              <div style="display:flex;gap:10px"><span style="padding:12px 20px;border-radius:9px;background:#1D2733;color:#6C8299;font-size:15px;font-weight:800">Rebalance</span><span style="padding:12px 20px;border-radius:9px;background:#1D2733;color:#9FB6CF;font-size:15px;font-weight:800">Edit stations</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Dynamic routing has an operation and no screen</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">rebalanceStationLoad</span> — <i>move work between stations mid-service</i> — is in the <span style="font-family:'IBM Plex Mono',monospace">fnb</span> contract and reaches no screen on any platform. It is the capability this screen is named for. The two operations actually declared here are <span style="font-family:'IBM Plex Mono',monospace">listKitchenStations</span> and <span style="font-family:'IBM Plex Mono',monospace">setKitchenStations</span>, which read and edit the station definitions rather than move today's work. Rebalance is drawn inert.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">contract has &middot; rebalanceStationLoad<br>screen has &middot; list + set stations</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Load is a promise-time question</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A station is over capacity when the work on it cannot be finished by the promise times it holds — not when it has more tickets than another. That is why the percentage is drawn beside average prep time and the number of chefs, which are the two things that change it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">load &middot; work vs promise<br>shown with &middot; prep time, chefs</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Editing stations mid-service is a real act</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">setKitchenStations</span> changes what routes where for every ticket that follows. It stays on the screen — a kitchen that loses a fryer needs it — and it never touches tickets already fired.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">applies to &middot; new tickets only<br>fired &middot; never re-routed</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listKitchenStations &middot; setKitchenStations <span style="color:#B98900">(rebalanceStationLoad missing)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-001">KIT-001</a> &middot; <a href="#kit-002">KIT-002</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3E</span></div>
+      </div>
+    </div>
+
+    <div id="kit-006" data-screen-label="KIT-006" data-screen-id="KIT-006" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-006</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Expeditor &amp; Order Assembly</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#E7F4F2;color:#0B5B41">nothing leaves incomplete</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The pass. One order at a time, every component checked off as it lands, and a chase button for the station holding everyone else up.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff">Pass</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">2 assembling · 1 ready</span></div>
+            <span style="font-family:'IBM Plex Mono',monospace;font-size:16px;color:#fff">19:34</span>
+          </div>
+          <div style="flex:1;display:flex;gap:18px;padding:20px 22px;min-height:0">
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;min-width:0">
+              <div style="background:#16202B;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:14px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:24px;font-weight:600;color:#fff">T12 · 2 covers</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#E0483A">12 min</span></div>
+                <div style="display:flex;flex-direction:column;gap:10px">
+                  <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:10px;background:#0B0F14"><span style="width:26px;height:26px;border-radius:7px;background:#22A06B;flex:none"></span><span style="flex:1;font-size:17px;font-weight:700;color:#fff">1× Halloumi</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#22A06B">cold · plated</span></div>
+                  <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:10px;background:#0B0F14"><span style="width:26px;height:26px;border-radius:7px;background:#22A06B;flex:none"></span><span style="flex:1;font-size:17px;font-weight:700;color:#fff">1× Burger <span style="font-size:14px;color:#E0A03A">no pickle</span></span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#22A06B">grill · plated</span></div>
+                  <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:10px;background:#0B0F14;border:1px solid #E0483A"><span style="width:26px;height:26px;border-radius:7px;border:2px solid #E0483A;flex:none"></span><span style="flex:1;font-size:17px;font-weight:700;color:#fff">1× Burger <span style="font-size:14px;color:#E0A03A">rare</span></span><span style="padding:8px 14px;border-radius:8px;background:#E0483A;color:#fff;font-size:14px;font-weight:800">Chase grill</span></div>
+                </div>
+                <div style="display:flex;gap:10px"><span style="flex:1;height:48px;border-radius:10px;background:#1D2733;color:#6C8299;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800">Away to table</span><span style="width:150px;height:48px;border-radius:10px;background:#1D2733;color:#9FB6CF;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700">Print label</span></div>
+              </div>
+              <div style="margin-top:auto;padding:13px 15px;border-radius:11px;background:#101822;font-size:13px;color:#8FA6BD;line-height:1.55">Away is disabled until every component is checked. The expeditor can override with a long press, and the override is recorded against the order.</div>
+            </div>
+            <div style="flex:none;width:320px;display:flex;flex-direction:column;gap:12px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">next at the pass</div>
+              <div style="background:#16202B;border-radius:12px;padding:14px 15px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#fff">T04</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#E0A03A">2 of 3</span></div><div style="font-size:14px;color:#8FA6BD">sharing board, 2× fries</div></div>
+              <div style="background:#16202B;border-radius:12px;padding:14px 15px;display:flex;flex-direction:column;gap:7px"><div style="display:flex;justify-content:space-between;align-items:baseline"><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;font-weight:600;color:#fff">K02</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#22A06B">ready</span></div><div style="font-size:14px;color:#8FA6BD">3× wrap · collection 41</div><div style="font-size:13px;color:#6C8299">label printed 19:33</div></div>
+              <div style="margin-top:auto;padding:13px 15px;border-radius:11px;background:#101822;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7E93A8;line-height:1.7">collection orders &middot; label, then <a href="#kit-007" style="color:#6C8299">KIT-007</a><br>table orders &middot; away, then cleared</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Chase is a message, not a status change</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">chaseStation</span> puts the ticket at the top of the named station's rail and says who asked. It does not change the ticket's state, because the food is not further along for having been chased — and a chase that quietly reprioritises without saying so is how two stations end up disagreeing about what is next.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">chase &middot; attributed, visible<br>state &middot; unchanged</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two endings, one screen</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">A table order goes away; a collection order gets a label and a number and becomes <a href="#kit-007">KIT-007</a>'s problem. <span style="font-family:'IBM Plex Mono',monospace">markOrderCollected</span> is declared here as well as there, which is right — the pass hands over at a counter when there is nobody to run it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">table &middot; away<br>collection &middot; label + number</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The label prints offline</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">printOrderLabel</span> renders from the cached ticket to a local printer, so a network drop does not stop a counter handing food over. The print is journalled like a bump.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">printer &middot; local<br>offline &middot; prints, journals</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listKitchenTickets &middot; setKitchenTicketStatus &middot; chaseStation &middot; markOrderCollected &middot; printOrderLabel</div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; stationId&larr;session <span style="color:#9AA5B6">(pass)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-007">KIT-007</a> &middot; <a href="#kit-008">KIT-008</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3F</span></div>
+      </div>
+    </div>
+
+    <div id="kit-007" data-screen-label="KIT-007" data-screen-id="KIT-007" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-007</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Guest Collection, Buzzer &amp; Digital Notification</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">the notification is not wired</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">The screen the guest reads, and the one behind the counter. Two operations declared: list the tickets, record the handover. The digital notification in the title has an operation elsewhere and no caller.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex">
+          <div style="flex:1;display:flex;flex-direction:column;min-width:0;border-right:1px solid #1D2733">
+            <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px"><span style="font-size:17px;font-weight:800;color:#fff">Guest-facing board</span><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6C8299">Bridge Kitchen counter</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:22px;padding:26px;min-height:0">
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#22A06B">ready to collect</div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:44px;font-weight:600;color:#fff;background:#16202B;border-radius:12px;padding:14px 24px">41</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:44px;font-weight:600;color:#fff;background:#16202B;border-radius:12px;padding:14px 24px">38</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:44px;font-weight:600;color:#fff;background:#16202B;border-radius:12px;padding:14px 24px">36</span>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:12px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:#6C8299">preparing</div>
+                <div style="display:flex;gap:14px;flex-wrap:wrap">
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;color:#8FA6BD;background:#101822;border-radius:12px;padding:12px 20px">42</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;color:#8FA6BD;background:#101822;border-radius:12px;padding:12px 20px">43</span>
+                  <span style="font-family:'IBM Plex Mono',monospace;font-size:34px;font-weight:600;color:#8FA6BD;background:#101822;border-radius:12px;padding:12px 20px">44</span>
+                </div>
+              </div>
+              <div style="margin-top:auto;font-size:15px;color:#6C8299;line-height:1.5">Numbers stay on the board for four minutes after collection, so somebody who looked away does not have to ask.</div>
+            </div>
+          </div>
+          <div style="flex:none;width:420px;display:flex;flex-direction:column">
+            <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;padding:0 20px"><span style="font-size:17px;font-weight:800;color:#fff">Handover</span></div>
+            <div style="flex:1;display:flex;flex-direction:column;gap:12px;padding:20px;min-height:0">
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:#fff">41</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#22A06B">ready 1:12</span></div>
+                <div style="font-size:15px;color:#fff">3× wrap · kiosk order</div>
+                <div style="font-size:13px;color:#8FA6BD">guest app · Sam O. · buzzer 41</div>
+                <span style="height:46px;border-radius:10px;background:#22A06B;color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800">Handed over</span>
+              </div>
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:9px">
+                <div style="display:flex;align-items:baseline;justify-content:space-between"><span style="font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:#fff">38</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#E0A03A">ready 6:40</span></div>
+                <div style="font-size:14px;color:#8FA6BD">1× fish, 1× salad · counter</div>
+                <div style="font-size:13px;color:#E0A03A">nobody has come · call again?</div>
+              </div>
+              <div style="margin-top:auto;padding:13px 15px;border-radius:11px;background:#101822;font-size:13px;color:#8FA6BD;line-height:1.55">A number that has sat ready for six minutes is the kitchen's problem, not the guest's. The prompt is drawn; the operation that would send it does not reach this screen.</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">Digital notification is in the name and not in the operations</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">sendOrderNotification</span> — <i>tell the guest where their order is</i> — is in the <span style="font-family:'IBM Plex Mono',monospace">fnb</span> contract and reaches no screen. This screen declares <span style="font-family:'IBM Plex Mono',monospace">listKitchenTickets</span> and <span style="font-family:'IBM Plex Mono',monospace">recordOrderHandover</span>. So the board lights up, the counter can record a handover, and nothing tells the guest holding a phone that their food is ready.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">contract has &middot; sendOrderNotification<br>screen has &middot; list + handover</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two audiences, one device</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">The guest half is read from across a room and holds numbers only — no names, no items, nothing that identifies who ordered what. The staff half sits behind the counter and carries the detail. Drawn as one screen because it is one screen; drawn split because they are read from different distances by different people.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">guest side &middot; numbers only<br>staff side &middot; items, guest, buzzer</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Handover is the record, not the buzzer</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">recordOrderHandover</span> closes the fulfilment journey on <a href="#kit-004">KIT-004</a> and is what a dispute is settled from later. A buzzer going quiet proves nothing.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">closes &middot; the journey<br>offline &middot; journalled</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; listKitchenTickets &middot; recordOrderHandover <span style="color:#B98900">(sendOrderNotification missing)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; <a href="#kit-006">KIT-006</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-004">KIT-004</a> &middot; <a href="#kit-006">KIT-006</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3G</span></div>
+      </div>
+    </div>
+
+    <div id="kit-008" data-screen-label="KIT-008" data-screen-id="KIT-008" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-008</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Exceptions, Re-Fire &amp; Unavailable Items</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FFF7E6;color:#8A6D00">reads HACCP, cannot act on it</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Eighty-sixing an item, re-firing a plate, and logging what went wrong. The one screen in this app that writes to food safety — and it can only read it.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff">Exceptions</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">3 items off · 2 re-fires tonight</span></div>
+            <span style="padding:7px 14px;border-radius:8px;background:#16202B;color:#22A06B;font-size:13px;font-weight:800">HACCP · all checks in window</span>
+          </div>
+          <div style="flex:1;display:flex;gap:18px;padding:20px 22px;min-height:0">
+            <div style="flex:1;display:flex;flex-direction:column;gap:14px;min-width:0">
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">off the menu · 86</div>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:11px;background:#16202B"><span style="flex:1;font-size:17px;font-weight:700;color:#fff">Sea bass</span><span style="font-size:14px;color:#8FA6BD">off since 19:02 · sold out</span><span style="padding:9px 16px;border-radius:9px;background:#1D2733;color:#9FB6CF;font-size:14px;font-weight:700">Back on</span></div>
+                  <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:11px;background:#16202B"><span style="flex:1;font-size:17px;font-weight:700;color:#fff">Chocolate tart</span><span style="font-size:14px;color:#8FA6BD">off since 18:40 · sold out</span><span style="padding:9px 16px;border-radius:9px;background:#1D2733;color:#9FB6CF;font-size:14px;font-weight:700">Back on</span></div>
+                  <div style="display:flex;align-items:center;gap:14px;padding:13px 15px;border-radius:11px;background:#16202B;border:1px solid #E0483A"><span style="flex:1;font-size:17px;font-weight:700;color:#fff">Mussels</span><span style="font-size:14px;color:#E0483A">off · quality, not stock</span><span style="padding:9px 16px;border-radius:9px;background:#1D2733;color:#6C8299;font-size:14px;font-weight:700">Locked</span></div>
+                </div>
+              </div>
+              <div style="display:flex;flex-direction:column;gap:11px">
+                <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">tonight's exceptions</div>
+                <div style="display:flex;flex-direction:column;gap:9px">
+                  <div style="padding:13px 15px;border-radius:11px;background:#16202B;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;gap:10px"><span style="font-size:16px;font-weight:700;color:#fff">T09 · steak re-fired</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#8FA6BD">19:21</span></div><div style="font-size:14px;color:#8FA6BD">sent back · cooked through, ordered rare</div></div>
+                  <div style="padding:13px 15px;border-radius:11px;background:#16202B;display:flex;flex-direction:column;gap:5px"><div style="display:flex;justify-content:space-between;gap:10px"><span style="font-size:16px;font-weight:700;color:#fff">T06 · wrong side</span><span style="font-family:'IBM Plex Mono',monospace;font-size:14px;color:#8FA6BD">18:52</span></div><div style="font-size:14px;color:#8FA6BD">fries for salad · replaced, no re-fire</div></div>
+                </div>
+              </div>
+              <div style="margin-top:auto"><span style="display:inline-flex;height:48px;padding:0 22px;align-items:center;border-radius:10px;background:#E0A03A;color:#0B0F14;font-size:16px;font-weight:800">Log an exception</span></div>
+            </div>
+            <div style="flex:none;width:330px;display:flex;flex-direction:column;gap:12px">
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:15px;font-weight:800;color:#fff">Food safety</div>
+                <div style="display:flex;flex-direction:column;gap:9px;font-size:14px;color:#8FA6BD">
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Fridge 1</span><span style="font-family:'IBM Plex Mono',monospace;color:#22A06B">3.2 °C</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Fridge 2</span><span style="font-family:'IBM Plex Mono',monospace;color:#22A06B">4.0 °C</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Hot hold</span><span style="font-family:'IBM Plex Mono',monospace;color:#E0A03A">63 °C</span></div>
+                  <div style="display:flex;justify-content:space-between;gap:10px"><span>Last check</span><span style="font-family:'IBM Plex Mono',monospace;color:#fff">18:00</span></div>
+                </div>
+                <div style="padding:11px 12px;border-radius:9px;background:#0B0F14;font-size:13px;color:#8FA6BD;line-height:1.5">Read-only here. Recording a corrective action is not something this screen can do.</div>
+              </div>
+              <div style="margin-top:auto;padding:13px 15px;border-radius:11px;background:#101822;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7E93A8;line-height:1.7">getHaccpStatus &middot; read<br>list86Events &middot; read<br>setItemAvailability &middot; write<br>logKitchenException &middot; write</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">A HACCP reading with nowhere to act</div>
+            <div style="font-size:11.5px;color:#5A4A20;line-height:1.6;text-wrap:pretty">The screen reads <span style="font-family:'IBM Plex Mono',monospace">getHaccpStatus</span>, and the three operations that follow a finding — <span style="font-family:'IBM Plex Mono',monospace">recordCorrectiveAction</span>, <span style="font-family:'IBM Plex Mono',monospace">escalateCorrectiveAction</span>, <span style="font-family:'IBM Plex Mono',monospace">closeCorrectiveAction</span> — reach no screen on any platform. Food safety was absent from 947 operations until CF-159 was raised off the client F&amp;B board; the operations exist now and the surface does not. A hot hold at 63 °C is exactly when somebody needs to record what they did about it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">CF-159 &middot; food safety, closed<br>no screen &middot; 3 corrective-action ops</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Sold out and not safe are different</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">An item off for stock comes back with one tap by whoever is on the station. An item off for quality is locked and cannot be restored from the kitchen display — that is a decision with a record attached, made by someone accountable for it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">stock &middot; reversible here<br>quality &middot; locked, needs authority</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">86 reaches every channel at once</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">setItemAvailability</span> takes the item off the guest app, the kiosk and every POS in the venue. It is the most consequential write on this device, and it is one tap because the alternative is a guest buying something that ran out ten minutes ago.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">reaches &middot; app, kiosk, POS<br>offline &middot; journalled, syncs first</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; list86Events &middot; getHaccpStatus &middot; setItemAvailability &middot; setKitchenTicketStatus &middot; logKitchenException <span style="color:#B98900">(corrective actions absent)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; ticketId&larr;<a href="#kit-002">KIT-002</a></div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-002">KIT-002</a> &middot; <a href="#kit-010">KIT-010</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3H</span></div>
+      </div>
+    </div>
+
+    <div id="kit-009" data-screen-label="KIT-009" data-screen-id="KIT-009" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-009</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">SLA, Priority &amp; Service Rules</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#FDEDED;color:#8A2020">writes venue settings, not kitchen SLA</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">How long a ticket may sit before it is late, and who jumps the queue. The targets on the left are what every amber and red on this board is measured against.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff">Service rules</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">Bridge Kitchen · this venue</span></div>
+            <div style="display:flex;gap:10px"><span style="padding:7px 14px;border-radius:8px;background:#1D2733;color:#9FB6CF;font-size:13px;font-weight:700">Cancel</span><span style="padding:7px 14px;border-radius:8px;background:#22A06B;color:#fff;font-size:13px;font-weight:800">Save</span></div>
+          </div>
+          <div style="flex:1;display:flex;gap:18px;padding:20px 22px;min-height:0">
+            <div style="flex:1;display:flex;flex-direction:column;gap:13px;min-width:0">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">how long before a ticket is late</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:11px;background:#16202B"><span style="flex:1;font-size:17px;font-weight:700;color:#fff">Starters</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#E0A03A">8 min</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#E0483A">12 min</span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:11px;background:#16202B"><span style="flex:1;font-size:17px;font-weight:700;color:#fff">Mains</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#E0A03A">14 min</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#E0483A">20 min</span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:11px;background:#16202B"><span style="flex:1;font-size:17px;font-weight:700;color:#fff">Counter &amp; kiosk</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#E0A03A">5 min</span><span style="font-family:'IBM Plex Mono',monospace;font-size:17px;color:#E0483A">8 min</span></div>
+                <div style="display:flex;align-items:center;gap:16px;padding:14px 16px;border-radius:11px;background:#101822"><span style="flex:1;font-size:17px;font-weight:700;color:#8FA6BD">Interval orders</span><span style="font-family:'IBM Plex Mono',monospace;font-size:15px;color:#6C8299">promise time governs</span></div>
+              </div>
+              <div style="display:flex;gap:22px;padding-top:6px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:#6C8299"><span><span style="color:#E0A03A">■</span> amber at</span><span><span style="color:#E0483A">■</span> red at</span></div>
+            </div>
+            <div style="flex:none;width:390px;display:flex;flex-direction:column;gap:13px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">who goes first</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-radius:11px;background:#16202B"><span style="font-size:16px;font-weight:700;color:#fff">Interval tables</span><span style="width:44px;height:24px;border-radius:14px;background:#22A06B;flex:none"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-radius:11px;background:#16202B"><span style="font-size:16px;font-weight:700;color:#fff">Accessible seating</span><span style="width:44px;height:24px;border-radius:14px;background:#22A06B;flex:none"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-radius:11px;background:#16202B"><span style="font-size:16px;font-weight:700;color:#fff">Re-fires</span><span style="width:44px;height:24px;border-radius:14px;background:#22A06B;flex:none"></span></div>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 15px;border-radius:11px;background:#101822"><span style="font-size:16px;font-weight:700;color:#8FA6BD">Members</span><span style="width:44px;height:24px;border-radius:14px;background:#2E4459;flex:none"></span></div>
+              </div>
+              <div style="margin-top:auto;padding:13px 15px;border-radius:11px;background:#101822;font-size:13px;color:#8FA6BD;line-height:1.55">Membership does not move food. It was asked for, and it is off by default: a kitchen queue that can be bought is a queue the room can see being bought.</div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#FEF7F7;border:1px solid #F5C9C9;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#8A2020">The right operation exists and is not the one declared</div>
+            <div style="font-size:11.5px;color:#8A2020;line-height:1.6;text-wrap:pretty"><span style="font-family:'IBM Plex Mono',monospace">setKitchenSla</span> — <i>how long a ticket may sit before it is late</i> — is in the <span style="font-family:'IBM Plex Mono',monospace">fnb</span> contract and reaches no screen. This screen declares <span style="font-family:'IBM Plex Mono',monospace">setVenueSettings</span> instead, which is a general venue write standing in for a specific one. The targets drawn here are the SLA; saving them through a generic settings call is how a kitchen threshold ends up somewhere nothing reads it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#A85252;line-height:1.7">declared &middot; setVenueSettings<br>correct &middot; setKitchenSla</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Two thresholds, not one</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Amber and red are set separately per course, because a kitchen wants warning before a promise is broken and not at the moment it breaks. Every colour on <a href="#kit-001">KIT-001</a> and <a href="#kit-002">KIT-002</a> resolves from these two numbers.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">amber &middot; warning<br>red &middot; late</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Priority is a policy here, an act there</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6"><span style="font-family:'IBM Plex Mono',monospace">prioritiseKitchenTicket</span> appears on this screen and on <a href="#kit-003">KIT-003</a>. Here it defines which categories always jump; there it moves one ticket tonight, attributed to whoever did it.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">rule &middot; this screen<br>one-off &middot; KIT-003</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; prioritiseKitchenTicket &middot; setVenueSettings <span style="color:#B98900">(setKitchenSla is the right one)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#0A4FB8">offline · amber, keeps working</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-001">KIT-001</a> &middot; <a href="#kit-003">KIT-003</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3J</span></div>
+      </div>
+    </div>
+
+    <div id="kit-010" data-screen-label="KIT-010" data-screen-id="KIT-010" style="display:flex;flex-direction:column;gap:13px;scroll-margin-top:24px">
+      <div>
+        <div style="display:flex;align-items:baseline;gap:9px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;color:#8494A8">KIT-010</span><span style="font-size:16.5px;font-weight:800;letter-spacing:-.015em">Kitchen Performance, AI &amp; Operational Optimization</span><span style="font-size:9px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;padding:2px 7px;border-radius:5px;background:#EDF3FF;color:#0A4FB8">the only screen that goes dark offline</span></div>
+        <div style="font-size:12px;color:#6B7280;margin-top:3px">Last night and last week, and a question box. Read after service by a head chef, not during it — which is why it is the one screen here that is allowed to need the network.</div>
+      </div>
+      <div style="width:1280px;height:880px;display:flex;flex-direction:column;gap:16px;padding:20px;background:#fff;border:1px solid #E3E8F0;border-radius:16px;box-shadow:0 16px 38px rgba(12,35,64,.09)">
+        <div style="flex:1;min-height:0;border-radius:12px;overflow:hidden;background:#0B0F14;display:flex;flex-direction:column">
+          <div style="flex:none;height:58px;border-bottom:1px solid #1D2733;display:flex;align-items:center;justify-content:space-between;padding:0 22px">
+            <div style="display:flex;align-items:baseline;gap:14px"><span style="font-size:19px;font-weight:800;color:#fff">Performance</span><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#6C8299">last night · Wed 3 Sep</span></div>
+            <span style="padding:7px 14px;border-radius:8px;background:#1D2733;color:#9FB6CF;font-size:13px;font-weight:700">7 days</span>
+          </div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:16px;padding:20px 22px;min-height:0">
+            <div style="flex:none;height:46px;border-radius:11px;background:#16202B;display:flex;align-items:center;gap:12px;padding:0 16px"><span style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:#6C8299">ask</span><span style="font-size:16px;color:#9FB6CF">which station made us late on Saturday?</span></div>
+            <div style="flex:none;display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">tickets</span><span style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;line-height:1;color:#fff">312</span></div>
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">avg to pass</span><span style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;line-height:1;color:#fff">11:40</span></div>
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">late</span><span style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;line-height:1;color:#E0A03A">14%</span></div>
+              <div style="background:#16202B;border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:6px"><span style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:#6C8299">re-fires</span><span style="font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;line-height:1;color:#fff">6</span></div>
+            </div>
+            <div style="flex:1;display:flex;gap:16px;min-height:0">
+              <div style="flex:1;background:#16202B;border-radius:12px;padding:17px 18px;display:flex;flex-direction:column;gap:13px;min-width:0">
+                <div style="font-size:15px;font-weight:800;color:#fff">Where the time went</div>
+                <div style="display:flex;flex-direction:column;gap:11px">
+                  <div style="display:flex;align-items:center;gap:14px"><span style="width:88px;font-size:14px;color:#8FA6BD">Accepted</span><div style="flex:1;height:14px;border-radius:8px;background:#0B0F14"><div style="width:6%;height:14px;border-radius:8px;background:#22A06B"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#fff;width:52px;text-align:right">0:14</span></div>
+                  <div style="display:flex;align-items:center;gap:14px"><span style="width:88px;font-size:14px;color:#8FA6BD">Waiting to fire</span><div style="flex:1;height:14px;border-radius:8px;background:#0B0F14"><div style="width:34%;height:14px;border-radius:8px;background:#E0A03A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#fff;width:52px;text-align:right">3:58</span></div>
+                  <div style="display:flex;align-items:center;gap:14px"><span style="width:88px;font-size:14px;color:#8FA6BD">Preparing</span><div style="flex:1;height:14px;border-radius:8px;background:#0B0F14"><div style="width:52%;height:14px;border-radius:8px;background:#6C8299"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#fff;width:52px;text-align:right">6:04</span></div>
+                  <div style="display:flex;align-items:center;gap:14px"><span style="width:88px;font-size:14px;color:#8FA6BD">At the pass</span><div style="flex:1;height:14px;border-radius:8px;background:#0B0F14"><div style="width:14%;height:14px;border-radius:8px;background:#E0483A"></div></div><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:#fff;width:52px;text-align:right">1:24</span></div>
+                </div>
+                <div style="margin-top:auto;font-size:13px;color:#8FA6BD;line-height:1.55">Four minutes of every ticket is spent waiting to be fired, which is a course-rule question rather than a cooking one.</div>
+              </div>
+              <div style="flex:none;width:330px;background:#16202B;border-radius:12px;padding:17px 18px;display:flex;flex-direction:column;gap:11px">
+                <div style="font-size:15px;font-weight:800;color:#fff">Suggested</div>
+                <div style="padding:12px 13px;border-radius:10px;background:#0B0F14;font-size:14px;color:#9FB6CF;line-height:1.5">Grill was over capacity for 40 minutes from 19:10. Two of the three wraps in that window could have gone to the pass station.</div>
+                <div style="padding:12px 13px;border-radius:10px;background:#0B0F14;font-size:14px;color:#9FB6CF;line-height:1.5">Dessert auto-fire on bump added 90 seconds to mains at four tables.</div>
+                <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7E93A8;line-height:1.7">suggestions &middot; not actions<br>every one names its evidence</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style="flex:none;height:222px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:12px">
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">The one screen that is honestly unavailable offline</div>
+            <div style="font-size:11.5px;color:#5A6577;line-height:1.6;text-wrap:pretty">Every other screen here journals and keeps working. This one says it cannot: <span style="font-family:'IBM Plex Mono',monospace">getDashboard</span> is an analytical read (ADR-0016) and there is nothing to cache that would still be true. Drawn as a stated unavailability rather than a stale dashboard, because a chef reading last night's numbers as tonight's is worse than a chef reading none.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">ADR-0016 &middot; analytical read<br>offline &middot; not available, stated</div>
+          </div>
+          <div style="background:#FFF7E6;border:1px solid #F0DFB8;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em;color:#5A4A20">askReportingQuestion is an AI call on a kitchen screen</div>
+            <div style="font-size:11px;color:#5A4A20;line-height:1.6">The same operation CF-78 covers: a natural-language query that calls a model and must write an <span style="font-family:'IBM Plex Mono',monospace">ai.interaction</span> record. On this device it also needs a tenant's AI licensing answer, because a kitchen display is not where anyone expects a model to be running.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8A6D00;line-height:1.7">CF-78 &middot; AI outside governance<br>also on &middot; SUP-008, many others</div>
+          </div>
+          <div style="background:#F7F9FC;border:1px solid #E8ECF3;border-radius:12px;padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+            <div style="font-size:12.5px;font-weight:800;letter-spacing:-.01em">Suggestions name their evidence</div>
+            <div style="font-size:11px;color:#5A6577;line-height:1.6">Each one states the window, the station and the number of tickets it is drawn from. A suggestion a chef cannot check is a suggestion a chef ignores, and nothing on this screen acts on its own.</div>
+            <div style="margin-top:auto;font-family:'IBM Plex Mono',monospace;font-size:10px;color:#8494A8;line-height:1.7">AI &middot; advisory only<br>no write &middot; nothing auto-applies</div>
+          </div>
+        </div>
+      </div>
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:10px;line-height:1.85;color:#7C8899">
+        <div><b style="color:#4A5566;font-weight:600">OPERATIONS</b> &middot; getDashboard &middot; askReportingQuestion <span style="color:#B98900">(CF-78 · ai.interaction)</span></div>
+        <div><b style="color:#4A5566;font-weight:600">STATES</b> &middot; loading &middot; emptyFirstRun &middot; emptyNoResults &middot; emptyNoAccess &middot; error &middot; <b style="color:#A81E1E">offline · not available</b></div>
+        <div><b style="color:#4A5566;font-weight:600">ARRIVES WITH</b> &middot; venueId&larr;session &middot; window&larr;screen state</div>
+        <div><b style="color:#4A5566;font-weight:600">GOES TO</b> &middot; <a href="#kit-001">KIT-001</a> &middot; <a href="#kit-005">KIT-005</a> &middot; <a href="#kit-009">KIT-009</a> &middot; <span style="border-bottom:1px dotted #C6CFDB" title="board not in this project">FNB-3K</span></div>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:12px;padding:14px 16px;background:#F2F7FD;border:1px solid #BBD8F5;border-radius:12px;font-size:12px;color:#194975;line-height:1.6">
+      <div style="width:3px;border-radius:2px;background:#1E5AA8;flex:none"></div>
+      <div><b>What this board found.</b> Five, and four of them are the same shape: <b>the operation the screen is named for exists in the contract and reaches no screen.</b> <span style="font-family:'IBM Plex Mono',monospace">rebalanceStationLoad</span> on <a href="#kit-005">KIT-005</a> <i>dynamic routing</i>; <span style="font-family:'IBM Plex Mono',monospace">sendOrderNotification</span> on <a href="#kit-007">KIT-007</a> <i>digital notification</i>; <span style="font-family:'IBM Plex Mono',monospace">setKitchenSla</span> on <a href="#kit-009">KIT-009</a> <i>SLA</i>, where <span style="font-family:'IBM Plex Mono',monospace">setVenueSettings</span> is declared instead; and the three HACCP corrective-action operations on <a href="#kit-008">KIT-008</a>, which reads food-safety status and cannot record what was done about it. All four sit in P15's own list of 31 operations with no screen — the gap table names them and nothing had put them beside the screen that wants them. Fifth: <a href="#kit-004">KIT-004</a> is called <i>management</i> and declares two reads, so either the name or the operations are wrong.</div>
+    </div>
+
+    <div style="margin-top:20px;padding-top:16px;border-top:1px solid #DCE3ED;display:flex;justify-content:space-between;font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:#8494A8">
+      <span>P15 Kitchen Display · 10 screens · 1 module · drawn 4 September 2026</span>
+      <span><a href="TICVAI%20Board%20Index.dc.html">board index</a></span>
+    </div>
+
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

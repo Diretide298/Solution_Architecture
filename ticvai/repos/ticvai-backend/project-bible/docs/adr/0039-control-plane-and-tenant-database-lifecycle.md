@@ -2,7 +2,10 @@
 
 **Status:** Accepted
 **Date:** 3 September 2026
-**Follows:** [ADR-0038](0038-cell-is-a-region-database-per-tenant.md), which said this home was the next ADR
+**Follows:** [ADR-0038](0038-cell-is-a-region-database-per-tenant.md), which said this home was the
+next ADR. **ADR-0038 is since amended by ADR-0040** — a region may hold more than one instance — and
+that reaches this ADR in one place: `control.cell_tenant` needs the instance as well as the
+database name before a second instance can exist.
 **Amends:** [ADR-0028](0028-service-decomposition.md) — the tenant template is the schema set minus `control`
 **Raises:** **CF-167** — where the control plane physically sits
 

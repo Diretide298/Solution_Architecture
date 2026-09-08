@@ -31,7 +31,7 @@ scale:
   flows: 94
   stateModels: 124
   events: 29
-  decisions: 40
+  decisions: 42
   requirements: 3184
   buildPercent: 0
 actors:

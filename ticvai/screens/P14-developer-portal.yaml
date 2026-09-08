@@ -116,7 +116,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/ApiReference.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-001
   notes: CF-135. **A portal over artefacts that already exist**, which is why this is frontend scope rather
     than a contract gap — the twelve domain-13 rows left open after the contract landed are all this screen
@@ -177,7 +178,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/OrganisationForm.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-002
   notes: '13.1.6 to 13.1.10. **The organisation administers its own people** — Softlabs maintaining every
     integrator''s staff list is Softlabs doing their HR.
@@ -254,7 +256,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/ClientList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-003
   notes: 'CF-135a. **The one credential model** — 2.7.52, 7.1.25 and 7.1.30 each asserted their own. **Rotation
     carries an overlap window and revocation does not**: one is hygiene, the other is what you reach for
@@ -336,7 +339,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/SandboxList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-004
   notes: 'Decisions D2 and D3. **One shared sandbox, synthetic data only** — which removes the PDPL and
     DESC exposure entirely. Tenant-specific validation runs on per-customer staging.
@@ -424,7 +428,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/WebhookList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-005
   notes: '13.1.26 to 13.1.30, 13.3.17 to 13.3.23. **The 29 events already existed and nothing outside
     could receive one.**
@@ -485,7 +490,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/UsageDashboard.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-006
   notes: '13.1.16 to 13.1.20 and 13.1.41 to 13.1.45. **One screen for five requirements, because they
     are one question asked five ways.**
@@ -545,7 +551,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/ListingList.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-007
   notes: '13.1.49 and 13.1.50, decision D1. **A listing, not an installation** — the integration runs
     on the developer''s own infrastructure, and third-party code does not execute inside TICVAI.
@@ -621,7 +628,8 @@ screens:
     component: apps/developer-portal-web/src/routes/developer/ProgrammeAdmin.tsx
     status: notStarted
   wireframe:
-    status: generated
+    status: notStarted
+    provenance: generated
     board: wireframes/P14 Developer.dc.html#dev-008
   notes: '**`DEVELOPER_ADMIN` throughout, and never shown to a developer.** Decision D5 makes the commercial
     model configuration rather than code — this is the surface, and the rates themselves remain CF-135c.

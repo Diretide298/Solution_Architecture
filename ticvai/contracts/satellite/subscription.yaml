@@ -2877,7 +2877,7 @@ paths:
     get:
       operationId: listMembershipAnnualPass
       x-ticvai-consumed-by:
-        - P08 BO-284 Membership & Annual Pass Command Center
+        - "P08 BO-284 Membership & Annual Pass Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2915,7 +2915,7 @@ paths:
     put:
       operationId: setMembershipProductTier
       x-ticvai-consumed-by:
-        - P08 BO-285 Membership Product & Tier Builder
+        - "P08 BO-285 Membership Product & Tier Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2957,7 +2957,7 @@ paths:
     put:
       operationId: setMembershipEligibilityQualification
       x-ticvai-consumed-by:
-        - P08 BO-286 Membership Eligibility & Qualification Rule Builder
+        - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -2999,7 +2999,7 @@ paths:
     put:
       operationId: setValidityActivationExpiry
       x-ticvai-consumed-by:
-        - P08 BO-287 Validity, Activation & Expiry Configuration
+        - "P08 BO-287 Validity, Activation & Expiry Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3041,7 +3041,7 @@ paths:
     put:
       operationId: setMembershipEntitlementAdmission
       x-ticvai-consumed-by:
-        - P08 BO-288 Membership Entitlement & Admission Benefit Builder
+        - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3083,7 +3083,7 @@ paths:
     get:
       operationId: listMembershipUsageVisit
       x-ticvai-consumed-by:
-        - P08 BO-289 Membership Usage, Visit & Consumption Rules
+        - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3122,7 +3122,7 @@ paths:
     put:
       operationId: setFamilyHouseholdDependent
       x-ticvai-consumed-by:
-        - P08 BO-290 Family, Household & Dependent Membership Configuration
+        - "P08 BO-290 Family, Household & Dependent Membership Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3164,7 +3164,7 @@ paths:
     get:
       operationId: listMembershipCommercialPricing
       x-ticvai-consumed-by:
-        - P08 BO-291 Membership Commercial, Pricing & Channel Association
+        - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3202,7 +3202,7 @@ paths:
     put:
       operationId: setRenewalAutoMembership
       x-ticvai-consumed-by:
-        - P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration
+        - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3244,7 +3244,7 @@ paths:
     put:
       operationId: approveMembershipProductValidation
       x-ticvai-consumed-by:
-        - P08 BO-293 Membership Product Validation, Approval, Publication & Versioning
+        - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3286,7 +3286,7 @@ paths:
     get:
       operationId: listMember
       x-ticvai-consumed-by:
-        - P08 BO-294 Member Operations Command Center
+        - "P08 BO-294 Member Operations Command Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3373,7 +3373,7 @@ paths:
     put:
       operationId: setMemberMembershipAccount
       x-ticvai-consumed-by:
-        - P08 BO-295 Member 360° Membership Account Workspace
+        - "P08 BO-295 Member 360° Membership Account Workspace"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3416,7 +3416,7 @@ paths:
     get:
       operationId: listMembershipActivationCredential
       x-ticvai-consumed-by:
-        - P08 BO-296 Membership Activation, Assignment & Credential Management
+        - "P08 BO-296 Membership Activation, Assignment & Credential Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3454,7 +3454,7 @@ paths:
     get:
       operationId: listVisitAdmissionEntitlement
       x-ticvai-consumed-by:
-        - P08 BO-297 Visit, Admission & Entitlement Usage Monitor
+        - "P08 BO-297 Visit, Admission & Entitlement Usage Monitor"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3492,7 +3492,7 @@ paths:
     get:
       operationId: listMembershipFreezeSuspension
       x-ticvai-consumed-by:
-        - P08 BO-298 Membership Freeze, Suspension & Reactivation Management
+        - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3530,7 +3530,7 @@ paths:
     get:
       operationId: listMembershipUpgradeDowngrade
       x-ticvai-consumed-by:
-        - P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations
+        - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3568,7 +3568,7 @@ paths:
     get:
       operationId: listRenewalAuto
       x-ticvai-consumed-by:
-        - P08 BO-300 Renewal Operations & Auto-Renewal Management
+        - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3606,7 +3606,7 @@ paths:
     get:
       operationId: listMemberExceptionOverride
       x-ticvai-consumed-by:
-        - P08 BO-301 Member Exceptions, Overrides & Service Recovery
+        - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3644,7 +3644,7 @@ paths:
     get:
       operationId: listMemberLifecycleCase
       x-ticvai-consumed-by:
-        - P08 BO-302 Member Lifecycle History, Audit & Case Timeline
+        - "P08 BO-302 Member Lifecycle History, Audit & Case Timeline"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3682,7 +3682,7 @@ paths:
     get:
       operationId: listMembershipRenewalRetention
       x-ticvai-consumed-by:
-        - P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center
+        - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
       x-ticvai-audience:
         - staff
       x-ticvai-provisional: true
@@ -3769,7 +3769,7 @@ paths:
     get:
       operationId: listPartner
       x-ticvai-consumed-by:
-        - P10 PTR-022 Partner Management Command Center
+        - "P10 PTR-022 Partner Management Command Center"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -3844,7 +3844,7 @@ paths:
     put:
       operationId: setPartnerProfileOrganization
       x-ticvai-consumed-by:
-        - P10 PTR-023 Partner Profile & Organization Setup
+        - "P10 PTR-023 Partner Profile & Organization Setup"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -3886,7 +3886,7 @@ paths:
     get:
       operationId: listPartnerOnboardingApplication
       x-ticvai-consumed-by:
-        - P10 PTR-024 Partner Onboarding & Application Workflow
+        - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -3924,7 +3924,7 @@ paths:
     get:
       operationId: listPartnerContactUser
       x-ticvai-consumed-by:
-        - P10 PTR-025 Partner Contacts & User Administration
+        - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -3962,7 +3962,7 @@ paths:
     get:
       operationId: listTerritoryMarketDistribution
       x-ticvai-consumed-by:
-        - P10 PTR-026 Territory, Market & Distribution Rights
+        - "P10 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4000,7 +4000,7 @@ paths:
     put:
       operationId: setPartnerBrandVenue
       x-ticvai-consumed-by:
-        - P10 PTR-027 Partner Brand, Venue & Business Scope Assignment
+        - "P10 PTR-027 Partner Brand, Venue & Business Scope Assignment"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4043,7 +4043,7 @@ paths:
     get:
       operationId: listPartnerDocumentationCompliance
       x-ticvai-consumed-by:
-        - P10 PTR-028 Partner Documentation & Compliance Repository
+        - "P10 PTR-028 Partner Documentation & Compliance Repository"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4081,7 +4081,7 @@ paths:
     get:
       operationId: listPartnerAccessRole
       x-ticvai-consumed-by:
-        - P10 PTR-029 Partner Access, Roles & Permission Profile
+        - "P10 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4119,7 +4119,7 @@ paths:
     put:
       operationId: approvePartnerStatuLifecycle
       x-ticvai-consumed-by:
-        - P10 PTR-030 Partner Approval, Status & Lifecycle Management
+        - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4161,7 +4161,7 @@ paths:
     get:
       operationId: listPartnerProfileReadiness
       x-ticvai-consumed-by:
-        - P10 PTR-031 Partner 360° Profile, Readiness & AI Review
+        - "P10 PTR-031 Partner 360° Profile, Readiness & AI Review"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4200,7 +4200,7 @@ paths:
     get:
       operationId: listCommercialAgreement
       x-ticvai-consumed-by:
-        - P10 PTR-032 Commercial Agreement Command Center
+        - "P10 PTR-032 Commercial Agreement Command Center"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4288,7 +4288,7 @@ paths:
     put:
       operationId: setAgreementContractTerm
       x-ticvai-consumed-by:
-        - P10 PTR-033 Agreement & Contract Terms Builder
+        - "P10 PTR-033 Agreement & Contract Terms Builder"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4330,7 +4330,7 @@ paths:
     put:
       operationId: setPartnerRateNet
       x-ticvai-consumed-by:
-        - P10 PTR-034 Partner Rate & Net Pricing Configuration
+        - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4372,7 +4372,7 @@ paths:
     get:
       operationId: listCommissionMarginIncentive
       x-ticvai-consumed-by:
-        - P10 PTR-035 Commission, Margin & Incentive Management
+        - "P10 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4410,7 +4410,7 @@ paths:
     get:
       operationId: listCreditLimitExposure
       x-ticvai-consumed-by:
-        - P10 PTR-036 Credit Limit & Exposure Management
+        - "P10 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4449,7 +4449,7 @@ paths:
     get:
       operationId: listDepositGuaranteeFinancial
       x-ticvai-consumed-by:
-        - P10 PTR-037 Deposit, Guarantee & Financial Security Management
+        - "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4487,7 +4487,7 @@ paths:
     put:
       operationId: setPaymentTermBilling
       x-ticvai-consumed-by:
-        - P10 PTR-038 Payment Terms, Billing & Account Configuration
+        - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4529,7 +4529,7 @@ paths:
     get:
       operationId: listCommercialAllocationQuota
       x-ticvai-consumed-by:
-        - P10 PTR-039 Commercial Allocation, Quota & Commitment Management
+        - "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4567,7 +4567,7 @@ paths:
     put:
       operationId: approveBookingLimitCommercial
       x-ticvai-consumed-by:
-        - P10 PTR-040 Booking Limits, Commercial Exceptions & Approval
+        - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4609,7 +4609,7 @@ paths:
     get:
       operationId: listCommercialAgreementHealth
       x-ticvai-consumed-by:
-        - P10 PTR-041 Commercial Agreement 360°, Health & AI Review
+        - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4647,7 +4647,7 @@ paths:
     get:
       operationId: listPartner2
       x-ticvai-consumed-by:
-        - P10 PTR-042 Partner Operations Command Center
+        - "P10 PTR-042 Partner Operations Command Center"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4716,7 +4716,7 @@ paths:
     get:
       operationId: listPartnerOrderBooking
       x-ticvai-consumed-by:
-        - P10 PTR-043 Partner Orders & Booking Management
+        - "P10 PTR-043 Partner Orders & Booking Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4803,7 +4803,7 @@ paths:
     get:
       operationId: listReservationHoldRelease
       x-ticvai-consumed-by:
-        - P10 PTR-044 Reservations, Holds & Release Management
+        - "P10 PTR-044 Reservations, Holds & Release Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4842,7 +4842,7 @@ paths:
     get:
       operationId: listPartnerCancellationRefund
       x-ticvai-consumed-by:
-        - P10 PTR-045 Partner Cancellations, Refunds & Amendments
+        - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4880,7 +4880,7 @@ paths:
     get:
       operationId: listPartnerStatementAccount
       x-ticvai-consumed-by:
-        - P10 PTR-046 Partner Statement & Account Activity
+        - "P10 PTR-046 Partner Statement & Account Activity"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4918,7 +4918,7 @@ paths:
     get:
       operationId: listPartnerReconciliationException
       x-ticvai-consumed-by:
-        - P10 PTR-047 Partner Reconciliation & Exception Management
+        - "P10 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4956,7 +4956,7 @@ paths:
     get:
       operationId: listCommissionCalculationSettlement
       x-ticvai-consumed-by:
-        - P10 PTR-048 Commission Calculation & Settlement Management
+        - "P10 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -4994,7 +4994,7 @@ paths:
     get:
       operationId: listPartnerDisputeCase
       x-ticvai-consumed-by:
-        - P10 PTR-049 Partner Disputes, Cases & Service Management
+        - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -5032,7 +5032,7 @@ paths:
     get:
       operationId: listPartnerPerformanceScorecard
       x-ticvai-consumed-by:
-        - P10 PTR-050 Partner Performance Scorecard & Risk Monitoring
+        - "P10 PTR-050 Partner Performance Scorecard & Risk Monitoring"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -5070,7 +5070,7 @@ paths:
     get:
       operationId: listPartnerRelationship
       x-ticvai-consumed-by:
-        - P10 PTR-051 Partner AI Intelligence & Relationship Optimization
+        - "P10 PTR-051 Partner AI Intelligence & Relationship Optimization"
       x-ticvai-audience:
         - partner
       x-ticvai-provisional: true
@@ -6494,6 +6494,67 @@ components:
             **A claim that a question cannot affect your artefact is the one most likely to be left
             standing after it does**, which is why the correction is recorded here rather than the sentence
             simply deleted.'
+    CellInstance:
+      x-ticvai-persistence: control.cell_instance
+      description: 'One Postgres instance serving a cell. **A cell is a region and a region may be served
+        by more than one instance** (ADR-0040), so the instance is a thing a cell has rather than a thing
+        it is.
+
+
+        **This exists because a database name stopped being an address.** `CellTenant.databaseName` was
+        complete while a cell had one instance; with several, the router has to be told which host holds
+        the database, and guessing is the failure mode ADR-0042 was written to remove.
+
+
+        **Every instance of a cell is in that cell''s region.** Residency is a property of the cell, and
+        adding instances does not weaken it — which is why there is no country code here.
+
+        '
+      type: object
+      required:
+      - id
+      - cellId
+      - name
+      - status
+      properties:
+        id:
+          type: string
+          format: uuid
+        cellId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: 'Unique within the cell. The host a service connects to, and stable across
+            restores — an instance rebuilt from a backup keeps its name, because the tenants pointing at
+            it did not move.'
+        status:
+          type: string
+          enum:
+          - provisioning
+          - live
+          - draining
+          - retired
+          description: '`draining` takes no new tenants and still serves the ones it has. **Placement and
+            liveness are different questions** — an instance being emptied is not an instance being
+            down, and collapsing them would either strand its tenants or send new ones to a host that is
+            being retired.'
+        maxConnections:
+          type: integer
+          nullable: true
+          description: 'The instance''s own `max_connections`. **Read rather than assumed**, because the
+            placement rule in ADR-0042 measures headroom as a fraction of it and instances in one region
+            need not be the same size.'
+        createdAt:
+          type: string
+          format: date-time
+          nullable: true
+        retiredAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: 'Set rather than the row deleted, for the reason `CellTenant.droppedAt` is: a
+            migration run records the host it touched by name, and that record has to stay readable.'
     CellTenant:
       x-ticvai-persistence: control.cell_tenant
       description: 'Which tenants a cell holds, and the database each one is. **The relation that replaced
@@ -6511,6 +6572,7 @@ components:
       - id
       - cellId
       - tenantId
+      - instanceId
       - databaseName
       - status
       properties:
@@ -6523,6 +6585,21 @@ components:
         tenantId:
           type: string
           format: uuid
+        instanceId:
+          type: string
+          format: uuid
+          description: 'Which instance of the cell holds this database. **Required, not nullable** — a
+            cell with one instance still names it, because a column that is only populated once there
+            are two is a column every reader has to guess about. **`cellId` and `instanceId` together
+            are the address**; the database name alone has not been one since ADR-0040.'
+        pinnedInstance:
+          type: boolean
+          default: false
+          description: 'True where this tenant was placed by hand and the balancer must leave it. The
+            override in ADR-0042''s **emptiest-first with a pin** — a dedicated client is buying a quiet
+            neighbour, and a rule that can silently rebalance them has sold something it does not
+            deliver. **A pin survives migration**: moving a pinned tenant is an operator decision, never
+            a placement one.'
         databaseName:
           type: string
           description: 'Unique within the cell. Derived from the tenant''s stable code, never from its

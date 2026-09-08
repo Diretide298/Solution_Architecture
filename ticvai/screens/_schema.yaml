@@ -63,7 +63,13 @@ properties:
       type: object
       required: [id, name, module, wave, states]
       properties:
-        id: { type: string, pattern: '^[A-Z]{3}-[0-9]{3}$' }
+        # **Two or three letters, not three.** This read `{3}` until 8 September, which **all 363
+        # `BO-` screens failed** — a third of the package outside its own schema, on the field
+        # every other artefact keys on. Nothing validated it, which is the same reason the
+        # `wireframe` block drifted: a schema nothing reads is a document, not a constraint.
+        # Widened to describe the prefixes that exist rather than renaming 363 screens, because
+        # the id is what `board-data.js`, the traceability map and every board anchor join on.
+        id: { type: string, pattern: '^[A-Z]{2,3}-[0-9]{3}$' }
         name: { type: string }
         module: { type: string }
         requiresModule:
@@ -214,8 +220,52 @@ properties:
             notes: { type: string }
         wireframe:
           type: object
+          # **This block described four fields and carried seven.** Until 8 September `status`
+          # was the only declared one with an enum, and **not one of the 1,091 screens held a
+          # legal value** — 958 read `generated` and 133 `designed`, neither in the enum, and
+          # nothing validated it. `board`, `workshopBoard`, `source`, `note`,
+          # `generatedFallback` and `derivedFrom` were not declared at all.
+          #
+          # The defect underneath was **one field carrying intent and fact**. `generated` and
+          # `designed` say how a frame came to exist; they are not places in a review workflow,
+          # and putting them in `status` left four consumers reading four different numbers off
+          # it — 0, 1091, 133 and a permanent 0.
+          #
+          # **`status` is intent. `provenance` is fact.** Neither is coverage: coverage is the
+          # board join, and no field here should be read as a substitute for it.
+          additionalProperties: false
           properties:
-            status: { type: string, enum: [notStarted, inProgress, review, approved] }
+            status:
+              type: string
+              enum: [notStarted, inProgress, review, approved]
+              description: >
+                **Where this screen has reached in the design workflow, and nothing else.**
+                Hand-set. `notStarted` is the honest default and is not a claim that no frame
+                exists — a generated frame is a frame nobody has reviewed.
+            provenance:
+              type: string
+              enum: [generated, designed]
+              description: >
+                **How the frame came to exist.** `generated` is the tool's output from the
+                screen's own name and operations; `designed` is a frame a person drew. A
+                generated frame agreeing with the operation it was generated from is not
+                corroboration.
+            board:
+              type: string
+              description: The frame this screen renders as, as `<board file>#<anchor>`.
+            workshopBoard:
+              type: string
+              description: The workshop frame this screen was drawn on, where one exists.
+            generatedFallback:
+              type: string
+              description: >
+                The generated frame kept alongside a drawn one, so a board that stops opening
+                does not take the screen's only frame with it.
+            derivedFrom:
+              type: string
+              description: The frame this screen's layout was taken from, where it reuses another.
+            source: { type: string }
+            note: { type: string }
             figmaNodeId: { type: string }
             owner: { type: string }
         notes: { type: string }
