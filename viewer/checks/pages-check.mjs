@@ -52,6 +52,12 @@ const PAGES = [
   // reviewer gets a sentence explaining what it is instead, which is a
   // different assertion and belongs in the client harness rather than here.
   '/audit.html',
+  // Everybody's page, not an admin's — one person's OpenProject credential,
+  // their git identity and the bridge line. Added here on the day it was built,
+  // because `/platforms.html` sat outside this list long enough to stop being
+  // an orphan without anyone noticing, and that is the failure this list exists
+  // to prevent.
+  '/settings.html',
 ];
 
 let pass = 0, fail = 0;

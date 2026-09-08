@@ -80,6 +80,11 @@ ADMIN_EMAIL=""
 # splits on commas -- so an origin that does not resolve yet is simply never
 # sent and costs nothing, while the day adam's record exists it already works.
 PUBLIC_ORIGIN="${PUBLIC_ORIGIN-https://adam.ainfinite.ai,https://aster.ainfinite.ai}"
+
+# Where the credential-encryption key lives on the box. Outside the checkout, so
+# a `git pull` cannot touch it and a clone of the repo does not carry it; 0600
+# and owned by root, so the file is as private as the database it protects.
+SECRET_FILE="${SECRET_FILE-/etc/ticvai/secret.key}"
 COOKIE_DOMAIN="${COOKIE_DOMAIN-.ainfinite.ai}"
 SECURE_COOKIE="${SECURE_COOKIE-1}"
 
@@ -281,21 +286,29 @@ fi
 # without it comes up perfectly healthy and then raises the first time somebody
 # posts the spreadsheet — a feature that 500s on a machine where nobody changed
 # anything, which is the failure this line exists to prevent.
+#
+# cryptography is the per-account credentials (api/secrets.py). It fails harder
+# than python-multipart and is therefore easier to catch: secrets.py imports
+# Fernet at module load, so a venv without it means uvicorn does not start at
+# all rather than a feature raising later. It was present on the workstation as
+# somebody else's transitive dependency, which is not the same as being depended
+# on — a resolver that stops pulling it in takes the whole service down.
 "$APP_DIR/.venv/bin/pip" install -q fastapi "uvicorn[standard]" argon2-cffi \
-  openpyxl python-multipart
+  openpyxl python-multipart cryptography
 chown -R "$APP_USER:$APP_USER" "$APP_DIR/.venv"
 
 # Asserted rather than assumed, for the same reason the gate and the cookie
 # domain are asserted further down: a missing import here is invisible until an
 # admin uploads a file, and by then the deploy has been declared done.
-"$APP_DIR/.venv/bin/python" - <<'PYCHECK' || die "the venv is missing openpyxl or python-multipart — the decisions upload would fail at request time"
+"$APP_DIR/.venv/bin/python" - <<'PYCHECK' || die "the venv is missing openpyxl, python-multipart or cryptography — the first two fail at request time, the third stops the service starting at all"
 import importlib.util, sys
 # "multipart" and not "python-multipart": the distribution is named one thing
 # and the module it installs another, and find_spec asks about the module.
-missing = [m for m in ("openpyxl", "multipart") if not importlib.util.find_spec(m)]
+missing = [m for m in ("openpyxl", "multipart", "cryptography")
+           if not importlib.util.find_spec(m)]
 sys.exit(1 if missing else 0)
 PYCHECK
-note "openpyxl and python-multipart are in the venv"
+note "openpyxl, python-multipart and cryptography are in the venv"
 
 # ── the store ───────────────────────────────────────────────────────────────
 say "Database"
@@ -316,6 +329,42 @@ else
   note "created, with $ADMIN_EMAIL as the first admin"
 fi
 chown "$APP_USER:$APP_USER" "$DB"
+
+# ── the credential key ──────────────────────────────────────────────────────
+say "Credential key"
+
+# Generated once and never again. Regenerating it would not lose the rows in
+# `account_secret` — it would leave them there, undecryptable, and the symptom
+# is every developer's OpenProject token failing at once with nothing in the
+# logs to say why. So this creates the file if it is absent and otherwise reads
+# what is already there, and never overwrites.
+#
+# Generated into a temporary file first, checked, and only then moved into
+# place. A pipe straight into the destination creates the file whatever happens
+# — so a python that fails leaves an empty key behind, and because this block
+# never overwrites an existing file, every later run then reads that empty file,
+# fails the check below, and dies. A first run that half-worked would poison the
+# box until somebody deleted the file by hand.
+#
+# `umask 077` before the redirect, so the temporary file is 600 from the moment
+# it exists rather than being created world-readable and chmodded after. `mv` on
+# the same filesystem is atomic, so there is never a partial key at the real
+# path either.
+if [[ ! -f "$SECRET_FILE" ]]; then
+  install -d -m 700 "$(dirname "$SECRET_FILE")"
+  SECRET_TMP="$SECRET_FILE.new.$$"
+  ( umask 077
+    "$APP_DIR/.venv/bin/python" -c \
+      'from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())' \
+      > "$SECRET_TMP" ) || { rm -f "$SECRET_TMP"; die "could not generate a credential key — is cryptography in the venv?"; }
+  [[ -s "$SECRET_TMP" ]] || { rm -f "$SECRET_TMP"; die "the generated credential key was empty"; }
+  mv "$SECRET_TMP" "$SECRET_FILE"
+  note "generated $SECRET_FILE — back it up; losing it makes every stored credential unreadable"
+else
+  note "using the existing $SECRET_FILE"
+fi
+SECRET_KEY="$(cat "$SECRET_FILE")"
+[[ -n "$SECRET_KEY" ]] || die "$SECRET_FILE is empty. Remove it and re-run to generate one."
 
 # ── pm2 ─────────────────────────────────────────────────────────────────────
 say "Processes"
@@ -344,6 +393,15 @@ module.exports = {
         TICVAI_ORIGINS: '$PUBLIC_ORIGIN',
         TICVAI_COOKIE_DOMAIN: '$COOKIE_DOMAIN',
         TICVAI_SECURE_COOKIE: '$SECURE_COOKIE',
+        // What the per-account OpenProject credentials are encrypted with.
+        // Generated once on the box and kept in $SECRET_FILE, deliberately NOT
+        // in this repository and not in the database it protects — a key stored
+        // beside its ciphertext is a longer way of writing plaintext.
+        //
+        // Absent, the settings page says so and refuses to store a credential.
+        // That is the intended failure: there is no default key, because a
+        // default key is the one that ships.
+        TICVAI_SECRET_KEY: '$SECRET_KEY',
       },
       autorestart: true,
       max_restarts: 20,
@@ -367,6 +425,16 @@ module.exports = {
 };
 CONFIG
 chown "$APP_USER:$APP_USER" "$APP_DIR/ecosystem.config.cjs"
+# **0600, because this file now carries TICVAI_SECRET_KEY in the clear.**
+#
+# `cat >` creates at the umask default, which is 644 on a normal box — so
+# without this line the credential-encryption key is readable by every local
+# user, and the 0600 on /etc/ticvai/secret.key protects nothing. A secret is
+# only as private as its most public copy.
+#
+# The owner is the service account rather than root because pm2 runs as that
+# account and has to read this file to start anything.
+chmod 600 "$APP_DIR/ecosystem.config.cjs"
 
 # startOrRestart, not start. `pm2 start` on an app that is already online is a
 # no-op — it says "already launched" and returns 0 — so a redeploy would copy

@@ -337,6 +337,20 @@ export const setAccountRole = (id, role) =>
 export const changePassword = (current, replacement) =>
   call('/api/auth/password', { method: 'POST', body: { current, replacement } });
 
+// ---- what a developer configures about themselves -------------------------
+// The settings page. `mySettings` never returns a stored credential — only
+// whether there is one and its last four characters — so nothing here can leak
+// a token into a page even by accident.
+export const mySettings = () => call('/api/settings/me');
+export const saveGitIdentity = (gitEmail) =>
+  call('/api/settings/git-identity', { method: 'PUT', body: { git_email: gitEmail } });
+// Checked against the OpenProject instance server-side before it is kept, so a
+// resolved promise here means the token actually works.
+export const saveOpenProjectToken = (token, endpoint) =>
+  call('/api/settings/openproject', { method: 'PUT', body: { token, endpoint } });
+export const forgetOpenProjectToken = () =>
+  call('/api/settings/openproject', { method: 'DELETE' });
+
 export async function refreshSession() {
   try {
     const data = await call('/api/auth/me');

@@ -1129,6 +1129,14 @@
                client asking what a flash sale costs to run is asking this. -->
           <a class="auth-button auth-button-quiet" href="/?layer=cicd&amp;mode=cicd-burst">Flash sale — what an environment runs</a>
 
+          <!-- Everybody's, not an admin's: it holds one person's own OpenProject
+               token, their git identity and the line that wires up the bridge.
+               Outside `#account-admin` deliberately — a reviewer configuring
+               their own credential is not an administrative act, and putting it
+               behind the admin flag would mean only admins could use the PMS as
+               themselves, which is the opposite of the point. -->
+          <a class="auth-button auth-button-quiet" href="/settings.html">Your settings — OpenProject, git identity, the bridge</a>
+
           <!-- admin only: the door to everything about accounts -->
           <div id="account-admin" hidden>
             <p class="auth-note auth-fine">

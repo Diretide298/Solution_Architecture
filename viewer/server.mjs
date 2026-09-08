@@ -21,6 +21,7 @@ import http from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { watch } from 'node:fs';
 import { gzipSync } from 'node:zlib';
+import { createHash } from 'node:crypto';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { buildIndex } from './lib/indexer.mjs';
@@ -104,7 +105,7 @@ const API_META = API_PUBLIC
  * `session` was in here and is the reason /api/session was 404ing.
  */
 const API_ROUTES =
-  /^\/(api\/(auth|accounts|invites|reset|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
+  /^\/(api\/(auth|accounts|invites|reset|settings|links|work-packages|board|validation|verdicts|mentions|mentionable|health)(\/|$)|docs|openapi\.json)/;
 
 /**
  * Hand a request to the accounts service and give its answer back unchanged.
@@ -628,13 +629,40 @@ function sendCachedJson(res, req, cache, key, value) {
     // A thunk, so a filtered variant is built once on the miss rather than
     // rebuilt on every hit and then thrown away.
     const body = Buffer.from(JSON.stringify(typeof value === 'function' ? value() : value));
-    entry = { body, packed: gzipSync(body) };
+    // Hashed here, with the one buffering that already happens, because this
+    // cache is cleared on every rebuild — so a digest computed now is valid for
+    // exactly as long as the entry is.
+    entry = { body, packed: gzipSync(body), etag: `"${createHash('sha1').update(body).digest('base64url')}"` };
     cache.set(key, entry);
   }
   const wants = /\bgzip\b/.test(req.headers['accept-encoding'] ?? '');
+
+  // A validator, so a client holding the last answer can ask whether it still
+  // holds. There was none, and the cost fell on whoever cached: the MCP bridge
+  // re-downloaded 1.9 MB of index to look up one contract, silently — the
+  // answers were right and only slow.
+  //
+  // `Cache-Control: no-store` stays exactly as it was. It is deliberate: these
+  // payloads are gated package data and they do not belong in a browser's disk
+  // cache on a shared machine. A browser told `no-store` keeps nothing and so
+  // never sends `If-None-Match`, which means this changes nothing about the
+  // browser's behaviour. It is for a client that manages its own cache in
+  // memory and asks the question out loud.
+  //
+  // Weak or strong matters here: the ETag is of the *identity* body, and the
+  // gzip and plain forms of one entry share it. That is correct for a
+  // conditional request — `Vary: Accept-Encoding` already keeps the two
+  // representations apart — and it means a client that switches encodings does
+  // not lose its cache.
+  if (req.headers['if-none-match'] === entry.etag) {
+    res.writeHead(304, { ETag: entry.etag, 'Cache-Control': 'no-store', Vary: 'Accept-Encoding' });
+    return res.end();
+  }
+
   res.writeHead(200, {
     'Content-Type': MIME['.json'],
     'Cache-Control': 'no-store',
+    ETag: entry.etag,
     Vary: 'Accept-Encoding',
     ...(wants ? { 'Content-Encoding': 'gzip' } : {}),
   });

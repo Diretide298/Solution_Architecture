@@ -194,6 +194,88 @@ CREATE TABLE IF NOT EXISTS account_project (
   PRIMARY KEY (account_id, project_id)
 );
 CREATE INDEX IF NOT EXISTS account_project_by_project ON account_project(project_id, role);
+
+-- A credential this service holds on somebody's behalf, encrypted.
+--
+-- **Its own table, not a column on `account`.** Every other secret here is a
+-- one-way hash; this one has to be usable later, as a token, so it is stored
+-- reversibly. Keeping it out of the account row means the many places that read
+-- an account — sign-in, the roster, `/auth/me`, every JOIN above — cannot carry
+-- it out by accident. Reaching it takes naming this table on purpose.
+--
+-- `ciphertext` is Fernet, and the key is in the environment and never in here:
+-- a stolen copy of this file is inert without it. See api/secrets.py.
+--
+-- `hint` is the last four characters in the clear, which is what a person is
+-- shown so they can recognise which token they pasted. Never the token.
+--
+-- `kind` rather than a column per system, because the second credential is
+-- coming — this is the shape that does not need another migration for it.
+-- Which artefact a piece of scheduled work is about.
+--
+-- **This is the only thing the bridge stores about work, and it is the only
+-- thing nothing else can say.** OpenProject holds the work packages — 23 epics,
+-- 444 features, 2,173 tasks — and it is perfectly good at that. What it cannot
+-- express is that WP #1841 is about screen `BO-102`, table `access.entitlement`
+-- and `AccessService`, because it knows nothing about the package. The package
+-- knows those names and nothing about the schedule. This table is the join, and
+-- building anything else here would be recommitting CF-124: two independent
+-- plans over the same work, neither referencing the other.
+--
+-- No id of our own for the work: `external_key` is OpenProject's number and
+-- stays OpenProject's. Minting a second identifier is how the third plan starts.
+--
+-- Many-to-many on purpose. One work package usually touches several artefacts,
+-- and one artefact is usually touched by several work packages over time.
+--
+-- `project_id` from the first row, though there is one package today. It is a
+-- column now and a migration later, and the later one has to touch every row.
+--
+-- The `cached_*` columns are a copy of what OpenProject said at `synced_at`,
+-- kept so a board can be drawn without fanning out one API call per row. They
+-- are a cache and are labelled as one wherever they are shown: OpenProject is
+-- the truth about status, always.
+CREATE TABLE IF NOT EXISTS artefact_link (
+  id              INTEGER PRIMARY KEY AUTOINCREMENT,
+  project_id      TEXT    NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  target_kind     TEXT    NOT NULL,
+  target_id       TEXT    NOT NULL,
+  external_system TEXT    NOT NULL DEFAULT 'openproject',
+  external_key    TEXT    NOT NULL,
+  url             TEXT    NOT NULL DEFAULT '',
+  cached_subject  TEXT    NOT NULL DEFAULT '',
+  cached_status   TEXT    NOT NULL DEFAULT '',
+  cached_type     TEXT    NOT NULL DEFAULT '',
+  cached_assignee TEXT    NOT NULL DEFAULT '',
+  synced_at       TEXT    NOT NULL DEFAULT '',
+  created_at      TEXT    NOT NULL,
+  created_by      INTEGER REFERENCES account(id) ON DELETE SET NULL,
+  -- The same artefact linked to the same work package twice is a duplicate row
+  -- and a board that counts it twice, so the store refuses it rather than the
+  -- three callers each remembering to check.
+  UNIQUE (project_id, target_kind, target_id, external_system, external_key)
+);
+-- The two directions this is read from. Artefact → work is "what is scheduled
+-- against this screen"; work → artefact is "what does this ticket touch", which
+-- is the question an agent asks when it opens a branch.
+CREATE INDEX IF NOT EXISTS artefact_link_by_target
+  ON artefact_link(project_id, target_kind, target_id);
+CREATE INDEX IF NOT EXISTS artefact_link_by_external
+  ON artefact_link(project_id, external_system, external_key);
+
+CREATE TABLE IF NOT EXISTS account_secret (
+  account_id INTEGER NOT NULL REFERENCES account(id) ON DELETE CASCADE,
+  kind       TEXT    NOT NULL,
+  ciphertext TEXT    NOT NULL,
+  hint       TEXT    NOT NULL DEFAULT '',
+  -- Which instance the credential is for. A token is only meaningful against
+  -- the host it was issued by, and storing that with it is what lets somebody
+  -- point at a different OpenProject without silently sending the old key.
+  endpoint   TEXT    NOT NULL DEFAULT '',
+  created_at TEXT    NOT NULL,
+  updated_at TEXT    NOT NULL,
+  PRIMARY KEY (account_id, kind)
+);
 """
 
 # The project every row that predates projects belongs to.
@@ -350,6 +432,16 @@ def init() -> None:
             cur.execute(
                 "CREATE INDEX verdict_target "
                 "ON verdict(project_id, target_kind, target_id, audience, id DESC)")
+
+        # Which git identity an account commits under. Not a secret, so it sits
+        # on the account row rather than in `account_secret` — and it is what
+        # lets a commit be matched to the person who owns a work package.
+        account_columns = {row[1] for row in cur.execute("PRAGMA table_info(account)")}
+        if "git_email" not in account_columns:
+            # Blank rather than a copy of `email`: they are the same for most
+            # people and guessing would produce a value nobody chose, which then
+            # reads as confirmed. Blank is honestly "not stated yet".
+            cur.execute("ALTER TABLE account ADD COLUMN git_email TEXT NOT NULL DEFAULT ''")
 
         invite_columns = {row[1] for row in cur.execute("PRAGMA table_info(invite)")}
         if "project_id" not in invite_columns:

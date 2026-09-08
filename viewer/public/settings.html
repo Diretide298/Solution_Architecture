@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      // The saved day/night choice, before the stylesheets resolve. `theme.js`
+      // owns this key; this is only here because a module cannot run early
+      // enough to beat the first paint.
+      try {
+        if ((localStorage.getItem('ticvai-theme') ?? 'dark') === 'dark') {
+          document.documentElement.dataset.theme = 'dark';
+        }
+      } catch { /* storage can be denied outright; day is a fine fallback */ }
+    </script>
+    <title>Adam — your settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/layers.css" />
+    <link rel="icon" href="/brand/adam-mark.png" />
+    <style>
+      /* Small enough to live here rather than in a ninth stylesheet that every
+         other page would then load for nothing. */
+      .set-grid { display: grid; gap: 10px; }
+      .set-row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+      .set-row .auth-input { flex: 1 1 22rem; min-width: 0; }
+      .set-state {
+        font: 500 0.82rem/1.5 'Plus Jakarta Sans', system-ui, sans-serif;
+        min-height: 1.4em;
+      }
+      .set-state[data-tone='good'] { color: #2bb3b0; }
+      .set-state[data-tone='bad'] { color: #e2685f; }
+      .set-mono {
+        font-family: 'JetBrains Mono', ui-monospace, monospace;
+        font-size: 0.78rem;
+        white-space: pre-wrap;
+        word-break: break-all;
+        padding: 12px 14px;
+        border-radius: 10px;
+        background: rgba(127, 127, 127, 0.1);
+        border: 1px solid rgba(127, 127, 127, 0.2);
+      }
+      .set-badge {
+        font: 600 0.72rem/1 'Plus Jakarta Sans', system-ui, sans-serif;
+        padding: 5px 9px;
+        border-radius: 999px;
+        border: 1px solid rgba(127, 127, 127, 0.28);
+      }
+      .set-badge[data-on='yes'] { color: #2bb3b0; border-color: rgba(43, 179, 176, 0.5); }
+    </style>
+  </head>
+  <body class="admin-page">
+    <header class="admin-bar">
+      <div class="brand">
+        <a class="brand-home" href="/" aria-label="Adam — back to the viewer">
+          <img class="brand-lockup brand-lockup-day" src="/brand/adam-lockup-day.png" alt="Adam" />
+          <img class="brand-lockup brand-lockup-night" src="/brand/adam-lockup-night.png" alt="" aria-hidden="true" />
+        </a>
+        <span class="brand-sub">your settings</span>
+      </div>
+      <div class="admin-bar-right">
+        <span id="whoami" class="admin-who"></span>
+        <a class="chip" href="/">Back to the viewer</a>
+      </div>
+    </header>
+
+    <main id="signed-out" class="admin-main" hidden>
+      <div class="admin-panel">
+        <h1 class="auth-title">Sign in first</h1>
+        <p class="auth-note">These settings belong to an account, so there has to be one.</p>
+        <a class="auth-button" href="/login.html">Sign in</a>
+      </div>
+    </main>
+
+    <main id="settings" class="admin-main" hidden>
+      <!-- ── OpenProject ──────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">
+          OpenProject <span id="op-state" class="set-badge" data-on="no">not connected</span>
+        </h2>
+        <p class="auth-note">
+          <strong>Your own token, not a shared one.</strong> Anything ADAM does in the PMS is done
+          as you, so the history there names a person rather than a robot. It is encrypted before
+          it is stored and never sent back to this page — you will see the last four characters,
+          which is enough to recognise which one you pasted.
+        </p>
+        <!-- Said before the field rather than after a failed save: a deployment
+             with no encryption key cannot store a credential, and finding that
+             out by typing a live token into a box is the wrong order. -->
+        <p class="auth-note" id="op-nokey" hidden></p>
+
+        <div class="set-grid" id="op-form">
+          <div class="set-row">
+            <input id="op-endpoint" class="auth-input" type="url" placeholder="https://pms.example.com" />
+          </div>
+          <div class="set-row">
+            <input id="op-token" class="auth-input" type="password" autocomplete="off"
+                   placeholder="Paste an API token" />
+            <button id="op-save" class="chip" type="button">Check and save</button>
+            <button id="op-forget" class="chip" type="button" hidden>Remove</button>
+          </div>
+          <p class="set-state" id="op-says"></p>
+        </div>
+
+        <p class="auth-note">
+          Make one in OpenProject under <strong>My account → Access tokens</strong>. ADAM checks it
+          against the instance before keeping it — a token that does not work is worse than none,
+          because it looks configured and fails later somewhere that reads as a different fault.
+        </p>
+      </section>
+
+      <!-- ── git identity ─────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">Your git identity</h2>
+        <p class="auth-note">
+          The address your commits carry, when it differs from the one you sign in with. It is what
+          lets a commit be matched back to the work package it belongs to. Not a secret, and blank
+          is fine — blank honestly means "not stated" rather than a guess nobody made.
+        </p>
+        <div class="set-row">
+          <input id="git-email" class="auth-input" type="email" placeholder="you@example.com" />
+          <button id="git-save" class="chip" type="button">Save</button>
+        </div>
+        <p class="set-state" id="git-says"></p>
+      </section>
+
+      <!-- ── the bridge ───────────────────────────────────────────── -->
+      <section class="admin-panel">
+        <h2 class="admin-heading">The ADAM bridge</h2>
+        <p class="auth-note">
+          Nine read-only tools that let your local Claude read this package — screens, journeys,
+          contracts, tables, services, modules and the decisions behind them. Run this once, with
+          your own password where it says so.
+        </p>
+        <div class="set-mono" id="mcp-line">…</div>
+        <div class="set-row" style="margin-top: 10px">
+          <button id="mcp-copy" class="chip" type="button">Copy</button>
+          <span class="set-state" id="mcp-says"></span>
+        </div>
+        <p class="auth-note">
+          Everything it can read is what <em>you</em> can read — it signs in as your account and
+          inherits the same refusals. There is no shared login, deliberately: one would hand every
+          reader the widest role in the building.
+        </p>
+      </section>
+    </main>
+
+    <script type="module" src="/settings.js"></script>
+  </body>
+</html>

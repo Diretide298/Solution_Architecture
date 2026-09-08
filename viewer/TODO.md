@@ -25,22 +25,26 @@ labels.
 
 | State | Count |
 |---|---|
-| BLOCKED — needs your decision | **2** |
+| BLOCKED — needs your decision | **4** |
+| OPEN — the ADAM bridge | **1** |
 | OPEN — with the package side | **4** |
 | OPEN — reviewer experience | **3** |
 | OPEN — correctness | **2** |
 | OPEN — polish | **5** |
-| DONE | **32** |
+| DONE | **38** |
 
-**Nothing is blocking.**
+**One thing blocks: V-49.** Phase 4 of the bridge cannot be designed until it is
+answered. Nothing before phase 4 waits on it.
 
 ---
 
-## Blocked — needs a decision from you — 2
+## Blocked — needs a decision from you — 4
 
 | ID | Item | Why it is stuck |
 |---|---|---|
 | **V-03** | Name the reviewer checklist criteria | I can build it; I cannot invent what it should ask. Gates the wording half of V-15 |
+| **V-49** | **`/adam propose` contradicts phases 1–2.** Phase 4 says it runs the package's eleven checks locally and refuses a PR on a red one. Phases 1–2 are built on the opposite premise — a developer has **no `ticvai/` checkout** and reads everything through the viewer. You cannot run derivation checks against a package you do not have. Either developers do check it out, or the checks run server-side and `propose` asks for a verdict. Settle before phase 4 is designed, not during |
+| **V-50** | **Rotate the OpenProject API token.** The one generated on 8 September was pasted into a chat transcript, so treat it as spent. It was used read-only and written nowhere on disk. **Separately:** `pms.softlabsgroup.in` runs OpenProject core **10.0.2**, which shipped September 2019 — roughly seven years of unpatched Rails, internet-facing, about to hold the delivery plan. Belongs in `docs/registers/conflicts.md` rather than here, and an upgrade would move API details the bridge is otherwise written against |
 | **V-04** | Change the first administrator's password | Only you can. It was committed to a public repo. **Separately**: `harness.admin@softlabsgroup.com` / `a-long-enough-passphrase` is now public in `checks/*.mjs`. It does *not* authenticate against the live instance, so it is inert — but do not create that account there |
 
 ## Open — with the package side — 4
@@ -69,6 +73,20 @@ Raised from the viewer, fixed in the package. Listed here so they are not lost.
 | **V-37** | **Eight harnesses hardcode `4173`/`8787`** and ignore `TICVAI_VIEWER`/`TICVAI_API`: `ai-tables`, `contract-trace`, `lens`, `scroll`, `signoff`, `tree-fold`, `verdict-submit`, `_shot`. They can only run against the instance backed by the real account database. **`signoff-check` is the one that matters** — its own README says it records real verdicts. `pages-check`, `paging-check`, `links-rail-check` and `tip-facts-check` are parameterised and are the pattern to copy |
 | **V-38** | `paging-check` fails 2 against the current package — *"the reader shows prose the index no longer carries — proposeTranslations"*, and the Lineage view drawing no group to page through. Both surfaced once the harness could run at all. Neither is diagnosed |
 
+## Open — the ADAM bridge — 1
+
+**Phases 1 and 2 are built and proven** — `viewer/mcp/`, nine tools, 28 checks passing against live
+data, and **no new server route in either phase**. These are what is left in front of phases 3 and 4.
+Reasoning lives in `viewer/HANDOFF-adam-bridge.md`; these are the local labels.
+
+**V-45, V-46, V-47, V-48 and V-51 are done** — see the Done section. **Only V-52 is left**, and it
+cannot be built until the frontend apps have routes. Nothing before phase 3 is now waiting on this
+side; what remains is V-49 and V-50 under Blocked, and decisions 2 and 3.
+
+| ID | Item |
+|---|---|
+| **V-52** | **`adam_impl` cannot be built and this is why.** It was to start from the file you have open and return the screen behind it. `ticvai/repos/ticvai-frontend/` is a real Nx monorepo — six apps, `packages/`, nx.json, pnpm — and **every app is a single `export {};`**. Only `packages/offline-core` has code, about 700 lines. There is no route file to resolve a screen against, so the tool would answer "not implemented" for every input. Screen records already carry `app` and `route`, so this is small work the day the apps grow routes — and wasted work before then |
+
 ## Open — polish — 5
 
 | ID | Item |
@@ -81,7 +99,7 @@ Raised from the viewer, fixed in the package. Listed here so they are not lost.
 
 **Dropped rather than done.** `V-23` was never a bug — the States zoom cap of `1.1` is deliberate and commented. `V-25` asked whether two root tools should be kept or deleted; both now live in `ticvai/tools/`, so the question answered itself. `V-02` wanted a commit split that a fresh history made moot.
 
-## Done — 32
+## Done — 38
 
 | ID | Item |
 |---|---|
@@ -89,6 +107,12 @@ Raised from the viewer, fixed in the package. Listed here so they are not lost.
 | **V-24** | Stop the second accounts API on 8788. **Done — nothing is listening on 8788 or 4619 any more.** It was a full second copy of the accounts API with no `TICVAI_DB`, so it defaulted to the real `api/ticvai.db` |
 | **V-36** | The workbook's `Scaling` sheet. Root cause was `build-schema-workbook.py` globbing `/home/claude/...`; `glob.glob` on a missing directory returns `[]` and raises nothing, so the workbook built with two empty sheets. **Restoring it surfaced a third `/home/claude` path in the same file** that no one had found — not a glob, so it failed the other way: `open` raised, `except Exception` swallowed it, and the `Service` column read `—` for all 379 tables. `Foreign writers` was empty with it. Now: Scaling 32 rows and TOTAL 674/46/264/38, Service across 17 services, Foreign writers on 37 tables. See V-41 |
 | **V-27** | The UTF-8 stdout guard, on 31 of 40 tools. See V-41 |
+| **V-53** | **Phase 3 — the join — done.** `artefact_link` in the accounts store, `api/openproject.py` reading the PMS **as the caller** with their own stored token, four endpoints (`/api/links`, `/api/work-packages/{key}`, `/api/board/mine`) and four MCP tools — `adam_board`, `adam_work`, `adam_links`, and `adam_link`, **the first tool in the bridge that writes**. All it can write is a row saying a work package is about an artefact: it cannot change a status, an assignee or a work package, because OpenProject owns those and owning any of them here would be CF-124 committed on purpose. A link is **refused unless the work package resolves** — a link to a number nobody can open looks like coordination and is a dead end. 13 checks in `api/links-check.mjs`, 36 in the MCP harness. Verified against the live instance: the board returns 36 real open items |
+| **V-45** | **The settings page — done.** `/settings.html`, everybody's rather than an admin's: a per-account OpenProject token, the git identity, and the `claude mcp add` line with the account's own address already in it. The token is **checked against the live instance before it is stored** — a token that does not work is worse than none, because it looks configured and fails later somewhere that reads as a different fault — then encrypted with Fernet (`api/secrets.py`) into its own `account_secret` table, kept off the `account` row so the many places that read an account cannot carry it out by accident. **The key lives in `TICVAI_SECRET_KEY`, never in the database**; `deploy.sh` generates one into `/etc/ticvai/secret.key` at 0600 on first run and never overwrites it, because regenerating would leave every stored credential undecryptable with nothing in the logs to say why. No token ever returns to a browser — the page shows the last four characters. Removing it says plainly that it is **not** revoked in OpenProject. 13 checks in `api/settings-check.mjs`, and the one that matters is the negative: store a credential, then assert it does not come back |
+| **V-46** | **ETag on `sendCachedJson` — done.** SHA-1 of the body it already buffers, computed on the same miss that gzips it, so the cost is nothing. `If-None-Match` now gets a 304: the 3.25 MB index becomes 0 bytes. **`Cache-Control: no-store` is unchanged and deliberate** — these are gated payloads and do not belong in a browser's disk cache, and a browser told `no-store` never sends a conditional request anyway, so nothing about the browser's behaviour changed. This is for a client holding its own cache in memory. The MCP prefers the ETag now and keeps the `generatedAt` fallback for a deployed viewer that predates it |
+| **V-47** | **Two more selectors, done.** `adam_decisions` over `/api/decisions` — the most valuable of the nine, because an agent writing TICVAI code most needs not to contradict a decision already made, and its listing flags the case that misleads: Accepted *and* partly superseded reads as current in a list and is not. `adam_file` over `/api/file`, windowed by line because a 756 KB contract cannot arrive whole. Neither needed a server route |
+| **V-48** | **Phase 1 proven against live data — 28 of 28.** 1,091 screens, 94 flows, 395 tables, 44 ADRs, 16 services, 32 modules. **Running it found three bugs the protocol checks could not**: `adam_table` never resolved a bare name because `fold()` strips the dot the prefix regex was looking for; the "did you mean" list joined `module` and `name` into `access.access.entitlement`, which names nothing; and `kinds` described the corpus rather than the result, so a caller could see `table` there and find none in the hits. All three fixed |
+| **V-51** | The harness probes the viewer and the accounts service separately now, and names which is down. **Also: nothing skips quietly any more** — a lookup with nothing to test fails, because two of V-48's three bugs sat behind a benign-looking `skip` line. A check that skips quietly is a check that lies |
 | **V-44** | **`platforms.html` was excluded from `pages-check` as an orphan and had not been one for some time.** `public/platforms.js` is back and `server.mjs` imports `lib/platforms.mjs`; the page, its script and its payload all answer 200. It was still reachable from nothing but its siblings' header chips, so nobody noticed either way. Linked from the viewer's menu, and both it and `/uiux.html` are in `pages-check` now — **55/0** |
 | **V-01** | Commit and push everything. `adam` initialised, 6,917 files, **no database staged** — `.gitignore` excludes `api/*.db` and it was verified before the push, not after. Both remotes force-pushed to `d200412` |
 | **V-28** | The Domains lens page — `domains.html`, `.js`, `.css`, all present and rendering. **The row was stale, not the work** |

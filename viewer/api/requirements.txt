@@ -8,3 +8,9 @@ argon2-cffi>=23
 # feature 500s on a machine where nobody changed anything.
 openpyxl>=3.1
 python-multipart>=0.0.9
+
+# Fernet, for the per-account credentials the settings page stores. It was
+# already installed as somebody else's transitive dependency, which is not the
+# same as being depended on — a resolver that drops it turns a working
+# deployment into one that cannot store a token, at import time.
+cryptography>=41

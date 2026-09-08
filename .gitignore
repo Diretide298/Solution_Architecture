@@ -51,3 +51,12 @@ Thumbs.db
 # public GitHub repo, and 133 MB of duplicated renders is not package.
 # Remove this line to commit it.
 ticvai/Updating old wireframes/
+
+# --- drops that arrived beside the repository, not in it ---------------------
+# Three archives and a OneDrive export landed at the root during the September
+# board work; the largest is 263 MB. One of the remotes is a public GitHub repo,
+# so a quarter-gigabyte of upload is not something to do by accident. They are
+# kept on disk and out of the history, like `Updating old wireframes/` above.
+/Docs.zip
+/Handoff_Claude_design.zip
+/OneDrive_2_8-9-2026.zip

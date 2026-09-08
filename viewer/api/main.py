@@ -14,8 +14,12 @@ binding it fails with Errno 10013.
 
 from __future__ import annotations
 
+import base64
+import json
 import os
 import re
+import urllib.error
+import urllib.request
 from datetime import date, timedelta
 from typing import List, Optional
 
@@ -26,7 +30,7 @@ from fastapi import (
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
-from . import db, decisions, security
+from . import db, decisions, openproject, secrets, security
 
 app = FastAPI(
     title="TICVAI viewer — accounts and validation",
@@ -872,6 +876,434 @@ def use_reset(body: PasswordReset, response: Response, request: Request):
     )
     _set_session_cookie(response, token)
     return {"ok": True, "email": row["email"], "dropped": dropped}
+
+
+# ── settings: what a developer configures about themselves ───────────
+#
+# One page, because the configuration stopped being one field. It holds the
+# things ADAM needs *per person* rather than per installation: the OpenProject
+# credential it will act with, the git identity that ties a commit back to a
+# work package, and the line that wires up the MCP bridge.
+#
+# **The credential is per account and never shared.** A single service token
+# would attribute every status change in the PMS to one robot, which destroys
+# the audit trail the PMS exists for. Yours moves things as you.
+
+OPENPROJECT = "openproject"
+
+# Where the PMS is. One instance, so it is a default rather than a question —
+# but stored per credential, because a token is only meaningful against the host
+# that issued it and pointing somewhere new must not silently send the old key.
+DEFAULT_PMS = os.environ.get("TICVAI_PMS_URL", "https://pms.softlabsgroup.in").rstrip("/")
+
+
+class GitIdentityIn(BaseModel):
+    git_email: str = ""
+
+
+class PmsTokenIn(BaseModel):
+    token: str
+    endpoint: str = ""
+
+
+def _secret_row(account_id: int, kind: str):
+    return db.one(
+        "SELECT ciphertext, hint, endpoint, updated_at FROM account_secret "
+        "WHERE account_id = ? AND kind = ?",
+        (account_id, kind),
+    )
+
+
+@app.get("/api/settings/me")
+def my_settings(account: dict = Depends(require_account)):
+    """
+    What this person has configured. **Never a token** — the hint is the last
+    four characters, which is enough to recognise which one is stored.
+    """
+    row = db.one("SELECT git_email FROM account WHERE id = ?", (account["id"],))
+    stored = _secret_row(account["id"], OPENPROJECT)
+    return {
+        "email": account["email"],
+        "name": account["name"],
+        "gitEmail": (row["git_email"] if row else "") or "",
+        "openproject": {
+            "configured": bool(stored),
+            "hint": stored["hint"] if stored else "",
+            "endpoint": (stored["endpoint"] if stored else "") or DEFAULT_PMS,
+            "updatedAt": stored["updated_at"] if stored else None,
+        },
+        # Said out loud rather than left for a 500 after somebody types a token
+        # in. A deployment with no key cannot store one, and the reason names
+        # the variable to set.
+        "canStoreCredentials": secrets.available(),
+        "whyNot": secrets.describe_key(),
+    }
+
+
+@app.put("/api/settings/git-identity")
+def set_git_identity(body: GitIdentityIn, account: dict = Depends(require_account)):
+    """The address this person's commits carry. Blank clears it."""
+    value = body.git_email.strip()
+    if value and not re.fullmatch(r"[^@\s]+@[^@\s]+\.[^@\s]+", value):
+        raise HTTPException(400, "That is not an e-mail address.")
+    db.write("UPDATE account SET git_email = ? WHERE id = ?", (value, account["id"]))
+    return {"ok": True, "gitEmail": value}
+
+
+@app.put("/api/settings/openproject")
+def set_openproject_token(body: PmsTokenIn, account: dict = Depends(require_account)):
+    """
+    Store an OpenProject API token for this account, encrypted.
+
+    **The token is checked against the instance before it is kept.** A token
+    that does not work is worse than none: it is stored, looks configured, and
+    fails later somewhere that reads as a different bug. So this calls
+    `/api/v3/users/me` as the token and refuses anything that does not come back
+    naming a user.
+    """
+    token = body.token.strip()
+    if not token:
+        raise HTTPException(400, "Paste a token.")
+    if not secrets.available():
+        raise HTTPException(503, secrets.describe_key())
+
+    endpoint = (body.endpoint.strip() or DEFAULT_PMS).rstrip("/")
+    if not endpoint.startswith(("http://", "https://")):
+        raise HTTPException(400, "The instance must be an http or https address.")
+    # **No userinfo.** `https://apikey:SECRET@pms.example.com` is a valid URL and
+    # would be stored in `endpoint` — which is a plaintext column, deliberately,
+    # because it is meant to hold a hostname. A credential smuggled in there
+    # would sit unencrypted beside the encrypted one and appear in any error
+    # message naming the endpoint.
+    if "@" in endpoint.split("//", 1)[1].split("/", 1)[0]:
+        raise HTTPException(
+            400,
+            "Give the instance address on its own — a username or password in "
+            "the URL would be stored unencrypted. The token field is what "
+            "carries the credential.",
+        )
+
+    # OpenProject takes an API key as HTTP Basic with the literal username
+    # `apikey`. Verified here rather than trusted.
+    auth = base64.b64encode(f"apikey:{token}".encode("utf-8")).decode("ascii")
+    request = urllib.request.Request(
+        f"{endpoint}/api/v3/users/me",
+        headers={
+            "Authorization": f"Basic {auth}",
+            "Accept": "application/json",
+            # **Named, because urllib's default gets us blocked.** The instance
+            # sits behind Cloudflare, which refuses `Python-urllib/3.9` outright
+            # with a 403 and error 1010 — "blocked based on your browser's
+            # signature". That 403 never reaches OpenProject, so reading it as
+            # a rejected token accuses the one thing that was fine. The same
+            # request from curl succeeds; the only difference is this header.
+            "User-Agent": "ADAM-bridge/1.0 (+https://adam.ainfinite.ai)",
+        },
+    )
+    try:
+        with urllib.request.urlopen(request, timeout=15) as answer:
+            who = json.loads(answer.read().decode("utf-8"))
+    except urllib.error.HTTPError as exc:
+        body = ""
+        try:
+            body = exc.read().decode("utf-8", "replace")[:400]
+        except Exception:  # noqa: BLE001 — a body that will not read is not the story
+            pass
+        # An edge that refused us never asked OpenProject anything, so the token
+        # is not what failed and must not be blamed. Told apart by the body,
+        # because the status code alone is a 403 either way.
+        if "cloudflare" in body.lower() or "error_code" in body and "1010" in body:
+            raise HTTPException(
+                502,
+                f"{endpoint} is behind a proxy that refused this service before "
+                f"OpenProject saw it. Your token was never checked. An "
+                f"administrator needs to allow this server through.",
+            )
+        if exc.code in (401, 403):
+            raise HTTPException(400, "OpenProject did not accept that token.")
+        raise HTTPException(502, f"OpenProject answered {exc.code} — try again.")
+    except Exception as exc:  # noqa: BLE001 — the network, in all its forms
+        raise HTTPException(502, f"Could not reach {endpoint}: {exc}")
+
+    who_name = who.get("name") or who.get("login") or "an account"
+
+    now = security.stamp()
+    existing = _secret_row(account["id"], OPENPROJECT)
+    if existing:
+        db.write(
+            "UPDATE account_secret SET ciphertext = ?, hint = ?, endpoint = ?, "
+            "updated_at = ? WHERE account_id = ? AND kind = ?",
+            (secrets.seal(token), secrets.hint(token), endpoint, now,
+             account["id"], OPENPROJECT),
+        )
+    else:
+        db.write(
+            "INSERT INTO account_secret (account_id, kind, ciphertext, hint, endpoint, "
+            "created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            (account["id"], OPENPROJECT, secrets.seal(token), secrets.hint(token),
+             endpoint, now, now),
+        )
+    # Who it turned out to be, so somebody who pasted the wrong token sees it
+    # immediately rather than discovering it when work is attributed oddly.
+    return {"ok": True, "connectedAs": who_name, "hint": secrets.hint(token),
+            "endpoint": endpoint}
+
+
+@app.delete("/api/settings/openproject")
+def forget_openproject_token(account: dict = Depends(require_account)):
+    """
+    Remove it. **This does not revoke it in OpenProject** — only the owner can
+    do that, from their account page there — and the answer says so, because
+    "removed" reading as "revoked" is how a live credential is left lying about.
+    """
+    db.write("DELETE FROM account_secret WHERE account_id = ? AND kind = ?",
+             (account["id"], OPENPROJECT))
+    return {
+        "ok": True,
+        "note": "Removed from ADAM. The token is still live in OpenProject until "
+                "you delete it there, under My account → Access tokens.",
+    }
+
+
+# ── the join: which artefact a work package is about ─────────────────
+#
+# **The only thing this service stores about scheduled work.** OpenProject holds
+# the work packages and is good at it; what it cannot express is that WP #1841 is
+# about screen `BO-102` and table `access.entitlement`, because it knows nothing
+# about the package. The package knows those names and nothing about the
+# schedule. This is the join, and it is deliberately the whole of ADAM's
+# ambition here — a second issue tracker would be CF-124 committed on purpose.
+
+# What an artefact can be. Checked rather than free text: a typo'd kind makes a
+# row no board will ever look for again, and it fails silently.
+LINKABLE = {"screen", "flow", "contract", "operation", "schema", "table",
+            "module", "service", "adr", "platform"}
+
+
+def _work_package_key(raw: str) -> str:
+    """An OpenProject work package id, checked before it becomes part of a URL.
+
+    They are integers, always. Without this the value goes straight into
+    `work_packages/{key}` — and a key containing a `?` would append a query
+    string to the request, while `..` would walk up to the API root and return
+    something that is not a work package at all. Neither is dangerous here, but
+    both produce an answer that is confidently about the wrong thing, which is
+    the failure mode worth spending three lines on.
+    """
+    key = str(raw).strip().lstrip("#")
+    if not key.isdigit():
+        raise HTTPException(400, f"'{raw}' is not a work package number.")
+    return key
+
+
+class LinkIn(BaseModel):
+    target_kind: str
+    target_id: str
+    external_key: str
+    project_id: str = ""
+
+
+def _pms_for(account_id: int):
+    """This person's OpenProject endpoint and token, decrypted.
+
+    Raises the sentence to show them if they have not configured one — which is
+    a thing to fix on a page, not an error to log.
+    """
+    row = db.one(
+        "SELECT ciphertext, endpoint FROM account_secret WHERE account_id = ? AND kind = ?",
+        (account_id, OPENPROJECT),
+    )
+    if not row:
+        raise HTTPException(
+            428,
+            "Connect your OpenProject account first — Settings, then paste an API "
+            "token. ADAM reads the PMS as you, never as a shared service account.",
+        )
+    try:
+        return (row["endpoint"] or DEFAULT_PMS), secrets.open_(row["ciphertext"])
+    except secrets.Unreadable as exc:
+        raise HTTPException(409, str(exc))
+
+
+def _link_row(row) -> dict:
+    return {
+        "id": row["id"],
+        "target": {"kind": row["target_kind"], "id": row["target_id"]},
+        "system": row["external_system"],
+        "key": row["external_key"],
+        "url": row["url"],
+        # Labelled as a cache wherever it is shown. OpenProject is the truth
+        # about status; this is what it said at `syncedAt` and may be old.
+        "cached": {
+            "subject": row["cached_subject"],
+            "status": row["cached_status"],
+            "type": row["cached_type"],
+            "assignee": row["cached_assignee"],
+            "syncedAt": row["synced_at"],
+        },
+    }
+
+
+@app.get("/api/links")
+def list_links(
+    target_kind: str = Query(default=""),
+    target_id: str = Query(default=""),
+    external_key: str = Query(default=""),
+    project_id: str = Query(default=""),
+    account: dict = Depends(require_account),
+):
+    """
+    Links, read either way round.
+
+    Artefact to work is "what is scheduled against this screen". Work to
+    artefact is "what does this ticket touch", which is what an agent asks when
+    it opens a branch. Both are one index away, which is why the table carries
+    two.
+    """
+    project = project_id or db.FIRST_PROJECT
+    where = ["project_id = ?"]
+    args = [project]
+    if target_kind:
+        where.append("target_kind = ?")
+        args.append(target_kind)
+    if target_id:
+        where.append("target_id = ?")
+        args.append(target_id)
+    if external_key:
+        where.append("external_key = ?")
+        args.append(external_key.lstrip("#"))
+
+    rows = db.all_rows(
+        f"SELECT * FROM artefact_link WHERE {' AND '.join(where)} ORDER BY id DESC",
+        tuple(args),
+    )
+    return {"total": len(rows), "links": [_link_row(r) for r in rows]}
+
+
+@app.post("/api/links")
+def make_link(body: LinkIn, account: dict = Depends(require_account)):
+    """
+    Say that a work package is about an artefact.
+
+    **The work package is fetched before the row is written.** A link to a
+    number nobody can open is worse than no link: it looks like coordination,
+    is a dead end, and the board that draws it has no way to tell. Fetching also
+    fills the cached columns, so a listing can be drawn without one API call per
+    row.
+    """
+    kind = body.target_kind.strip().lower()
+    if kind not in LINKABLE:
+        raise HTTPException(
+            400,
+            f"'{kind}' is not something a work package can be about. "
+            f"One of: {', '.join(sorted(LINKABLE))}.",
+        )
+    target = body.target_id.strip()
+    if not target:
+        raise HTTPException(400, "Both an artefact and a work package are needed.")
+    key = _work_package_key(body.external_key)
+
+    endpoint, token = _pms_for(account["id"])
+    try:
+        found = openproject.work_package(endpoint, token, key)
+    except openproject.Blocked as exc:
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        raise HTTPException(400 if exc.status == 404 else 502, str(exc))
+
+    project = body.project_id or db.FIRST_PROJECT
+    now = security.stamp()
+    try:
+        db.write(
+            "INSERT INTO artefact_link (project_id, target_kind, target_id, "
+            "external_system, external_key, url, cached_subject, cached_status, "
+            "cached_type, cached_assignee, synced_at, created_at, created_by) "
+            "VALUES (?, ?, ?, 'openproject', ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (project, kind, target, key, found["url"], found["subject"],
+             found["status"], found["type"], found["assignee"], now, now,
+             account["id"]),
+        )
+    except Exception as exc:  # noqa: BLE001 — the UNIQUE is the one that matters
+        if "UNIQUE" in str(exc).upper():
+            # Already said. The state the caller wanted is the state that
+            # exists, so this is a 409 and not a failure worth alarm.
+            raise HTTPException(409, f"{kind} {target} is already linked to #{key}.")
+        raise
+
+    return {"ok": True, "linked": {"kind": kind, "id": target}, "workPackage": found}
+
+
+@app.delete("/api/links/{link_id}")
+def drop_link(link_id: int, account: dict = Depends(require_account)):
+    """Unsay it. Deletes the join and nothing in OpenProject — which is the
+    whole point of the join living here."""
+    row = db.one("SELECT id FROM artefact_link WHERE id = ?", (link_id,))
+    if not row:
+        raise HTTPException(404, "No such link.")
+    db.write("DELETE FROM artefact_link WHERE id = ?", (link_id,))
+    return {"ok": True, "note": "The link is gone. The work package is untouched."}
+
+
+@app.get("/api/work-packages/{key}")
+def read_work_package(key: str, account: dict = Depends(require_account)):
+    """One work package, read live as the caller, with whatever it is linked to."""
+    # The number is checked before the credential is looked up, and the order
+    # matters: the other way round, asking for `/api/work-packages/banana`
+    # without a stored token answers "connect your OpenProject account", which
+    # sends somebody to configure a thing that was never the problem.
+    number = _work_package_key(key)
+    endpoint, token = _pms_for(account["id"])
+    try:
+        found = openproject.work_package(endpoint, token, number)
+    except openproject.Blocked as exc:
+        raise HTTPException(502, str(exc))
+    except openproject.Refused as exc:
+        raise HTTPException(404 if exc.status == 404 else 502, str(exc))
+
+    rows = db.all_rows(
+        "SELECT * FROM artefact_link WHERE external_key = ? "
+        "AND external_system = 'openproject'",
+        (number,),
+    )
+    return {"workPackage": found, "touches": [_link_row(r)["target"] for r in rows]}
+
+
+@app.get("/api/board/mine")
+def my_board(account: dict = Depends(require_account)):
+    """
+    What is open and assigned to this person, with the artefacts each touches.
+
+    Live from OpenProject rather than from the cached columns: a board is the
+    one place staleness shows, and it is read rarely enough that one API call is
+    the right cost. The cached columns exist for listings that hang off an
+    artefact, where fanning out would be one call per row.
+    """
+    endpoint, token = _pms_for(account["id"])
+    try:
+        items = openproject.mine(endpoint, token)
+    except (openproject.Blocked, openproject.Refused) as exc:
+        raise HTTPException(502, str(exc))
+
+    # One query for every link, joined in memory. The alternative is a query per
+    # work package, and this table is small.
+    touching: dict = {}
+    for row in db.all_rows(
+        "SELECT external_key, target_kind, target_id FROM artefact_link "
+        "WHERE external_system = 'openproject'", ()
+    ):
+        touching.setdefault(row["external_key"], []).append(
+            {"kind": row["target_kind"], "id": row["target_id"]})
+
+    return {
+        "total": len(items),
+        "endpoint": endpoint,
+        "items": [{**item, "touches": touching.get(item["key"], [])} for item in items],
+        # Said out loud when it is the answer. An empty board reads as "nothing
+        # assigned to me", and the truth may be "nothing has been loaded yet".
+        "note": None if items else
+                "Nothing open is assigned to you in OpenProject. If the delivery "
+                "plan has not been loaded into the TICVAI project yet, that is why.",
+    }
 
 
 # ── mentions ────────────────────────────────────────────
