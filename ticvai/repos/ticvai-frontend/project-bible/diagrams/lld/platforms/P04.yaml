@@ -1,5 +1,5 @@
 id: LLD-P04
-title: P04 Venue POS — Terminal and Tablet — 24 screens
+title: P04 Venue POS — Terminal and Tablet — 30 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -19,12 +19,12 @@ deployment:
   releaseCadence: monthly, never during trading
 why: null
 modulesUsed:
-- module: ticketing
-  screens: 9
 - module: core
-  screens: 8
+  screens: 11
+- module: ticketing
+  screens: 10
 - module: fnb
-  screens: 3
+  screens: 5
 - module: analytics
   screens: 2
 - module: seating
@@ -33,36 +33,64 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: OrderService
-  operationCalls: 114
+  operationCalls: 117
 - service: CatalogueService
   operationCalls: 31
 - service: TenancyService
-  operationCalls: 17
-- service: RetailService
-  operationCalls: 17
+  operationCalls: 22
 - service: FnbService
-  operationCalls: 13
+  operationCalls: 22
+- service: RetailService
+  operationCalls: 18
 - service: ReportingService
-  operationCalls: 9
-- service: MarketingService
-  operationCalls: 4
-- service: VenueOpsService
-  operationCalls: 3
+  operationCalls: 10
 - service: IdentityService
-  operationCalls: 2
+  operationCalls: 7
+- service: VenueOpsService
+  operationCalls: 6
+- service: MarketingService
+  operationCalls: 6
 - service: AccessService
-  operationCalls: 2
+  operationCalls: 3
 - service: LedgerService
   operationCalls: 1
 - service: InventoryService
   operationCalls: 1
 coverage:
-  screens: 24
+  screens: 30
   inAFlow: 19
-  drawn: 24
+  drawn: 30
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
+- screen: POS-000
+  name: Sign In
+  module: Shift
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - forceLogout
+  - getCurrentSession
+  - listActiveSessions
+  - login
+  - selectRole
+  states:
+  - denied
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams: []
+  goesTo:
+  - KIT-002
+  - POS-001
+  - POS-025
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-000
+  inFlows: null
 - screen: POS-001
   name: Begin Shift
   module: Shift
@@ -88,8 +116,10 @@ screens:
   - selectRole
   - suspendShift
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -106,10 +136,11 @@ screens:
   - POS-022
   - POS-023
   - POS-024
+  - POS-025
   boardFrames:
   - POS Board 3.dc.html#pos-3d
   - TICVAI Boards v2.dc.html#pos-2a
-  wireframe: wireframes/TICVAI Boards v2.dc.html#pos-2a
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-001
   inFlows:
   - F32 A till opens, trades and settles
 - screen: POS-002
@@ -161,7 +192,7 @@ screens:
   - syncOrders
   - voidOrder
   states:
-  - catalogueStale
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -192,7 +223,7 @@ screens:
   - Retail Board 3.dc.html#ret-3b
   - Retail Board 3.dc.html#ret-3c
   - Retail Board 3.dc.html#ret-3d
-  wireframe: wireframes/Retail Board 3.dc.html#ret-3b
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-002
   inFlows:
   - F14 A discount needs a manager
   - F17 A guest buys merchandise and collects later
@@ -217,10 +248,11 @@ screens:
   - listInventoryHolds
   - listProductVariants
   - listProducts
-  - releaseInventoryHold
+  - relinquishInventoryHold
   - renewInventoryHold
   - resolveProductByCode
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -257,14 +289,17 @@ screens:
   - getSeatAvailability
   - getSeatHold
   - recommendSeats
-  - releaseSeatHold
+  - relinquishSeatHold
   - updatePerformance
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
+  - zoneUnavailable
   offlineState: true
   entryParams:
   - holdId<-deepLink
@@ -277,7 +312,7 @@ screens:
   - POS-006
   boardFrames:
   - Seat Board 3.dc.html#seat-3a
-  wireframe: wireframes/Seat Board 3.dc.html#seat-3a
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-004
   inFlows:
   - F59 A seat is picked, held and sold at a window
 - screen: POS-005
@@ -301,6 +336,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -317,7 +353,7 @@ screens:
   - POS-023
   boardFrames:
   - Retail Board 3.dc.html#ret-3e
-  wireframe: wireframes/Retail Board 3.dc.html#ret-3e
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-005
   inFlows:
   - F108 A guest orders food at a counter and collects it
   - F14 A discount needs a manager
@@ -348,6 +384,7 @@ screens:
   - resumeOrder
   - voidOrder
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -364,7 +401,7 @@ screens:
   - POS-004
   boardFrames:
   - Retail Board 3.dc.html#ret-3f
-  wireframe: wireframes/Retail Board 3.dc.html#ret-3f
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-006
   inFlows: null
 - screen: POS-007
   name: Close Shift
@@ -391,6 +428,8 @@ screens:
   - resumeShift
   - suspendShift
   states:
+  - awaitingApproval
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -405,11 +444,12 @@ screens:
   goesTo:
   - POS-001
   - POS-002
+  - POS-008
   - POS-009
   boardFrames:
   - POS Board 3.dc.html#pos-3f
   - TICVAI Boards v2.dc.html#pos-2f
-  wireframe: wireframes/TICVAI Boards v2.dc.html#pos-2f
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-007
   inFlows:
   - F32 A till opens, trades and settles
   - F74 A shift closes and the day is reported
@@ -442,6 +482,7 @@ screens:
   goesTo:
   - POS-001
   - POS-002
+  - POS-009
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-008
   inFlows:
@@ -485,7 +526,7 @@ screens:
   - POS-007
   boardFrames:
   - POS Board 3.dc.html#pos-3a
-  wireframe: wireframes/POS Board 3.dc.html#pos-3a
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-009
   inFlows:
   - F74 A shift closes and the day is reported
 - screen: POS-010
@@ -503,6 +544,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -554,10 +596,11 @@ screens:
   - boxId<-session
   goesTo:
   - POS-002
+  - POS-012
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2b
   - Retail Board 3.dc.html#ret-3g
-  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2b
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-011
   inFlows:
   - F34 A retail sale, from scan to return
   - F58 A ticket is sold at a till, added to, and refunded
@@ -591,10 +634,11 @@ screens:
   - boxId<-session
   goesTo:
   - POS-001
+  - POS-013
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2c
   - Retail Board 3.dc.html#ret-3h
-  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2c
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-012
   inFlows:
   - F60 An online order is collected at the counter
   - F87 A till handles a return, a collection and a safe drop
@@ -614,6 +658,7 @@ screens:
   - syncOrders
   - withdrawFromDepositBox
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -627,11 +672,12 @@ screens:
   - shiftId<-session
   goesTo:
   - POS-002
+  - POS-007
   - POS-020
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2d
   - POS Frontline Board 2.dc.html#pos-2e
-  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2d
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-013
   inFlows:
   - F32 A till opens, trades and settles
   - F87 A till handles a return, a collection and a safe drop
@@ -648,7 +694,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -684,6 +729,7 @@ screens:
   - shiftId<-deepLink
   goesTo:
   - POS-001
+  - POS-018
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-015
   inFlows:
@@ -697,21 +743,25 @@ screens:
   operations:
   - allocateDepositBox
   - configureWorkstation
+  - listDevices
+  - recordDeviceHeartbeat
+  - setReaderScannerPeripheral
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - workstationId<-session
+  - deviceId<-navigation
   goesTo:
   - POS-001
+  - POS-019
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2b
-  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2b
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-016
   inFlows:
   - F73 A till is configured and its cash rules set
 - screen: POS-017
@@ -725,7 +775,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -737,7 +786,7 @@ screens:
   - POS-001
   boardFrames:
   - POS Frontline Board 2.dc.html#pos-2d
-  wireframe: wireframes/POS Frontline Board 2.dc.html#pos-2d
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-017
   inFlows: null
 - screen: POS-018
   name: Safe Drop & Cash Transfer Management
@@ -767,7 +816,7 @@ screens:
   - POS-001
   boardFrames:
   - POS Board 3.dc.html#pos-3b
-  wireframe: wireframes/POS Board 3.dc.html#pos-3b
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-018
   inFlows:
   - F73 A till is configured and its cash rules set
 - screen: POS-019
@@ -793,9 +842,10 @@ screens:
   - venueId<-deepLink
   goesTo:
   - POS-001
+  - POS-015
   boardFrames:
   - POS Board 3.dc.html#pos-3c
-  wireframe: wireframes/POS Board 3.dc.html#pos-3c
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-019
   inFlows:
   - F73 A till is configured and its cash rules set
 - screen: POS-020
@@ -828,7 +878,7 @@ screens:
   - POS-007
   boardFrames:
   - POS Board 3.dc.html#pos-3e
-  wireframe: wireframes/POS Board 3.dc.html#pos-3e
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-020
   inFlows:
   - F32 A till opens, trades and settles
 - screen: POS-021
@@ -845,6 +895,7 @@ screens:
   - listModifierGroups
   - setItemAvailability
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -876,6 +927,7 @@ screens:
   - markOrderCollected
   - setKitchenTicketStatus
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
@@ -908,12 +960,14 @@ screens:
   - listMerchandise
   - lookupMerchandise
   states:
+  - denied
   - emptyFirstRun
   - emptyNoAccess
   - emptyNoResults
   - error
   - loading
   - offline
+  - stockConflict
   offlineState: true
   entryParams:
   - workstationId<-session
@@ -954,4 +1008,155 @@ screens:
   - POS-005
   boardFrames: null
   wireframe: wireframes/P04 Venue POS.dc.html#pos-024
+  inFlows: null
+- screen: POS-025
+  name: Till Home
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - getCurrentShift
+  - getWorkstationHealth
+  - listAlerts
+  - listDevices
+  - listSaleBoards
+  states:
+  - denied
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  goesTo:
+  - POS-002
+  - POS-006
+  - POS-007
+  - POS-021
+  - POS-023
+  - POS-026
+  - POS-027
+  - POS-028
+  - POS-029
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-025
+  inFlows: null
+- screen: POS-026
+  name: Receipt & Reprint
+  module: Sell
+  requiresModule: ticketing
+  wave: 1
+  density: touchLarge
+  operations:
+  - reissueEntitlement
+  - reprintOrder
+  - reprintReceipt
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - orderId<-navigation
+  - workstationId<-session
+  - saleId<-navigation
+  - entitlementId<-navigation
+  goesTo:
+  - POS-011
+  - POS-025
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-026
+  inFlows: null
+- screen: POS-027
+  name: Guest Lookup
+  module: Sell
+  requiresModule: core
+  wave: 1
+  density: touchLarge
+  operations:
+  - identifyGuest
+  - searchGuests
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  goesTo:
+  - POS-002
+  - POS-025
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-027
+  inFlows: null
+- screen: POS-028
+  name: Table Service
+  module: Sell
+  requiresModule: fnb
+  wave: 1
+  density: touchLarge
+  operations:
+  - clearTable
+  - closeTableVisit
+  - getTableMap
+  - listTableReservations
+  - mergeTableVisits
+  - moveTableVisit
+  - openTableVisit
+  - seatTableReservation
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - outletId<-session
+  - tableId<-navigation
+  - visitId<-navigation
+  - reservationId<-navigation
+  goesTo:
+  - POS-005
+  - POS-021
+  - POS-025
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-028
+  inFlows: null
+- screen: POS-029
+  name: Order Queue
+  module: Sell
+  requiresModule: fnb
+  wave: 1
+  density: touchLarge
+  operations:
+  - getQueue
+  - getQueueFeedHealth
+  - listFnbOrders
+  - listQueueEntries
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  - offline
+  offlineState: true
+  entryParams:
+  - workstationId<-session
+  - outletId<-session
+  - queueId<-navigation
+  - feedId<-navigation
+  goesTo:
+  - POS-022
+  - POS-025
+  boardFrames: null
+  wireframe: wireframes/P04 Venue POS.dc.html#pos-029
   inFlows: null

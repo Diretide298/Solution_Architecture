@@ -23,9 +23,11 @@ Three shapes, and the distinction is the point:
   goes stale the moment a supplier changes.**
 
 Where a panel needs something genuinely new the entry says `build` — and after this pass there are
-five, all in Board 2's three newest frames.
+four, all in Board 2's three newest frames.
 """
+import datetime
 import json
+import os
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -235,22 +237,22 @@ MAP = {
 
 
 def main() -> int:
-    boards = json.loads((ROOT / "handoff" / "board-panel-map.json").read_text(encoding="utf-8")) \
-        if (ROOT / "handoff" / "board-panel-map.json").exists() else {}
     lin = json.loads((ROOT / "handoff" / "api-data-lineage.json").read_text(encoding="utf-8"))
     # **A deriver that reads /tmp is a deriver that works until the machine restarts.** This one
-    # crashed `refresh.sh` outright after a container reset — the panel map is derived from board
-    # reads that were extracted once into a scratch file and never brought into the package.
+    # read the board extract from a scratch file that stopped existing on 3 September, and from
+    # then until 8 September every run printed *"keeping the existing map"* and returned. The
+    # guard was written to stop a missing scratch file halting `refresh.sh`, and it worked — but
+    # a step that skips itself in silence while `check-package` passes is worse than the crash
+    # it replaced, because nothing anywhere says the artefact stopped moving.
     #
-    # **The existing map is the artefact; the scratch file was the working step.** Absent it, the
-    # right behaviour is to leave `board-panel-map.json` alone and say so, not to halt every
-    # other deriver behind it.
-    scratch = Path("/tmp/reads.json")
-    if not scratch.exists():
-        print("  board-panel-map: /tmp/reads.json absent — keeping the existing map")
-        print("    the scratch extract does not survive a restart; handoff/board-panel-map.json is the artefact")
-        return 0
-    frames = json.loads(scratch.read_text(encoding="utf-8"))
+    # **The input is in the package now.** `tools/extract-board-reads.py` rebuilds it from the
+    # F&B boards, so the map is derived from something versioned rather than from something
+    # that had to survive a restart.
+    reads = ROOT / "sources" / "board-reads.json"
+    if not reads.exists():
+        print("  board-panel-map: sources/board-reads.json absent — run tools/extract-board-reads.py")
+        return 1
+    frames = json.loads(reads.read_text(encoding="utf-8"))
 
     out = {
         "note": (
@@ -271,7 +273,11 @@ def main() -> int:
                            "places to change when a model changes."),
             "build": "Genuinely new. Four, all in Board 2's three newest frames.",
         },
-        "generated": "24 August 2026",
+        # **This was the string "24 August 2026" for as long as the file existed**, so the
+        # one field that would have shown the map had stopped moving was the one field that
+        # could not. It is the run date now.
+        "generated": datetime.date.today().strftime("%-d %B %Y") if os.name != "nt"
+        else datetime.date.today().strftime("%d %B %Y").lstrip("0"),
         "panels": {},
     }
 

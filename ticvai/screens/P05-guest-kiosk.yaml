@@ -39,26 +39,29 @@ platform:
     **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
     `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
     an orphan. **A board nobody references is a board nobody reviews.**'
+  targetApp:
+    app: guest
+    name: TICVAI Guest
+    shell: kiosk
+    siblings:
+    - P01
+    - P02
+    note: '**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations;
+      the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather
+      than different.'
+    decided: 10 September 2026
 screens:
 - id: KSK-001
   name: Attract Loop
   module: Sell
-  purpose: Pull somebody standing in a queue out of it.
-  capability: C00
+  requiresModule: core
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-  states:
-    loading: Not applicable — the attract loop is the idle state
-    emptyFirstRun: Not applicable
-    error: Falls through to KSK-014 if the kiosk cannot reach the server
-    offline: '**Not available.** An unattended terminal selling from a stale catalogue oversells with
-      nobody watching'
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/attract-loop
+    component: apps/guest-app/src/routes/sell/AttractLoopDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-002
@@ -66,45 +69,73 @@ screens:
     - KSK-004
     inferred: true
     isEntryPoint: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-001
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+    transitions:
+    - to: KSK-002
+      trigger: Chooses a language
+      provenance: flow F07 step 1→2, F75 step 1→2
+    - to: KSK-003
+      trigger: What are you buying
+      provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
+    - to: KSK-004
+      trigger: Choose tickets
+      provenance: structural — KSK-001 is P05's home screen and its exits are its launcher
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **The attract loop is the entry.** A kiosk has no login and nobody navigates to it
     — it is what the screen shows when nobody is standing there. **Declared 20 August** — `isEntryPoint`
     existed in the schema and five platforms used none, so every screen in them read as unreachable.
-  implementation:
-    app: guest-app
-    route: /sell/attract-loop
-    component: apps/guest-app/src/routes/sell/AttractLoopDetail.tsx
-    status: notStarted
   density: touchLarge
-  requiresModule: core
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-001
-- id: KSK-002
-  name: Language Select
-  module: Sell
-  purpose: Ask the only question that changes everything else.
-  capability: C00
-  wave: 2
+  pattern: listDetail
+  patternReason: '**the screen''s operations choose no pattern** — no list, no get, no write that groups.
+    It falls to the default, and the fallback is recorded rather than passed off as a decision'
+  purpose: Pull somebody standing in a queue out of it.
+  gaps:
+  - operation: null
+    why: '**This screen declares no operation the contracts recognise.** Nothing fills it, nothing it
+      does is committed anywhere, and its shape below is a default rather than a reading.'
+    source: the screen's own declarations
   layout:
-    template: detail
+    template: split
     regions:
     - name: contentBody
+      slot: carried
       components:
       - kind: detailPanel
         notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
   states:
-    loading: Languages from tenant config
+    loading: Not applicable — the attract loop is the idle state
+    error: Falls through to KSK-014 if the kiosk cannot reach the server
     emptyFirstRun: Not applicable
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.'
-    error: Defaults to the venue language and continues
-    offline: Not available
+    emptyNoResults: The filter narrowed it and the attract loop are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: '**Not available.** An unattended terminal selling from a stale catalogue oversells with
+      nobody watching'
+  apis: []
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-001
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
+- id: KSK-002
+  name: Language Select
+  module: Sell
+  requiresModule: core
+  wave: 2
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/language-select
+    component: apps/guest-app/src/routes/sell/LanguageSelectDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -112,18 +143,70 @@ screens:
     - KSK-004
     inferred: true
     fromFlows: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-002
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+    transitions:
+    - to: KSK-003
+      trigger: Chooses buy or collect
+      provenance: flow F07 step 2→3, F75 step 2→3
+    - to: KSK-004
+      trigger: Choose tickets
+      carries:
+      - productId
+      provenance: derived — KSK-004 declares entryState.params productId, so an edge into it must carry
+        them
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/language-select
-    component: apps/guest-app/src/routes/sell/LanguageSelectDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-002
+  pattern: statusTracker
+  patternReason: '`getTenantAppStatus` reads one record and nothing reads a population — the screen is
+    about that one thing'
+  purpose: Ask the only question that changes everything else.
+  gaps:
+  - operation: getTenantConfig
+    why: '**1 declared operation reach no component on this screen**: getTenantConfig. Either the screen
+      is missing what calls them, or the declaration is residue.'
+    source: the screen's own declarations
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      slot: record
+      components:
+      - kind: detailPanel
+        label: The selected language select
+        bindsTo: TenantAppStatus
+        columns:
+        - TenantAppStatus.isPublished
+        - TenantAppStatus.publishedVersion
+        - TenantAppStatus.publishedAt
+        - TenantAppStatus.draftVersion
+        - TenantAppStatus.hasUnpublishedChanges
+        - TenantAppStatus.activeModuleCount
+        - TenantAppStatus.licensedModuleCount
+        - TenantAppStatus.activePageCount
+        - TenantAppStatus.isInMaintenance
+        - TenantAppStatus.maintenanceMessage
+        - TenantAppStatus.expectedBackAt
+        - TenantAppStatus.recentChanges
+        operation: getTenantAppStatus
+        provenance: contract white-label.yaml GET /tenant-config/status
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+  states:
+    loading: The language select list.
+    error: Could not load. Names which read failed and leaves the language select untouched.
+    emptyFirstRun: No language select yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoResults: The filter narrowed it and the language select are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available
   apis:
   - operationId: getTenantAppStatus
     contract: white-label
@@ -133,107 +216,156 @@ screens:
     contract: white-label
     purpose: Full working configuration
     trigger: onLoad
-  density: touchLarge
-  requiresModule: core
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-002
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-002
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-003
   name: What are you buying
   module: Sell
-  purpose: Get to a product in one touch.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: cardList
-        derived: true
-        impliedBy: listProducts
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-  states:
-    loading: Product categories
-    emptyFirstRun: Nothing on sale today — a real answer, not an error
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Catalogue unavailable. KSK-014
-    offline: Not available
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
-      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
-      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
-      when the list is empty, and this screen gained the list before it gained the sentence.'
-  navigation:
-    exitTo:
-    - KSK-001
-    - KSK-002
-    - KSK-004
-    inferred: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-003
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-003
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  capability: C00
   implementation:
     app: guest-app
     route: /sell/what-are-you-buying
     component: apps/guest-app/src/routes/sell/WhatAreYouBuyingDetail.tsx
     status: notStarted
+  navigation:
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-004
+    - KSK-006
+    inferred: true
+    transitions:
+    - to: KSK-004
+      trigger: Chooses tickets and quantities
+      provenance: flow F07 step 3→4
+      operation: listProducts
+    - to: KSK-006
+      trigger: They review the basket
+      provenance: flow F75 step 3→4
+      operation: listProducts
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-003
+  pattern: listDetail
+  patternReason: '`listProducts` reads a population and nothing reads one of them; the detail is the row
+    until a `get` exists'
+  purpose: Get to a product in one touch.
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Every what are you
+        bindsTo: Product
+        columns:
+        - Product.id
+        - Product.code
+        - Product.name
+        - Product.description
+        - Product.kind
+        - Product.venueId
+        - Product.scopePath
+        - Product.createdByPrincipalId
+        - Product.approvedByPrincipalId
+        - Product.responsibleDepartmentId
+        - Product.onSaleFrom
+        - Product.onSaleTo
+        operation: listProducts
+        provenance: contract catalogue.yaml GET /products
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected what are you
+        bindsTo: Product
+        columns:
+        - Product.id
+        - Product.code
+        - Product.name
+        - Product.description
+        - Product.kind
+        - Product.venueId
+        - Product.scopePath
+        - Product.createdByPrincipalId
+        - Product.approvedByPrincipalId
+        - Product.responsibleDepartmentId
+        - Product.onSaleFrom
+        - Product.onSaleTo
+        - Product.lifecycleState
+        - Product.isSellable
+        - Product.hasVariants
+        - Product.variantCount
+        operation: listProducts
+        provenance: contract catalogue.yaml GET /products
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: cardList
+        derived: true
+        impliedBy: listProducts
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+        provenance: carried from the previous definition
+  states:
+    loading: The what are you list.
+    error: Could not load. Names which read failed and leaves the what are you untouched.
+    emptyFirstRun: No what are you yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoResults: The filter narrowed it and the what are you are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available
   apis:
   - operationId: listProducts
     contract: catalogue
     purpose: List products
     trigger: onLoad
-  density: touchLarge
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-003
+  entryState:
+    preloaded:
+    - Product.id
+    - Product.code
+    - Product.name
+    - Product.description
+    - Product.kind
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-003
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-004
   name: Choose tickets
   module: Sell
-  purpose: Quantities, with targets a gloved hand can hit.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: cardList
-        derived: true
-        impliedBy: listProductVariants
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-  states:
-    loading: Variants and prices
-    emptyFirstRun: No variants for this product
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Pricing unavailable
-    offline: Not available
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
-      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
-      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
-      when the list is empty, and this screen gained the list before it gained the sentence.'
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/choose-tickets
+    component: apps/guest-app/src/routes/sell/ChooseTicketsDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -242,18 +374,63 @@ screens:
     - KSK-005
     inferred: true
     fromFlows: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-004
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+    transitions:
+    - to: KSK-005
+      trigger: Chooses a session
+      provenance: flow F07 step 4→5
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/choose-tickets
-    component: apps/guest-app/src/routes/sell/ChooseTicketsDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-004
+  pattern: listDetail
+  patternReason: '`listProductVariants` reads the population and `getAvailability` reads one of them —
+    list, select, act'
+  purpose: Quantities, with targets a gloved hand can hit.
+  gaps:
+  - operation: getAvailability
+    why: '**1 declared operation reach no component on this screen**: getAvailability. Either the screen
+      is missing what calls them, or the declaration is residue.'
+    source: the screen's own declarations
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Every choose tickets
+        bindsTo: ProductVariant
+        columns:
+        - ProductVariant.id
+        - ProductVariant.productId
+        - ProductVariant.sku
+        - ProductVariant.axisValues
+        - ProductVariant.isActive
+        operation: listProductVariants
+        provenance: contract catalogue.yaml GET /products/{productId}/variants
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: cardList
+        derived: true
+        impliedBy: listProductVariants
+        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
+          a venue''s busiest hour is a list that skips rows.'
+        provenance: carried from the previous definition
+  states:
+    loading: The choose tickets list.
+    error: Could not load. Names which read failed and leaves the choose tickets untouched.
+    emptyFirstRun: No choose tickets yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoResults: The filter narrowed it and the choose tickets are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available
   apis:
   - operationId: getAvailability
     contract: catalogue
@@ -263,51 +440,34 @@ screens:
     contract: catalogue
     purpose: List generated variants
     trigger: onLoad
-  density: touchLarge
   entryState:
     params:
     - name: productId
       from: deepLink
     coldEntry: '**A shared product link after the product retired.** Shows what replaced it where a successor
       exists, and the catalogue where none does.'
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-004
+    preloaded: []
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-004
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-005
   name: Choose a session
   module: Sell
-  purpose: Pick a time that still has room.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: acquireInventoryHold
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: acquireInventoryHold
-  states:
-    loading: Live availability, never cached
-    emptyFirstRun: '**Sold out.** Offers the next available session rather than a dead end'
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Availability unavailable. Selection is blocked — overselling is worse than waiting
-    offline: Not available
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/choose-a-session
+    component: apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -316,18 +476,56 @@ screens:
     - KSK-006
     inferred: true
     fromFlows: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-005
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+    transitions:
+    - to: KSK-006
+      trigger: Reviews the order
+      provenance: flow F07 step 5→6
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/choose-a-session
-    component: apps/guest-app/src/routes/sell/ChooseASessionDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-005
+  pattern: statusTracker
+  patternReason: '`getAvailability` reads one record and nothing reads a population — the screen is about
+    that one thing'
+  purpose: Pick a time that still has room.
+  gaps:
+  - operation: getAvailability
+    why: '**1 declared operation reach no component on this screen**: getAvailability. Either the screen
+      is missing what calls them, or the declaration is residue.'
+    source: the screen's own declarations
+  layout:
+    template: detail
+    regions:
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Acquire
+        operation: acquireInventoryHold
+        provenance: contract catalogue.yaml POST /inventory-holds
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: acquireInventoryHold
+        provenance: carried from the previous definition
+  states:
+    loading: The choose session list.
+    error: Could not load. Names which read failed and leaves the choose session untouched.
+    emptyFirstRun: No choose session yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoResults: The filter narrowed it and the choose session are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available
   apis:
   - operationId: acquireInventoryHold
     contract: catalogue
@@ -337,66 +535,123 @@ screens:
     contract: catalogue
     purpose: Live remaining capacity
     trigger: onLoad
-  density: touchLarge
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-005
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-005
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-006
   name: Review
   module: Sell
-  purpose: Show what is being bought before money moves.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: addCartLine
-        label: Add cart line
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: addCartLine
-  states:
-    loading: Promotion evaluation
-    emptyFirstRun: Cart empty — returns to KSK-003
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Pricing failed. The guest is not asked to pay an amount nobody computed
-    offline: Not available
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/review
+    component: apps/guest-app/src/routes/sell/ReviewDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
     - KSK-002
     - KSK-003
     - KSK-007
+    - KSK-008
     inferred: true
     fromFlows: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-006
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+    transitions:
+    - to: KSK-007
+      trigger: Pays at the terminal
+      provenance: flow F07 step 6→7, F75 step 4→5
+    - to: KSK-008
+      trigger: The payment does not resolve
+      provenance: flow F57 step 1→2
+    entryFrom:
+    - KSK-003
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/review
-    component: apps/guest-app/src/routes/sell/ReviewDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-006
+  pattern: statusTracker
+  patternReason: '`getCart` reads one record and nothing reads a population — the screen is about that
+    one thing'
+  purpose: Show what is being bought before money moves.
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      slot: record
+      components:
+      - kind: detailPanel
+        label: The selected review
+        bindsTo: Cart
+        columns:
+        - Cart.id
+        - Cart.token
+        - Cart.venueId
+        - Cart.channel
+        - Cart.subjectId
+        - Cart.status
+        - Cart.lines
+        - Cart.conflicts
+        - Cart.subtotal
+        - Cart.discountTotal
+        - Cart.taxTotal
+        - Cart.total
+        - Cart.appliedPromotionIds
+        - Cart.expiresAt
+        - Cart.extensionsUsed
+        - Cart.maxExtensions
+        operation: getCart
+        provenance: contract orders.yaml GET /carts/{cartId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Add
+        operation: addCartLine
+        provenance: contract orders.yaml POST /carts/{cartId}/lines
+      - kind: secondaryButton
+        label: Checkout
+        operation: checkoutCart
+        provenance: contract orders.yaml POST /carts/{cartId}/checkout
+      - kind: secondaryButton
+        label: Evaluate
+        operation: evaluatePromotions
+        provenance: contract promotions.yaml POST /promotions/evaluate
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: primaryButton
+        derived: true
+        impliedBy: addCartLine
+        label: Add cart line
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: addCartLine
+        provenance: carried from the previous definition
+  states:
+    loading: The review list.
+    error: Could not load. Names which read failed and leaves the review untouched.
+    emptyFirstRun: No review yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the review are still there. Names the active filter and
+      offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available
   apis:
   - operationId: getCart
     contract: orders
@@ -414,51 +669,32 @@ screens:
     contract: promotions
     purpose: Evaluate promotions against a cart
     trigger: onAction
-  density: touchLarge
   entryState:
     params:
     - name: cartId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-006
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-006
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-007
   name: Payment
   module: Sell
-  purpose: Take a card, and nothing else.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: createPayment
-        label: Create payment
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: createPayment
-  states:
-    loading: Terminal state, shown plainly
-    emptyFirstRun: Not applicable
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Declined, with the reason. The lease is held for the remaining window so a second card is possible
-    offline: Not available. **Card only, and card needs the acquirer**
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/payment
+    component: apps/guest-app/src/routes/sell/PaymentDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -467,11 +703,11 @@ screens:
     - KSK-009
     inferred: true
     fromFlows: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-007
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+    transitions:
+    - to: KSK-009
+      trigger: Takes the printed ticket
+      provenance: flow F07 step 7→8, F75 step 5→6
+      operation: createPayment
   notes: 'Definition derived from the wireframe board on 14 August. Components, states and operations
     still to be written. **Card only. No foreign cash** — a kiosk accepting foreign notes needs a note
     reader and a per-currency float, and neither is specified. A guest paying by card in a foreign currency
@@ -479,84 +715,175 @@ screens:
     accepting notes needs a note reader and a per-currency float, and neither is specified. Dynamic currency
     conversion by the terminal is recorded as `fxRateSource: cardScheme`, because that rate is the scheme''s
     rather than ours.'
-  implementation:
-    app: guest-app
-    route: /sell/payment
-    component: apps/guest-app/src/routes/sell/PaymentDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-007
+  pattern: configEditor
+  patternReason: the screen declares only writes (`createPayment`) and no read of a population — it is
+    settings, not a list
+  purpose: Take a card, and nothing else.
+  layout:
+    template: form
+    regions:
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: textField
+        label: id
+        bindsTo: CreatePaymentRequest.id
+        provenance: contract orders.yaml POST /payments
+      - kind: textField
+        label: orderId
+        bindsTo: CreatePaymentRequest.orderId
+        provenance: contract orders.yaml POST /payments
+      - kind: textField
+        label: tender
+        bindsTo: CreatePaymentRequest.tender
+        provenance: contract orders.yaml POST /payments
+      - kind: textField
+        label: amount
+        bindsTo: CreatePaymentRequest.amount
+        provenance: contract orders.yaml POST /payments
+      - kind: textField
+        label: tenderedAmount
+        bindsTo: CreatePaymentRequest.tenderedAmount
+        provenance: contract orders.yaml POST /payments
+      - kind: textField
+        label: walletAuthorisationId
+        bindsTo: CreatePaymentRequest.walletAuthorisationId
+        provenance: contract orders.yaml POST /payments
+      - kind: textField
+        label: deviceId
+        bindsTo: CreatePaymentRequest.deviceId
+        provenance: contract orders.yaml POST /payments
+      - kind: textField
+        label: recordedAt
+        bindsTo: CreatePaymentRequest.recordedAt
+        provenance: contract orders.yaml POST /payments
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Create
+        operation: createPayment
+        provenance: contract orders.yaml POST /payments
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: primaryButton
+        derived: true
+        impliedBy: createPayment
+        label: Create payment
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: createPayment
+        provenance: carried from the previous definition
+  states:
+    loading: The saved payment.
+    error: Could not load. Names which read failed and leaves the payment untouched.
+    emptyFirstRun: No payment configured. Carries the create action and says what the platform does in
+      the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available. **Card only, and card needs the acquirer**
   apis:
   - operationId: createPayment
     contract: orders
     purpose: Take a payment against an order
     trigger: onAction
-  density: touchLarge
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-007
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-007
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-008
   name: Payment unresolved
   module: Sell
-  purpose: Handle the state that has nobody standing next to it.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: inquirePaymentStatus
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: inquirePaymentStatus
-  states:
-    loading: Inquiry in progress
-    emptyFirstRun: Not applicable
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: '**The important screen.** A card charged with no response. It inquires rather than retries,
-      and prints nothing until it knows'
-    offline: Not applicable
-  navigation:
-    exitTo:
-    - KSK-001
-    - KSK-002
-    - KSK-003
-    inferred: false
-    entryFrom:
-    - KSK-007
-    notes: '**Reached from KSK-007** — the payment screen is the one that fails. Stated on 4 September:
-      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-008
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-008
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  capability: C00
   implementation:
     app: guest-app
     route: /sell/payment-unresolved
     component: apps/guest-app/src/routes/sell/PaymentUnresolvedDetail.tsx
     status: notStarted
+  navigation:
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
+    - KSK-010
+    inferred: false
+    entryFrom:
+    - KSK-006
+    - KSK-007
+    notes: '**Reached from KSK-007** — the payment screen is the one that fails. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+    transitions:
+    - to: KSK-010
+      trigger: Or it resolves and the printer fails
+      provenance: flow F57 step 2→3
+      operation: inquirePaymentStatus
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-008
+  pattern: configEditor
+  patternReason: the screen declares only writes (`inquirePaymentStatus`) and no read of a population
+    — it is settings, not a list
+  purpose: Handle the state that has nobody standing next to it.
+  gaps:
+  - operation: inquirePaymentStatus
+    why: '**`inquirePaymentStatus` declares no request body shape**, so nothing says what this editor
+      edits. The fields cannot be derived and the screen needs the contract before it needs a designer.'
+    source: contract orders.yaml POST /payments/{paymentId}/inquiry
+  layout:
+    template: form
+    regions:
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Inquire
+        operation: inquirePaymentStatus
+        provenance: contract orders.yaml POST /payments/{paymentId}/inquiry
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: inquirePaymentStatus
+        provenance: carried from the previous definition
+  states:
+    loading: The saved payment unresolved.
+    error: Could not load. Names which read failed and leaves the payment unresolved untouched.
+    emptyFirstRun: No payment unresolved configured. Carries the create action and says what the platform
+      does in the meantime.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not applicable
   apis:
   - operationId: inquirePaymentStatus
     contract: orders
     purpose: Ask the provider what actually happened
     trigger: onAction
-  density: touchLarge
   entryState:
     params:
     - name: paymentId
@@ -566,62 +893,104 @@ screens:
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
       Arrives with `paymentId`.'
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-008
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-008
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-009
   name: Ticket issued
   module: Sell
-  purpose: Get the ticket into the guest’s hand.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: transferOrderTickets
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
-  states:
-    loading: Printing
-    emptyFirstRun: Not applicable
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Print failed — falls through to KSK-010
-    offline: Not applicable
-  navigation:
-    exitTo:
-    - KSK-001
-    - KSK-002
-    - KSK-003
-    inferred: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 1.dc.html#KSK-009
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-009
-  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
-    to be written.
+  capability: C00
   implementation:
     app: guest-app
     route: /sell/ticket-issued
     component: apps/guest-app/src/routes/sell/TicketIssuedDetail.tsx
     status: notStarted
+  navigation:
+    exitTo:
+    - KSK-001
+    - KSK-002
+    - KSK-003
+    - KSK-013
+    inferred: true
+    transitions:
+    - to: KSK-013
+      trigger: Something goes wrong and they call staff
+      provenance: flow F75 step 6→7
+  notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
+    to be written.
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 1.dc.html#KSK-009
+  pattern: statusTracker
+  patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
+    one thing'
+  purpose: Get the ticket into the guest’s hand.
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      slot: record
+      components:
+      - kind: detailPanel
+        label: The selected ticket issued
+        bindsTo: Order
+        columns:
+        - Order.id
+        - Order.orderNumber
+        - Order.channel
+        - Order.venueId
+        - Order.scopePath
+        - Order.status
+        - Order.currency
+        - Order.currencyScale
+        - Order.grossAmount
+        - Order.taxAmount
+        - Order.netAmount
+        - Order.refundedAmount
+        - Order.totalPriceVariance
+        - Order.lines
+        - Order.payments
+        - Order.principalId
+        operation: getOrder
+        provenance: contract orders.yaml GET /orders/{orderId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Transfer
+        operation: transferOrderTickets
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
+        provenance: carried from the previous definition
+  states:
+    loading: The ticket issued list.
+    error: Could not load. Names which read failed and leaves the ticket issued untouched.
+    emptyFirstRun: No ticket issued yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoResults: The filter narrowed it and the ticket issued are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not applicable
   apis:
   - operationId: transferOrderTickets
     contract: orders
@@ -631,45 +1000,33 @@ screens:
     contract: orders
     purpose: Read an order
     trigger: onLoad
-  density: touchLarge
   entryState:
     params:
     - name: orderId
       from: deepLink
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 1.dc.html#KSK-009
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-009
+    note: '**Drawn by Claude Design on `Kiosk Board 1.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-010
   name: Print failure
   module: Sell
-  purpose: Recover when the paper runs out mid-sale.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: transferOrderTickets
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
-  states:
-    loading: Sending by email and rendering the QR
-    emptyFirstRun: Not applicable
-    error: '**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself
-      degraded rather than dead'
-    offline: Not applicable
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/print-failure
+    component: apps/guest-app/src/routes/sell/PrintFailureDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -678,70 +1035,91 @@ screens:
     - KSK-013
     inferred: false
     entryFrom:
+    - KSK-008
     - KSK-009
     notes: '**Reached from KSK-009** — printing fails after the ticket is issued. Stated on 4 September:
       this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-010
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+    transitions:
+    - to: KSK-013
+      trigger: They call for help
+      provenance: flow F57 step 3→4
+      operation: transferOrderTickets
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/print-failure
-    component: apps/guest-app/src/routes/sell/PrintFailureDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-010
+  pattern: configEditor
+  patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
+    — it is settings, not a list
+  purpose: Recover when the paper runs out mid-sale.
+  gaps:
+  - operation: transferOrderTickets
+    why: '**`transferOrderTickets` declares no request body shape**, so nothing says what this editor
+      edits. The fields cannot be derived and the screen needs the contract before it needs a designer.'
+    source: contract orders.yaml POST /orders/{orderId}/transfer
+  layout:
+    template: form
+    regions:
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Transfer
+        operation: transferOrderTickets
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
+        provenance: carried from the previous definition
+  states:
+    loading: Sending by email and rendering the QR
+    error: '**The order is paid and the ticket exists.** Email and on-screen QR, and the kiosk marks itself
+      degraded rather than dead'
+    emptyFirstRun: Not applicable
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not applicable
   apis:
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
-  density: touchLarge
   entryState:
     params:
     - name: orderId
       from: deepLink
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
-  requiresModule: ticketing
-  boardFrames:
-  - Kiosk Board 2.dc.html#KSK-010
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-010
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-011
   name: Collect a booking
   module: Sell
-  purpose: Turn a reference into media.
-  capability: C00
+  requiresModule: retail
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: searchField
-        derived: true
-        impliedBy: lookupShopAndDrop
-        label: Search
-        notes: A search that returns nothing must say so differently from a search not yet run.
-  states:
-    loading: Reference entry
-    emptyFirstRun: Not applicable
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `retail` is not licensed.** The tenant has not bought this module, which is
-      a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Lookup unavailable
-    offline: Not available
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
-      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
-      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
-      when the list is empty, and this screen gained the list before it gained the sentence.'
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/collect-a-booking
+    component: apps/guest-app/src/routes/sell/CollectABookingDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -753,18 +1131,72 @@ screens:
     notes: '**Reached from KSK-003** — collecting is an alternative to buying, offered at the start. Stated
       on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-011
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-011
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/collect-a-booking
-    component: apps/guest-app/src/routes/sell/CollectABookingDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-011
+  pattern: statusTracker
+  patternReason: '`getOrder` reads one record and nothing reads a population — the screen is about that
+    one thing'
+  purpose: Turn a reference into media.
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      slot: record
+      components:
+      - kind: detailPanel
+        label: The selected collect booking
+        bindsTo: Order
+        columns:
+        - Order.id
+        - Order.orderNumber
+        - Order.channel
+        - Order.venueId
+        - Order.scopePath
+        - Order.status
+        - Order.currency
+        - Order.currencyScale
+        - Order.grossAmount
+        - Order.taxAmount
+        - Order.netAmount
+        - Order.refundedAmount
+        - Order.totalPriceVariance
+        - Order.lines
+        - Order.payments
+        - Order.principalId
+        operation: getOrder
+        provenance: contract orders.yaml GET /orders/{orderId}
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Lookup
+        operation: lookupShopAndDrop
+        provenance: contract retail.yaml GET /shop-and-drop/lookup
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: searchField
+        derived: true
+        impliedBy: lookupShopAndDrop
+        label: Search
+        notes: A search that returns nothing must say so differently from a search not yet run.
+        provenance: carried from the previous definition
+  states:
+    loading: The collect booking list.
+    error: Could not load. Names which read failed and leaves the collect booking untouched.
+    emptyFirstRun: No collect booking yet. Carries the create action; distinct from a filter that matched
+      nothing.
+    emptyNoResults: The filter narrowed it and the collect booking are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available
   apis:
   - operationId: lookupShopAndDrop
     contract: retail
@@ -774,44 +1206,33 @@ screens:
     contract: orders
     purpose: Read an order
     trigger: onLoad
-  density: touchLarge
   entryState:
     params:
     - name: orderId
       from: deepLink
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
-  requiresModule: retail
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 2.dc.html#KSK-011
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-011
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-012
   name: Booking found
   module: Sell
-  purpose: Confirm it is the right booking, then print.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: transferOrderTickets
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: transferOrderTickets
-  states:
-    loading: Booking detail
-    emptyFirstRun: No booking for that reference
-    error: Not found. Offers KSK-013
-    offline: Not available
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/booking-found
+    component: apps/guest-app/src/routes/sell/BookingFoundDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -823,114 +1244,167 @@ screens:
     notes: '**Reached from KSK-011** — a booking is found by the search that looked for it. Stated on
       4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-012
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-012
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/booking-found
-    component: apps/guest-app/src/routes/sell/BookingFoundDetail.tsx
-    status: notStarted
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-012
+  pattern: configEditor
+  patternReason: the screen declares only writes (`transferOrderTickets`) and no read of a population
+    — it is settings, not a list
+  purpose: Confirm it is the right booking, then print.
+  gaps:
+  - operation: transferOrderTickets
+    why: '**`transferOrderTickets` declares no request body shape**, so nothing says what this editor
+      edits. The fields cannot be derived and the screen needs the contract before it needs a designer.'
+    source: contract orders.yaml POST /orders/{orderId}/transfer
+  layout:
+    template: form
+    regions:
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: Transfer
+        operation: transferOrderTickets
+        provenance: contract orders.yaml POST /orders/{orderId}/transfer
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: transferOrderTickets
+        provenance: carried from the previous definition
+  states:
+    loading: Booking detail
+    error: Not found. Offers KSK-013
+    emptyFirstRun: No booking for that reference
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Not available
   apis:
   - operationId: transferOrderTickets
     contract: orders
     purpose: Transfer tickets to another guest
     trigger: onAction
-  density: touchLarge
   entryState:
     params:
     - name: orderId
       from: deepLink
     coldEntry: '**A guest opening an order link weeks later.** Shows the order if it still resolves; if
       it was refunded or the performance passed, says which and offers the order list rather than an error.'
-  requiresModule: ticketing
-  boardFrames:
-  - Kiosk Board 2.dc.html#KSK-012
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-012
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-013
   name: Call staff
   module: Sell
-  purpose: Get a human, without leaving the kiosk.
-  capability: C00
+  requiresModule: marketing
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-      - kind: primaryButton
-        derived: true
-        impliedBy: endKioskAssist
-        notes: The act the screen exists for.
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: endKioskAssist
-  states:
-    loading: Alerting staff
-    emptyFirstRun: Not applicable
-    error: '**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner'
-    offline: Shows the counter location
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/call-staff
+    component: apps/guest-app/src/routes/sell/CallStaffDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
     - KSK-002
     - KSK-003
     inferred: true
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-013
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+    entryFrom:
+    - KSK-009
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written. **Device audience on a guest surface.** `endKioskAssist` is called by the kiosk, not
     by the guest — **the guest presses a button and the device raises the call**, which is why the operation
     authenticates as a device and authorises nothing. A guest cannot end an assist session they did not
     start.
-  implementation:
-    app: guest-app
-    route: /sell/call-staff
-    component: apps/guest-app/src/routes/sell/CallStaffDetail.tsx
-    status: notStarted
+  density: touchLarge
+  audience: device
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-013
+  pattern: configEditor
+  patternReason: the screen declares only writes (`endKioskAssist`) and no read of a population — it is
+    settings, not a list
+  purpose: Get a human, without leaving the kiosk.
+  gaps:
+  - operation: endKioskAssist
+    why: '**`endKioskAssist` declares no request body shape**, so nothing says what this editor edits.
+      The fields cannot be derived and the screen needs the contract before it needs a designer.'
+    source: contract marketing-crm.yaml POST /kiosk-assists/{sessionId}/end
+  layout:
+    template: form
+    regions:
+    - name: actionBar
+      slot: publish
+      components:
+      - kind: primaryButton
+        label: End
+        operation: endKioskAssist
+        provenance: contract marketing-crm.yaml POST /kiosk-assists/{sessionId}/end
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Cancel
+        notes: '**A screen that can submit must be leaveable without submitting.**'
+        derived: true
+        impliedBy: endKioskAssist
+        provenance: carried from the previous definition
+  states:
+    loading: Alerting staff
+    error: '**Cannot reach staff.** Shows the counter location and opening hours instead of a spinner'
+    emptyFirstRun: Not applicable
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: Shows the counter location
   apis:
   - operationId: endKioskAssist
     contract: marketing-crm
     purpose: Stop assisting
     trigger: onAction
-  density: touchLarge
   entryState:
     params:
     - name: sessionId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
-  requiresModule: marketing
-  audience: device
-  boardFrames:
-  - Kiosk Board 2.dc.html#KSK-013
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-013
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 1 operation this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-014
   name: Out of service
   module: Sell
-  purpose: Fail in a way that does not strand anybody.
-  capability: C00
+  requiresModule: core
   wave: 2
-  layout:
-    template: detail
-    regions:
-    - name: contentBody
-      components:
-      - kind: detailPanel
-        notes: Structure from the wireframe board. Components not yet enumerated.
-  states:
-    loading: Not applicable
-    emptyFirstRun: Not applicable
-    error: This is the error state
-    offline: This is the offline state. It does not attempt a cached sale
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /sell/out-of-service
+    component: apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx
+    status: notStarted
   navigation:
     exitTo:
     - KSK-001
@@ -942,54 +1416,167 @@ screens:
     notes: '**Reached from KSK-001** — the attract loop is what an out-of-service kiosk replaces. Stated
       on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation
       graph entirely.'
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-014
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-014
   notes: Definition derived from the wireframe board on 14 August. Components, states and operations still
     to be written.
-  implementation:
-    app: guest-app
-    route: /sell/out-of-service
-    component: apps/guest-app/src/routes/sell/OutOfServiceDetail.tsx
-    status: notStarted
   density: touchLarge
-  requiresModule: core
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-014
+  pattern: listDetail
+  patternReason: '**the screen''s operations choose no pattern** — no list, no get, no write that groups.
+    It falls to the default, and the fallback is recorded rather than passed off as a decision'
+  purpose: Fail in a way that does not strand anybody.
+  gaps:
+  - operation: null
+    why: '**This screen declares no operation the contracts recognise.** Nothing fills it, nothing it
+      does is committed anywhere, and its shape below is a default rather than a reading.'
+    source: the screen's own declarations
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: detailPanel
+        notes: Structure from the wireframe board. Components not yet enumerated.
+        provenance: carried from the previous definition
+  states:
+    loading: Not applicable
+    error: This is the error state
+    emptyFirstRun: Not applicable
+    emptyNoResults: The filter narrowed it and the out service are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
+    offline: This is the offline state. It does not attempt a cached sale
+  apis: []
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-014
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 0 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-015
   name: Assistant
   module: AI
-  purpose: Help a guest choose and pay, and nothing else.
-  capability: C00
+  requiresModule: ticketing
   wave: 2
+  capability: C00
+  implementation:
+    app: guest-app
+    route: /kiosk/assistant
+    component: apps/guest-app/src/routes/Assistant.tsx
+    status: notStarted
+  navigation:
+    exitTo:
+    - KSK-001
+    inferred: false
+    fromFlows: true
+    entryFrom:
+    - KSK-004
+    notes: '**Reached from KSK-004** — help is asked for at the point of confusion. Stated on 4 September:
+      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
+    transitions:
+    - to: SUP-004
+      trigger: The conversation appears in the queue
+      provenance: flow F24 step 2→3
+      operation: handoverToAgent
+      crossesDevice: true
+      back: false
+  notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no
+    AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
+    and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
+    why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Wave
+    2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a guest
+    through ticket selection and checkout cannot ship before the screens that do the selecting and the
+    checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate
+    to a back office and a guest app does not navigate to either** — those are device handovers, and a
+    flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-015
+  pattern: listDetail
+  patternReason: '`listProducts` reads the population and `getAvailability` reads one of them — list,
+    select, act'
+  purpose: Help a guest choose and pay, and nothing else.
+  gaps:
+  - operation: getAvailability
+    why: '**1 declared operation reach no component on this screen**: getAvailability. Either the screen
+      is missing what calls them, or the declaration is residue.'
+    source: the screen's own declarations
   layout:
-    template: detail
+    template: split
     regions:
     - name: contentBody
+      slot: collection
       components:
-      - kind: detailPanel
+      - kind: dataTable
+        label: Every assistant
+        bindsTo: Product
+        columns:
+        - Product.id
+        - Product.code
+        - Product.name
+        - Product.description
+        - Product.kind
+        - Product.venueId
+        - Product.scopePath
+        - Product.createdByPrincipalId
+        - Product.approvedByPrincipalId
+        - Product.responsibleDepartmentId
+        - Product.onSaleFrom
+        - Product.onSaleTo
+        operation: listProducts
+        provenance: contract catalogue.yaml GET /products
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Send
+        operation: sendAiMessage
+        provenance: contract ai.yaml POST /conversations/{conversationId}/messages
+      - kind: secondaryButton
+        label: Handover
+        operation: handoverToAgent
+        provenance: contract marketing-crm.yaml POST /conversations/{conversationId}/handover
+    - name: contentBody
+      slot: carried
+      components:
       - kind: primaryButton
         derived: true
         impliedBy: sendAiMessage
         label: Send ai message
-        notes: The act the screen exists for.
+        provenance: carried from the previous definition
       - kind: cardList
         derived: true
         impliedBy: listProducts
         notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
           a venue''s busiest hour is a list that skips rows.'
+        provenance: carried from the previous definition
       - kind: secondaryButton
         label: Cancel
         notes: '**A screen that can submit must be leaveable without submitting.**'
         derived: true
         impliedBy: sendAiMessage
+        provenance: carried from the previous definition
+  states:
+    loading: The assistant list.
+    error: Could not load. Names which read failed and leaves the assistant untouched.
+    emptyFirstRun: No assistant yet. Carries the create action; distinct from a filter that matched nothing.
+    emptyNoResults: The filter narrowed it and the assistant are still there. Names the active filter
+      and offers to clear it.
+    emptyNoAccess: Names the missing permission. **Never an empty table** — that reads as *there is no
+      data* and sends somebody to support with the wrong question.
   apis:
   - operationId: sendAiMessage
     contract: ai
     purpose: Ask
     trigger: onAction
+    invalidates:
+    - listProducts
   - operationId: listProducts
     contract: catalogue
     purpose: List products
@@ -1002,67 +1589,106 @@ screens:
     contract: marketing-crm
     purpose: Pass an assistant conversation to a person
     trigger: onAction
-  states:
-    loading: Answers stream. **The purchase flow stays on screen behind it** — the assistant helps with
-      the task rather than replacing it
-    emptyFirstRun: —
-    emptyNoAccess: '**Signed out, or signed in as somebody else.** A guest surface has no permissions
-      to lack — this state is reached by a session that expired, and the action is to sign in again rather
-      than to ask for access.
-
-
-      **Also reached when `ticketing` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: '**Falls back to Call staff** (KSK-013), not to an error. A guest stuck at a kiosk with a broken
-      assistant needs a person, and there is one in the building'
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
-      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
-      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
-      when the list is empty, and this screen gained the list before it gained the sentence.'
-  navigation:
-    exitTo:
-    - KSK-001
-    inferred: false
-    fromFlows: true
-    entryFrom:
-    - KSK-004
-    notes: '**Reached from KSK-004** — help is asked for at the point of confusion. Stated on 4 September:
-      this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.'
-  implementation:
-    app: guest-app
-    route: /kiosk/assistant
-    component: apps/guest-app/src/routes/Assistant.tsx
-    status: notStarted
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-015
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-015
-  notes: 'Added 17 August for 2.1.28, which names the kiosk explicitly and was the only surface with no
-    AI screen. **Scoped to `guestCapabilityScope`** — ticket selection, promotions, FAQs, recommendations
-    and checkout, and nothing else. **No keyboard**: voice or a constrained touch interface, which is
-    why the app chat pattern does not transfer. Depends on CF-14. **Not on the wireframe board.** **Wave
-    2 with the rest of the kiosk.** Set to Wave 1 in error on 17 August — an assistant that guides a guest
-    through ticket selection and checkout cannot ship before the screens that do the selecting and the
-    checking out. **Cross-platform navigation removed 24 August**: SUP-004. **A till does not navigate
-    to a back office and a guest app does not navigate to either** — those are device handovers, and a
-    flow declares them with `crossesDevice` rather than a screen pretending there is a link.'
-  density: touchLarge
+    invalidates:
+    - listProducts
   entryState:
     params:
     - name: conversationId
       from: deepLink
     coldEntry: A conversation link an agent opens from a notification. Resolves, or says it was closed
       and by whom.
-  requiresModule: ticketing
-  statesDerived: true
-  boardFrames:
-  - Kiosk Board 2.dc.html#KSK-015
+    preloaded: []
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-015
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-016
   name: Order Food
   module: Sell
+  requiresModule: fnb
   wave: 2
+  implementation:
+    app: guest-app
+    route: /sell/order-food
+    component: apps/guest-app/src/routes/sell/OrderFoodList.tsx
+    status: notStarted
+  navigation:
+    entryFrom:
+    - KSK-003
+    exitTo:
+    - KSK-017
+    transitions:
+    - to: KSK-017
+      trigger: Shop
+      carries:
+      - cartId
+      - outletId
+      provenance: derived — KSK-017 declares entryState.params cartId, outletId, so an edge into it must
+        carry them
+  notes: BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
+    are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-016
+  pattern: statusTracker
+  patternReason: '`getGuestMenu` reads one record and nothing reads a population — the screen is about
+    that one thing'
   purpose: Order food from the kiosk and collect it.
+  layout:
+    template: detail
+    regions:
+    - name: contentBody
+      slot: record
+      components:
+      - kind: detailPanel
+        label: The selected order food
+        bindsTo: GuestMenu
+        columns:
+        - GuestMenu.outletId
+        - GuestMenu.menuId
+        - GuestMenu.name
+        - GuestMenu.inForceUntil
+        - GuestMenu.currency
+        - GuestMenu.currencyScale
+        - GuestMenu.sections
+        operation: getGuestMenu
+        provenance: contract fnb.yaml GET /outlets/{outletId}/guest-menu
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Create
+        operation: createGuestFnbOrder
+        provenance: contract fnb.yaml POST /guest-orders
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: cardList
+        bindsTo: Menu
+        notes: Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**
+        provenance: carried from the previous definition
+      - kind: banner
+        notes: Allergens shown on the card, not behind a tap. **contains and mayContain are different
+          claims** and a fryer shared with breaded fish makes chips a fish risk
+        provenance: carried from the previous definition
+      - kind: primaryButton
+        label: Add to order
+        provenance: carried from the previous definition
+  states:
+    loading: The menu, with the first category open
+    error: Could not load the menu. **The kiosk still sells tickets** — one outlet being unreachable does
+      not close the kiosk.
+    emptyFirstRun: Nothing is being served right now. **The state names the next service time** — a guest
+      at a kiosk at 4pm needs to know whether to wait twenty minutes or go elsewhere.
+    emptyNoResults: Nothing matches that filter. **Allergen filters narrow hard** — a guest filtering
+      for nut-free at a nut-heavy outlet should be told that plainly rather than shown a blank menu.
+    emptyNoAccess: Not applicable — a kiosk menu is public.
   apis:
   - operationId: getGuestMenu
     contract: fnb
@@ -1072,46 +1698,6 @@ screens:
     contract: fnb
     purpose: Place the order
     trigger: onAction
-  states:
-    loading: The menu, with the first category open
-    emptyFirstRun: Nothing is being served right now. **The state names the next service time** — a guest
-      at a kiosk at 4pm needs to know whether to wait twenty minutes or go elsewhere.
-    emptyNoResults: Nothing matches that filter. **Allergen filters narrow hard** — a guest filtering
-      for nut-free at a nut-heavy outlet should be told that plainly rather than shown a blank menu.
-    emptyNoAccess: Not applicable — a kiosk menu is public.
-    error: Could not load the menu. **The kiosk still sells tickets** — one outlet being unreachable does
-      not close the kiosk.
-  layout:
-    template: list
-    regions:
-    - name: contentBody
-      components:
-      - kind: cardList
-        bindsTo: Menu
-        notes: Photographs, because **a guest at a kiosk with a queue behind them is not reading descriptions**
-      - kind: banner
-        notes: Allergens shown on the card, not behind a tap. **contains and mayContain are different
-          claims** and a fryer shared with breaded fish makes chips a fish risk
-      - kind: primaryButton
-        label: Add to order
-  density: touchLarge
-  navigation:
-    entryFrom:
-    - KSK-003
-    exitTo:
-    - KSK-017
-  implementation:
-    app: guest-app
-    route: /sell/order-food
-    component: apps/guest-app/src/routes/sell/OrderFoodList.tsx
-    status: notStarted
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-016
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-016
-  notes: BL-066. **Every operation existed and no screen called them** — `getGuestMenu` and `createGuestFnbOrder`
-    are contracted and guest-callable, and P05 had fifteen screens selling neither food nor merchandise.
   entryState:
     params:
     - name: outletId
@@ -1121,55 +1707,26 @@ screens:
       three weeks late all land here, and the person holding the link did nothing wrong. **The screen
       names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
       Arrives with `outletId`.'
-  requiresModule: fnb
-  boardFrames:
-  - Kiosk Board 2.dc.html#KSK-016
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-016
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.
 - id: KSK-017
   name: Shop
   module: Sell
+  requiresModule: retail
   wave: 2
-  purpose: Buy merchandise at the kiosk, or reserve it for collection.
-  apis:
-  - operationId: listMerchandise
-    contract: retail
-    purpose: What is available
-    trigger: onLoad
-  - operationId: reserveMerchandise
-    contract: retail
-    purpose: Hold for collection
-    trigger: onAction
-  - operationId: addCartLine
-    contract: orders
-    purpose: Add something
-    trigger: onAction
-  - operationId: lookupMerchandise
-    contract: retail
-    purpose: Price and stock check by barcode
-    trigger: onLoad
-  states:
-    loading: Products with stock, in-stock first
-    emptyFirstRun: This kiosk does not sell merchandise. **Stated rather than shown as an empty shop**
-      — a guest looking at a blank grid assumes it is broken.
-    emptyNoResults: Nothing in stock in that size or category. **Reserve-for-collection is offered here**,
-      because out of stock at this kiosk is not out of stock at the venue.
-    emptyNoAccess: Not applicable.
-    error: Could not load. Tickets and food are unaffected.
-  layout:
-    template: list
-    regions:
-    - name: contentBody
-      components:
-      - kind: cardList
-        bindsTo: Merchandise[]
-      - kind: multiSelect
-        label: Size
-      - kind: primaryButton
-        label: Add
-      - kind: secondaryButton
-        label: Reserve for collection
-        notes: BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen
-          is honest about which
-  density: touchLarge
+  implementation:
+    app: guest-app
+    route: /sell/shop
+    component: apps/guest-app/src/routes/sell/ShopList.tsx
+    status: notStarted
   navigation:
     entryFrom:
     - KSK-016
@@ -1179,20 +1736,130 @@ screens:
     notes: '**Returns to KSK-016.** Stated on 4 September: this screen declared where it is reached from
       and no way to leave, so whoever landed on it was stuck. The return path is the same edge travelled
       the other way, not a guess about the product.'
-  implementation:
-    app: guest-app
-    route: /sell/shop
-    component: apps/guest-app/src/routes/sell/ShopList.tsx
-    status: notStarted
-  wireframe:
-    status: notStarted
-    provenance: designed
-    board: wireframes/Kiosk Board 2.dc.html#KSK-017
-    generatedFallback: wireframes/P05 Guest Kiosk.dc.html#ksk-017
+    transitions:
+    - to: KSK-016
+      trigger: Order Food
+      carries:
+      - outletId
+      provenance: derived — KSK-016 declares entryState.params outletId, so an edge into it must carry
+        them
   notes: 'BL-066, BL-019. **A guest can browse and reserve and not buy**, which is where retail stops
     for a guest surface — `createRetailSale` is a till operation. **Cross-surface parity, 31 August**:
     added addCartLine, lookupMerchandise. **A guest does not know which surface they are on** — the same
     named screen on web and app now calls the same guest-callable operations.'
+  density: touchLarge
+  boardFrames:
+  - Kiosk Board 2.dc.html#KSK-017
+  pattern: listDetail
+  patternReason: '`listMerchandise` reads a population and nothing reads one of them; the detail is the
+    row until a `get` exists'
+  purpose: Buy merchandise at the kiosk, or reserve it for collection.
+  layout:
+    template: split
+    regions:
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Every shop
+        bindsTo: MerchandiseItem
+        columns:
+        - MerchandiseItem.id
+        - MerchandiseItem.sku
+        - MerchandiseItem.barcode
+        - MerchandiseItem.name
+        - MerchandiseItem.outletId
+        - MerchandiseItem.categoryId
+        - MerchandiseItem.variantId
+        - MerchandiseItem.inventoryItemId
+        - MerchandiseItem.price
+        - MerchandiseItem.onHand
+        - MerchandiseItem.isReturnable
+        - MerchandiseItem.returnWindowDays
+        operation: listMerchandise
+        provenance: contract retail.yaml GET /merchandise
+    - name: contextPanel
+      slot: selection
+      components:
+      - kind: detailPanel
+        label: The selected shop
+        bindsTo: MerchandiseItem
+        columns:
+        - MerchandiseItem.id
+        - MerchandiseItem.sku
+        - MerchandiseItem.barcode
+        - MerchandiseItem.name
+        - MerchandiseItem.outletId
+        - MerchandiseItem.categoryId
+        - MerchandiseItem.variantId
+        - MerchandiseItem.inventoryItemId
+        - MerchandiseItem.price
+        - MerchandiseItem.onHand
+        - MerchandiseItem.isReturnable
+        - MerchandiseItem.returnWindowDays
+        - MerchandiseItem.requiresSerialNumber
+        - MerchandiseItem.imageAssetRef
+        - MerchandiseItem.isActive
+        operation: listMerchandise
+        provenance: contract retail.yaml GET /merchandise
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: primaryButton
+        label: Reserve
+        operation: reserveMerchandise
+        provenance: contract retail.yaml POST /outlets/{outletId}/reserve
+      - kind: secondaryButton
+        label: Add
+        operation: addCartLine
+        provenance: contract orders.yaml POST /carts/{cartId}/lines
+      - kind: secondaryButton
+        label: Lookup
+        operation: lookupMerchandise
+        provenance: contract retail.yaml GET /merchandise/lookup
+    - name: contentBody
+      slot: carried
+      components:
+      - kind: multiSelect
+        label: Size
+        provenance: carried from the previous definition
+      - kind: primaryButton
+        label: Add
+        provenance: carried from the previous definition
+      - kind: secondaryButton
+        label: Reserve for collection
+        notes: BL-019. **Reserve is not buy** — the guest pays at a till or on the app, and this screen
+          is honest about which
+        provenance: carried from the previous definition
+  states:
+    loading: Products with stock, in-stock first
+    error: Could not load. Tickets and food are unaffected.
+    emptyFirstRun: This kiosk does not sell merchandise. **Stated rather than shown as an empty shop**
+      — a guest looking at a blank grid assumes it is broken.
+    emptyNoResults: Nothing in stock in that size or category. **Reserve-for-collection is offered here**,
+      because out of stock at this kiosk is not out of stock at the venue.
+    emptyNoAccess: Not applicable.
+  apis:
+  - operationId: listMerchandise
+    contract: retail
+    purpose: What is available
+    trigger: onLoad
+  - operationId: reserveMerchandise
+    contract: retail
+    purpose: Hold for collection
+    trigger: onAction
+    invalidates:
+    - listMerchandise
+  - operationId: addCartLine
+    contract: orders
+    purpose: Add something
+    trigger: onAction
+    invalidates:
+    - listMerchandise
+  - operationId: lookupMerchandise
+    contract: retail
+    purpose: Price and stock check by barcode
+    trigger: onLoad
   entryState:
     params:
     - name: outletId
@@ -1200,6 +1867,19 @@ screens:
     - name: cartId
       from: session
     coldEntry: Resolves from the session; a cold arrival is the ordinary case.
-  requiresModule: retail
-  boardFrames:
-  - Kiosk Board 2.dc.html#KSK-017
+    preloaded:
+    - MerchandiseItem.id
+    - MerchandiseItem.sku
+    - MerchandiseItem.barcode
+    - MerchandiseItem.name
+    - MerchandiseItem.outletId
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P05 Guest Kiosk.dc.html#ksk-017
+    note: '**Drawn by Claude Design on `Kiosk Board 2.dc.html`, archived 9 September 2026 to `_dump/wireframes-3-september/`.**
+      The frame it points at now is the generated one. This screen has been designed once and is not starting
+      from nothing.'
+  apisNote: Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack
+    — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them
+    to the ones that matter is work a person still owes this screen.

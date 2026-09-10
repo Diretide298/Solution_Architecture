@@ -318,6 +318,7 @@ paths:
       operationId: getWorkstationHealth
       x-ticvai-consumed-by:
         - "P04 POS-001 Begin Shift"
+        - "P04 POS-025 Till Home"
         - "P08 BO-036 Device Registry"
         - "P08 BO-125 Product & Category Button Configuration"
         - "P08 BO-128 Live Workstation Health Monitor"
@@ -935,6 +936,7 @@ paths:
       operationId: listSaleBoards
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-025 Till Home"
         - "P08 BO-115 Category, Brand & Merchandise Hierarchy"
         - "P08 BO-116 Merchandising & Product Presentation"
         - "P08 BO-117 Product Import, Governance & AI Configuration Assistant"
@@ -1049,6 +1051,8 @@ paths:
     get:
       operationId: listDevices
       x-ticvai-consumed-by:
+        - "P04 POS-016 Till Configuration"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-043 Device settings"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
@@ -1133,6 +1137,7 @@ paths:
     post:
       operationId: recordDeviceHeartbeat
       x-ticvai-consumed-by:
+        - "P04 POS-016 Till Configuration"
         - "P08 BO-036 Device Registry"
         - "P08 BO-124 Layout & Journey Builder"
         - "P08 BO-125 Product & Category Button Configuration"

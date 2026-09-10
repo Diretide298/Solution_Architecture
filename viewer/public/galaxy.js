@@ -436,7 +436,7 @@ export class Galaxy {
    */
   constructor(canvas, {
     onSelect, onHover, onEmpty, onZoom, onView,
-    sphere = true, camera = false, hoops = false, moteGain = 1,
+    sphere = true, camera = false, hoops = false, moteGain = 1, zoom = 1,
   } = {}) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
@@ -461,7 +461,21 @@ export class Galaxy {
     // Added to the automatic rotation, never replacing it, so letting go of a
     // drag leaves the scene turning from where it was put rather than snapping.
     this.spin = { yaw: 0, pitch: 0 };
-    this.zoom = 1;
+    // **The scale the view opens at, and the one `resetView` comes back to.**
+    //
+    // Not the same question as `spread`. Spread is how far apart the bodies sit
+    // in the model; this is how much of the result the window shows. A caller
+    // that adds layers widens the constellation without moving a single body
+    // relative to the others, and the fix is the frame rather than the layout —
+    // pulling the bodies together to fit would flatten the size relation the
+    // sizes exist to say.
+    //
+    // `SUB_ZOOM` is deliberately *not* measured against this. It is the point
+    // where individual motes are large enough on screen to carry a name, which
+    // is an absolute question about pixels, not a relative one about how far
+    // the reader has come from wherever the view happened to open.
+    this.baseZoom = zoom;
+    this.zoom = zoom;
     this._drag = null;
     // Null until the first frame, which is what seeds it at its own target
     // rather than easing in from the top-left corner on load.
@@ -803,7 +817,7 @@ export class Galaxy {
    */
   resetView() {
     this.spin = { yaw: 0, pitch: 0 };
-    this.zoom = 1;
+    this.zoom = this.baseZoom;
     this._flight = 0;
     this.start();
     this.draw();
@@ -811,7 +825,7 @@ export class Galaxy {
 
   /** Whether the reader has moved the camera off its default. */
   moved() {
-    return this.zoom !== 1 || this.spin.yaw !== 0 || this.spin.pitch !== 0;
+    return this.zoom !== this.baseZoom || this.spin.yaw !== 0 || this.spin.pitch !== 0;
   }
 
   setSelected(id) {

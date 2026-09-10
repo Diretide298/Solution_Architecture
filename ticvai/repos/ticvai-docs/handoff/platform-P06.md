@@ -5,16 +5,16 @@
 | | |
 |---|---|
 | Screens | 66 |
-| Operations | 182 |
+| Operations | 184 |
 | Contracts | 17 |
 | Modules | 3 |
 | Undrawn | 0 |
-| Operations with no screen | 126 |
+| Operations with no screen | 125 |
 | Waves | wave1 25 · wave2 40 · wave3 1 |
 
 ## Gaps
 
-### 126 operations with no screen here
+### 125 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -40,11 +40,12 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
+| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
+| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
-| `clearTable` | fnb | POST | Mark a table cleared and free |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
@@ -59,8 +60,7 @@
 | `sendOrderNotification` | fnb | POST | Tell the guest where their order is |
 | `setComboSlots` | fnb | PUT | What the guest chooses, and what it costs extra |
 | `setKitchenSla` | fnb | PUT | How long a ticket may sit before it is late |
-| `setSectionLayout` | fnb | PUT | Divide the floor into sections and give each a server |
-| … | | | 86 more |
+| … | | | 85 more |
 
 ### 1 modules split across waves
 
@@ -130,9 +130,9 @@
 | `EMP-052` | Floor Plan & Table Map | Floor Service | 2 | 2 | yes |
 | `EMP-053` | Table & Seating Configuration | Floor Service | 2 | 1 | yes |
 | `EMP-054` | Reservation Calendar & Timeline | Floor Service | 2 | 1 | yes |
-| `EMP-055` | Create / Edit Reservation | Floor Service | 2 | 1 | yes |
+| `EMP-055` | Create / Edit Reservation | Floor Service | 2 | 2 | yes |
 | `EMP-056` | Walk-In & Waitlist Management | Floor Service | 2 | 1 | yes |
-| `EMP-057` | Guest Profile & Dining History | Floor Service | 2 | 2 | yes |
+| `EMP-057` | Guest Profile & Dining History | Floor Service | 2 | 4 | yes |
 | `EMP-058` | Live Table & Service Management | Floor Service | 2 | 16 | yes |
 | `EMP-059` | Table Order, Bill & Payment Management | Floor Service | 2 | 7 | yes |
 | `EMP-060` | Reservation & Table Performance | Floor Service | 2 | 2 | yes |

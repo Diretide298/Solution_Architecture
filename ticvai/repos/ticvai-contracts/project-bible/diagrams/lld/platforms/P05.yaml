@@ -60,6 +60,8 @@ screens:
   operations: []
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -71,7 +73,7 @@ screens:
   - KSK-004
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-001
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-001
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-001
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -87,6 +89,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -98,7 +101,7 @@ screens:
   - KSK-004
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-002
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-002
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-002
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -123,9 +126,10 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-004
+  - KSK-006
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-003
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-003
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-003
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -155,7 +159,7 @@ screens:
   - KSK-005
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-004
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-004
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-004
   inFlows:
   - F07 Guest buys at a kiosk
 - screen: KSK-005
@@ -170,6 +174,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -182,7 +187,7 @@ screens:
   - KSK-006
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-005
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-005
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-005
   inFlows:
   - F07 Guest buys at a kiosk
 - screen: KSK-006
@@ -199,6 +204,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -210,9 +216,10 @@ screens:
   - KSK-002
   - KSK-003
   - KSK-007
+  - KSK-008
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-006
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-006
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-006
   inFlows:
   - F07 Guest buys at a kiosk
   - F57 A guest uses a kiosk and it fails
@@ -240,7 +247,7 @@ screens:
   - KSK-009
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-007
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-007
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-007
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -265,9 +272,10 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
+  - KSK-010
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-008
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-008
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-008
   inFlows:
   - F57 A guest uses a kiosk and it fails
 - screen: KSK-009
@@ -282,6 +290,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -292,9 +301,10 @@ screens:
   - KSK-001
   - KSK-002
   - KSK-003
+  - KSK-013
   boardFrames:
   - Kiosk Board 1.dc.html#KSK-009
-  wireframe: wireframes/Kiosk Board 1.dc.html#KSK-009
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-009
   inFlows:
   - F07 Guest buys at a kiosk
   - F75 A kiosk serves itself and calls for help
@@ -308,6 +318,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -321,7 +332,7 @@ screens:
   - KSK-013
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-010
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-010
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-010
   inFlows:
   - F57 A guest uses a kiosk and it fails
 - screen: KSK-011
@@ -349,7 +360,7 @@ screens:
   - KSK-003
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-011
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-011
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-011
   inFlows: null
 - screen: KSK-012
   name: Booking found
@@ -361,6 +372,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -373,7 +385,7 @@ screens:
   - KSK-003
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-012
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-012
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-012
   inFlows: null
 - screen: KSK-013
   name: Call staff
@@ -385,6 +397,7 @@ screens:
   - endKioskAssist
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -397,7 +410,7 @@ screens:
   - KSK-003
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-013
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-013
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-013
   inFlows:
   - F57 A guest uses a kiosk and it fails
   - F75 A kiosk serves itself and calls for help
@@ -410,6 +423,8 @@ screens:
   operations: []
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -421,7 +436,7 @@ screens:
   - KSK-003
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-014
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-014
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-014
   inFlows: null
 - screen: KSK-015
   name: Assistant
@@ -447,7 +462,7 @@ screens:
   - KSK-001
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-015
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-015
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-015
   inFlows:
   - F24 A guest asks the assistant and ends up with a person
 - screen: KSK-016
@@ -472,7 +487,7 @@ screens:
   - KSK-017
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-016
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-016
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-016
   inFlows: null
 - screen: KSK-017
   name: Shop
@@ -499,6 +514,6 @@ screens:
   - KSK-016
   boardFrames:
   - Kiosk Board 2.dc.html#KSK-017
-  wireframe: wireframes/Kiosk Board 2.dc.html#KSK-017
+  wireframe: wireframes/P05 Guest Kiosk.dc.html#ksk-017
   inFlows:
   - F51 A guest shops in the venue and collects on the way out

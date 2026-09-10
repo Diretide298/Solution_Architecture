@@ -23,9 +23,7 @@ modulesUsed:
   screens: 8
 servicesCalled:
 - service: TenancyService
-  operationCalls: 5
-- service: VenueOpsService
-  operationCalls: 1
+  operationCalls: 6
 coverage:
   screens: 8
   inAFlow: 3
@@ -42,13 +40,13 @@ screens:
   operations: []
   states:
   - emptyFirstRun
+  - emptyNoResults
   - error
   - loading
   offlineState: false
   entryParams: []
   goesTo:
   - ACC-002
-  - ACC-003
   - ACC-004
   boardFrames: null
   wireframe: wireframes/P11 Accreditation Web.dc.html#acc-001
@@ -59,20 +57,18 @@ screens:
   requiresModule: accreditation
   wave: 3
   density: compact
-  operations:
-  - listApprovalRequests
+  operations: []
   states:
+  - denied
   - emptyFirstRun
-  - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - applicationRef<-deepLink
   goesTo:
   - ACC-001
   - ACC-003
-  - ACC-004
   - ACC-007
   boardFrames: null
   wireframe: wireframes/P11 Accreditation Web.dc.html#acc-002
@@ -86,13 +82,15 @@ screens:
   density: compact
   operations: []
   states:
+  - denied
   - emptyFirstRun
+  - emptyNoResults
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - applicationRef<-ACC-002
   goesTo:
-  - ACC-001
   - ACC-002
   - ACC-004
   boardFrames: null
@@ -106,15 +104,17 @@ screens:
   density: compact
   operations: []
   states:
+  - denied
   - emptyFirstRun
+  - emptyNoResults
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - applicationRef<-deepLink
   goesTo:
   - ACC-001
-  - ACC-002
-  - ACC-003
+  - ACC-005
   boardFrames: null
   wireframe: wireframes/P11 Accreditation Web.dc.html#acc-004
   inFlows: null
@@ -123,22 +123,21 @@ screens:
   module: Applicant Journey
   requiresModule: accreditation
   wave: 3
-  density: compact
+  density: touchLarge
   operations:
+  - issueAccreditationBadge
   - listAccreditationBadges
-  - listApprovalRequests
   states:
   - emptyFirstRun
-  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
-  offlineState: false
-  entryParams: []
+  - offline
+  offlineState: true
+  entryParams:
+  - applicationRef<-ACC-004
   goesTo:
-  - ACC-001
-  - ACC-002
-  - ACC-003
+  - ACC-004
   boardFrames: null
   wireframe: wireframes/P11 Accreditation Web.dc.html#acc-005
   inFlows:
@@ -150,15 +149,17 @@ screens:
   wave: 3
   density: compact
   operations:
-  - getWaitTimes
+  - listApprovalRequests
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-session
   goesTo:
-  - ACC-001
   - ACC-007
   - ACC-008
   boardFrames: null
@@ -181,9 +182,8 @@ screens:
   - loading
   offlineState: false
   entryParams:
-  - requestId<-deepLink
+  - requestId<-ACC-006
   goesTo:
-  - ACC-001
   - ACC-005
   - ACC-006
   - ACC-008
@@ -197,15 +197,18 @@ screens:
   requiresModule: accreditation
   wave: 3
   density: compact
-  operations: []
+  operations:
+  - listAccreditationBadges
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - programmeId<-session
   goesTo:
-  - ACC-001
   - ACC-006
   - ACC-007
   boardFrames: null

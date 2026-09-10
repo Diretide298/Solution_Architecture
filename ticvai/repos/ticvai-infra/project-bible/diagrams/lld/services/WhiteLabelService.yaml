@@ -1,5 +1,5 @@
 id: LLD-WhiteLabelService
-title: WhiteLabelService — 50 operations, 13 tables
+title: WhiteLabelService — 51 operations, 13 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: Branding, content, navigation and the tenant's own app configuration. Separ
 scale: Read-heavy and heavily cached. Published, not queried.
 ifDown: Down freezes the current published config. Guests see the last good version.
 coverage:
-  operations: 50
+  operations: 51
   inAFlow: 22
   percent: 44%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -22,7 +22,7 @@ schemas:
   largestTable: whitelabel.tenant_config
 operationsByContract:
 - contract: white-label
-  count: 50
+  count: 51
   operations:
   - operation: claimCustomDomain
     verb: POST
@@ -264,6 +264,14 @@ operationsByContract:
     offline: false
     reads: 3
     writes: 3
+  - operation: relinquishCustomDomain
+    verb: DELETE
+    path: /tenant-domains/{domainId}
+    scope: tenant
+    permission: TENANT_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: restoreConfigVersion
     verb: POST
     path: /tenant-config/versions/{version}/restore
@@ -575,5 +583,6 @@ flows:
 - F07 Guest buys at a kiosk
 - F102 A brand is set, previewed, published and rolled back
 - F103 A tenant claims a domain and gets a certificate
+- 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - F22 A tenant rebrands their app
 - F75 A kiosk serves itself and calls for help

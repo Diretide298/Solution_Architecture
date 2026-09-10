@@ -22,7 +22,7 @@ steps:
   operations:
   - claimCustomDomain
   - listCustomDomains
-  - releaseCustomDomain
+  - relinquishCustomDomain
   - verifyCustomDomain
   outcome: 4 operations, 4 of them previously unwalked.
 - step: 2

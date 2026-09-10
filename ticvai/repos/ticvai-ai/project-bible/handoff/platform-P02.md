@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | Screens | 71 |
-| Operations | 132 |
+| Operations | 155 |
 | Contracts | 16 |
 | Modules | 16 |
 | Undrawn | 0 |
@@ -50,7 +50,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `GST-001` | Home – Default | Discovery & Browse | 1 | 4 | yes |
+| `GST-001` | Home – Default | Discovery & Browse | 1 | 5 | yes |
 | `GST-002` | Explore Categories | Discovery & Browse | 1 | 1 | yes |
 | `GST-003` | Event & Attraction Listing | Discovery & Browse | 1 | 4 | yes |
 | `GST-004` | Attraction Details | Discovery & Browse | 1 | 4 | yes |
@@ -58,7 +58,7 @@
 | `GST-006` | Event / Exhibition Details | Discovery & Browse | 1 | 2 | yes |
 | `GST-007` | Select Date & Time | Booking & Selection | 1 | 2 | yes |
 | `GST-008` | Tickets & Add-ons | Booking & Selection | 1 | 1 | yes |
-| `GST-009` | Review & Payment | Cart & Checkout | 1 | 5 | yes |
+| `GST-009` | Review & Payment | Cart & Checkout | 1 | 9 | yes |
 | `GST-010` | Booking Confirmation | Cart & Checkout | 1 | 3 | yes |
 | `GST-011` | Wallet Overview | Membership, Loyalty & Value | 2 | 2 | yes |
 | `GST-012` | My Tickets | Account & Self-Service | 1 | 6 | yes |
@@ -72,10 +72,10 @@
 | `GST-020` | Saved Items / Wishlist | Account & Self-Service | 3 | 3 | yes |
 | `GST-021` | Interactive Map | In-venue Services | 2 | 4 | yes |
 | `GST-022` | Attraction Wait Times | In-venue Services | 2 | 1 | yes |
-| `GST-023` | Virtual Queue | In-venue Services | 3 | 4 | yes |
+| `GST-023` | Virtual Queue | In-venue Services | 3 | 5 | yes |
 | `GST-024` | F&B – Browse & Order | In-venue Services | 2 | 8 | yes |
 | `GST-025` | F&B – Order Tracking | In-venue Services | 2 | 3 | yes |
-| `GST-026` | Retail / Merchandise | Retail | 2 | 2 | yes |
+| `GST-026` | Retail / Merchandise | Retail | 2 | 4 | yes |
 | `GST-027` | Parking – Reserve & Pay | In-venue Services | 3 | 3 | yes |
 | `GST-028` | Parking – Reservation Confirmed | In-venue Services | 3 | 2 | yes |
 | `GST-029` | Venue Info & Services | In-venue Services | 2 | 2 | yes |
@@ -86,11 +86,11 @@
 | `GST-034` | Lost & Found | Support | 2 | 3 | yes |
 | `GST-035` | Feedback & Ratings | Engagement & Support | 3 | 2 | yes |
 | `GST-036` | Loyalty & Rewards | Membership, Loyalty & Value | 2 | 4 | yes |
-| `GST-037` | Offers & Promotions | Promotions | 2 | 3 | yes |
+| `GST-037` | Offers & Promotions | Promotions | 2 | 4 | yes |
 | `GST-038` | Digital Companion Mode | In-venue Services | 3 | 3 | yes |
-| `GST-039` | Profile | Account & Self-Service | 1 | 1 | yes |
+| `GST-039` | Profile | Account & Self-Service | 1 | 2 | yes |
 | `GST-040` | Help & Support | Engagement & Support | 2 | 5 | yes |
-| `GST-041` | Checkout Entry | Cart & Checkout | 1 | 2 | yes |
+| `GST-041` | Checkout Entry | Cart & Checkout | 1 | 8 | yes |
 | `GST-042` | Simple Registration & OTP | Account & Self-Service | 1 | 18 | yes |
 | `GST-043` | Arabic / RTL Experience | System States | 1 | 0 | yes |
 | `GST-044` | Multi-Currency & Pricing | Ticketing | 2 | 2 | yes |
@@ -112,13 +112,13 @@
 | `GST-061` | Menu Item Detail | In-Venue Experience | 2 | 2 | yes |
 | `GST-062` | Shop & Drop Collection | In-Venue Experience | 3 | 1 | yes |
 | `GST-063` | Search | Discovery | 1 | 1 | yes |
-| `GST-065` | Newsletter & Preferences | Marketing | 3 | 2 | yes |
+| `GST-065` | Newsletter & Preferences | Marketing | 3 | 4 | yes |
 | `GST-066` | Privacy & My Data | Account & Self-Service | 2 | 5 | yes |
 | `GST-067` | Refunds & Resale | Account & Self-Service | 2 | 3 | yes |
 | `GST-068` | Help & My Cases | Engagement & Support | 2 | 3 | yes |
 | `GST-069` | Face Pass | Account & Self-Service | 2 | 3 | yes |
 | `GST-070` | Reserve a Table or Cabana | In-venue Services | 2 | 7 | yes |
-| `GST-071` | Payment Methods | Account & Self-Service | 2 | 4 | yes |
+| `GST-071` | Payment Methods | Account & Self-Service | 2 | 5 | yes |
 | `GST-072` | Share & Group Booking | Booking & Selection | 2 | 5 | yes |
-| `GST-073` | Security & Sign-in | Account & Self-Service | 2 | 1 | yes |
+| `GST-073` | Security & Sign-in | Account & Self-Service | 2 | 5 | yes |
 

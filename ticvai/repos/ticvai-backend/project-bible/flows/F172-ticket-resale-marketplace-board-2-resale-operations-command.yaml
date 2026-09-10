@@ -1,0 +1,156 @@
+id: F172
+name: 'Ticket Resale Marketplace board 2: Resale Operations Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Ticket Resale Marketplace board 2. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-288
+  entryPoints:
+  - Arrives at Resale Operations Command Center
+steps:
+- step: 1
+  screen: ADM-288
+  action: Opens Resale Operations Command Center
+  operations:
+  - listResale
+  outcome: Provide operations teams with a real-time control center for all resale transactions after
+    listings move into purchase/fulfillment.
+- step: 2
+  screen: ADM-289
+  action: Works in Buyer Purchase & Resale Order Management
+  operations:
+  - listBuyerPurchaseResale
+  outcome: Manage the buyer-side purchase transaction and ensure that a resale ticket is temporarily protected
+    while checkout occurs.
+- step: 3
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-290
+  action: Works in Ticket Ownership Transfer Management
+  operations:
+  - listTicketOwnershipTransfer
+  outcome: Securely transfer the ticket entitlement from the original seller to the resale buyer.
+- step: 5
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-291
+  action: Works in Credential Revocation & Regeneration
+  operations:
+  - listCredentialRevocationRegeneration
+  outcome: Ensure the seller's old ticket credential cannot continue to provide access after resale. This
+    is one of the most important security functions in the module.
+- step: 7
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-292
+  action: Works in Resale Fraud & Duplicate Sale Protection
+  operations:
+  - listResaleFraudDuplicate
+  outcome: Protect TICVAI, venues, sellers and buyers from resale abuse and fraudulent ticket activity.
+- step: 9
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-293
+  action: Works in Capacity & Inventory Reconciliation
+  operations:
+  - listCapacityInventoryReconciliation
+  outcome: Ensure resale activity never creates additional venue capacity or corrupts primary ticket inventory.
+- step: 11
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-294
+  action: Works in Seller Settlement & Payout Management
+  operations:
+  - listSellerSettlementPayout
+  outcome: Manage the financial amount owed to sellers following successful resale.
+- step: 13
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-295
+  action: Works in Refunds, Disputes & Resale Exceptions
+  operations:
+  - listRefundDisputeResale
+  outcome: Handle exceptional scenarios that occur after a resale transaction.
+- step: 15
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-296
+  action: Works in Resale Audit & Ownership History
+  operations:
+  - listResaleOwnership
+  outcome: Provide complete end-to-end traceability of every ticket that enters the resale ecosystem.
+- step: 17
+  screen: ADM-288
+  action: Returns to the board's landing screen
+  operations:
+  - listResale
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-297
+  action: Works in Resale Analytics & AI Intelligence
+  operations:
+  - listResale2
+  outcome: 'Provide management with commercial, operational and predictive intelligence about the resale
+    marketplace. Board 3 defines how the end customer actually accesses, uses, sells through, and buys
+    from The existing resale architecture already defines the backend marketplace configuration and transaction
+    processing across Boards 1 and 2. Board 3 closes the missing experience layer: Board 1 — Configure
+    Marketplace Eligibility → Policy → Listings → Pricing → Fees → Approval → Inventory Board 2 — Execute
+    Resale Transaction Buyer → Payment → Ownership Transfer → Credentials → Fraud → Settlement → Audit
+    Board 3 — Customer Experience Seller Journey → Buyer Journey → White-Label Portal → Client B2C Integration
+    → Hosted Marketplace → Headless/API'
+branches:
+- at: 1
+  condition: Nothing has been set up on Resale Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Ticket Resale Marketplace board 2 visited
+primaryContract: orders
+contracts:
+- orders

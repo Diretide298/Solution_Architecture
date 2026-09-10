@@ -1,5 +1,5 @@
 id: LLD-white-label
-title: white-label — 50 operations
+title: white-label — 51 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: satellite
@@ -397,6 +397,16 @@ operations:
   - cache:idempotency
   - cache:resolution
   - whitelabel.custom_domain
+- operation: relinquishCustomDomain
+  verb: DELETE
+  path: /tenant-domains/{domainId}
+  scope: tenant
+  permission: TENANT_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads: []
+  writes: []
 - operation: restoreConfigVersion
   verb: POST
   path: /tenant-config/versions/{version}/restore

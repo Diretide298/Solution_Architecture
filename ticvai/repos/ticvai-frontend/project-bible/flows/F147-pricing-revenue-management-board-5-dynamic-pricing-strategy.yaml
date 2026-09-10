@@ -1,0 +1,155 @@
+id: F147
+name: 'Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Pricing   Revenue Management board 5. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-088
+  entryPoints:
+  - Arrives at Dynamic Pricing Strategy Command Center
+steps:
+- step: 1
+  screen: ADM-088
+  action: Opens Dynamic Pricing Strategy Command Center
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Provide the central backend workspace for creating, monitoring, and managing all dynamic- pricing
+    strategies. This should be the primary operational screen for Revenue Managers.
+- step: 2
+  screen: ADM-089
+  action: Works in Dynamic Pricing Strategy Builder
+  operations:
+  - setDynamicPricingStrategy
+  outcome: Create the master dynamic-pricing strategy and define what commercial objects it controls.
+- step: 3
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-090
+  action: Works in Demand, Occupancy & Availability Rule Builder
+  operations:
+  - setDemandOccupancyAvailability
+  outcome: 'Configure price movements driven by actual demand and capacity consumption. This directly
+    covers the fundamental matrix requirements for: Demand-Based Pricing Occupancy-Based Pricing Availability-Based
+    Pricing Inventory-Based Pricing'
+- step: 5
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-091
+  action: Works in Booking Velocity & Time-to-Event Rule Builder
+  operations:
+  - setBookingVelocityTime
+  outcome: Control price movement based on how quickly inventory is selling and how much time remains
+    before the event or visit date. This is critical because occupancy alone is insufficient for effective
+    revenue management.
+- step: 7
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-092
+  action: Works in Seasonal, Calendar, Day & Timeslot Dynamic Rules
+  operations:
+  - listSeasonalCalendarDay
+  outcome: Configure dynamic pricing behavior according to temporal commercial patterns.
+- step: 9
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-093
+  action: Works in Channel, Customer Segment & Location Dynamic Rules
+  operations:
+  - listChannelCustomerSegment
+  outcome: Allow dynamic-pricing behavior to differ according to commercial context.
+- step: 11
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-094
+  action: Works in Dynamic Price Bands, Ladders & Adjustment Matrix
+  operations:
+  - listDynamicPriceBand
+  outcome: Define the controlled monetary steps through which prices can move. This is preferable to allowing
+    unrestricted price generation for many products.
+- step: 13
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-095
+  action: Works in Dynamic Pricing Guardrails & Commercial Protection
+  operations:
+  - listDynamicPricingGuardrail
+  outcome: Establish the non-negotiable boundaries for every dynamic-pricing strategy.
+- step: 15
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-096
+  action: Works in Dynamic Pricing Automation Policy & Control
+  operations:
+  - listDynamicPricingAutomation
+  outcome: Define how much authority the pricing engine has to act on a calculated dynamic price. This
+    is different from Board 4's approval workflow. Board 5 determines whether the engine may act automatically.
+    Board 4 handles governance when formal approval is required.
+- step: 17
+  screen: ADM-088
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicPricingStrategy
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-097
+  action: Works in Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
+  operations:
+  - listRulePriorityConflict
+  outcome: Determine the final dynamic price when multiple strategies and rules are simultaneously applicable.
+    This is the final and most important control screen of Board 5.
+branches:
+- at: 1
+  condition: Nothing has been set up on Dynamic Pricing Strategy Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Pricing   Revenue Management board 5 visited
+primaryContract: catalogue
+contracts:
+- catalogue

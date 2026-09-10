@@ -63,7 +63,6 @@ screens:
   - offline
   offlineState: true
   entryParams:
-  - sessionId<-session
   - shiftId<-session
   goesTo:
   - SCN-002
@@ -125,10 +124,6 @@ screens:
   - error
   - loading
   - offline
-  - outcomeAdmitted
-  - outcomeBlacklisted
-  - outcomeDenied
-  - overrideDialog
   offlineState: true
   entryParams:
   - mediaCode<-deepLink
@@ -137,6 +132,8 @@ screens:
   - SCN-001
   - SCN-002
   - SCN-003
+  - SCN-007
+  - SCN-014
   boardFrames: null
   wireframe: wireframes/P07 Venue Scanner.dc.html#scn-003
   inFlows:
@@ -204,6 +201,7 @@ screens:
   - SCN-001
   - SCN-002
   - SCN-003
+  - SCN-009
   boardFrames: null
   wireframe: wireframes/P07 Venue Scanner.dc.html#scn-008
   inFlows:
@@ -251,6 +249,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -291,6 +290,7 @@ screens:
   - SCN-001
   - SCN-002
   - SCN-003
+  - SCN-014
   boardFrames: null
   wireframe: wireframes/P07 Venue Scanner.dc.html#scn-013
   inFlows:
@@ -357,6 +357,7 @@ screens:
   - SCN-001
   - SCN-002
   - SCN-003
+  - SCN-013
   boardFrames: null
   wireframe: wireframes/P07 Venue Scanner.dc.html#scn-015
   inFlows:

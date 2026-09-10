@@ -1,0 +1,133 @@
+id: F125
+name: 'Approval Workflows and Governance board 3: Approval Matrix Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 3. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-329
+  entryPoints:
+  - Arrives at Approval Matrix Command Center
+steps:
+- step: 1
+  screen: ADM-329
+  action: Opens Approval Matrix Command Center
+  operations: []
+  outcome: Provide administrators with a centralized overview of all approval matrices configured across
+    TICVAI.
+- step: 2
+  screen: ADM-330
+  action: Works in Approval Authority Matrix
+  operations: []
+  outcome: Provide a visual table showing who can approve what and up to which authority level.
+- step: 3
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-331
+  action: Works in Organizational Hierarchy Routing
+  operations: []
+  outcome: Configure approval routing based on the client's organizational hierarchy.
+- step: 5
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-332
+  action: Works in Department-Based Approval Matrix
+  operations: []
+  outcome: Allow different departments to maintain different approval authority structures.
+- step: 7
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-333
+  action: Works in Venue & Tenant Approval Matrix
+  operations: []
+  outcome: Allow approval policies to differ between TICVAI clients and between venues belonging to the
+    same client.
+- step: 9
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-334
+  action: Works in Value & Threshold Routing
+  operations: []
+  outcome: Configure approval authority according to transaction value or percentage thresholds. Example
+    — Refund
+- step: 11
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-335
+  action: Works in Risk-Based & Conditional Routing
+  operations: []
+  outcome: Dynamically modify approval routing based on the risk or context of the request.
+- step: 13
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-336
+  action: Works in Approver Group & Decision Policy
+  operations: []
+  outcome: Define cases where approval authority belongs to multiple people rather than one individual.
+- step: 15
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-337
+  action: Works in Routing Simulator & Conflict Detection
+  operations: []
+  outcome: Allow administrators to test the complete approval matrix before deployment. This is particularly
+    important because Board 3 can contain hundreds of combinations.
+- step: 17
+  screen: ADM-329
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-338
+  action: Works in AI Routing Advisor & Matrix Optimization
+  operations: []
+  outcome: Use TICVAI AI to analyze approval behavior and recommend improvements to the approval matrix.
+    The source requires AI risk assessment, priority scoring and escalation recommendations.
+branches:
+- at: 1
+  condition: Nothing has been set up on Approval Matrix Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 3 visited
+primaryContract: unknown
+contracts:
+- unknown

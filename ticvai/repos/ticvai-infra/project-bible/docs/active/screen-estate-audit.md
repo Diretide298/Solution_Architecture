@@ -83,7 +83,7 @@ Duplication is not recomputed here. `tools/check-screen-redundancy.py` clusters 
 | `recordGamePlay` | guest | staff | **guest** | P08 |
 | `refreshToken` | guest, partner, staff | anonymous, guest, public | **partner, staff** | P01, P02 |
 | `registerDeveloper` | public | partner | **public** | P14 |
-| `releaseSeatBlock` | partner, staff | partner | **staff** | P10 |
+| `relinquishSeatBlock` | partner, staff | partner | **staff** | P10 |
 | `removeMfaMethod` | guest, partner, staff | anonymous, guest, public | **partner, staff** | P01, P02 |
 | `replayEvents` | partner, staff | partner | **staff** | P14 |
 | `resetSandbox` | partner, staff | partner | **staff** | P14 |

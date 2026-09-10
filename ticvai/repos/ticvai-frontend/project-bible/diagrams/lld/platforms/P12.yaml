@@ -42,13 +42,13 @@ servicesCalled:
   operationCalls: 1
 coverage:
   screens: 28
-  inAFlow: 3
+  inAFlow: 23
   drawn: 28
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
 - screen: SUP-001
-  name: Agent Login
+  name: Venue Management Sign In
   module: Access & Availability
   requiresModule: core
   wave: 3
@@ -69,9 +69,11 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams:
-  - sessionId<-session
+  entryParams: []
   goesTo:
+  - ANL-001
+  - BO-001
+  - CMS-001
   - SUP-002
   - SUP-003
   - SUP-004
@@ -98,6 +100,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -109,7 +112,7 @@ screens:
   - SUP-004
   boardFrames:
   - Dashboards Board.dc.html#sup-002
-  wireframe: wireframes/Dashboards Board.dc.html#sup-002
+  wireframe: wireframes/P12 Venue Support.dc.html#sup-002
   inFlows: null
 - screen: SUP-003
   name: Availability & Routing Settings
@@ -248,6 +251,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -279,6 +283,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -321,7 +326,8 @@ screens:
   - SUP-018
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-009
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-010
   name: Customer 360° Service Profile
   module: Support
@@ -342,7 +348,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-010
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-011
   name: Unified Interaction & Communication History
   module: Support
@@ -354,7 +361,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -363,7 +369,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-011
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-012
   name: Case Creation, Classification & Intelligent Routing
   module: Support
@@ -375,7 +382,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -384,7 +390,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-012
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-013
   name: Case Investigation & Resolution Workspace
   module: Support
@@ -405,7 +412,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-013
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-014
   name: Order, Booking & Ticket Service Workspace
   module: Support
@@ -426,7 +434,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-014
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-015
   name: Refund, Compensation & Service Exception Workspace
   module: Support
@@ -447,7 +456,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-015
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-016
   name: Escalation, Collaboration & Internal Resolution
   module: Support
@@ -459,7 +469,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -468,7 +477,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-016
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-017
   name: Case Resolution, Closure & Customer Feedback
   module: Support
@@ -480,7 +490,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -489,7 +498,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-017
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-018
   name: AI Customer Service Copilot & Knowledge Workspace
   module: Support
@@ -510,7 +520,8 @@ screens:
   - SUP-009
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-018
-  inFlows: null
+  inFlows:
+  - 'F134 Customer Service board 1: Customer Service Command Center'
 - screen: SUP-019
   name: Contact Center Operations Command Center
   module: Support
@@ -540,7 +551,8 @@ screens:
   - SUP-028
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-019
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-020
   name: Queue Configuration & Management
   module: Support
@@ -552,7 +564,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -561,7 +572,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-020
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-021
   name: Intelligent Routing, Skills & Assignment Engine
   module: Support
@@ -582,7 +594,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-021
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-022
   name: SLA Policy & Service-Level Management
   module: Support
@@ -594,7 +607,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -603,7 +615,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-022
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-023
   name: Agent Workload, Availability & Workforce Control
   module: Support
@@ -624,7 +637,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-023
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-024
   name: Escalation & Critical Case Monitor
   module: Support
@@ -645,7 +659,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-024
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-025
   name: Quality Management & Agent Evaluation
   module: Support
@@ -666,7 +681,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-025
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-026
   name: Customer Satisfaction, Feedback & Voice of Customer
   module: Support
@@ -687,7 +703,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-026
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-027
   name: Service Analytics & Root-Cause Intelligence
   module: Support
@@ -708,7 +725,8 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-027
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - screen: SUP-028
   name: AI Contact Center Intelligence & Automation Studio
   module: Support
@@ -729,4 +747,5 @@ screens:
   - SUP-019
   boardFrames: null
   wireframe: wireframes/P12 Venue Support.dc.html#sup-028
-  inFlows: null
+  inFlows:
+  - 'F135 Customer Service board 2: Contact Center Operations Command Center'

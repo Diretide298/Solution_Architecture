@@ -1,0 +1,136 @@
+id: F178
+name: 'Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P16 Venue Analytics
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Unified BI Reporting and AI Analytics Platform board 4.
+    **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: ANL-041
+  entryPoints:
+  - Arrives at Reporting Governance Command Center
+steps:
+- step: 1
+  screen: ANL-041
+  action: Opens Reporting Governance Command Center
+  operations: []
+  outcome: Provide administrators with a centralized overview of reporting operations, governance, distribution
+    and compliance.
+- step: 2
+  screen: ANL-042
+  action: Works in Report Scheduler
+  operations: []
+  outcome: Allow authorized users to automatically generate reports according to defined schedules.
+- step: 3
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ANL-043
+  action: Works in Subscription Manager
+  operations: []
+  outcome: Allow users and administrators to subscribe recipients to dashboards, reports and KPI summaries.
+- step: 5
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ANL-044
+  action: Works in Distribution & Delivery Configuration
+  operations: []
+  outcome: Configure how generated reporting content reaches approved recipients or destinations.
+- step: 7
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ANL-045
+  action: Works in Export & Download Center
+  operations: []
+  outcome: Provide centralized management of report and dashboard exports. The source matrix requires
+    reporting export to multiple formats, including PDF, Excel, delimited text and XML.
+- step: 9
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ANL-046
+  action: Works in Report API & Data Delivery Manager
+  operations: []
+  outcome: Allow approved systems to receive reporting information programmatically. This supports the
+    requirement for report export/access through APIs.
+- step: 11
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ANL-047
+  action: Works in Report Access & Sharing Control
+  operations: []
+  outcome: Provide centralized security for reports, dashboards and analytical information. The matrix
+    specifically requires reporting access based on group rights, operating-area rights and user access
+    rights.
+- step: 13
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ANL-048
+  action: Works in Delivery Monitoring & Failure Management
+  operations: []
+  outcome: Monitor scheduled report execution and distribution and provide operational management of failures.
+- step: 15
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ANL-049
+  action: Works in Report Audit Trail & Compliance
+  operations: []
+  outcome: Maintain complete traceability of reporting activity. The source matrix requires report logs
+    and audit reporting for sales history.
+- step: 17
+  screen: ANL-041
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ANL-050
+  action: Works in Retention, Archive & Governance Policy
+  operations: []
+  outcome: Control the lifecycle of reports, generated files and historical analytical data. The reporting-platform
+    specification requires long-term reporting history together with archival and retrieval capability.
+branches:
+- at: 1
+  condition: Nothing has been set up on Reporting Governance Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Unified BI Reporting and AI Analytics Platform board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

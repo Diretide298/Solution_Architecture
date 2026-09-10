@@ -21,8 +21,12 @@ CREATE INDEX IF NOT EXISTS ix_burst_environment_usage_record_id ON control.burst
 CREATE INDEX IF NOT EXISTS ix_cell_cluster_id ON control.cell (cluster_id);
 -- convention, not declared: control.cell_cluster.modelled_on_cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS ix_cell_cluster_modelled_on_cell_id ON control.cell_cluster (modelled_on_cell_id);
+-- convention, not declared: control.cell_instance.cell_id -> control.cell
+CREATE INDEX IF NOT EXISTS ix_cell_instance_cell_id ON control.cell_instance (cell_id);
 -- convention, not declared: control.cell_tenant.cell_id -> control.cell
 CREATE INDEX IF NOT EXISTS ix_cell_tenant_cell_id ON control.cell_tenant (cell_id);
+-- convention, not declared: control.cell_tenant.instance_id -> control.cell_instance
+CREATE INDEX IF NOT EXISTS ix_cell_tenant_instance_id ON control.cell_tenant (instance_id);
 -- convention, not declared: control.cell_tenant.tenant_id -> platform.tenant
 CREATE INDEX IF NOT EXISTS ix_cell_tenant_tenant_id ON control.cell_tenant (tenant_id);
 -- convention, not declared: control.content_block.approved_by_principal_id -> identity.principal

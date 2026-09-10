@@ -565,10 +565,12 @@ writesOutside:
 screens:
 - P01:WEB-016 Login / Register
 - P01:WEB-020 Profile & Preferences
+- P01:WEB-024 Devices, Wishlist & Consent
 - P02:GST-015 Memberships
 - P02:GST-042 Simple Registration & OTP
 - P02:GST-066 Privacy & My Data
 - P02:GST-073 Security & Sign-in
+- P04:POS-000 Sign In
 - P04:POS-001 Begin Shift
 - P04:POS-018 Safe Drop & Cash Transfer Management
 - P06:EMP-001 Sign in
@@ -595,10 +597,11 @@ screens:
 - P09:ADM-015 API Rate Limit & Quota Management
 - P09:ADM-020 Platform User Directory
 - P09:ADM-021 Platform Role Management
+- P09:ADM-342 Authentication & MFA Policy Manager
 - P10:PTR-001 Partner Login / MFA
 - P10:PTR-003 Profile & Company Details
 - P10:PTR-020 Sub-Agent Management
-- P12:SUP-001 Agent Login
+- P12:SUP-001 Venue Management Sign In
 - P13:CMS-001 Tenant Workspace
 - P13:CMS-019 User Access
 - P16:ANL-003 Operational Performance
@@ -609,6 +612,8 @@ flows:
 - F104 A platform operator signs in under MFA
 - F105 A rate limit is set and a developer hits it
 - F106 A security dashboard surfaces something and it is investigated
+- F109 A tenant gets its first administrator
+- F110 A partner is onboarded onto the B2B portal
 - F16 A venue opens for the first time
 - F32 A till opens, trades and settles
 - F56 A guest registers, verifies and sets preferences

@@ -1,5 +1,5 @@
 id: LLD-OrderService
-title: OrderService — 186 operations, 34 tables
+title: OrderService — 187 operations, 34 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**The transactional core.** 96 operations, 34 tables, and the highest writ
 scale: Write-heavy, spiky, latency-critical. **The one that autoscales.**
 ifDown: '**Down means no sales.** Highest availability target in the platform.'
 coverage:
-  operations: 186
+  operations: 187
   inAFlow: 53
   percent: 55%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -33,7 +33,7 @@ schemas:
   largestTable: orders.shift
 operationsByContract:
 - contract: orders
-  count: 167
+  count: 168
   operations:
   - operation: abandonCart
     verb: DELETE
@@ -1091,6 +1091,14 @@ operationsByContract:
     offline: false
     reads: 1
     writes: 2
+  - operation: relinquishStoredValue
+    verb: POST
+    path: /stored-value/authorisations/{authorisationId}/release
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: removeCartLine
     verb: DELETE
     path: /carts/{cartId}/lines/{lineId}
@@ -1823,6 +1831,7 @@ screens:
 - P01:WEB-016 Login / Register
 - P01:WEB-018 My Tickets
 - P01:WEB-019 Order History
+- P01:WEB-021 Wallet & Gift Cards
 - P01:WEB-023 Membership Management
 - P01:WEB-030 Ticket Transfer
 - P01:WEB-031 My Reservations
@@ -1868,6 +1877,8 @@ screens:
 - P04:POS-020 Shift Exceptions & Alerts
 - P04:POS-021 Sell — Food & Drink
 - P04:POS-023 Sell — Merchandise
+- P04:POS-025 Till Home
+- P04:POS-026 Receipt & Reprint
 - P05:KSK-006 Review
 - P05:KSK-007 Payment
 - P05:KSK-008 Payment unresolved
@@ -1901,7 +1912,7 @@ screens:
 - P08:BO-040 Variance Approval
 - P08:BO-041 Cash Movements
 - P08:BO-042 Banking & Safe
-- P08:BO-047 F&B Order Management
+- P08:BO-047 Order Corrections & Exceptions
 - P08:BO-051 Purchase Orders
 - P08:BO-062 Venue Profile
 - P08:BO-065 Venue Configuration
@@ -2027,8 +2038,17 @@ flows:
 - F108 A guest orders food at a counter and collects it
 - F11 Guest orders food to a lounger
 - F13 Month end closes
+- 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
+- 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - F14 A discount needs a manager
+- 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
+- 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
+- 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - F17 A guest buys merchandise and collects later
+- 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
+- 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
+- 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
+- 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - F25 A guest rents a cabana
 - F29 A table is seated, coursed and split
 - F32 A till opens, trades and settles

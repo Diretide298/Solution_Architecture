@@ -91,18 +91,85 @@ acceptance baseline.
 
 ---
 
-## `designs/` — Client design material
+## `designs/` — Design material
 
-Rank 3. Directional.
+Two different things live here, and they do not carry the same weight.
+
+**Client material. Rank 3, directional.**
 
 | File | Covers |
 |---|---|
 | `Ticvai_Design_Vision_Book_v1_1.pdf` | Design vision and direction |
 | `TICVAI_White_Label_Guest_App_UI_Reference_1.pdf` | Guest B2C app UI reference |
 | `TICVAI_Employee_App_UI_Reference_1.pdf` | Employee app UI reference |
+| `Park_POS_dc.html`, `Park_POS_v1_dc.html` | Early POS explorations |
 
 Design references are a **starting point, not a specification** (03 Aug §2). Where a design
 reference conflicts with a MoM decision, the MoM wins.
+
+**Our own builds, from our own sources.** These were not given to us. They were built by a
+teammate's Claude Design session reading this package's MoM transcriptions and screen specs, which
+is why they agree with the contracts rather than merely resembling them — and why they outrank the
+PDFs above for anything about structure.
+
+| File | Covers | Standing |
+|---|---|---|
+| `TICVAI_POS_Terminal_client_approved.html` | P04, 30 screens | **Client-approved.** The fidelity reference every other build is measured against |
+| `booking-skeletons/` | The guest booking spine | The design system of record for the booking flow |
+
+`booking-skeletons/` is a white-label booking engine, not a mockup. One fixed step spine —
+Select, Seats, Extras, Details, Payment, Confirmed — composed from **16 module factories** (chips,
+date, note, counters, cards, form, timeline, event, benefits, heights, toggle, spec, sessions,
+menu, matrix, expand) and covering **34 flows across five verticals**: theme park, water park, stadium, theatre and
+dining. Brand, palette, type, density and layout are configuration; the theme is derived from a
+logo by sampling its pixels. Its own claim is that **a new flow is a data entry, not new UI.**
+
+That claim is the reason it matters here. Roughly **55 of the 134 guest screens** across P01, P02
+and P05 sit on this spine. Those are to be *mapped* onto the modules — flow, modules in order,
+configuration — and not drawn again. A screen that genuinely will not compose from the fourteen is
+a missing module and should be reported as one. The remaining guest screens — account, membership,
+engagement, in-venue services, support — are not covered and do need drawing.
+
+The pack's own README says fourteen modules and omits `date()` and `toggle()`, both of which are
+in use — the count above is read off the code, which is the one that renders.
+
+**A flow is a data entry that renders itself**, not a drawing. The unit looks like this:
+
+```js
+{ id: 'day', label: 'Dated day pass', pay: 'full', requires: ['lead', 'consent'],
+  modules: () => [date(), expand('tt', 'Choose your ticket', [...]), note('nudge', ...)] }
+```
+
+So work against this pack means **adding an entry to `flows: []`**, not authoring HTML that
+resembles the output. Anything hand-drawn in its style is a fork of the engine on day one.
+
+Open `TICVAI_Booking_Skeletons.dc.html` directly; `support.js` and `logos/` sit beside it and every
+path in it is relative, so it renders from disk with nothing installed.
+`TICVAI_White_Label_Booking.earlier.dc.html` is the previous iteration, kept because it shows which
+decisions were reversed.
+
+**The POS build is a bundle; the Skeletons pack is source.** That difference decides how each one
+can be extended. `TICVAI_POS_Terminal_client_approved.html` is 5.67 MB of which only 20 KB is
+reachable text: the build itself is a JSON-escaped string on one line inside
+`<script type="__bundler/template">`, with 4.67 MB of base64 assets on another. It cannot be
+edited, diffed or read in that form. `tools/extract-design-document.py` unpacks it --
+
+    python3 tools/extract-design-document.py         sources/designs/TICVAI_POS_Terminal_client_approved.html         --out wireframes/design-base/pos-terminal --apply
+
+-- into a 0.95 MB document plus 48 assets, with every `src="<uuid>"` rewritten and
+`window.__resources` injected so the 29 images reached through `_P('ph20', ...)` resolve instead of
+silently falling back to paths that do not exist. **The output lives under `wireframes/`, which is
+not mirrored**, because it is derived from a file already in the package and copying 4.6 MB into
+six bibles buys nothing. It is not committed as the source of truth; the bundle is.
+
+**The palette trick does not survive being copied out.** It reads logo pixels through a canvas,
+which needs a same-origin image. A frame that points at `logos/` works here and comes out blank on
+a board. Frames drawn from this pack must leave logo and photo slots empty, naming the source file.
+
+**What was left in the zip.** 16MB of pasted conversation screenshots, a rendered export of the
+earlier build, and a copy of the POS terminal that is byte-identical to the one above
+(`ab1b7d3b559a8a14ea36c86d13eb3ee2`) — checked, not assumed. The zip is at
+`adam/Venue ticketing platform design.zip` if any of that is ever wanted.
 
 ---
 

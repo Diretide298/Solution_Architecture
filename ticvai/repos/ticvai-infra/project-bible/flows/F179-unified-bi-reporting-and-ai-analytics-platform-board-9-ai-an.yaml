@@ -1,0 +1,133 @@
+id: F179
+name: 'Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P16 Venue Analytics
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Unified BI Reporting and AI Analytics Platform board 9.
+    **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: ANL-051
+  entryPoints:
+  - Arrives at AI Analytics Command Center
+steps:
+- step: 1
+  screen: ANL-051
+  action: Opens AI Analytics Command Center
+  operations: []
+  outcome: Provide a centralized landing page for all AI-generated analytical intelligence across TICVAI.
+- step: 2
+  screen: ANL-052
+  action: Works in Ask TICVAI — Natural Language Analytics
+  operations: []
+  outcome: Allow users to query TICVAI business information using normal language instead of manually
+    building reports.
+- step: 3
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ANL-053
+  action: Works in AI-Generated Dashboard Studio
+  operations: []
+  outcome: Allow users to generate dashboards from natural-language requests.
+- step: 5
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ANL-054
+  action: Works in AI Report Generator
+  operations: []
+  outcome: Generate detailed reports from natural-language instructions.
+- step: 7
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ANL-055
+  action: Works in Anomaly Detection Center
+  operations: []
+  outcome: Automatically identify unusual behavior across TICVAI data without requiring users to manually
+    monitor every KPI.
+- step: 9
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ANL-056
+  action: Works in Root-Cause Analysis Explorer
+  operations: []
+  outcome: Help users understand why a KPI changed. This is one of the most important AI capabilities
+    in the entire platform.
+- step: 11
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ANL-057
+  action: Works in Forecasting & Predictive Analytics Studio
+  operations: []
+  outcome: Provide configurable forward-looking analytics across business domains.
+- step: 13
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ANL-058
+  action: Works in AI Recommendation & Next-Best-Action Center
+  operations: []
+  outcome: Convert analytical insights into prioritized business recommendations.
+- step: 15
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ANL-059
+  action: Works in AI Insight History, Evidence & Explainability
+  operations: []
+  outcome: Create a full governance trail for AI-generated analytics and recommendations.
+- step: 17
+  screen: ANL-051
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ANL-060
+  action: Works in AI Analytics Governance & Model Control
+  operations: []
+  outcome: Provide administrators with centralized control over how AI may access and use TICVAI analytics.
+    This screen is critical because Board 9 should not give an LLM unrestricted access to the TICVAI database.
+branches:
+- at: 1
+  condition: Nothing has been set up on AI Analytics Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Unified BI Reporting and AI Analytics Platform board 9 visited
+primaryContract: unknown
+contracts:
+- unknown

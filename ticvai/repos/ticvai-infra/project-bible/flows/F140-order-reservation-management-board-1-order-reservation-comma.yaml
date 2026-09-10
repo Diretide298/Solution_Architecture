@@ -1,0 +1,153 @@
+id: F140
+name: 'Order   Reservation Management board 1: Order & Reservation Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Order   Reservation Management board 1. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-304
+  entryPoints:
+  - Arrives at Order & Reservation Command Center
+steps:
+- step: 1
+  screen: BO-304
+  action: Opens Order & Reservation Command Center
+  operations:
+  - listOrderReservation
+  outcome: Provide the central operational workspace for searching, monitoring, opening, and managing
+    every order and reservation across TICVAI.
+- step: 2
+  screen: BO-305
+  action: Works in Order Detail & Transaction Workspace
+  operations:
+  - setOrderDetailTransaction
+  outcome: Provide the authoritative 360-degree view of a single order. This should become one of the
+    most important operational screens in TICVAI.
+- step: 3
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-306
+  action: Works in Reservation & Hold Policy Configuration
+  operations:
+  - setReservationHoldPolicy
+  outcome: Configure how TICVAI temporarily reserves inventory before an order is fully confirmed.
+- step: 5
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-307
+  action: Works in Order & Reservation Status Lifecycle Configuration
+  operations:
+  - setOrderReservationStatus
+  outcome: Define the governed state machine for orders and reservations. SoftLab should not hard-code
+    status transitions independently in every channel.
+- step: 7
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-308
+  action: Works in Order Creation & Source/Channel Configuration
+  operations:
+  - createOrderSourceChannel
+  outcome: Configure how orders can originate from different TICVAI sales channels while using one common
+    transaction engine.
+- step: 9
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-309
+  action: Works in Customer, Guest & Account Assignment
+  operations:
+  - setCustomerGuestAccount
+  outcome: Define how customers are identified and associated with orders/reservations.
+- step: 11
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-310
+  action: Works in Order Line, Product & Entitlement Composition
+  operations:
+  - listOrderLineProduct
+  outcome: Manage the products and commercial components contained within an order.
+- step: 13
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-311
+  action: Works in Capacity Reservation & Inventory Commitment
+  operations:
+  - listCapacityReservationInventory
+  outcome: Control when and how order activity consumes real capacity/inventory. This is the transactional
+    bridge between the Order Engine and the Capacity/Inventory Engines.
+- step: 15
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-312
+  action: Works in Reservation Confirmation, Expiry & Fulfillment Readiness
+  operations:
+  - listReservationConfirmationExpiry
+  outcome: Determine when a reservation becomes a confirmed order and when it is ready for ticket/media
+    fulfillment.
+- step: 17
+  screen: BO-304
+  action: Returns to the board's landing screen
+  operations:
+  - listOrderReservation
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-313
+  action: Works in Order Lifecycle Timeline, SLA, Exceptions & AI Operations
+  operations:
+  - listOrderLifecycleTimeline
+  outcome: Provide complete lifecycle visibility and proactively identify orders/reservations that require
+    operational intervention.
+branches:
+- at: 1
+  condition: Nothing has been set up on Order & Reservation Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Order   Reservation Management board 1 visited
+primaryContract: orders
+contracts:
+- orders

@@ -1,0 +1,153 @@
+id: F117
+name: 'Access Control board 7: Offline & Edge Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 7. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-204
+  entryPoints:
+  - Arrives at Offline & Edge Operations Command Center
+steps:
+- step: 1
+  screen: BO-204
+  action: Opens Offline & Edge Operations Command Center
+  operations:
+  - listOfflineEdge
+  outcome: Provide a real-time overview of offline readiness across the entire access-control estate.
+- step: 2
+  screen: BO-205
+  action: Works in Edge Node & Local Processing Configuration
+  operations:
+  - setEdgeNodeLocal
+  outcome: Configure where local access decisions are processed when central services cannot be reached.
+- step: 3
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-206
+  action: Works in Offline Validation Policy Builder
+  operations:
+  - setOfflinePolicy
+  outcome: Define exactly which access checks are allowed to run locally. The matrix identifies key offline
+    criteria including eligible media, eligible site, eligible time, ticket validity and eligible access
+    mode.
+- step: 5
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-207
+  action: Works in Edge Package & Data Distribution
+  operations:
+  - listEdgePackageData
+  outcome: Define what configuration and operational data is securely distributed to edge devices.
+- step: 7
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-208
+  action: Works in Offline Credential & Revocation Cache
+  operations:
+  - listOfflineCredentialRevocation
+  outcome: Manage the local information required to reject credentials that should no longer be usable.
+    This is especially important because Board 3 requires refunded, cancelled, transferred, exchanged,
+    upgraded and reissued credentials to be invalidated.
+- step: 9
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-209
+  action: Works in Offline Entitlement & Usage Ledger
+  operations:
+  - listOfflineEntitlementUsage
+  outcome: 'Track entitlement consumption while the central system is unavailable. This is necessary for
+    tickets such as: 3 Fast Pass uses 1 park entry 1 meal 1 re-entry where usage can occur during an outage.'
+- step: 11
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-210
+  action: Works in Connectivity Failure & Degraded Mode Policy
+  operations:
+  - listConnectivityFailureDegraded
+  outcome: Configure how devices transition from normal online operation to offline/degraded operation.
+- step: 13
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-211
+  action: Works in Reconnection, Synchronization & Conflict Resolution
+  operations:
+  - listReconnectionSynchronizationConflict
+  outcome: Synchronize everything that occurred offline when connectivity returns.
+- step: 15
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-212
+  action: Works in Offline Simulation & Resilience Testing
+  operations:
+  - simulateOfflineResilienceTesting
+  outcome: Allow venues to prove that their access environment will survive outages before opening to
+    guests.
+- step: 17
+  screen: BO-204
+  action: Returns to the board's landing screen
+  operations:
+  - listOfflineEdge
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-213
+  action: Works in Edge Security, Audit & Deployment
+  operations:
+  - listEdgeSecurityDeployment
+  outcome: Govern the complete offline/edge environment.
+branches:
+- at: 1
+  condition: Nothing has been set up on Offline & Edge Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 7 visited
+primaryContract: access
+contracts:
+- access
+- tenancy

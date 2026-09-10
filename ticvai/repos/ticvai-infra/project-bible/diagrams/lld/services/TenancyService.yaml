@@ -1,5 +1,5 @@
 id: LLD-TenancyService
-title: TenancyService — 76 operations, 38 tables
+title: TenancyService — 78 operations, 39 tables
 generatedBy: tools/derive-diagrams.py
 tier: foundation
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ why: '**`platform.org_unit` is reached by 304 of 379 tables** — the tenancy sp
 scale: Read-heavy and highly cacheable. Config changes are rare.
 ifDown: Same as identity — nothing runs without a scope.
 coverage:
-  operations: 76
+  operations: 78
   inAFlow: 32
   percent: 62%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -37,13 +37,13 @@ schemas:
   - postgres
   largestTable: workforce.rota_assignment
 - schema: approvals
-  tables: 7
+  tables: 8
   stores:
   - postgres
   largestTable: approvals.request
 operationsByContract:
 - contract: approvals
-  count: 35
+  count: 37
   operations:
   - operation: approveMatrixMultiLevel
     verb: PUT
@@ -221,6 +221,14 @@ operationsByContract:
     offline: false
     reads: 0
     writes: 0
+  - operation: listStepUpPolicies
+    verb: GET
+    path: /step-up-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: listWorkflow
     verb: GET
     path: /workflow
@@ -285,6 +293,14 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 3
+  - operation: setStepUpPolicy
+    verb: PUT
+    path: /step-up-policies
+    scope: tenant
+    permission: APPROVAL_CONFIGURE
+    offline: false
+    reads: 1
+    writes: 1
   - operation: setTriggerActionCross
     verb: PUT
     path: /trigger-action-cross
@@ -726,6 +742,13 @@ tables:
   writtenBy:
   - approvals
   foreignWriters: null
+- table: approvals.step_up_policy
+  columns: 8
+  store: postgres
+  parent: null
+  writtenBy:
+  - approvals
+  foreignWriters: null
 - table: platform.audit_read
   columns: 3
   store: postgres
@@ -998,6 +1021,7 @@ screens:
 - P04:POS-019 Shift Templates & Policies
 - P04:POS-020 Shift Exceptions & Alerts
 - P04:POS-024 Outlet Setup
+- P04:POS-025 Till Home
 - P06:EMP-007 Handover notes
 - P06:EMP-021 Roster
 - P06:EMP-022 My rota
@@ -1080,17 +1104,23 @@ screens:
 - P09:ADM-255 Workflow Analytics & Process Performance
 - P09:ADM-256 Process Optimization & Automation Opportunity Center
 - P09:ADM-257 AI Workflow Intelligence & Autonomous Governance Center
-- P11:ACC-002 Registration Form
+- P09:ADM-342 Authentication & MFA Policy Manager
 - P11:ACC-005 Accreditation Badge
+- P11:ACC-006 Reviewer Queue
 - P11:ACC-007 Reviewer Application Detail
+- P11:ACC-008 Credential Register
 - P15:KIT-009 SLA, Priority & Service Rules
 - P16:ANL-003 Operational Performance
 flows:
 - F08 Steward works a shift on the employee app
 - F106 A security dashboard surfaces something and it is investigated
+- 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - F14 A discount needs a manager
 - F15 A part is needed and ordered
+- 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - F16 A venue opens for the first time
+- 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
+- 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - F23 A contractor gets a badge and uses it
 - F32 A till opens, trades and settles
 - F34 A retail sale, from scan to return

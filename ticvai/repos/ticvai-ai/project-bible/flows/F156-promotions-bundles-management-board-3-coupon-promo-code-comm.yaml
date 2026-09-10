@@ -1,0 +1,157 @@
+id: F156
+name: 'Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 3. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-158
+  entryPoints:
+  - Arrives at Coupon & Promo Code Command Center
+steps:
+- step: 1
+  screen: ADM-158
+  action: Opens Coupon & Promo Code Command Center
+  operations:
+  - listCouponCodes
+  outcome: Provide the central operational dashboard for all coupon, promo-code, and promotional voucher
+    activities.
+- step: 2
+  screen: ADM-159
+  action: Works in Coupon & Promo Code Builder
+  operations:
+  - setCouponPromoCode
+  outcome: Create the commercial definition of a coupon or promo-code campaign.
+- step: 3
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-160
+  action: Works in Unique Code Generation & Batch Manager
+  operations:
+  - listUniqueCodeGeneration
+  outcome: Generate and manage large quantities of secure unique promotional codes.
+- step: 5
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-161
+  action: Works in Code Eligibility & Restriction Manager
+  operations:
+  - listCodeEligibilityRestriction
+  outcome: Determine where, when, by whom, and against what a code can be redeemed. The matrix explicitly
+    requires promo codes to support restrictions for usage, dates, duration, capacity, frequency, location,
+    group, partner, operating area, and sales channel.
+- step: 7
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-162
+  action: Works in Usage, Capacity & Frequency Control
+  operations:
+  - listUsageCapacityFrequency
+  outcome: Control exactly how frequently and how many times promotional codes may be redeemed.
+- step: 9
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-163
+  action: Works in Validity, Date & Time Control
+  operations:
+  - listValidityDateTime
+  outcome: Control the temporal validity of coupons and codes.
+- step: 11
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-164
+  action: Works in Code Distribution & Assignment Manager
+  operations:
+  - setCodeDistributionManager
+  outcome: Manage how promotional codes are allocated and distributed.
+- step: 13
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-165
+  action: Works in Redemption Monitor & Code Lookup
+  operations:
+  - listRedemptionCodeLookup
+  outcome: Provide real-time operational visibility into coupon and promo-code redemption.
+- step: 15
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-166
+  action: Works in Code Security, Fraud & Exception Center
+  operations:
+  - listCodeSecurityFraud
+  outcome: Detect promo-code abuse, leakage, abnormal redemption, and suspicious campaign behavior.
+- step: 17
+  screen: ADM-158
+  action: Returns to the board's landing screen
+  operations:
+  - listCouponCodes
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-167
+  action: Works in Redemption Analytics, Audit & AI Optimization
+  operations:
+  - listRedemption
+  outcome: 'Provide complete performance analytics and governance for coupon and promo-code campaigns.
+    Board 4 shall provide TICVAI with an enterprise-grade Advanced Promotion Mechanics Engine for promotions
+    involving relationships between products, quantities, basket composition, rewards, and qualifying
+    purchases. While Board 2 defines standard discounts and thresholds and Board 3 manages promo codes/coupons,
+    Board 4 answers: “When the customer buys X, what exactly should TICVAI give them, discount, replace,
+    upgrade, or add to the transaction?” The matrix requires mechanics such as Buy X Get X, Buy X Get
+    Y, Buy N Get X, percentage/amount discounts on another product, cheapest-item-free, fixed-price combinations,
+    cross-category F&B/Retail rewards, added-value gifts, and automatic cart-level promotion application.
+    Board 4 shall contain 10 backend screens.'
+branches:
+- at: 1
+  condition: Nothing has been set up on Coupon & Promo Code Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 3 visited
+primaryContract: promotions
+contracts:
+- promotions

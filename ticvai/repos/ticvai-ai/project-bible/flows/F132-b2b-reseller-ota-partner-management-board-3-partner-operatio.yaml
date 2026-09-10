@@ -1,0 +1,151 @@
+id: F132
+name: 'B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
+actor: partner
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P10 Partner Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as B2B, Reseller & OTA Partner Management board 3. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: PTR-042
+  entryPoints:
+  - Arrives at Partner Operations Command Center
+steps:
+- step: 1
+  screen: PTR-042
+  action: Opens Partner Operations Command Center
+  operations:
+  - listPartner2
+  outcome: Provide commercial, operations and finance teams with one real-time view of active B2B, reseller
+    and OTA business.
+- step: 2
+  screen: PTR-043
+  action: Works in Partner Orders & Booking Management
+  operations:
+  - listPartnerOrderBooking
+  outcome: Provide a consolidated operational view of orders created by each partner.
+- step: 3
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: PTR-044
+  action: Works in Reservations, Holds & Release Management
+  operations:
+  - listReservationHoldRelease
+  outcome: Manage inventory temporarily reserved by B2B partners before final confirmation. This is particularly
+    important for tour operators, corporate groups and travel-trade partners.
+- step: 5
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: PTR-045
+  action: Works in Partner Cancellations, Refunds & Amendments
+  operations:
+  - listPartnerCancellationRefund
+  outcome: Manage post-booking changes according to the partner's commercial agreement and product policies.
+- step: 7
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: PTR-046
+  action: Works in Partner Statement & Account Activity
+  operations:
+  - listPartnerStatementAccount
+  outcome: Give finance and commercial teams a complete financial statement for each partner account.
+- step: 9
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: PTR-047
+  action: Works in Partner Reconciliation & Exception Management
+  operations:
+  - listPartnerReconciliationException
+  outcome: Reconcile operational bookings against financial and channel records and identify discrepancies.
+- step: 11
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: PTR-048
+  action: Works in Commission Calculation & Settlement Management
+  operations:
+  - listCommissionCalculationSettlement
+  outcome: Calculate, approve and settle commission or incentive amounts owed under partner commercial
+    agreements.
+- step: 13
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: PTR-049
+  action: Works in Partner Disputes, Cases & Service Management
+  operations:
+  - listPartnerDisputeCase
+  outcome: Provide a structured case-management environment for partner operational and commercial disputes.
+- step: 15
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: PTR-050
+  action: Works in Partner Performance Scorecard & Risk Monitoring
+  operations:
+  - listPartnerPerformanceScorecard
+  outcome: Create a consistent scorecard for evaluating the quality and commercial value of every partner
+    relationship.
+- step: 17
+  screen: PTR-042
+  action: Returns to the board's landing screen
+  operations:
+  - listPartner2
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: PTR-051
+  action: Works in Partner AI Intelligence & Relationship Optimization
+  operations:
+  - listPartnerRelationship
+  outcome: Provide TICVAI's AI decision-support layer across the complete partner lifecycle. This screen
+    should combine information from Boards 1, 2 and 3.
+branches:
+- at: 1
+  condition: Nothing has been set up on Partner Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on B2B, Reseller & OTA Partner Management board 3 visited
+primaryContract: subscription
+contracts:
+- subscription

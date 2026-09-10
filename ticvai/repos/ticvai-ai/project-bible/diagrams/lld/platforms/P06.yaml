@@ -50,14 +50,14 @@ servicesCalled:
   operationCalls: 35
 - service: AccessService
   operationCalls: 23
+- service: MarketingService
+  operationCalls: 18
 - service: InventoryService
   operationCalls: 18
 - service: CatalogueService
   operationCalls: 17
 - service: IdentityService
   operationCalls: 16
-- service: MarketingService
-  operationCalls: 15
 - service: AiService
   operationCalls: 8
 - service: RetailService
@@ -91,8 +91,7 @@ screens:
   - loading
   - offline
   offlineState: true
-  entryParams:
-  - sessionId<-session
+  entryParams: []
   goesTo:
   - EMP-002
   - EMP-003
@@ -288,9 +287,6 @@ screens:
   - error
   - loading
   - offline
-  - outcomeAdmitted
-  - outcomeDenied
-  - overrideDialog
   offlineState: true
   entryParams: []
   goesTo:
@@ -397,6 +393,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-009
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-017
   inFlows:
@@ -425,6 +422,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-049
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-018
   inFlows:
@@ -553,6 +551,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-004
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-006
   inFlows:
@@ -614,6 +613,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-017
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-008
   inFlows:
@@ -642,6 +642,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-020
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-019
   inFlows:
@@ -670,6 +671,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-040
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-020
   inFlows:
@@ -703,6 +705,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-032
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-031
   inFlows:
@@ -733,6 +736,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-033
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-032
   inFlows:
@@ -748,7 +752,7 @@ screens:
   - createChannelCapacity
   - getChannelAllocations
   - listChannelCapacities
-  - releaseChannelAllocation
+  - relinquishChannelAllocation
   - setChannelAllocations
   - updateChannelCapacity
   states:
@@ -813,6 +817,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-035
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-034
   inFlows:
@@ -841,6 +846,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-036
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-035
   inFlows:
@@ -858,6 +864,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -983,6 +990,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-047
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-050
   inFlows:
@@ -1010,6 +1018,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-022
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-021
   inFlows:
@@ -1038,6 +1047,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-023
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-022
   inFlows:
@@ -1066,6 +1076,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-024
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-023
   inFlows:
@@ -1094,6 +1105,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-025
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-024
   inFlows:
@@ -1152,6 +1164,7 @@ screens:
   - EMP-002
   - EMP-003
   - EMP-004
+  - EMP-027
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-026
   inFlows:
@@ -1181,6 +1194,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-050
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-027
   inFlows:
@@ -1251,6 +1265,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-030
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-029
   inFlows:
@@ -1281,9 +1296,10 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-028
   boardFrames:
   - Seat Board 4.dc.html#seat-4c
-  wireframe: wireframes/Seat Board 4.dc.html#seat-4c
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-030
   inFlows:
   - F70 A guest needs help and something is lost
 - screen: EMP-038
@@ -1350,6 +1366,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1413,6 +1430,7 @@ screens:
   - EMP-001
   - EMP-002
   - EMP-003
+  - EMP-018
   boardFrames: null
   wireframe: wireframes/P06 Venue Staff App.dc.html#emp-043
   inFlows:
@@ -1426,6 +1444,8 @@ screens:
   operations: []
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1447,6 +1467,8 @@ screens:
   operations: []
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1469,6 +1491,7 @@ screens:
   - logout
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -1493,6 +1516,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1531,7 +1555,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4a
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4a
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-051
   inFlows: null
 - screen: EMP-052
   name: Floor Plan & Table Map
@@ -1557,7 +1581,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4b
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4b
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-052
   inFlows: null
 - screen: EMP-053
   name: Table & Seating Configuration
@@ -1570,7 +1594,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1582,7 +1605,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4c
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-053
   inFlows: null
 - screen: EMP-054
   name: Reservation Calendar & Timeline
@@ -1606,7 +1629,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4d
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4d
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-054
   inFlows: null
 - screen: EMP-055
   name: Create / Edit Reservation
@@ -1616,10 +1639,10 @@ screens:
   density: comfortable
   operations:
   - createTableReservation
+  - matchGuest
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1630,7 +1653,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4e
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4e
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-055
   inFlows: null
 - screen: EMP-056
   name: Walk-In & Waitlist Management
@@ -1643,7 +1666,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1654,7 +1676,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4f
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4f
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-056
   inFlows: null
 - screen: EMP-057
   name: Guest Profile & Dining History
@@ -1665,6 +1687,8 @@ screens:
   operations:
   - getGuestProfile
   - listOrders
+  - matchGuest
+  - mergeGuests
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1680,7 +1704,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4g
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4g
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-057
   inFlows: null
 - screen: EMP-058
   name: Live Table & Service Management
@@ -1708,7 +1732,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1722,11 +1745,12 @@ screens:
   - ticketId<-deepLink
   goesTo:
   - EMP-059
+  - EMP-060
   boardFrames:
   - FnB Board 4.dc.html#fnb-4a
   - FnB Board 4.dc.html#fnb-4b
   - FnB Board 4.dc.html#fnb-4h
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4a
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-058
   inFlows:
   - F29 A table is seated, coursed and split
   - F80 A table is configured, reserved, seated and billed
@@ -1760,7 +1784,7 @@ screens:
   - EMP-058
   boardFrames:
   - FnB Board 4.dc.html#fnb-4j
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4j
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-059
   inFlows:
   - F29 A table is seated, coursed and split
   - F80 A table is configured, reserved, seated and billed
@@ -1786,9 +1810,10 @@ screens:
   - outletId<-EMP-003
   goesTo:
   - EMP-003
+  - EMP-061
   boardFrames:
   - FnB Board 4.dc.html#fnb-4c
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4c
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-060
   inFlows:
   - F80 A table is configured, reserved, seated and billed
   - F94 A restaurant floor is set up before service
@@ -1816,7 +1841,7 @@ screens:
   boardFrames:
   - FnB Board 4.dc.html#fnb-4d
   - FnB Board 4.dc.html#fnb-4e
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4d
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-061
   inFlows:
   - F80 A table is configured, reserved, seated and billed
   - F94 A restaurant floor is set up before service
@@ -1846,7 +1871,7 @@ screens:
   - EMP-067
   boardFrames:
   - FnB Board 5.dc.html#fnb-5j
-  wireframe: wireframes/FnB Board 5.dc.html#fnb-5j
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-062
   inFlows:
   - F28 A temperature excursion is caught and signed off
 - screen: EMP-063
@@ -1872,7 +1897,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4f
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4f
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-063
   inFlows: null
 - screen: EMP-064
   name: Store-to-Store & Warehouse Transfers
@@ -1897,7 +1922,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 4.dc.html#fnb-4g
-  wireframe: wireframes/FnB Board 4.dc.html#fnb-4g
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-064
   inFlows: null
 - screen: EMP-065
   name: Receiving & Store Put-Away
@@ -1926,7 +1951,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 5.dc.html#fnb-5g
-  wireframe: wireframes/FnB Board 5.dc.html#fnb-5g
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-065
   inFlows:
   - F35 Stock arrives short and an oversell is resolved
 - screen: EMP-066
@@ -1957,7 +1982,7 @@ screens:
   - EMP-003
   boardFrames:
   - Retail Board 4.dc.html#ret-4f
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4f
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-066
   inFlows:
   - F30 A count is entered, varied and posted
 - screen: EMP-067
@@ -1974,7 +1999,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1987,7 +2011,7 @@ screens:
   - EMP-003
   boardFrames:
   - FnB Board 5.dc.html#fnb-5e
-  wireframe: wireframes/FnB Board 5.dc.html#fnb-5e
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-067
   inFlows:
   - F28 A temperature excursion is caught and signed off
 - screen: EMP-068
@@ -2014,7 +2038,7 @@ screens:
   - EMP-003
   boardFrames:
   - Retail Board 4.dc.html#ret-4h
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4h
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-068
   inFlows: null
 - screen: EMP-069
   name: Barcode, RFID, Serialized Stock & Traceability
@@ -2039,7 +2063,7 @@ screens:
   - EMP-003
   boardFrames:
   - Retail Board 4.dc.html#ret-4j
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4j
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-069
   inFlows: null
 - screen: EMP-070
   name: Inventory Exceptions, AI Replenishment & Action Center
@@ -2066,5 +2090,5 @@ screens:
   - EMP-003
   boardFrames:
   - Inventory Board 1.dc.html#inv-10
-  wireframe: wireframes/Inventory Board 1.dc.html#inv-10
+  wireframe: wireframes/P06 Venue Staff App.dc.html#emp-070
   inFlows: null

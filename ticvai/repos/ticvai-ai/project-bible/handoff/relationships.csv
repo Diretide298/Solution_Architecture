@@ -156,8 +156,10 @@ control.cell,cluster_id,control.cell_cluster,reference,convention,,yes
 control.cell,region_id,platform.org_unit,reference,declared,yes,yes
 control.cell_cluster,modelled_on_cell_id,control.cell,child,convention,,yes
 control.cell_cluster,region_id,platform.org_unit,reference,declared,yes,yes
+control.cell_instance,cell_id,control.cell,child,convention,,yes
 control.cell_job,cell_id,control.cell,child,declared,,yes
 control.cell_tenant,cell_id,control.cell,child,convention,,yes
+control.cell_tenant,instance_id,control.cell_instance,reference,convention,,yes
 control.cell_tenant,tenant_id,platform.tenant,reference,convention,yes,yes
 control.channel_listing,price_list_id,catalogue.price_list,reference,declared,yes,yes
 control.channel_listing,product_id,catalogue.product,reference,declared,yes,yes
@@ -592,6 +594,7 @@ marketing.invitation,product_id,catalogue.product,reference,declared,yes,yes
 marketing.invitation_campaign,event_id,catalogue.event,reference,declared,yes,yes
 marketing.invitation_campaign,product_id,catalogue.product,reference,declared,yes,yes
 marketing.journey_entrant,journey_id,marketing.journey,child,convention,,yes
+marketing.journey_entrant,step_id,approvals.step_up_policy,reference,convention,yes,
 marketing.journey_entrant,subject_id,pii.subject,reference,convention,yes,yes
 marketing.kiosk_assist_session,cart_id,orders.cart,reference,declared,yes,yes
 marketing.kiosk_assist_session,device_id,platform.device,reference,declared,yes,yes

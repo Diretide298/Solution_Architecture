@@ -1,0 +1,149 @@
+id: F122
+name: 'Access Control board 12: Access Monitoring & Analytics Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 12. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-254
+  entryPoints:
+  - Arrives at Access Monitoring & Analytics Command Center
+steps:
+- step: 1
+  screen: BO-254
+  action: Opens Access Monitoring & Analytics Command Center
+  operations:
+  - listAccessMonitoring
+  outcome: Provide a single executive and operational overview of access performance across all TICVAI-controlled
+    venues.
+- step: 2
+  screen: BO-255
+  action: Works in Live Venue Occupancy & People Counting
+  operations:
+  - listLiveVenueOccupancy
+  outcome: Provide real-time people counting and occupancy using entry and exit events.
+- step: 3
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-256
+  action: Works in Graphical Access Map & Live Gate Performance
+  operations:
+  - listGraphicalAccessMap
+  outcome: Turn the graphical access topology created in Board 1 into a live operational analytics map.
+- step: 5
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-257
+  action: Works in Attendance & Admission Analytics
+  operations:
+  - listAttendanceAdmission
+  outcome: Provide detailed reporting of who actually attended compared with tickets sold/reserved. This
+    is particularly important because group admission may differ from purchased quantity.
+- step: 7
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-258
+  action: Works in Entry, Exit, Re-entry & Crossover Analytics
+  operations:
+  - listEntryExitCrossover
+  outcome: Analyze complete guest movement across the access journey.
+- step: 9
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-259
+  action: Works in Throughput, Queue & Validation Performance Analytics
+  operations:
+  - listThroughputQueueValidation
+  outcome: Measure the operational efficiency of gates and validation devices.
+- step: 11
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-260
+  action: Works in Validation Outcome & Rejection Analytics
+  operations:
+  - listValidationOutcomeRejection
+  outcome: Analyze why guests are denied or require manual intervention.
+- step: 13
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-261
+  action: Works in Guest Dwell Time, Length of Stay & Attraction Flow
+  operations:
+  - listGuestDwellTime
+  outcome: Use access events to understand how guests move through and use the venue.
+- step: 15
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-262
+  action: Works in Access Reports, Scheduled Reporting & Data Export
+  operations:
+  - listAccessReportScheduled
+  outcome: Provide configurable operational and management reports.
+- step: 17
+  screen: BO-254
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessMonitoring
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-263
+  action: Works in AI Access Intelligence, Forecasting & Executive Insights
+  operations:
+  - listAccessExecutiveInsight
+  outcome: Turn access-control data into proactive operational intelligence. This should be the final
+    intelligence screen of the entire Access Control module.
+branches:
+- at: 1
+  condition: Nothing has been set up on Access Monitoring & Analytics Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 12 visited
+primaryContract: access
+contracts:
+- access

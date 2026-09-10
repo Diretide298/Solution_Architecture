@@ -208,7 +208,13 @@ def platform_status() -> dict:
     for f in sorted((ROOT / "screens").glob("P*.yaml")):
         d = yaml.safe_load(f.read_text(encoding="utf-8"))
         p = d["platform"]
+        # **`app` and `targetApp` are two different units and both are real.** `app` is the build
+        # unit -- twelve of them, each joining to a `frontend/*.yaml` manifest that `check-frontend`
+        # and `check-package` validate against. `targetApp` is the shipped unit: the five
+        # applications a user actually installs, decided 10 September. Reporting one number for
+        # "apps" hid that, and the manifest read `12 apps` for a package that ships five.
         platforms.append({"code": p["code"], "name": p["shortName"], "app": p["app"],
+                          "targetApp": (p.get("targetApp") or {}).get("app"),
                           "operator": p.get("operator"), "screens": len(d["screens"])})
         for s in d["screens"]:
             screens[s["id"]] = s
@@ -217,6 +223,13 @@ def platform_status() -> dict:
     states = [f for f in (ROOT / "states").glob("*.yaml") if "_schema" not in f.name]
     events = [f for f in (ROOT / "events").glob("*.yaml") if "_schema" not in f.name]
     flows = sorted((ROOT / "flows").glob("F*.yaml"))
+
+    # **Authored flows and derived ones are different populations.** `derive-board-flows.py` can
+    # put a route against every client board in one run; those carry `provenance: derived-from-board`
+    # and are counted apart, because a metric a generator can satisfy measures nothing.
+    derived_flows = [f for f in flows
+                     if "provenance: derived-from-board" in f.read_text(encoding="utf-8")]
+    authored_flows = [f for f in flows if f not in set(derived_flows)]
     adrs = sorted((ROOT / "docs" / "adr").glob("0*.md"))
 
     reached = {a["operationId"] for s in screens.values() for a in (s.get("apis") or [])
@@ -281,14 +294,18 @@ def platform_status() -> dict:
                 "Not a defect on its own — sync, webhook and job operations have no screen."),
         _metric("Artefact classes", len(closed_classes), 15,
                 "Three remain: device and hardware, retention (CF-64), performance targets."),
-        _metric("Flows", len(flows), 120,
+        _metric("Flows", len(authored_flows), 120,
                 "**Raised from 60 to 120 on 24 August**, after the journey pass took the count past the "
                 "old estimate and the invariant fired. The estimate was set when flows were being "
                 "written one domain at a time; **walking the guest and staff platforms screen by "
                 "screen showed the real surface is roughly twice that.** "
                 "120 is an estimate and not a commitment. Every flow written has found a defect — "
                 "a till that could author the catalogue, a scanner that could create gates, a shift "
-                "summary that could sign off its own review."),
+                "summary that could sign off its own review. "
+                "**Counts authored flows only.** 72 more are derived from the client boards and "
+                "carry `provenance: derived-from-board`; they route screens the client specified "
+                "and do not yet say why anyone walks them, so they are scaffolding to write "
+                "against rather than journeys already written."),
     ]
     # **Every metric publishes how it counts.** A dump and this file disagreed on 20 August about
     # *operations reaching a screen* — 948 against 287 — and neither said what it was counting, so
@@ -337,8 +354,15 @@ def platform_status() -> dict:
             "operations": len(ops), "contracts": len(contracts), "tables": len(tables),
             "stores": len(stores), **_ddl_counts(),
             "relationships": len(rels), "states": len(states), "events": len(events),
-            "flows": len(flows), "adrs": len(adrs), "screens": len(screens),
-            "platforms": len(platforms), "apps": len({p["app"] for p in platforms}),
+            "flows": len(authored_flows), "flowsDerived": len(derived_flows),
+            "adrs": len(adrs), "screens": len(screens),
+            "platforms": len(platforms), "frontends": len({p["app"] for p in platforms}),
+            "apps": len({p["targetApp"] for p in platforms if p.get("targetApp")}),
+            # **Counted off disk, because that is the number that was wrong.** MANIFEST.md read
+            # "83 boards, 15 generated and 65 from client design packs" for a week after the 65
+            # were archived on 10 September. A board count typed once is a board count that
+            # survives the boards.
+            "boards": len(list((ROOT / "wireframes").glob("*.dc.html"))),
         },
         "metrics": {"design": design, "build": build},
         "metricDefinitions": definitions,

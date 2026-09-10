@@ -1,0 +1,135 @@
+id: F126
+name: 'Approval Workflows and Governance board 4: Approval Decision Workspace'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 4. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-374
+  entryPoints:
+  - Arrives at Approval Decision Workspace
+steps:
+- step: 1
+  screen: BO-374
+  action: Opens Approval Decision Workspace
+  operations: []
+  outcome: Provide the approver with one comprehensive workspace to evaluate and action a request.
+- step: 2
+  screen: BO-375
+  action: Works in Business Context & Evidence Viewer
+  operations: []
+  outcome: 'Provide the business evidence required to make an informed decision. For example, for a refund
+    approval:'
+- step: 3
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-376
+  action: Works in Approval Timeline & Decision Chain
+  operations: []
+  outcome: Provide a visual representation of the complete approval journey.
+- step: 5
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-377
+  action: Works in Approve & Sensitive Action Confirmation
+  operations: []
+  outcome: Control the final approval action before it becomes binding.
+- step: 7
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-378
+  action: Works in Reject / Return / Request Information
+  operations: []
+  outcome: Manage situations where an approver cannot or should not approve the request.
+- step: 9
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-379
+  action: Works in Requester Modification & Resubmission
+  operations: []
+  outcome: Allow rejected or returned requests to be corrected and submitted again. The source specifically
+    requires rejected requests to be modified and resubmitted.
+- step: 11
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-380
+  action: Works in Withdrawal, Cancellation, Expiration & Reopening
+  operations: []
+  outcome: Manage non-standard approval lifecycle actions. The matrix explicitly covers draft requests,
+    cancellation, expiration and reopening.
+- step: 13
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-381
+  action: Works in Segregation of Duties & Four-Eyes Control
+  operations: []
+  outcome: Prevent inappropriate or conflicting approval actions. This is a critical governance screen.
+    The matrix requires the system to prevent users from approving their own requests and supports dual
+    approval for sensitive operations.
+- step: 15
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-382
+  action: Works in Approved Action Execution & Status
+  operations: []
+  outcome: Separate approval of the request from execution of the underlying business transaction. This
+    distinction is extremely important. An approval being completed does not automatically mean the underlying
+    transaction executed successfully.
+- step: 17
+  screen: BO-374
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-383
+  action: Works in Decision Record & Immutable Audit View
+  operations: []
+  outcome: Provide the authoritative record of a completed approval.
+branches:
+- at: 1
+  condition: Nothing has been set up on Approval Decision Workspace yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 4 visited
+primaryContract: unknown
+contracts:
+- unknown

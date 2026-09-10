@@ -1,0 +1,153 @@
+id: F157
+name: 'Promotions   Bundles Management board 4: Advanced Offer Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 4. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-168
+  entryPoints:
+  - Arrives at Advanced Offer Command Center
+steps:
+- step: 1
+  screen: ADM-168
+  action: Opens Advanced Offer Command Center
+  operations:
+  - listAdvancedOffer
+  outcome: Provide the centralized management workspace for all advanced promotional mechanics.
+- step: 2
+  screen: ADM-169
+  action: Works in Buy X Get Y / BOGO Rule Builder
+  operations:
+  - setBuyGetBogo
+  outcome: Configure the fundamental qualifier → reward relationship.
+- step: 3
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-170
+  action: Works in Multi-Buy & Quantity Offer Configurator
+  operations:
+  - listMultiBuyQuantity
+  outcome: Configure advanced quantity relationships that go beyond simple BOGO.
+- step: 5
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-171
+  action: Works in Cheapest / Lowest-Value Item Promotion
+  operations:
+  - listCheapestLowestValue
+  outcome: Configure offers where TICVAI dynamically identifies the lowest-priced qualifying item. The
+    matrix explicitly requires “buy multiple products and get cheapest item free” and adding cheaper qualifying
+    items within the same transaction.
+- step: 7
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-172
+  action: Works in Fixed-Price & “N for X” Offer Builder
+  operations:
+  - setFixedPriceOffer
+  outcome: Configure promotions where a qualifying collection of products is sold for a fixed promotional
+    total.
+- step: 9
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-173
+  action: Works in Gift, Free Product & Added-Value Offer Builder
+  operations:
+  - setGiftFreeProduct
+  outcome: 'Configure promotions where a purchase generates an additional entitlement rather than simply
+    reducing price. The matrix explicitly provides the example: “Buy for more than 200 AED and get a free
+    pencil.”'
+- step: 11
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-174
+  action: Works in Cross-Category Promotion Builder
+  operations:
+  - setCrossCategoryPromotion
+  outcome: Create promotions spanning different TICVAI commercial domains.
+- step: 13
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-175
+  action: Works in Reward Selection, Substitution & Customer Choice
+  operations:
+  - listRewardSelectionSubstitution
+  outcome: Control situations where the customer can choose between multiple promotional rewards.
+- step: 15
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-176
+  action: Works in Advanced Offer Guardrails & Conflict Controls
+  operations:
+  - listAdvancedOfferGuardrail
+  outcome: Prevent advanced offers from generating unintended financial or operational outcomes. This
+    screen handles offer-specific safeguards; the complete cross-promotion stacking hierarchy remains
+    in Board 8.
+- step: 17
+  screen: ADM-168
+  action: Returns to the board's landing screen
+  operations:
+  - listAdvancedOffer
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-177
+  action: Works in Offer Simulation, Basket Trace & AI Optimization
+  operations:
+  - listOfferBasketTrace
+  outcome: Test complex promotion mechanics before publication.
+branches:
+- at: 1
+  condition: Nothing has been set up on Advanced Offer Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 4 visited
+primaryContract: promotions
+contracts:
+- promotions

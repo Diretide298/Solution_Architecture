@@ -1,44 +1,47 @@
 {
  "scope": "platform",
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived on every run by tools/build-status.py. A hand-maintained status page is worse than none, because somebody plans against it.",
  "counts": {
-  "operations": 1626,
+  "operations": 1628,
   "contracts": 28,
-  "tables": 386,
+  "tables": 388,
   "stores": 5,
   "foreignKeys": 574,
-  "indexes": 276,
-  "tablesWritten": 386,
-  "relationships": 975,
-  "states": 124,
+  "indexes": 278,
+  "tablesWritten": 388,
+  "relationships": 978,
+  "states": 125,
   "events": 29,
-  "flows": 94,
-  "adrs": 41,
-  "screens": 1091,
+  "flows": 96,
+  "flowsDerived": 72,
+  "adrs": 44,
+  "screens": 1235,
   "platforms": 15,
-  "apps": 12
+  "frontends": 12,
+  "apps": 5,
+  "boards": 21
  },
  "metrics": {
   "design": [
    {
     "name": "API data lineage resolved",
-    "done": 1047,
-    "total": 1626,
+    "done": 1052,
+    "total": 1635,
     "percent": 64,
     "note": "Every operation maps to the tables it reads and writes."
    },
    {
     "name": "Operations declaring an auth model",
-    "done": 1626,
-    "total": 1626,
+    "done": 1628,
+    "total": 1628,
     "percent": 100,
     "note": "A permission, an auth mode, or a declared audience. None may be silent."
    },
    {
     "name": "Screens defined, specified and given a purpose",
-    "done": 1091,
-    "total": 1091,
+    "done": 1235,
+    "total": 1235,
     "percent": 100,
     "note": "Loading, empty and error states written for each."
    },
@@ -65,23 +68,23 @@
    },
    {
     "name": "State models",
-    "done": 124,
-    "total": 131,
-    "percent": 95,
+    "done": 125,
+    "total": 133,
+    "percent": 94,
     "note": "The denominator is status enums in contracts. Some models describe behaviour with no enum, so this can exceed 100%."
    },
    {
     "name": "Tables with a relationship",
-    "done": 374,
-    "total": 395,
+    "done": 376,
+    "total": 397,
     "percent": 95,
     "note": "The remainder are partitions, platform-written tables and caches, each stating why."
    },
    {
     "name": "Screens with operations",
-    "done": 1082,
-    "total": 1091,
-    "percent": 99,
+    "done": 1089,
+    "total": 1235,
+    "percent": 88,
     "note": "The remainder are static, workshop-blocked, or navigation shells."
    },
    {
@@ -100,8 +103,8 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 1379,
-    "total": 1626,
+    "done": 1386,
+    "total": 1628,
     "percent": 85,
     "note": "Not a defect on its own \u2014 sync, webhook and job operations have no screen."
    },
@@ -114,17 +117,17 @@
    },
    {
     "name": "Flows",
-    "done": 94,
+    "done": 96,
     "total": 120,
-    "percent": 78,
-    "note": "**Raised from 60 to 120 on 24 August**, after the journey pass took the count past the old estimate and the invariant fired. The estimate was set when flows were being written one domain at a time; **walking the guest and staff platforms screen by screen showed the real surface is roughly twice that.** 120 is an estimate and not a commitment. Every flow written has found a defect \u2014 a till that could author the catalogue, a scanner that could create gates, a shift summary that could sign off its own review."
+    "percent": 80,
+    "note": "**Raised from 60 to 120 on 24 August**, after the journey pass took the count past the old estimate and the invariant fired. The estimate was set when flows were being written one domain at a time; **walking the guest and staff platforms screen by screen showed the real surface is roughly twice that.** 120 is an estimate and not a commitment. Every flow written has found a defect \u2014 a till that could author the catalogue, a scanner that could create gates, a shift summary that could sign off its own review. **Counts authored flows only.** 72 more are derived from the client boards and carry `provenance: derived-from-board`; they route screens the client specified and do not yet say why anyone walks them, so they are scaffolding to write against rather than journeys already written."
    }
   ],
   "build": [
    {
     "name": "Tables written",
-    "done": 386,
-    "total": 386,
+    "done": 388,
+    "total": 388,
     "percent": 100,
     "note": "Counted from backend/. ADR-0024 said DDL waits for the design to settle; ADR-0038 and ADR-0039 settled it."
    },
@@ -169,19 +172,20 @@
   }
  },
  "headline": {
-  "design": 90,
+  "design": 89,
   "build": 33
  },
  "waves": {
-  "wave1": 170,
+  "wave1": 176,
   "wave2": 261,
-  "wave3": 660
+  "wave3": 798
  },
  "platformBreakdown": [
   {
    "code": "P01",
    "name": "Guest Web",
    "app": "guest-web",
+   "targetApp": "guest",
    "operator": "guest",
    "screens": 46
   },
@@ -189,6 +193,7 @@
    "code": "P02",
    "name": "Guest App",
    "app": "guest-app",
+   "targetApp": "guest",
    "operator": "guest",
    "screens": 71
   },
@@ -196,13 +201,15 @@
    "code": "P04",
    "name": "Venue POS",
    "app": "venue-pos",
+   "targetApp": "venue-pos",
    "operator": "venue",
-   "screens": 24
+   "screens": 30
   },
   {
    "code": "P05",
    "name": "Guest Kiosk",
    "app": "guest-app",
+   "targetApp": "guest",
    "operator": "guest",
    "screens": 17
   },
@@ -210,6 +217,7 @@
    "code": "P06",
    "name": "Venue Staff App",
    "app": "venue-staff-app",
+   "targetApp": "venue-staff-mobile",
    "operator": "venue",
    "screens": 66
   },
@@ -217,6 +225,7 @@
    "code": "P07",
    "name": "Venue Scanner",
    "app": "venue-scanner",
+   "targetApp": "venue-staff-mobile",
    "operator": "venue",
    "screens": 11
   },
@@ -224,20 +233,23 @@
    "code": "P08",
    "name": "Venue Management",
    "app": "venue-management-web",
+   "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 363
+   "screens": 393
   },
   {
    "code": "P09",
    "name": "TICVAI Web",
    "app": "ticvai-web",
+   "targetApp": "ticvai-control",
    "operator": "ticvai",
-   "screens": 318
+   "screens": 367
   },
   {
    "code": "P10",
    "name": "Partner Web",
    "app": "partner-web",
+   "targetApp": "ticvai-control",
    "operator": "partner",
    "screens": 51
   },
@@ -245,6 +257,7 @@
    "code": "P11",
    "name": "Accreditation Web",
    "app": "accreditation-web",
+   "targetApp": "ticvai-control",
    "operator": "public",
    "screens": 8
   },
@@ -252,6 +265,7 @@
    "code": "P12",
    "name": "Venue Support",
    "app": "venue-support-web",
+   "targetApp": "venue-management",
    "operator": "venue",
    "screens": 28
   },
@@ -259,6 +273,7 @@
    "code": "P13",
    "name": "Venue CMS",
    "app": "venue-management-web",
+   "targetApp": "venue-management",
    "operator": "venue",
    "screens": 60
   },
@@ -266,6 +281,7 @@
    "code": "P14",
    "name": "Developer",
    "app": "developer-portal-web",
+   "targetApp": "ticvai-control",
    "operator": "partner",
    "screens": 8
   },
@@ -273,6 +289,7 @@
    "code": "P15",
    "name": "Kitchen Display",
    "app": "kitchen-display",
+   "targetApp": "venue-pos",
    "operator": "venue",
    "screens": 10
   },
@@ -280,23 +297,24 @@
    "code": "P16",
    "name": "Venue Analytics",
    "app": "venue-management-web",
+   "targetApp": "venue-management",
    "operator": "venue",
-   "screens": 10
+   "screens": 69
   }
  ],
  "conflicts": {
-  "open": 14,
+  "open": 16,
   "closed": 149,
   "withdrawn": 6,
   "blocking": 0,
   "byOwner": {
-   "Chinmay + Dinesh": 3,
+   "Chinmay + Dinesh": 4,
+   "Chinmay + Qossai": 2,
    "Dinesh": 1,
    "Chinmay": 1,
    "Chinmay + Allam": 1,
    "Allam": 1,
    "Dinesh + Qossai": 1,
-   "Chinmay + Qossai": 1,
    "Qossai + finance": 1,
    "Qossai": 1,
    "Allam + counsel": 1,
@@ -316,7 +334,9 @@
    "CF-166",
    "CF-167",
    "CF-168",
-   "CF-169"
+   "CF-169",
+   "CF-170",
+   "CF-171"
   ]
  },
  "stores": [

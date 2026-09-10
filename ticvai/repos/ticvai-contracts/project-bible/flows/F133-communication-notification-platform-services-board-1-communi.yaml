@@ -1,0 +1,153 @@
+id: F133
+name: 'Communication & Notification Platform Services board 1: Communication Service Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Communication & Notification Platform Services board 1.
+    **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: ADM-038
+  entryPoints:
+  - Arrives at Communication Service Command Center
+steps:
+- step: 1
+  screen: ADM-038
+  action: Opens Communication Service Command Center
+  operations:
+  - listCommunicationService
+  outcome: Provide administrators and technical/operations teams with a centralized view of the health
+    and activity of TICVAI's communication infrastructure. This is not a marketing dashboard.
+- step: 2
+  screen: ADM-039
+  action: Works in Channel & Provider Configuration
+  operations:
+  - setChannelProvider
+  outcome: Configure the external/internal services used by TICVAI to deliver communications.
+- step: 3
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-040
+  action: Works in Sender Identity, Domain & Brand Configuration
+  operations:
+  - setSenderIdentityDomain
+  outcome: Manage the identities from which TICVAI communications are sent.
+- step: 5
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-041
+  action: Works in System Transactional Template Registry
+  operations:
+  - listSystemTransactionalTemplate
+  outcome: Maintain centralized system/transactional communication templates used by TICVAI operational
+    modules. This screen must not replace CRM's marketing template builder.
+- step: 7
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-042
+  action: Works in Business Event & Notification Trigger Mapping
+  operations:
+  - listBusinessEventNotification
+  outcome: Map TICVAI business events to the operational communications they should generate. This is
+    the core of the event-driven communication architecture.
+- step: 9
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-043
+  action: Works in Routing, Priority, Throttling & Fallback Rules
+  operations:
+  - listRoutingPriorityThrottling
+  outcome: Determine how TICVAI delivers a message after a communication requirement has been created.
+- step: 11
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-044
+  action: Works in Consent, Preference & Communication Policy Enforcement
+  operations:
+  - listConsentPreferenceCommunication
+  outcome: Create a central enforcement layer ensuring communications respect the appropriate communication
+    rules.
+- step: 13
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-045
+  action: Works in Delivery Queue, Failure & Retry Management
+  operations:
+  - listDeliveryQueueFailure
+  outcome: Provide technical/operations teams with visibility into communications currently being processed
+    or failing.
+- step: 15
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-046
+  action: Works in Provider Health, Usage & Cost Monitoring
+  operations:
+  - listProviderHealthUsage
+  outcome: Monitor the operational and commercial performance of communication providers.
+- step: 17
+  screen: ADM-038
+  action: Returns to the board's landing screen
+  operations:
+  - listCommunicationService
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-047
+  action: Works in AI Delivery Optimization & Communication Platform Diagnostics
+  operations:
+  - listDeliveryCommunicationPlatform
+  outcome: Provide an AI intelligence layer focused specifically on communication infrastructure performance,
+    not CRM marketing strategy.
+branches:
+- at: 1
+  condition: Nothing has been set up on Communication Service Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Communication & Notification Platform Services board 1 visited
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

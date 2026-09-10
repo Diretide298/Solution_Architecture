@@ -1,0 +1,1576 @@
+{
+ "generatedBy": "tools/extract-mom-decisions.py",
+ "generated": "2026-09-09",
+ "note": "`absorbed` is a vocabulary match against the package's own prose, not a verdict. **A decision can be absorbed as a contract operation or a schema column with none of the minute's words surviving** -- an unabsorbed row is where to look, not what to conclude.",
+ "counts": {
+  "decisions": 86,
+  "byLabel": {
+   "Decision": 35,
+   "Confirmed": 30,
+   "Action": 12,
+   "Requested": 6,
+   "Agreed": 3
+  },
+  "byMinute": {
+   "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx": 11,
+   "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx": 10,
+   "TICVAI_MoM_2026-08-26_ResourceManagement.docx": 9,
+   "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx": 8,
+   "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx": 8,
+   "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx": 7,
+   "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx": 7,
+   "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx": 6,
+   "TICVAI_MoM_2026-08-27_WalletConfiguration.docx": 6,
+   "TICVAI_MoM_2026-09-02_AccessControl.docx": 6,
+   "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx": 4,
+   "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx": 3,
+   "TICVAI_Kickoff_MoM_2026-08-10.docx": 1
+  },
+  "unabsorbed": 1
+ },
+ "decisions": [
+  {
+   "date": "2026-08-10",
+   "mom": "TICVAI_Kickoff_MoM_2026-08-10.docx",
+   "label": "Decision",
+   "text": "Deferred \u2014 a separate AI workshop to be scheduled to walk through the mechanism and jointly decide the best approach (aligns with the platform's Tier 1/Tier 2/Tier 3 AI framework already documented separately).",
+   "terms": [
+    "jointly",
+    "aligns",
+    "framework",
+    "approach",
+    "best",
+    "scheduled",
+    "separately",
+    "documented"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-18",
+   "mom": "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+   "label": "Decision",
+   "text": "The team agreed to proceed with outlet-level configuration for F&B, applying the same segregation logic to Retail for consistency. Venue-owned, homogeneous outlets (e.g., popcorn/ice-cream booths) may still be set up centrally once and applied across outlets, but the underlying configuration model remains outlet-level.",
+   "terms": [
+    "venue-owned",
+    "ice-cream",
+    "booths",
+    "homogeneous",
+    "popcorn",
+    "underlying",
+    "centrally",
+    "outlet-level"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-18",
+   "mom": "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+   "label": "Decision",
+   "text": "While the reference material includes many granular statuses (put-away, picking, packing, dispatching, etc.), the team agreed NOT to implement every status. The goal is to keep day-to-day workflows simple and fast for end users, and this principle should guide UI/UX and workflow design across inventory and warehouse operations.",
+   "terms": [
+    "dispatching",
+    "day-to-day",
+    "statuses",
+    "put-away",
+    "goal",
+    "granular",
+    "includes",
+    "packing"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-18",
+   "mom": "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+   "label": "Action",
+   "text": "Chinmay Parab to evaluate both approaches and confirm the most feasible and efficient option before the next workshop (also relevant for ticketing/event-specific access).",
+   "terms": [
+    "feasible",
+    "event-specific",
+    "efficient",
+    "approaches",
+    "relevant",
+    "evaluate",
+    "parab",
+    "next"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-18",
+   "mom": "MoM_FnB_Retail_Procurement_Inventory_18Aug2026.docx",
+   "label": "Decision",
+   "text": "A single, unified customer profile will be used across ticketing, F&B and retail to give a 360\u00b0 view of guest activity and avoid duplicate records (a known issue in other systems where the same name is created multiple times with spelling variations). Example: a guest who buys tickets online and later dines at a restaurant will be matched by name/mobile number and associated with the same profile.",
+   "terms": [
+    "associated",
+    "variations",
+    "spelling",
+    "avoid",
+    "activity",
+    "multiple",
+    "buys",
+    "online"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Decision",
+   "text": "proceed with the rules-based dynamic pricing component near-term; the AI/factor-based component depends on forecasting mechanisms to be scoped separately.",
+   "terms": [
+    "factor-based",
+    "rules-based",
+    "near-term",
+    "mechanisms",
+    "proceed",
+    "separately",
+    "forecasting",
+    "depends"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Confirmed",
+   "text": "inventory continues to be managed at the outlet level (Chinmay).",
+   "terms": [
+    "continues",
+    "managed",
+    "outlet",
+    "inventory",
+    "chinmay",
+    "level"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Decision",
+   "text": "size/variant attributes (e.g., small/medium/large) will be configurable in the admin panel per product type, and reflected dynamically when products are added.",
+   "terms": [
+    "dynamically",
+    "reflected",
+    "attributes",
+    "medium",
+    "products",
+    "variant",
+    "panel",
+    "admin"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Decision",
+   "text": "shipping/courier rates and margins will be captured and configured manually by the operations team (who negotiate their own courier agreements), rather than through a live courier-API integration at this stage.",
+   "terms": [
+    "negotiate",
+    "margins",
+    "courier-api",
+    "courier",
+    "agreements",
+    "shipping",
+    "manually",
+    "captured"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Confirmed",
+   "text": "an item purchased via POS can also be returned through the web portal, subject to approval.",
+   "terms": [
+    "purchased",
+    "returned",
+    "portal",
+    "subject",
+    "item",
+    "through",
+    "approval"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Action",
+   "text": "Chinmay/Softlabs to prepare a pros-and-cons comparison of the single-DB vs. multiple-DB approaches (performance, reporting, offline sync) for further discussion.",
+   "terms": [
+    "pros-and-cons",
+    "multiple-db",
+    "single-db",
+    "approaches",
+    "discussion",
+    "prepare",
+    "further",
+    "comparison"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Decision",
+   "text": "stock can be reserved/held (e.g., for a VIP customer) and allocated per sales channel (e.g., 50 units online, 50 on-site), sold independently against each channel's allocation.",
+   "terms": [
+    "on-site",
+    "allocated",
+    "units",
+    "reserved",
+    "online",
+    "independently",
+    "sold",
+    "held"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-19",
+   "mom": "TICVAI_MoM_2026-08-19_FnB_Retail_Procurement_Inventory.docx",
+   "label": "Action",
+   "text": "Allam/Qossai to share RFID reader/device specifications and reference data.",
+   "terms": [
+    "specifications",
+    "rfid",
+    "allam",
+    "reader",
+    "qossai",
+    "reference",
+    "device",
+    "share"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Decision",
+   "text": "profiles cannot be merged automatically without customer consent. The system will identify likely-duplicate profiles algorithmically and notify the customer (push notification or e-mail); the merge proceeds only on customer confirmation. An admin-side review queue will also track flagged duplicates independent of customer response.",
+   "terms": [
+    "likely-duplicate",
+    "algorithmically",
+    "admin-side",
+    "e-mail",
+    "proceeds",
+    "notify",
+    "flagged",
+    "identify"
+   ],
+   "termsFoundInPackage": 4,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Decision",
+   "text": "RBAC will be configured per role, per module, with three access levels (edit/view, view-only, hidden), and further sub-permissions within a module (e.g., a CRM role could access Campaigns and Communications but not Journeys). Default role templates will be provided, customisable by admins.",
+   "terms": [
+    "sub-permissions",
+    "customisable",
+    "view-only",
+    "provided",
+    "admins",
+    "rbac",
+    "communications",
+    "hidden"
+   ],
+   "termsFoundInPackage": 4,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Decision",
+   "text": "the TICVAI B2C checkout journey should target a minimal, low-friction flow (in the range of 3\u20134 steps) modelled on the PlatinumList example, deferring full profile capture to an optional post-purchase step rather than gating checkout on it.",
+   "terms": [
+    "post-purchase",
+    "platinumlist",
+    "low-friction",
+    "deferring",
+    "minimal",
+    "gating",
+    "example",
+    "range"
+   ],
+   "termsFoundInPackage": 4,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Decision",
+   "text": "offer blocks in the Visual Journey Builder will pull only from pre-configured, system-validated offers (product/ticket-type scoped); ad-hoc discount values cannot be entered directly in the builder.",
+   "terms": [
+    "system-validated",
+    "pre-configured",
+    "ticket-type",
+    "ad-hoc",
+    "entered",
+    "pull",
+    "directly",
+    "offers"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Decision",
+   "text": "at least one of e-mail address or mobile number will be enforced as mandatory (not both), since some customers decline to share e-mail; the system supports conditional \u201ceither/or\u201d mandatory-field rules.",
+   "terms": [
+    "mandatory-field",
+    "e-mail",
+    "decline",
+    "customers",
+    "address",
+    "least",
+    "conditional",
+    "mandatory"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Decision",
+   "text": "conversation retention for chat/case history will be configurable (e.g., default of one month, extendable), consistent with the broader data-retention approach.",
+   "terms": [
+    "data-retention",
+    "extendable",
+    "broader",
+    "approach",
+    "consistent",
+    "chat",
+    "retention",
+    "history"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Action",
+   "text": "finalise the component-count logic for the experiences/dining section on the guest-app landing page (fixed 2\u20133-card layout vs. a scalable N-count layout) and confirm with Allam's team.",
+   "terms": [
+    "component-count",
+    "scalable",
+    "finalise",
+    "n-count",
+    "experiences",
+    "dining",
+    "landing",
+    "logic"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Action",
+   "text": "hold a dedicated data-migration workshop to define import formats and validation rules.",
+   "terms": [
+    "data-migration",
+    "formats",
+    "define",
+    "dedicated",
+    "import",
+    "workshop",
+    "validation",
+    "rules"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Decision",
+   "text": "data retention/archival periods (e.g., 3\u20135 years of \u201clive\u201d data before archival) will be configurable per tenant/venue at setup time, with a system default that administrators can override.",
+   "terms": [
+    "administrators",
+    "periods",
+    "years",
+    "archival",
+    "setup",
+    "retention",
+    "override",
+    "default"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-20",
+   "mom": "TICVAI_MoM_2026-08-20_CRM_Marketing_CMS.docx",
+   "label": "Action",
+   "text": "hold a dedicated follow-up session to define the full loyalty programme configuration (tiers, point rules, redemption, expiry) \u2014 today's material was high-level only.",
+   "terms": [
+    "high-level",
+    "follow-up",
+    "programme",
+    "tiers",
+    "material",
+    "define",
+    "today",
+    "expiry"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "the TICVAI B2C checkout should mirror this pattern: a visible step indicator, in-page (not multi-page) ticket-type browsing and expansion, an optional/removable add-ons step (skippable in configuration for products with no add-ons, collapsing the flow to Ticket Selection \u2192 Cart \u2192 Checkout), and per-person name capture for family/season-pass products.",
+   "terms": [
+    "ticket-type",
+    "season-pass",
+    "multi-page",
+    "removable",
+    "skippable",
+    "in-page",
+    "expansion",
+    "per-person"
+   ],
+   "termsFoundInPackage": 2,
+   "absorbed": false
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "seating rules (consecutive-seat enforcement, social-distancing buffer, seat-kill rule, company/held-seat rule) will be configurable per venue/event, defaulting to the venue's operational policy rather than a single fixed platform-wide rule.",
+   "terms": [
+    "social-distancing",
+    "consecutive-seat",
+    "seat-kill",
+    "held-seat",
+    "platform-wide",
+    "buffer",
+    "defaulting",
+    "company"
+   ],
+   "termsFoundInPackage": 4,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "the reference model confirms three seat-selection scenarios the platform must support: (1) unnumbered/zone-based capacity selling with no seat numbers, (2) system-assigned \u201cbest available\u201d seat allocation with deferred disclosure, and (3) full customer seat selection \u2014 selectable per section, per event.",
+   "terms": [
+    "system-assigned",
+    "seat-selection",
+    "zone-based",
+    "disclosure",
+    "unnumbered",
+    "selectable",
+    "confirms",
+    "scenarios"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "the platform will support a deferred seat-assignment workflow: confirmed section/quantity sale at purchase, internal seat allocation held until an admin-triggered bulk release (e-mail + QR ticket issuance) ahead of the event, in addition to immediate seat assignment for venues that require it.",
+   "terms": [
+    "admin-triggered",
+    "seat-assignment",
+    "e-mail",
+    "ahead",
+    "immediate",
+    "quantity",
+    "addition",
+    "issuance"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Action",
+   "text": "Chinmay's team to refine the guest-app/B2C flow already in progress based on today's Kidiya walkthrough feedback and share the updated flow back with Allam's team.",
+   "terms": [
+    "walkthrough",
+    "kidiya",
+    "refine",
+    "feedback",
+    "updated",
+    "progress",
+    "based",
+    "allam"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "the CMS/website builder will support both a full landing-page-plus-checkout mode and a B2C-only embedded mode, configurable per client, using the same underlying builder.",
+   "terms": [
+    "landing-page-plus-checkout",
+    "b2c-only",
+    "underlying",
+    "embedded",
+    "website",
+    "full",
+    "builder",
+    "mode"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "section type (seated / non-seated-zone / standing / suite) will be a configurable attribute set at the section level within a single seat map builder screen, rather than requiring separate configuration screens per type as shown in the reference tool.",
+   "terms": [
+    "non-seated-zone",
+    "seated",
+    "shown",
+    "requiring",
+    "suite",
+    "attribute",
+    "standing",
+    "section"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Action",
+   "text": "Chinmay's team to confirm how the seat map builder will consolidate the reference tool's multiple configuration screens (canvas, standing zone, suite, best-seats, entrance/exits) into one unified screen.",
+   "terms": [
+    "best-seats",
+    "canvas",
+    "exits",
+    "entrance",
+    "consolidate",
+    "multiple",
+    "suite",
+    "zone"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "the platform will support both manual seat map building and AI-assisted import (PDF/image + Excel/CSV), plus full and partial (section-level) copy-paste between seat maps, and a layout version-comparison view showing seat-count/configuration differences.",
+   "terms": [
+    "seat-count",
+    "version-comparison",
+    "copy-paste",
+    "section-level",
+    "differences",
+    "ai-assisted",
+    "excel",
+    "showing"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "the platform must support partial/tranche-based inventory release per section (temporary blocking, scheduled release, and tiered/early-bird sale volumes) rather than exposing full section inventory at go-live.",
+   "terms": [
+    "tranche-based",
+    "early-bird",
+    "exposing",
+    "volumes",
+    "go-live",
+    "tiered",
+    "blocking",
+    "temporary"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-21",
+   "mom": "TICVAI_MoM_2026-08-21_Seat_Management_CMS.docx",
+   "label": "Decision",
+   "text": "seats placed on hold (added to cart) must auto-release after a configurable timeout if checkout is abandoned, and must also auto-release immediately if a payment attempt fails, so inventory is not held indefinitely against an incomplete transaction.",
+   "terms": [
+    "auto-release",
+    "indefinitely",
+    "incomplete",
+    "immediately",
+    "timeout",
+    "abandoned",
+    "attempt",
+    "placed"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Decision",
+   "text": "high availability does not require multi-region setup \u2014 same-region/same-zone HA is sufficient. Multi-region is reserved for disaster recovery (DR), which will be offered as an optional, client-dependent add-on rather than a default.",
+   "terms": [
+    "client-dependent",
+    "same-region",
+    "same-zone",
+    "disaster",
+    "multi-region",
+    "sufficient",
+    "add-on",
+    "offered"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Decision",
+   "text": "HA will be applied selectively to revenue-critical, customer-facing components (ticketing, POS, B2C front end) rather than uniformly across all modules \u2014 e.g., the finance module does not require HA.",
+   "terms": [
+    "revenue-critical",
+    "customer-facing",
+    "selectively",
+    "uniformly",
+    "applied",
+    "modules",
+    "components",
+    "ticketing"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Decision",
+   "text": "for the centralized platform, 4 environments (dev, QA, pre-prod, prod) will be maintained during the current active development phase, reducing to 3 (dev, pre-prod, prod) post-rollout; QA and dev may run as separate instances within a shared environment rather than fully separate environments. Client-owned infrastructure will continue to follow Softlabs' standard 2-environment model (pre-prod, prod).",
+   "terms": [
+    "client-owned",
+    "post-rollout",
+    "pre-prod",
+    "reducing",
+    "centralized",
+    "development",
+    "continue",
+    "environments"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Requested",
+   "text": "the client asked Softlabs to document three illustrative deployment scenarios \u2014 (a) independent tenant deployment, (b) centralized/shared platform for small-to-medium tenants, and (c) dedicated infrastructure for large/mega events and flash sales \u2014 each with an architecture diagram, auto-scaling behavior and failure-handling response.",
+   "terms": [
+    "failure-handling",
+    "small-to-medium",
+    "centralized",
+    "mega",
+    "auto-scaling",
+    "behavior",
+    "illustrative",
+    "scenarios"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Confirmed",
+   "text": "analytical/reporting queries will run against a separate replica database rather than the main transactional database, to avoid impacting live transaction performance.",
+   "terms": [
+    "impacting",
+    "queries",
+    "avoid",
+    "analytical",
+    "transactional",
+    "replica",
+    "performance",
+    "separate"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Action",
+   "text": "a third-party security audit / penetration test covering the ticketing/client application, B2C and B2B applications, and mobile apps is required before go-live, with any identified severities to be resolved.",
+   "terms": [
+    "penetration",
+    "identified",
+    "severities",
+    "go-live",
+    "applications",
+    "apps",
+    "covering",
+    "third-party"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Decision",
+   "text": "Dinesh recommended segregating databases from the start, since splitting a centralized database after 2\u20133 years in production is significantly more difficult than starting isolated and reconciling/merging later if needed.",
+   "terms": [
+    "difficult",
+    "centralized",
+    "segregating",
+    "significantly",
+    "reconciling",
+    "starting",
+    "merging",
+    "recommended"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-24",
+   "mom": "TICVAI_MoM_2026-08-24_Infra_Cost_Ticketing.docx",
+   "label": "Confirmed",
+   "text": "multiple databases can run on a single database server instance (e.g., separate DB instances within one SQL Server/Postgres/AWS RDS instance) \u2014 this does not require separate physical servers.",
+   "terms": [
+    "servers",
+    "multiple",
+    "instances",
+    "physical",
+    "databases",
+    "server",
+    "postgres",
+    "single"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-25",
+   "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "label": "Decision",
+   "text": "venue-level admission capacity should supersede event-level capacity, with a system prompt/validation preventing an event from being configured or sold beyond the remaining venue capacity; overriding this will be an authorization-gated (role-based access control) action for authorized users only.",
+   "terms": [
+    "authorization-gated",
+    "event-level",
+    "overriding",
+    "preventing",
+    "authorized",
+    "role-based",
+    "venue-level",
+    "beyond"
+   ],
+   "termsFoundInPackage": 4,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-25",
+   "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "label": "Decision",
+   "text": "date-change/reschedule policy will be a configurable, product-level on/off setting with its own policy rules (e.g., reschedule allowed up to 24 hours before visit, denied within 24 hours) rather than a separate dedicated screen \u2014 raised by Chinmay to reduce configuration complexity, agreed by Allam.",
+   "terms": [
+    "product-level",
+    "date-change",
+    "reschedule",
+    "complexity",
+    "denied",
+    "reduce",
+    "hours",
+    "setting"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-25",
+   "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "label": "Confirmed",
+   "text": "a fallback/dynamic expiry rule is required for first-use-activation tickets \u2014 if a ticket is never scanned, it must still expire after a defined period (e.g., date of issue + 30 days) so revenue can be recognized rather than leaving tickets open indefinitely.",
+   "terms": [
+    "first-use-activation",
+    "recognized",
+    "scanned",
+    "indefinitely",
+    "leaving",
+    "fallback",
+    "defined",
+    "period"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-25",
+   "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "label": "Requested",
+   "text": "Chinmay flagged that the number of configuration screens/pages should be reduced and related settings/toggles consolidated, to avoid an overly long, click-heavy configuration flow for admins; Allam agreed and referred the team to the previous system's demo as a starting reference for simplification.",
+   "terms": [
+    "click-heavy",
+    "overly",
+    "simplification",
+    "admins",
+    "toggles",
+    "reduced",
+    "referred",
+    "consolidated"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-25",
+   "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "label": "Confirmed",
+   "text": "inventory can be distributed across sales channels and will be configurable at the venue/event level.",
+   "terms": [
+    "distributed",
+    "channels",
+    "sales",
+    "inventory",
+    "level",
+    "event"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-25",
+   "mom": "TICVAI_MoM_2026-08-25_Ticketing_ProductConfig.docx",
+   "label": "Action",
+   "text": "Allam to share the existing ticket configuration template (\u201ctechnical data sheet,\u201d with multiple sheets covering different information types) so the team can adapt it to TICVAI's own product strategy and database architecture.",
+   "terms": [
+    "sheets",
+    "multiple",
+    "information",
+    "technical",
+    "strategy",
+    "covering",
+    "types",
+    "adapt"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Decision",
+   "text": "food & beverage and retail/merchandise online sale remain optional, back-office-enabled modules, but where enabled, the entire purchase flow (browse, cart, checkout, and choice of pickup-at-venue or ship-to-guest) must complete within the TICVAI platform \u2014 guests should not be redirected to download a separate app to complete a purchase.",
+   "terms": [
+    "back-office-enabled",
+    "pickup-at-venue",
+    "ship-to-guest",
+    "redirected",
+    "beverage",
+    "enabled",
+    "download",
+    "browse"
+   ],
+   "termsFoundInPackage": 4,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Decision",
+   "text": "instructor/resource selection will be a configurable, per-ticket-type setting \u2014 private-session ticket types can optionally allow the guest to choose a specific instructor, while group-session ticket types auto-assign an instructor without exposing the choice to the guest. Private and group sessions are modelled as two separate products with separate pricing, not variants of the same product.",
+   "terms": [
+    "private-session",
+    "per-ticket-type",
+    "group-session",
+    "auto-assign",
+    "exposing",
+    "optionally",
+    "instructor",
+    "private"
+   ],
+   "termsFoundInPackage": 4,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Confirmed",
+   "text": "skill-based resource matching should rely on straightforward keyword/attribute matching (e.g., skill level, language) rather than a full AI-based matching system, to avoid unnecessary complexity.",
+   "terms": [
+    "skill-based",
+    "ai-based",
+    "straightforward",
+    "unnecessary",
+    "complexity",
+    "keyword",
+    "skill",
+    "avoid"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Decision",
+   "text": "resource allocation should rotate across all available resources (e.g., resource 1, then 2, then 3) rather than repeatedly reusing the same resource, to avoid overburdening any single resource while others remain unused.",
+   "terms": [
+    "overburdening",
+    "reusing",
+    "repeatedly",
+    "rotate",
+    "unused",
+    "avoid",
+    "resources",
+    "others"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Confirmed",
+   "text": "rental item and inventory data is expected to be provided by each client during onboarding, with a screen provided to update inventory and item details thereafter.",
+   "terms": [
+    "thereafter",
+    "provided",
+    "details",
+    "expected",
+    "onboarding",
+    "rental",
+    "update",
+    "item"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Confirmed",
+   "text": "in response to Chinmay's question, Allam confirmed that some elements of resource management configuration may be controlled at the tenant level rather than only centrally.",
+   "terms": [
+    "elements",
+    "controlled",
+    "centrally",
+    "confirmed",
+    "allam",
+    "response",
+    "resource",
+    "chinmay"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Confirmed",
+   "text": "the system must validate resource bookings and prevent the same resource from being double-booked or assigned to overlapping bookings (conflict detection and resolution).",
+   "terms": [
+    "double-booked",
+    "overlapping",
+    "bookings",
+    "prevent",
+    "assigned",
+    "detection",
+    "resolution",
+    "validate"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Confirmed",
+   "text": "rental/equipment items can be tracked with simplified state attributes (e.g., available, rented, faulty) rather than requiring granular custom attributes for this category \u2014 agreed by Allam.",
+   "terms": [
+    "faulty",
+    "simplified",
+    "rented",
+    "granular",
+    "requiring",
+    "tracked",
+    "equipment",
+    "attributes"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-26",
+   "mom": "TICVAI_MoM_2026-08-26_ResourceManagement.docx",
+   "label": "Confirmed",
+   "text": "a guest always books a product or package \u2014 never a resource directly, and never a specific room/vehicle/instructor by itself \u2014 across all sales channels. The product's configuration determines which resources are associated and get booked behind the scenes.",
+   "terms": [
+    "scenes",
+    "associated",
+    "vehicle",
+    "booked",
+    "instructor",
+    "determines",
+    "channels",
+    "resources"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-27",
+   "mom": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "label": "Confirmed",
+   "text": "every financial transaction (revenue, payment, tax, wallet top-up) is tied to a chart-of-account entry, so P&L and balance-sheet reporting can correctly reflect assets, liabilities, income and expenses \u2014 e.g., total wallet balances outstanding are reported as a liability owed to customers.",
+   "terms": [
+    "liabilities",
+    "expenses",
+    "income",
+    "balance-sheet",
+    "chart-of-account",
+    "top-up",
+    "reflect",
+    "balances"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-27",
+   "mom": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "label": "Confirmed",
+   "text": "wallet balances are tied to revenue recognition. Money loaded by a customer is initially recorded as a liability; once the balance is consumed against a specific product/service, it is recognized against that product's revenue account.",
+   "terms": [
+    "recognized",
+    "initially",
+    "balances",
+    "consumed",
+    "liability",
+    "loaded",
+    "recognition",
+    "money"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-27",
+   "mom": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "label": "Confirmed",
+   "text": "every wallet requires a validity period; it cannot remain open indefinitely. Once the validity period lapses, any remaining balance is automatically swept to a finance-designated account, per policy \u2014 this applies to monetary balances as well as non-monetary credits/vouchers, not only to points-style rewards.",
+   "terms": [
+    "points-style",
+    "vouchers",
+    "finance-designated",
+    "non-monetary",
+    "indefinitely",
+    "monetary",
+    "lapses",
+    "credits"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-27",
+   "mom": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "label": "Requested",
+   "text": "Chinmay shared that six wallet types had already been scoped on the Softlabs side (including attraction credit, game credit, rental credit, parking credit, and other credit types), and asked Allam to send the wallet-configuration documentation so these can be cross-checked and expanded against it \u2014 Allam confirmed he will share this.",
+   "terms": [
+    "wallet-configuration",
+    "cross-checked",
+    "expanded",
+    "documentation",
+    "types",
+    "rental",
+    "softlabs",
+    "including"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-27",
+   "mom": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "label": "Requested",
+   "text": "both auto-reload and recurring funding schedules should be configurable by the guest themselves via the guest/web app, not only by venue admins on the back end.",
+   "terms": [
+    "admins",
+    "auto-reload",
+    "funding",
+    "themselves",
+    "recurring",
+    "schedules",
+    "back",
+    "only"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-27",
+   "mom": "TICVAI_MoM_2026-08-27_WalletConfiguration.docx",
+   "label": "Confirmed",
+   "text": "guests can create family-member profiles themselves and configure spending limits directly from their own guest account, in addition to venue-side configuration.",
+   "terms": [
+    "family-member",
+    "venue-side",
+    "spending",
+    "themselves",
+    "addition",
+    "directly",
+    "profiles",
+    "limits"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-31",
+   "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "label": "Confirmed",
+   "text": "waiver trigger timing (at checkout, post-purchase, or on-site before entry) is business-configurable. Qossai noted that where a waiver is required before entry, access control should block entry until the waiver is completed \u2014 confirmed as supported (block ticket download, activation, check-in, or access if the waiver is incomplete).",
+   "terms": [
+    "business-configurable",
+    "post-purchase",
+    "on-site",
+    "incomplete",
+    "noted",
+    "timing",
+    "completed",
+    "download"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-31",
+   "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "label": "Confirmed",
+   "text": "communications and notifications will be built as a single centralized module that all other modules plug into, rather than each module building its own notification logic independently.",
+   "terms": [
+    "plug",
+    "centralized",
+    "communications",
+    "notifications",
+    "independently",
+    "logic",
+    "modules",
+    "building"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-31",
+   "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "label": "Confirmed",
+   "text": "changes to a product's price or configuration never retroactively affect tickets already purchased under the prior configuration \u2014 a guest who already bought at a given price keeps that price and terms regardless of later changes.",
+   "terms": [
+    "purchased",
+    "retroactively",
+    "regardless",
+    "bought",
+    "terms",
+    "given",
+    "affect",
+    "keeps"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-31",
+   "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "label": "Confirmed",
+   "text": "channel-specific pricing is required \u2014 e.g., online tickets are commonly priced lower than onsite/counter tickets in the region, reflecting reduced staff assistance for online purchases.",
+   "terms": [
+    "reflecting",
+    "channel-specific",
+    "commonly",
+    "reduced",
+    "onsite",
+    "purchases",
+    "assistance",
+    "lower"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-31",
+   "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "label": "Requested",
+   "text": "automatic inventory migration rules between channels \u2014 e.g., if B2C inventory sells out, the system should be able to automatically pull a configured share (e.g., 20%) from B2B inventory \u2014 confirmed this belongs in the same sales-channel/inventory configuration area.",
+   "terms": [
+    "sales-channel",
+    "pull",
+    "automatically",
+    "channels",
+    "area",
+    "sells",
+    "configured",
+    "automatic"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-31",
+   "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "label": "Agreed",
+   "text": "Chinmay (together with Dinesh) and Qossai will each separately research how major ticketing platforms handle secure resale and come back with a recommended approach \u2014 marked as pending confirmation from both sides.",
+   "terms": [
+    "major",
+    "secure",
+    "sides",
+    "research",
+    "approach",
+    "recommended",
+    "together",
+    "separately"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-08-31",
+   "mom": "TICVAI_MoM_2026-08-31_CS_B2B_Groups_Waivers_SalesChannel.docx",
+   "label": "Agreed",
+   "text": "sessions will continue daily at 8:30 AM (Allam's time) / 10:00 AM (Qossai's time), with the team aiming to complete all remaining workshop modules within roughly the next two weeks.",
+   "terms": [
+    "continue",
+    "aiming",
+    "daily",
+    "sessions",
+    "remaining",
+    "weeks",
+    "modules",
+    "roughly"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-01",
+   "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "label": "Confirmed",
+   "text": "partial payment/deposit is supported for bulk bookings such as schools and corporates \u2014 e.g., a 20\u201330% deposit upfront with the balance due on or before arrival.",
+   "terms": [
+    "corporates",
+    "schools",
+    "upfront",
+    "bookings",
+    "arrival",
+    "bulk",
+    "partial",
+    "deposit"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-01",
+   "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "label": "Decision",
+   "text": "the original virtual ticket ID is preserved through a resale \u2014 only the owner name and associated media (e.g., the QR code) are changed, giving a complete, traceable ownership history against a single stable ID (e.g., ID VT0010: originally Qossai, resold to Allam, resold again to Chinmay). A separate ownership change-log table will track each transfer, so that reporting, finance, and other downstream services continue to operate against the same stable ID without needing to change how they refer",
+   "terms": [
+    "change-log",
+    "resold",
+    "vt0010",
+    "associated",
+    "traceable",
+    "originally",
+    "preserved",
+    "continue"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-01",
+   "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "label": "Confirmed",
+   "text": "in some regions (e.g., Egypt), tax is calculated on the full pre-discount price rather than the discounted price \u2014 e.g., a AED 100 ticket with a 20% discount is paid at AED 80, but tax is still calculated on the AED 100 base. This inclusion/exclusion behavior must be configurable by region.",
+   "terms": [
+    "calculated",
+    "pre-discount",
+    "discounted",
+    "inclusion",
+    "egypt",
+    "exclusion",
+    "behavior",
+    "paid"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-01",
+   "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "label": "Confirmed",
+   "text": "conflicts are resolved via the configurable pricing hierarchy (introduced in 4.1) rather than an automatic \u201clowest price wins\u201d default \u2014 the hierarchy determines which rule supersedes or overrides another when more than one could apply to the same sale.",
+   "terms": [
+    "introduced",
+    "lowest",
+    "determines",
+    "overrides",
+    "supersedes",
+    "conflicts",
+    "wins",
+    "automatic"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-01",
+   "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "label": "Confirmed",
+   "text": "rounding precision must support regions requiring up to three decimal places, without rounding away the third decimal where the local currency requires exact figures.",
+   "terms": [
+    "precision",
+    "rounding",
+    "requiring",
+    "decimal",
+    "figures",
+    "away",
+    "places",
+    "regions"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-01",
+   "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "label": "Confirmed",
+   "text": "upgrade functionality must be available on the guest-facing mobile/web app, not only at the venue counter \u2014 guests should be able to view eligible upgrade options and complete the upgrade online without visiting on-site.",
+   "terms": [
+    "eligible",
+    "on-site",
+    "visiting",
+    "functionality",
+    "options",
+    "guest-facing",
+    "online",
+    "counter"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-01",
+   "mom": "TICVAI_MoM_2026-09-01_Pricing_Upgrades_Media_Reservations_Resale.docx",
+   "label": "Requested",
+   "text": "following up on last week's infrastructure/costing discussion, asked Qossai and Allam for concrete venue-scenario benchmarks \u2014 expected requests-per-second for events, and daily transaction volumes by venue type \u2014 to translate into a recommended AWS/GCP configuration and cost estimate, rather than working only from the earlier placeholder figures (e.g., 10,000 customers, 10 venues).",
+   "terms": [
+    "requests-per-second",
+    "venue-scenario",
+    "benchmarks",
+    "volumes",
+    "translate",
+    "discussion",
+    "concrete",
+    "costing"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-02",
+   "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "label": "Confirmed",
+   "text": "any ticket purchased online for a dynamic-QR event must be linked to the mobile app to display the working code \u2014 web/desktop purchases are redirected into the app experience for activation, not exempted from it.",
+   "terms": [
+    "dynamic-qr",
+    "redirected",
+    "purchased",
+    "exempted",
+    "desktop",
+    "purchases",
+    "online",
+    "experience"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-02",
+   "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "label": "Action",
+   "text": "recommended the team review the live consumer app and published privacy policy of an existing major venue-group client as a real-world reference for how facial-recognition consent, data use, and retention are explained to guests \u2014 to be used as a model for TICVAI's own privacy/consent design.",
+   "terms": [
+    "facial-recognition",
+    "venue-group",
+    "major",
+    "real-world",
+    "explained",
+    "recommended",
+    "consumer",
+    "published"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-02",
+   "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "label": "Confirmed",
+   "text": "TICVAI's role is to receive these vendor-pushed events and surface them as alerts/reports (e.g., notifying the operations team automatically when a turnstile goes offline) rather than to build fault-detection logic itself.",
+   "terms": [
+    "vendor-pushed",
+    "fault-detection",
+    "notifying",
+    "automatically",
+    "alerts",
+    "receive",
+    "logic",
+    "goes"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-02",
+   "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "label": "Decision",
+   "text": "the system will treat a successful scan as \u201cused\u201d regardless of physical passage, to close off a fraud vector; genuine cases are resolved manually by security via the ticket's scan-history log rather than by loosening the used/unused rule \u2014 confirmed by both Allam and Qossai as the safer approach.",
+   "terms": [
+    "successful",
+    "scan-history",
+    "loosening",
+    "passage",
+    "safer",
+    "manually",
+    "regardless",
+    "unused"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-02",
+   "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "label": "Action",
+   "text": "Qossai to share (has already shared via WhatsApp) a scope-of-work / reference document from a prior real-world dynamic QR code deployment for the team's review.",
+   "terms": [
+    "scope-of-work",
+    "real-world",
+    "whatsapp",
+    "prior",
+    "dynamic",
+    "qossai",
+    "deployment",
+    "review"
+   ],
+   "termsFoundInPackage": 7,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-02",
+   "mom": "TICVAI_MoM_2026-09-02_AccessControl.docx",
+   "label": "Confirmed",
+   "text": "integration happens at two levels \u2014 the turnstile itself and the reader \u2014 each producing its own outputs. Devices push events to TICVAI via a TCP/IP API (confirmed with a turnstile vendor during the session): anti-passback attempts, power loss, network loss, and other fault conditions are detected by the device itself and sent to TICVAI as alarms/events, rather than requiring TICVAI to poll or independently detect hardware state.",
+   "terms": [
+    "alarms",
+    "producing",
+    "detected",
+    "outputs",
+    "power",
+    "poll",
+    "anti-passback",
+    "requiring"
+   ],
+   "termsFoundInPackage": 8,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-07",
+   "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+   "label": "Confirmed",
+   "text": "the system must validate uniqueness of key identifiers (e.g., passport number, Emirates ID) and block a duplicate submission, prompting the applicant to resolve or resubmit rather than silently creating a duplicate record.",
+   "terms": [
+    "identifiers",
+    "prompting",
+    "resubmit",
+    "applicant",
+    "uniqueness",
+    "creating",
+    "submission",
+    "passport"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-07",
+   "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+   "label": "Agreed",
+   "text": "supportive of consolidating wherever the same information can reasonably be shown together \u2014 the priority is minimizing the number of separate screens an end user needs to navigate to find relevant information, rather than the number of underlying boards used to explain the concept during workshops.",
+   "terms": [
+    "consolidating",
+    "supportive",
+    "minimizing",
+    "reasonably",
+    "wherever",
+    "underlying",
+    "relevant",
+    "shown"
+   ],
+   "termsFoundInPackage": 5,
+   "absorbed": true
+  },
+  {
+   "date": "2026-09-07",
+   "mom": "TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue.docx",
+   "label": "Confirmed",
+   "text": "feasible via OCR \u2014 the system can read the uploaded ID/document image or PDF and auto-populate the corresponding fields. The extracted data must still be stored as structured fields (not just the image) so the system can track document expiry and prompt renewal ahead of an event.",
+   "terms": [
+    "auto-populate",
+    "feasible",
+    "corresponding",
+    "extracted",
+    "ahead",
+    "uploaded",
+    "structured",
+    "image"
+   ],
+   "termsFoundInPackage": 6,
+   "absorbed": true
+  }
+ ]
+}

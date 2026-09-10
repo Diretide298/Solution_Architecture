@@ -1,0 +1,120 @@
+id: F175
+name: 'Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P16 Venue Analytics
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Unified BI Reporting and AI Analytics Platform board 1.
+    **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: ANL-020
+  entryPoints:
+  - Arrives at Multi-Site & Performance Comparison
+steps:
+- step: 1
+  screen: ANL-020
+  action: Opens Multi-Site & Performance Comparison
+  operations: []
+  outcome: Allow enterprise management to compare sites, venues, attractions and business units.
+- step: 2
+  screen: ANL-012
+  action: Works in Live Operations Dashboard
+  operations: []
+  outcome: Provide a real-time view of what is happening across all operating locations.
+- step: 3
+  screen: ANL-020
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ANL-013
+  action: Works in Revenue Pulse
+  operations: []
+  outcome: Provide real-time visibility into revenue generation across TICVAI.
+- step: 5
+  screen: ANL-020
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ANL-014
+  action: Works in Attendance & Footfall Intelligence
+  operations: []
+  outcome: Monitor visitor movement and attendance across venues.
+- step: 7
+  screen: ANL-020
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ANL-015
+  action: Works in Capacity & Utilization Monitor
+  operations: []
+  outcome: Provide centralized monitoring of available and consumed capacity.
+- step: 9
+  screen: ANL-020
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ANL-016
+  action: Works in Sales & Channel Performance
+  operations: []
+  outcome: Provide management with consolidated commercial performance across every sales channel.
+- step: 11
+  screen: ANL-020
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ANL-017
+  action: Works in Customer, Membership & Loyalty Pulse
+  operations: []
+  outcome: Provide a consolidated view of customer health and engagement.
+- step: 13
+  screen: ANL-020
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ANL-018
+  action: Works in Alerts & Exception Center
+  operations: []
+  outcome: Create one centralized location for management-level KPI and operational exceptions.
+- step: 15
+  screen: ANL-020
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ANL-019
+  action: Works in AI Management Insights
+  operations: []
+  outcome: Provide management with proactive AI-generated business intelligence rather than requiring
+    users to manually analyze every dashboard.
+branches:
+- at: 1
+  condition: Nothing has been set up on Multi-Site & Performance Comparison yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Unified BI Reporting and AI Analytics Platform board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -39,25 +39,25 @@ modulesUsed:
   screens: 1
 servicesCalled:
 - service: MarketingService
-  operationCalls: 47
-- service: CatalogueService
-  operationCalls: 31
+  operationCalls: 58
 - service: OrderService
-  operationCalls: 31
+  operationCalls: 39
+- service: CatalogueService
+  operationCalls: 36
 - service: IdentityService
-  operationCalls: 19
+  operationCalls: 24
 - service: FnbService
-  operationCalls: 15
+  operationCalls: 18
 - service: VenueOpsService
-  operationCalls: 13
+  operationCalls: 16
 - service: RetailService
-  operationCalls: 10
+  operationCalls: 11
 - service: AccessService
-  operationCalls: 8
+  operationCalls: 10
 - service: WhiteLabelService
   operationCalls: 7
 - service: AiService
-  operationCalls: 3
+  operationCalls: 4
 - service: LedgerService
   operationCalls: 1
 coverage:
@@ -170,6 +170,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -222,6 +223,7 @@ screens:
   operations:
   - acquireInventoryHold
   - getAvailability
+  - getPerformance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -229,7 +231,8 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams: []
+  entryParams:
+  - performanceId<-navigation
   goesTo:
   - WEB-001
   - WEB-005
@@ -254,6 +257,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -267,7 +271,7 @@ screens:
   - WEB-010
   boardFrames:
   - Seat Board 3.dc.html#seat-3b
-  wireframe: wireframes/Seat Board 3.dc.html#seat-3b
+  wireframe: wireframes/P01 Guest Web.dc.html#web-007
   inFlows:
   - F02 Guest buys seated tickets
 - screen: WEB-008
@@ -278,15 +282,19 @@ screens:
   density: compact
   operations:
   - addCartLine
+  - getBundle
   - getUpsellSuggestions
+  - listCatalogueBundles
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
   entryParams:
   - cartId<-session
+  - bundleId<-navigation
   goesTo:
   - WEB-001
   - WEB-005
@@ -307,6 +315,8 @@ screens:
   - removeFromWishlist
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -340,6 +350,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -352,6 +363,7 @@ screens:
   - WEB-011
   - WEB-012
   - WEB-013
+  - WEB-030
   boardFrames: null
   wireframe: wireframes/P01 Guest Web.dc.html#web-010
   inFlows:
@@ -375,9 +387,11 @@ screens:
   - removeFromWishlist
   - revokeGuestDevice
   - updateMyProfile
+  - uploadGuestDocument
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -406,15 +420,18 @@ screens:
   - createOrder
   - createPayment
   - getOrder
+  - inquirePaymentStatus
   - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
   entryParams:
   - orderId<-deepLink
+  - paymentId<-navigation
   goesTo:
   - WEB-001
   - WEB-010
@@ -438,6 +455,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -463,13 +481,11 @@ screens:
   - getPaymentLink
   - payByLink
   states:
-  - alreadyPaid
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
-  - expired
   - loading
-  - superseded
   offlineState: false
   entryParams:
   - token<-deepLink
@@ -490,6 +506,8 @@ screens:
   - joinQueue
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -509,6 +527,7 @@ screens:
   operations:
   - claimCart
   - completeSsoAuthorization
+  - createMfaChallenge
   - enrolMfaMethod
   - getGuestSession
   - guestLogout
@@ -528,6 +547,7 @@ screens:
   - verifyMfaEnrolment
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -554,14 +574,18 @@ screens:
   density: compact
   operations:
   - addToWishlist
+  - getMyChallenges
   - getWishlist
   - listGuestDevices
   - recordConsent
   - registerGuestDevice
   - removeFromWishlist
+  - respondToInvitation
   - revokeGuestDevice
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -569,6 +593,7 @@ screens:
   - deviceId<-deepLink
   - itemId<-deepLink
   - subjectId<-session
+  - token<-deepLink
   goesTo:
   - WEB-001
   - WEB-016
@@ -576,7 +601,7 @@ screens:
   - WEB-019
   boardFrames:
   - Dashboards Board.dc.html#web-017
-  wireframe: wireframes/Dashboards Board.dc.html#web-017
+  wireframe: wireframes/P01 Guest Web.dc.html#web-017
   inFlows: null
 - screen: WEB-018
   name: My Tickets
@@ -588,11 +613,14 @@ screens:
   - getEntitlement
   - getEntitlementCredential
   - getEntitlementHistory
+  - issueWalletPass
   - listEntitlements
   - listMyEntitlements
+  - shareEntitlement
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -615,12 +643,14 @@ screens:
   wave: 1
   density: compact
   operations:
+  - createRefundRequest
   - getOrder
   - listMyOrders
   - listOrders
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -645,10 +675,12 @@ screens:
   - getGuestProfile
   - listConsentPurposes
   - recordConsent
+  - updateGuestPreferences
   - updateMyProfile
   - verifyGuestEmail
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -670,9 +702,13 @@ screens:
   wave: 2
   density: compact
   operations:
+  - getGameCard
   - getGiftCard
   - getWallet
+  - listPaymentTokens
   - listWalletTransactions
+  - storePaymentToken
+  - transferWalletBalance
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -683,6 +719,7 @@ screens:
   entryParams:
   - cardCode<-deepLink
   - subjectId<-session
+  - walletId<-navigation
   goesTo:
   - WEB-001
   - WEB-022
@@ -731,6 +768,8 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -752,14 +791,23 @@ screens:
   density: compact
   operations:
   - addToWishlist
+  - deleteGuestAccount
+  - exportSubjectData
+  - getFacePassEnrolment
+  - getGuestConsents
+  - getWaiverStatus
   - getWishlist
+  - grantDelegation
+  - listDelegations
   - listGuestDevices
   - recordConsent
   - registerGuestDevice
   - removeFromWishlist
+  - revokeFacePass
   - revokeGuestDevice
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -768,6 +816,7 @@ screens:
   - deviceId<-deepLink
   - itemId<-deepLink
   - subjectId<-session
+  - enrolmentId<-navigation
   goesTo:
   - WEB-001
   - WEB-021
@@ -784,9 +833,13 @@ screens:
   wave: 1
   density: compact
   operations:
+  - createCase
   - getTenantAppStatus
+  - listCases
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -809,6 +862,7 @@ screens:
   - submitReview
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   offlineState: false
@@ -839,6 +893,7 @@ screens:
   - setMarketingSubscription
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -865,6 +920,8 @@ screens:
   - getTenantAppStatus
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -887,6 +944,8 @@ screens:
   - getTenantAppStatus
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -904,6 +963,7 @@ screens:
   density: compact
   operations:
   - claimTicketTransfer
+  - createResaleListing
   - listOrders
   - transferOrderTickets
   states:
@@ -931,9 +991,13 @@ screens:
   wave: 2
   density: compact
   operations:
+  - bookResource
   - cancelReservation
+  - getGroupBooking
   - getReservation
+  - getResourceAvailability
   - listReservations
+  - updateTableReservation
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -943,6 +1007,8 @@ screens:
   offlineState: false
   entryParams:
   - reservationId<-deepLink
+  - groupBookingId<-navigation
+  - resourceId<-navigation
   goesTo:
   - WEB-001
   - WEB-030
@@ -1060,8 +1126,10 @@ screens:
   - claimLocationSession
   - claimTableSession
   - createGuestFnbOrder
+  - createTableReservation
   - getGuestMenu
   - getGuestOrderStatus
+  - joinRestaurantWaitlist
   - listDeliveryLocations
   - listDiningOutlets
   - listModifierGroups
@@ -1155,7 +1223,7 @@ screens:
   - WEB-001
   boardFrames:
   - Seat Board 3.dc.html#seat-3c
-  wireframe: wireframes/Seat Board 3.dc.html#seat-3c
+  wireframe: wireframes/P01 Guest Web.dc.html#web-039
   inFlows: null
 - screen: WEB-040
   name: Virtual Queue
@@ -1167,7 +1235,9 @@ screens:
   - getWaitTimes
   - getWaitingGuest
   - joinQueue
+  - joinWaitlist
   - leaveQueue
+  - leaveWaitlist
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1239,10 +1309,12 @@ screens:
   wave: 2
   density: compact
   operations:
+  - createReferral
   - evaluatePromotions
   - getLoyaltyPosition
   - listLoyaltyProgrammes
   - listPromotions
+  - redeemLoyaltyPoints
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1266,8 +1338,10 @@ screens:
   - createAiConversation
   - getGuestMenu
   - handoverToAgent
+  - listAiConversations
   - requestSuggestion
   - sendAiMessage
+  - sendConversationMessage
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1316,7 +1390,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false

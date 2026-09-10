@@ -1,0 +1,130 @@
+id: F123
+name: 'Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 1. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-364
+  entryPoints:
+  - Arrives at Approval Command Center Dashboard
+steps:
+- step: 1
+  screen: BO-364
+  action: Opens Approval Command Center Dashboard
+  operations: []
+  outcome: Provide management and approvers with a real-time overview of approval activity.
+- step: 2
+  screen: BO-365
+  action: Works in My Approval Inbox
+  operations: []
+  outcome: Provide each approver with their personal actionable queue.
+- step: 3
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-366
+  action: Works in Team / Shared Approval Queue
+  operations: []
+  outcome: Allow managers and centralized approval teams to manage approvals belonging to their team or
+    department.
+- step: 5
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-367
+  action: Works in Approval Request Detail
+  operations: []
+  outcome: Approval Request Detail
+- step: 7
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-368
+  action: Works in AI Decision Support
+  operations: []
+  outcome: AI Decision Support
+- step: 9
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-369
+  action: Works in High Priority & Risk Queue
+  operations: []
+  outcome: Create a dedicated operational screen for approvals requiring immediate attention.
+- step: 11
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-370
+  action: Works in Escalated Approval Center
+  operations: []
+  outcome: Manage requests that were escalated because of SLA breaches, risk conditions, unavailable approvers
+    or configured escalation rules.
+- step: 13
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-371
+  action: Works in Completed Approval History
+  operations: []
+  outcome: Provide searchable historical records of completed approval decisions.
+- step: 15
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-372
+  action: Works in Approval SLA & Workload Monitor
+  operations: []
+  outcome: Give managers visibility into operational performance before approvals become bottlenecks.
+- step: 17
+  screen: BO-364
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-373
+  action: Works in Approval Activity & Notification Center
+  operations: []
+  outcome: Provide a unified chronological feed of important approval events.
+branches:
+- at: 1
+  condition: Nothing has been set up on Approval Command Center Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 1 visited
+primaryContract: unknown
+contracts:
+- unknown

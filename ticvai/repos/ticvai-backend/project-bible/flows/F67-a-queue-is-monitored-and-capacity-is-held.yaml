@@ -55,7 +55,7 @@ branches:
     enforced per lane is not a limit — releasing the allocation stops every channel at once, including
     the web.'
   severity: high
-  resolvedBy: releaseChannelAllocation
+  resolvedBy: relinquishChannelAllocation
 exitStates:
 - state: withinCapacity
   description: Normal operation.

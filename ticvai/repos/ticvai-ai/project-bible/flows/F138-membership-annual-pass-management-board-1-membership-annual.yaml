@@ -1,0 +1,151 @@
+id: F138
+name: 'Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Membership   Annual Pass Management board 1. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-284
+  entryPoints:
+  - Arrives at Membership & Annual Pass Command Center
+steps:
+- step: 1
+  screen: BO-284
+  action: Opens Membership & Annual Pass Command Center
+  operations:
+  - listMembershipAnnualPass
+  outcome: Provide administrators with a centralized view of all membership, annual pass, season pass
+    and subscription-style admission products.
+- step: 2
+  screen: BO-285
+  action: Works in Membership Product & Tier Builder
+  operations:
+  - setMembershipProductTier
+  outcome: Configure the fundamental definition and hierarchy of a membership/pass.
+- step: 3
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-286
+  action: Works in Membership Eligibility & Qualification Rule Builder
+  operations:
+  - setMembershipEligibilityQualification
+  outcome: Determine who is allowed to purchase, activate, hold or renew a particular membership.
+- step: 5
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-287
+  action: Works in Validity, Activation & Expiry Configuration
+  operations:
+  - setValidityActivationExpiry
+  outcome: Define exactly when a membership becomes valid, how long it remains valid and how it expires.
+- step: 7
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-288
+  action: Works in Membership Entitlement & Admission Benefit Builder
+  operations:
+  - setMembershipEntitlementAdmission
+  outcome: Define exactly what the member receives. This is the heart of the membership product.
+- step: 9
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-289
+  action: Works in Membership Usage, Visit & Consumption Rules
+  operations:
+  - listMembershipUsageVisit
+  outcome: Control how membership entitlements may actually be consumed. Screen 13.1.5 defines what the
+    member receives. Screen 13.1.6 defines how it may be used.
+- step: 11
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-290
+  action: Works in Family, Household & Dependent Membership Configuration
+  operations:
+  - setFamilyHouseholdDependent
+  outcome: Support memberships covering more than one person while preserving individual identities and
+    entitlements.
+- step: 13
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-291
+  action: Works in Membership Commercial, Pricing & Channel Association
+  operations:
+  - listMembershipCommercialPricing
+  outcome: Connect the membership contract to TICVAI's central commercial engines without duplicating
+    pricing configuration.
+- step: 15
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-292
+  action: Works in Renewal, Auto-Renewal & Membership Continuity Configuration
+  operations:
+  - setRenewalAutoMembership
+  outcome: Define how a membership moves from one validity period into the next.
+- step: 17
+  screen: BO-284
+  action: Returns to the board's landing screen
+  operations:
+  - listMembershipAnnualPass
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-293
+  action: Works in Membership Product Validation, Approval, Publication & Versioning
+  operations:
+  - approveMembershipProductValidation
+  outcome: Provide the final governance layer before a membership/pass configuration becomes commercially
+    available.
+branches:
+- at: 1
+  condition: Nothing has been set up on Membership & Annual Pass Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Membership   Annual Pass Management board 1 visited
+primaryContract: subscription
+contracts:
+- subscription

@@ -18,7 +18,7 @@ terminal:
 transitions:
 - from: active
   to: released
-  operation: releaseInventoryHold
+  operation: relinquishInventoryHold
   trigger: operation
   guard: Terminal returned what it did not sell
 - from: active

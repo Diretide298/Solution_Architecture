@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Marketing & CRM
   version: 0.1.0
-  x-ticvai-screen-count: 140
+  x-ticvai-screen-count: 142
   x-ticvai-tier: satellite
   x-ticvai-module: 22 — Marketing & CRM
   x-ticvai-requirements: 319
@@ -233,6 +233,9 @@ paths:
   /guests/match:
     post:
       operationId: matchGuest
+      x-ticvai-consumed-by:
+        - "P06 EMP-055 Create / Edit Reservation"
+        - "P06 EMP-057 Guest Profile & Dining History"
       summary: Is this the same person we already have?
       description: 'Board 4E, 24 August. **A restaurant creates a duplicate guest every time somebody
         books by phone with a different number**, and a CRM that cannot recognise them reports two visits
@@ -294,6 +297,8 @@ paths:
   /guests/merge:
     post:
       operationId: mergeGuests
+      x-ticvai-consumed-by:
+        - "P06 EMP-057 Guest Profile & Dining History"
       summary: Two records, one person
       description: 'Board 4G. **Always a person''s decision, never the platform''s** — `matchGuest` proposes
         and this acts.
@@ -426,6 +431,7 @@ paths:
     put:
       operationId: updateGuestPreferences
       x-ticvai-consumed-by:
+        - "P01 WEB-020 Profile & Preferences"
         - "P02 GST-066 Privacy & My Data"
       summary: The things a regular should not have to say twice
       description: 'Board 4G. **Table, drink, dietary needs, contact channel.** A guest who states an
@@ -514,6 +520,7 @@ paths:
     post:
       operationId: respondToInvitation
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
       summary: Accept or decline
       description: '**The token is single-use.** An invitation link forwarded to a group chat is the failure
@@ -678,6 +685,7 @@ paths:
     get:
       operationId: getWaiverStatus
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-067 Refunds & Resale"
       summary: Whether this guest may be issued a ticket that requires a waiver
       description: '2.15.9. **Ticket issuance is conditional on waiver acceptance**, which puts this in
@@ -727,6 +735,7 @@ paths:
     post:
       operationId: uploadGuestDocument
       x-ticvai-consumed-by:
+        - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P02 GST-066 Privacy & My Data"
       summary: Store a guest photo, ID or signed document
       description: 'BL-133. **Deliberately not `assets`.** A guest''s passport scan is not a marketing
@@ -799,6 +808,7 @@ paths:
     get:
       operationId: getMyChallenges
       x-ticvai-consumed-by:
+        - "P01 WEB-017 My Account Dashboard"
         - "P02 GST-072 Share & Group Booking"
       summary: Active challenges and how far along I am
       description: '22.6.14 and 22.6.15. **Progress is shown, not just the outcome.** A guest two visits
@@ -999,6 +1009,7 @@ paths:
     post:
       operationId: createReferral
       x-ticvai-consumed-by:
+        - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-072 Share & Group Booking"
       summary: Issue a referral code
       description: 'BL-034. **The reward fires on the referee''s qualifying act, not on the sign-up**
@@ -1438,6 +1449,7 @@ paths:
       operationId: identifyGuest
       x-ticvai-consumed-by:
         - "P04 POS-002 Sell — Ticket Catalogue"
+        - "P04 POS-027 Guest Lookup"
       summary: Resolve any identifier to a guest
       description: '**A resolver over identifiers, not new data.** `searchGuests` finds by name and contact
         and `lookupTicket` resolves a ticket, so a cashier handed a wristband had to know which operation
@@ -1509,6 +1521,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-011 Guest Details & Attendee Forms"
         - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-039 Profile"
       summary: A guest correcting their own details
       description: '**`updateGuestProfile` is staff-only, and the three screens calling it are the staff
         app, the back office and the CMS** — so to correct a phone number a guest had to ask somebody.
@@ -1644,6 +1657,7 @@ paths:
     post:
       operationId: redeemLoyaltyPoints
       x-ticvai-consumed-by:
+        - "P01 WEB-043 Loyalty & Rewards"
         - "P02 GST-071 Payment Methods"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-005 Payment"
@@ -1801,6 +1815,7 @@ paths:
     post:
       operationId: sendConversationMessage
       x-ticvai-consumed-by:
+        - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-032 AI Concierge – Chat"
         - "P12 SUP-005 Live Chat Workspace"
       x-ticvai-audience:
@@ -2299,6 +2314,7 @@ paths:
     get:
       operationId: searchGuests
       x-ticvai-consumed-by:
+        - "P04 POS-027 Guest Lookup"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
@@ -2510,6 +2526,7 @@ paths:
     get:
       operationId: getGuestConsents
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
@@ -2985,6 +3002,7 @@ paths:
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-073 Security & Sign-in"
         - "P08 BO-036 Device Registry"
         - "P13 CMS-018 Consent & Legal"
       x-ticvai-audience:
@@ -3032,6 +3050,7 @@ paths:
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
       summary: Register a device for push
@@ -3116,6 +3135,7 @@ paths:
         - "P01 WEB-017 My Account Dashboard"
         - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-073 Security & Sign-in"
       x-ticvai-audience:
       - guest
       summary: Revoke a device registration
@@ -3906,6 +3926,7 @@ paths:
     get:
       operationId: listCases
       x-ticvai-consumed-by:
+        - "P01 WEB-025 Help Centre / FAQ"
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
@@ -3962,6 +3983,7 @@ paths:
     post:
       operationId: createCase
       x-ticvai-consumed-by:
+        - "P01 WEB-025 Help Centre / FAQ"
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-028 Lost & found"
         - "P06 EMP-029 Guest assistance"
@@ -4543,6 +4565,7 @@ paths:
       operationId: getMarketingSubscription
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-065 Newsletter & Preferences"
       x-ticvai-audience:
       - guest
       summary: What this guest has opted into
@@ -4567,6 +4590,7 @@ paths:
       operationId: setMarketingSubscription
       x-ticvai-consumed-by:
         - "P01 WEB-027 Newsletter Subscription"
+        - "P02 GST-065 Newsletter & Preferences"
       x-ticvai-audience:
       - guest
       summary: Subscribe or unsubscribe

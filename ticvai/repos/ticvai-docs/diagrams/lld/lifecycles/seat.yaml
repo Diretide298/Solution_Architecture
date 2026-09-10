@@ -21,7 +21,7 @@ transitions:
   guard: Not already held or sold. The hold is the concurrency control
 - from: held
   to: available
-  operation: releaseSeatHold
+  operation: relinquishSeatHold
   trigger: operation
   guard: Released by the holder
 - from: held
@@ -42,7 +42,7 @@ transitions:
   guard: Held back from sale — house seats, production, accessibility companion
 - from: blocked
   to: available
-  operation: releaseSeatBlock
+  operation: relinquishSeatBlock
   trigger: operation
   guard: Block released
 - from: blocked

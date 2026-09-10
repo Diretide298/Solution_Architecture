@@ -33,30 +33,30 @@
   }
  ],
  "stores": {
-  "postgres": 40,
+  "postgres": 41,
   "postgres-analytical": 5,
   "redis": 4,
   "qdrant": 1
  },
- "generated": "2026-09-03",
+ "generated": "2026-09-10",
  "note": "Derived by closure from the contract, not listed. See handoff/README.md \u2014 the hand-maintained version of this drifted four times in one day.",
  "counts": {
-  "operations": 32,
-  "schemas": 22,
+  "operations": 33,
+  "schemas": 23,
   "states": 11,
   "events": 11,
-  "tables": 50,
-  "screens": 33,
+  "tables": 51,
+  "screens": 34,
   "flows": 11,
-  "documents": 17,
+  "documents": 22,
   "openConflicts": 1
  },
  "metrics": {
   "design": [
    {
     "name": "Operations in the contract",
-    "done": 30,
-    "total": 30,
+    "done": 31,
+    "total": 31,
     "percent": 100,
     "note": "The seed of the closure."
    },
@@ -69,9 +69,9 @@
    },
    {
     "name": "Operations reaching a screen",
-    "done": 19,
-    "total": 30,
-    "percent": 63,
+    "done": 21,
+    "total": 31,
+    "percent": 68,
     "note": "This domain's own operations that a screen calls. Jobs and internal operations legitimately reach none."
    },
    {
@@ -93,12 +93,12 @@
   ]
  },
  "headline": {
-  "design": 85,
+  "design": 87,
   "build": 0
  },
  "waves": {
   "wave2": 15,
-  "wave3": 12,
+  "wave3": 13,
   "wave1": 6
  },
  "reachedOutsideTheContract": [
@@ -161,7 +161,7 @@
   "operations": []
  },
  "storage": {
-  "postgres": 40,
+  "postgres": 41,
   "postgres-analytical": 5,
   "redis": 4,
   "qdrant": 1
@@ -177,88 +177,113 @@
  "unmodelledLifecycles": [],
  "documents": [
   {
-   "file": "docs/active/ai-scope-for-confirmation.md",
+   "file": "docs\\active\\ai-scope-for-confirmation.md",
    "title": "AI scope \u2014 for confirmation",
    "status": ""
   },
   {
-   "file": "docs/active/deep-audit-24-august.md",
+   "file": "docs\\active\\deep-audit-24-august.md",
    "title": "Deep audit \u2014 ten invariants, run adversarially",
    "status": ""
   },
   {
-   "file": "docs/active/deployment-configs-costed.md",
+   "file": "docs\\active\\deployment-configs-costed.md",
    "title": "Deployment architecture \u2014 four configurations, costed on AWS and GCP",
    "status": ""
   },
   {
-   "file": "docs/active/full-layer-audit-20aug.md",
+   "file": "docs\\active\\dump-audit-3-september.md",
+   "title": "Audit \u2014 the 3 September dump, its checks, and what trickles down",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\full-layer-audit-20aug.md",
    "title": "Full-layer audit \u2014 20 August",
    "status": ""
   },
   {
-   "file": "docs/active/hierarchy-segregation-services.md",
+   "file": "docs\\active\\hierarchy-segregation-services.md",
    "title": "TICVAI \u2014 Hierarchy, Data Segregation and Services",
    "status": ""
   },
   {
-   "file": "docs/active/optimisation-assessment.md",
+   "file": "docs\\active\\optimisation-assessment.md",
    "title": "Optimisation assessment \u2014 RAG, caching, backend, frontend",
    "status": ""
   },
   {
-   "file": "docs/active/optimisation-plan.md",
+   "file": "docs\\active\\optimisation-plan.md",
    "title": "Optimisation adoption plan",
    "status": ""
   },
   {
-   "file": "docs/active/viewer-update-brief-20aug.md",
+   "file": "docs\\active\\screen-duplicate-triage.md",
+   "title": "Identical operation sets \u2014 what each cluster actually is",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\screen-estate-audit.md",
+   "title": "Screen estate audit \u2014 duplication, connectivity, and stranded capability",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\screen-regeneration-plan.md",
+   "title": "Regenerating the screen layer \u2014 plan",
+   "status": ""
+  },
+  {
+   "file": "docs\\active\\viewer-update-brief-20aug.md",
    "title": "Viewer \u2014 what changed in the package on 20 August",
    "status": ""
   },
   {
-   "file": "docs/adr/0007-hybrid-repository-topology.md",
+   "file": "docs\\active\\workshop-pack-log.md",
+   "title": "Workshop pack \u2014 what was done, and how to re-verify it",
+   "status": ""
+  },
+  {
+   "file": "docs\\adr\\0007-hybrid-repository-topology.md",
    "title": "ADR-0007: Hybrid repository topology",
    "status": "Accepted"
   },
   {
-   "file": "docs/adr/0020-ai-isolation-boundary.md",
+   "file": "docs\\adr\\0020-ai-isolation-boundary.md",
    "title": "ADR-0020 \u2014 Where AI runs, and what it is isolated from",
    "status": "Proposed \u00b7 17 August 2026"
   },
   {
-   "file": "docs/adr/0021-qdrant-partitioning.md",
+   "file": "docs\\adr\\0021-qdrant-partitioning.md",
    "title": "ADR-0021 \u2014 Qdrant: one collection per embedding model, tenant is the shard, scope is the filter",
    "status": "Proposed \u00b7 17 August 2026"
   },
   {
-   "file": "docs/adr/0023-pii-separation.md",
+   "file": "docs\\adr\\0023-pii-separation.md",
    "title": "ADR-0023 \u2014 Personal data lives apart from the append-only ledger",
    "status": "Accepted \u00b7 17 August 2026, recording a decision already impl"
   },
   {
-   "file": "docs/adr/0028-service-decomposition.md",
+   "file": "docs\\adr\\0028-service-decomposition.md",
    "title": "ADR-0028: Sixteen services, and the data boundary decides where they split",
-   "status": "Accepted \u2014 the data topology is reopened (CF-161, 24 August)"
+   "status": "Accepted. The data topology reopened by CF-161 on 24 August "
   },
   {
-   "file": "docs/adr/0033-outbox-and-dead-letters.md",
+   "file": "docs\\adr\\0033-outbox-and-dead-letters.md",
    "title": "ADR-0033: Every asynchronous handoff has an outbox and a place to fail",
    "status": "Accepted"
   },
   {
-   "file": "docs/adr/0034-ai-retrieval-and-cost.md",
+   "file": "docs\\adr\\0034-ai-retrieval-and-cost.md",
    "title": "ADR-0034: The cheapest AI call is the one that never reaches a provider",
    "status": "Accepted"
   },
   {
-   "file": "docs/architecture/README.md",
-   "title": "Architecture",
+   "file": "docs\\architecture\\ai-credentials.md",
+   "title": "AI provider credentials \u2014 where the key lives and who can reach it",
    "status": ""
   },
   {
-   "file": "docs/architecture/ai-credentials.md",
-   "title": "AI provider credentials \u2014 where the key lives and who can reach it",
+   "file": "docs\\architecture\\README.md",
+   "title": "Architecture",
    "status": ""
   }
  ]

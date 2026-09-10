@@ -1,0 +1,137 @@
+id: F127
+name: 'Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 5. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-384
+  entryPoints:
+  - Arrives at Delegation & Escalation Command Center
+steps:
+- step: 1
+  screen: BO-384
+  action: Opens Delegation & Escalation Command Center
+  operations: []
+  outcome: Provide administrators and managers with a real-time overview of delegation, SLA and escalation
+    conditions across TICVAI.
+- step: 2
+  screen: BO-385
+  action: Works in Delegation Management
+  operations: []
+  outcome: Allow an authorized approver or administrator to delegate approval authority to another eligible
+    user. The source specifically requires approvers to be able to delegate their approval authority.
+- step: 3
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-386
+  action: Works in Temporary Delegation & Availability Calendar
+  operations: []
+  outcome: Manage time-limited delegation caused by annual leave, business travel, training, sickness,
+    or other planned absence. The matrix requires temporary delegation periods with automatic expiration.
+- step: 5
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-387
+  action: Works in Out-of-Office & Substitute Routing
+  operations: []
+  outcome: Configure automatic routing when the primary approver is unavailable. The matrix specifically
+    requires automatic rerouting when approvers are unavailable.
+- step: 7
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-388
+  action: Works in Approval SLA Policy Configuration
+  operations: []
+  outcome: Define how quickly different approval types must be processed. The matrix explicitly requires
+    configurable approval response-time targets.
+- step: 9
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-389
+  action: Works in Reminder & Breach Notification Rules
+  operations: []
+  outcome: Configure proactive notifications before and after SLA breaches. The source requires reminders
+    for pending approvals and alerts when SLA thresholds are exceeded.
+- step: 11
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-390
+  action: Works in Escalation Policy Builder
+  operations: []
+  outcome: Define what TICVAI should do when an approval remains unresolved or meets another escalation
+    condition.
+- step: 13
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-391
+  action: Works in Live Escalation Operations Center
+  operations: []
+  outcome: Allow managers to monitor and intervene in currently escalated approvals.
+- step: 15
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-392
+  action: Works in SLA & Escalation Performance Analytics
+  operations: []
+  outcome: Provide management with analytics about where approval delays and escalations occur. The source
+    explicitly requires escalation reporting and escalation trend analytics.
+- step: 17
+  screen: BO-384
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-393
+  action: Works in AI SLA & Escalation Advisor
+  operations: []
+  outcome: Use AI to predict approval bottlenecks and recommend preventive actions before SLAs are breached.
+    The matrix specifically requires AI escalation recommendations.
+branches:
+- at: 1
+  condition: Nothing has been set up on Delegation & Escalation Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 5 visited
+primaryContract: unknown
+contracts:
+- unknown

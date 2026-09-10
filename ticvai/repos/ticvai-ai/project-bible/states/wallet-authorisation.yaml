@@ -33,12 +33,12 @@ transitions:
   guard: A further capture closed it
 - from: partiallyCaptured
   to: released
-  operation: releaseWalletAuthorisation
+  operation: relinquishWalletAuthorisation
   trigger: operation
   guard: '**The remainder returned.** Holding an unused balance is money a guest cannot spend elsewhere'
 - from: held
   to: released
-  operation: releaseWalletAuthorisation
+  operation: relinquishWalletAuthorisation
   trigger: operation
   guard: Nothing spent
 - from: held

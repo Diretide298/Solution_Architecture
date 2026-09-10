@@ -1,0 +1,154 @@
+id: F173
+name: 'Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Ticket Resale Marketplace board 3. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-298
+  entryPoints:
+  - Arrives at My Tickets & Resale Marketplace Entry
+steps:
+- step: 1
+  screen: ADM-298
+  action: Opens My Tickets & Resale Marketplace Entry
+  operations:
+  - listTicketResaleMarketplace
+  outcome: 'Provide the authenticated ticket holder with a simple and secure entry point into the official
+    resale journey. The preferred starting point should be the customer''s existing: My Account → My Tickets
+    rather than asking customers to manually enter ticket numbers or upload ticket PDFs.'
+- step: 2
+  screen: ADM-299
+  action: Works in Resale Eligibility & Ticket Selection
+  operations:
+  - listResaleEligibilityTicket
+  outcome: Explain whether the selected ticket can be resold before allowing a listing to be created.
+- step: 3
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-300
+  action: Works in Create Listing & Resale Price Selection
+  operations:
+  - listCreateListingResale
+  outcome: Allow an eligible seller to select a resale price within the client's approved marketplace
+    rules.
+- step: 5
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-301
+  action: Works in Fees, Seller Proceeds & Listing Confirmation
+  operations:
+  - listFeeSellerProceed
+  outcome: Provide complete financial transparency before the seller commits to publishing the listing.
+    This is essential to prevent later disputes.
+- step: 7
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-302
+  action: Works in My Resale Listings & Seller Dashboard
+  operations:
+  - listResaleListingSeller
+  outcome: Give sellers a dedicated self-service workspace to manage their resale activity after publishing.
+- step: 9
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-303
+  action: Works in Official Resale Marketplace & Buyer Discovery
+  operations:
+  - listOfficialResaleMarketplace
+  outcome: Provide buyers with a trusted client-branded marketplace for discovering authentic resale inventory.
+- step: 11
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-304
+  action: Works in Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
+  operations:
+  - listResaleTicketDetail
+  outcome: Allow customers to understand exactly what they are purchasing and distinguish resale inventory
+    from primary inventory.
+- step: 13
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-305
+  action: Works in Buyer Checkout, Inventory Hold & Secure Payment
+  operations:
+  - listBuyerCheckoutInventory
+  outcome: Provide a normal, secure TICVAI checkout while protecting the resale listing from simultaneous
+    purchase.
+- step: 15
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-306
+  action: Works in Resale Confirmation, Ownership Transfer & Ticket Delivery
+  operations:
+  - listResaleConfirmationOwnership
+  outcome: Provide the customer-facing completion experience after successful payment while the backend
+    performs the secure entitlement transfer.
+- step: 17
+  screen: ADM-298
+  action: Returns to the board's landing screen
+  operations:
+  - listTicketResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-307
+  action: Works in White-Label Marketplace Deployment & Experience Architecture
+  operations:
+  - listWhiteLabelMarketplace
+  outcome: This is the key architecture/configuration screen It defines how each TICVAI client chooses
+    to expose the resale marketplace to its customers. Deployment Model A — Embedded White-Label
+branches:
+- at: 1
+  condition: Nothing has been set up on My Tickets & Resale Marketplace Entry yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Ticket Resale Marketplace board 3 visited
+primaryContract: orders
+contracts:
+- orders

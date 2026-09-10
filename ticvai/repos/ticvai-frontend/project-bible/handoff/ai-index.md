@@ -6,14 +6,14 @@
 
 | | |
 |---|---|
-| **Operations** | 32 |
-| **Schemas** | 22 |
+| **Operations** | 33 |
+| **Schemas** | 23 |
 | **States** | 11 |
 | **Events** | 11 |
-| **Tables** | 50 |
-| **Screens** | 33 |
+| **Tables** | 51 |
+| **Screens** | 34 |
 | **Flows** | 11 |
-| **Documents** | 17 |
+| **Documents** | 22 |
 | **Open conflicts** | 1 |
 
 ## Reached outside the contract
@@ -42,11 +42,11 @@
 | **Every model call leaves an audit record** — 10 operations write an `ai.interaction` (8.3.55). | yes | tools/check-package.py — a model-calling operation with no interaction fails |
 | **Only governed operations outside the domain may write to it** — 2 operations in other contracts write an `ai.*` table: ['askReportingQuestion', 'saveNaturalLanguageQuery']. Each is a governance record, not a bypass. | yes | tools/check-package.py allowlist, stated in ADR-0020 |
 
-**Storage tiers** — `postgres` 40 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 4
+**Storage tiers** — `postgres` 41 · `postgres-analytical` 5 · `qdrant` 1 · `redis` 4
 
 ## Operations
 
-**30 in the contract.**
+**31 in the contract.**
 
 | Operation | Verb | Guest | Scope |
 |---|---|---|---|
@@ -61,6 +61,7 @@
 | `listAiConversations` | GET |  | venue |
 | `listAiInteractions` | GET |  | tenant |
 | `listAiProviders` | GET |  | region |
+| `listIndexFailures` | GET |  | tenant |
 | `listIndexJobs` | GET |  | tenant |
 | `listIndexSources` | GET |  | tenant |
 | `listKnowledgeCollections` | GET |  | tenant |
@@ -120,9 +121,9 @@
 
 ## Storage
 
-**`postgres`** — 40
+**`postgres`** — 41
 
-`ai.chunk_ref` · `ai.index_entry` · `ai.index_job` · `ai.index_source` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.layout_draft` · `ai.policy` · `ai.proposed_action` · `ai.provider` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `maintenance.inspection_template` · `marketing.case` · `marketing.loyalty_programme` · `platform.org_unit` · `platform.region_settings` · `promotions.promotion` · `reporting.report_definition` · `retail.merchandise` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.policy`
+`ai.chunk_ref` · `ai.index_entry` · `ai.index_failure` · `ai.index_job` · `ai.index_source` · `ai.knowledge_collection` · `ai.knowledge_document` · `ai.layout_draft` · `ai.policy` · `ai.proposed_action` · `ai.provider` · `assets.media_asset` · `catalogue.channel_capacity` · `catalogue.entitlement_template` · `catalogue.event` · `catalogue.performance` · `catalogue.price` · `catalogue.price_list` · `catalogue.product` · `catalogue.variant_dimension` · `control.content_block` · `fnb.menu_item` · `maintenance.inspection_template` · `marketing.case` · `marketing.loyalty_programme` · `platform.org_unit` · `platform.region_settings` · `promotions.promotion` · `reporting.report_definition` · `retail.merchandise` · `seating.seat` · `seating.seat_category` · `seating.seat_map` · `seating.seating_rules` · `seating.section` · `venuemap.import_job` · `venuemap.map` · `venuemap.point` · `whitelabel.content_page` · `whitelabel.faq_entry` · `whitelabel.policy`
 
 **`postgres-analytical`** — 5
 
@@ -140,7 +141,7 @@
 
 **P01 Guest Web**
 
-- `WEB-044` AI Concierge – Home — wave 2, 3 operations
+- `WEB-044` AI Concierge – Home — wave 2, 4 operations
 
 **P02 Guest App**
 
@@ -175,7 +176,7 @@
 - `BO-060` Attendance & Footfall — wave 2, 2 operations
 - `BO-061` Scheduled Reports — wave 3, 2 operations
 - `BO-088` Approval Analytics — wave 3, 1 operation
-- `BO-091` AI Policy & Spend — wave 1, 3 operations
+- `BO-091` AI Policy & Spend — wave 1, 4 operations
 - `BO-093` Map Import & Labelling — wave 2, 1 operation
 - `BO-115` Category, Brand & Merchandise Hierarchy — wave 2, 1 operation
 - `BO-117` Product Import, Governance & AI Configuration Assistant — wave 2, 2 operations
@@ -191,6 +192,7 @@
 
 **P12 Venue Support**
 
+- `SUP-006` Knowledge Base Search — wave 3, 1 operation
 - `SUP-008` Agent Performance & SLA View — wave 3, 2 operations
 
 **P15 Kitchen Display**
@@ -222,23 +224,28 @@
 
 | Document | Status | Mentions |
 |---|---|---|
-| [AI scope — for confirmation](../docs/active/ai-scope-for-confirmation.md) |  | 1 |
-| [Deep audit — ten invariants, run adversarially](../docs/active/deep-audit-24-august.md) |  | 4 |
-| [Deployment architecture — four configurations, costed on AWS and GCP](../docs/active/deployment-configs-costed.md) |  | 6 |
-| [Full-layer audit — 20 August](../docs/active/full-layer-audit-20aug.md) |  | 4 |
-| [TICVAI — Hierarchy, Data Segregation and Services](../docs/active/hierarchy-segregation-services.md) |  | 1 |
-| [Optimisation assessment — RAG, caching, backend, frontend](../docs/active/optimisation-assessment.md) |  | 4 |
-| [Optimisation adoption plan](../docs/active/optimisation-plan.md) |  | 3 |
-| [Viewer — what changed in the package on 20 August](../docs/active/viewer-update-brief-20aug.md) |  | 1 |
-| [ADR-0007: Hybrid repository topology](../docs/adr/0007-hybrid-repository-topology.md) | Accepted | 1 |
-| [ADR-0020 — Where AI runs, and what it is isolated from](../docs/adr/0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 14 |
-| [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](../docs/adr/0021-qdrant-partitioning.md) | Proposed · 17 August 2026 | 4 |
-| [ADR-0023 — Personal data lives apart from the append-only ledger](../docs/adr/0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 3 |
-| [ADR-0028: Sixteen services, and the data boundary decides where they split](../docs/adr/0028-service-decomposition.md) | Accepted — the data topology is reopened (CF-161, 24 August) | 1 |
-| [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](../docs/adr/0033-outbox-and-dead-letters.md) | Accepted | 2 |
-| [ADR-0034: The cheapest AI call is the one that never reaches a provider](../docs/adr/0034-ai-retrieval-and-cost.md) | Accepted | 7 |
-| [Architecture](../docs/architecture/README.md) |  | 1 |
-| [AI provider credentials — where the key lives and who can reach it](../docs/architecture/ai-credentials.md) |  | 4 |
+| [AI scope — for confirmation](..\docs\active\ai-scope-for-confirmation.md) |  | 1 |
+| [Deep audit — ten invariants, run adversarially](..\docs\active\deep-audit-24-august.md) |  | 4 |
+| [Deployment architecture — four configurations, costed on AWS and GCP](..\docs\active\deployment-configs-costed.md) |  | 7 |
+| [Audit — the 3 September dump, its checks, and what trickles down](..\docs\active\dump-audit-3-september.md) |  | 2 |
+| [Full-layer audit — 20 August](..\docs\active\full-layer-audit-20aug.md) |  | 4 |
+| [TICVAI — Hierarchy, Data Segregation and Services](..\docs\active\hierarchy-segregation-services.md) |  | 1 |
+| [Optimisation assessment — RAG, caching, backend, frontend](..\docs\active\optimisation-assessment.md) |  | 4 |
+| [Optimisation adoption plan](..\docs\active\optimisation-plan.md) |  | 3 |
+| [Identical operation sets — what each cluster actually is](..\docs\active\screen-duplicate-triage.md) |  | 5 |
+| [Screen estate audit — duplication, connectivity, and stranded capability](..\docs\active\screen-estate-audit.md) |  | 3 |
+| [Regenerating the screen layer — plan](..\docs\active\screen-regeneration-plan.md) |  | 1 |
+| [Viewer — what changed in the package on 20 August](..\docs\active\viewer-update-brief-20aug.md) |  | 1 |
+| [Workshop pack — what was done, and how to re-verify it](..\docs\active\workshop-pack-log.md) |  | 3 |
+| [ADR-0007: Hybrid repository topology](..\docs\adr\0007-hybrid-repository-topology.md) | Accepted | 1 |
+| [ADR-0020 — Where AI runs, and what it is isolated from](..\docs\adr\0020-ai-isolation-boundary.md) | Proposed · 17 August 2026 | 14 |
+| [ADR-0021 — Qdrant: one collection per embedding model, tenant is the shard, scope is the filter](..\docs\adr\0021-qdrant-partitioning.md) | Proposed · 17 August 2026 | 4 |
+| [ADR-0023 — Personal data lives apart from the append-only ledger](..\docs\adr\0023-pii-separation.md) | Accepted · 17 August 2026, recording a decision already impl | 3 |
+| [ADR-0028: Sixteen services, and the data boundary decides where they split](..\docs\adr\0028-service-decomposition.md) | Accepted. The data topology reopened by CF-161 on 24 August  | 1 |
+| [ADR-0033: Every asynchronous handoff has an outbox and a place to fail](..\docs\adr\0033-outbox-and-dead-letters.md) | Accepted | 3 |
+| [ADR-0034: The cheapest AI call is the one that never reaches a provider](..\docs\adr\0034-ai-retrieval-and-cost.md) | Accepted | 7 |
+| [AI provider credentials — where the key lives and who can reach it](..\docs\architecture\ai-credentials.md) |  | 4 |
+| [Architecture](..\docs\architecture\README.md) |  | 1 |
 
 ## Conflicts
 

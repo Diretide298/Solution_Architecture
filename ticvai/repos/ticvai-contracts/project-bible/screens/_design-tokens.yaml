@@ -1,0 +1,185 @@
+# TICVAI design tokens
+#
+# **This is not a new design system. It is the one already in use, written down.**
+#
+# Extracted 9 September 2026 from two sources that were produced independently and agree:
+# Claude Design's 22 boards, and the client's own `designs/Park_POS_dc.html`. Both use
+# `Manrope`, the same 9.5–13px type scale, the same 600/700/800 weights and the same near-black
+# `#0B1324`. **Two people who never coordinated reaching the same vocabulary makes it a system
+# rather than a preference**, which is why it can be codified without asking anyone to agree to it.
+#
+# Colour is named by **role, never by hex**, because a token called `#5A6577` teaches a reader
+# nothing and a token called `textBody` cannot be used in the wrong place. Every role below carries
+# the count of times that value appears in the source boards, so a reader can see which are load
+# bearing and which are incidental.
+#
+# Read with `screens/_patterns.yaml` (layout) and `screens/_components.yaml` (vocabulary).
+# `tools/derive-wireframes.py` renders from all three.
+
+meta:
+  generated: 2026-09-09
+  sources:
+    - wireframes/claude-design/*.dc.html   # 22 boards, Claude Design
+    - designs/Park_POS_dc.html             # client, independent
+    - designs/Ticvai_Design_Vision_Book_v1_1.pdf
+    - designs/TICVAI_Employee_App_UI_Reference_1.pdf
+    - designs/TICVAI_White_Label_Guest_App_UI_Reference_1.pdf
+  note: >
+    Roles were assigned by how each value is *used* in the source — as a background, as text, or as
+    a border — not by eye. A hex that appears 2,599 times as `color` and never as `background` is
+    body text, and calling it anything else would be a guess.
+
+typography:
+  family:
+    ui: "Manrope, system-ui, sans-serif"
+    mono: "'IBM Plex Mono', ui-monospace, monospace"
+    note: >
+      **Both sources use Manrope and neither declares a fallback beyond system-ui.** Mono appears
+      only for identifiers — screen codes, ids, counts — which is the right restraint: a monospace
+      label on prose reads as code and invites the reader to look for meaning in the alignment.
+  # The scale is unusually tight — seven steps inside 3.5px — because these are dense operational
+  # screens. **Do not widen it for the back office and narrow it for POS**; density does that job.
+  scale:
+    micro: 9.5px      # chip text, table meta
+    small: 10px
+    body: 11px        # the workhorse
+    bodyLarge: 11.5px
+    label: 12px
+    subheading: 12.5px
+    heading: 13px
+    title: 16.5px     # frame titles only
+  weight:
+    regular: 400      # rare in the sources: 2 occurrences
+    medium: 600
+    strong: 700
+    heavy: 800        # headings and titles
+  letterSpacing:
+    tight: "-.015em"  # titles
+    wide: ".07em"     # uppercase chips
+    wider: ".15em"    # section eyebrows
+
+colour:
+  # --- surfaces, light -----------------------------------------------------------------
+  ground: "#F7F9FC"          # 899 uses. The page behind everything.
+  surface: "#FAFBFD"         # 212. Cards and panels sitting on the ground.
+  surfaceSunken: "#F2F5F9"   # 156. Wells, table headers, inactive tabs.
+  surfaceRaised: "#FFFFFF"
+
+  # --- surfaces, dark ------------------------------------------------------------------
+  # Used for POS, scanner and kitchen display, where the room is dark and the screen is glanced at.
+  groundDark: "#0B1324"      # both sources
+  surfaceDark: "#171B22"     # 203
+  surfaceDarkAlt: "#0F1E33"  # 138
+  borderDark: "#262C36"      # 262
+
+  # --- text ----------------------------------------------------------------------------
+  textBody: "#5A6577"        # 2,599 uses as `color`, never as background.
+  textStrong: "#4A5566"      # 1,293
+  textMuted: "#8494A8"       # 1,465
+  textFaint: "#9FB6CF"       # 402
+  textOnDark: "#E8ECF2"      # 55 paired with #0E1116
+  textOnDarkMuted: "#C4CCD8" # 29 paired with #171B22
+
+  # --- lines ---------------------------------------------------------------------------
+  # **Three weights of hairline, and the distinction is real**: the lightest separates rows, the
+  # middle separates cards, the heaviest separates regions.
+  hairline: "#E8ECF3"        # 1,160
+  border: "#E3E8F0"          # 1,068
+  borderStrong: "#DCE3ED"    # 286
+
+  # --- semantic pairs ------------------------------------------------------------------
+  # Each is a background and the text that sits on it. **They are pairs and must stay paired** —
+  # the contrast was chosen together, and mixing an accent background with body text fails it.
+  accent:          { bg: "#EDF3FF", text: "#0A4FB8" }   # 106 + 501
+  accentAlt:       { bg: "#EAF4FF", text: "#0A4FB8" }   # 26
+  accentSolid:     { bg: "#0D6EFD", text: "#FFFFFF" }   # 142 — primary buttons
+  success:         { bg: "#E7F4F2", text: "#0B5B41" }   # 51
+  successSolid:    { bg: "#0E6B62", text: "#FFFFFF" }   # 185
+  warning:         { bg: "#FFF7E6", text: "#8A6D00" }   # 214 + 40
+  warningAlt:      { bg: "#FFF7E6", text: "#7A5F14" }   # 41
+  caution:         { bg: "#FFF1E6", text: "#9A5B00" }   # 40 — "86% occupied"
+  danger:          { bg: "#FDEDED", text: "#8A2020" }   # 50
+  dangerSubtle:    { bg: "#FEF7F7", text: "#8A2020" }   # 37
+  neutral:         { bg: "#F7F9FC", text: "#5A6577" }   # 57
+  neutralSunken:   { bg: "#F2F5F9", text: "#5A6577" }   # 46
+  onDark:          { bg: "#0E1116", text: "#E8ECF2" }   # 55
+
+  # Semantic borders, used with the pairs above.
+  warningBorder: "#F0DFB8"   # 233
+  dangerBorder: "#F5C9C9"    # 120
+  successBorder: "#C7E4DF"   # 69
+
+radius:
+  sharp: 5px
+  small: 9px
+  medium: 10px
+  large: 12px      # 724 uses — the default for cards and panels
+  xlarge: 16px     # client POS only
+
+spacing:
+  # A 3px base, which is what the sources actually use. Not a 4 or 8 grid — **recording what is
+  # there rather than tidying it** matters, because the boards were built on this and a regenerated
+  # board on an 8-grid would not sit beside a hand-drawn one.
+  xxs: 3px
+  xs: 6px
+  sm: 9px
+  md: 13px
+  lg: 18px
+  xl: 28px
+  xxl: 46px
+
+# **Density is hardware, not taste.** Already a field on every screen — 892 `compact`,
+# 148 `comfortable`, 51 `touchLarge` — and the reason it exists is stated on the eleven screens
+# carrying `densityReason`: *"bumped by somebody with flour on their hands, read from two metres."*
+# A generator that ignores this renders a kitchen display like a spreadsheet.
+density:
+  compact:
+    baseFont: body            # 11px
+    rowHeight: 28px
+    controlHeight: 28px
+    gap: sm
+    minTouchTarget: 24px
+  comfortable:
+    baseFont: bodyLarge       # 11.5px
+    rowHeight: 36px
+    controlHeight: 34px
+    gap: md
+    minTouchTarget: 32px
+  touchLarge:
+    baseFont: heading         # 13px
+    rowHeight: 56px
+    controlHeight: 52px
+    gap: lg
+    # **44px is the floor, not the target.** A gloved finger on a wet POS screen is the design
+    # case, and every control on a `touchLarge` surface clears it.
+    minTouchTarget: 44px
+
+elevation:
+  flat: none
+  raised: "0 1px 2px rgba(11,19,36,.06)"
+  overlay: "0 8px 28px rgba(11,19,36,.18)"    # dialogs and drawers
+  scrim: "rgba(11,19,36,.42)"                 # behind an open overlay
+
+# **The overlay is a frame, not a footnote.** Every popup a screen declares is rendered as its own
+# wireframe frame — the screen behind it, dimmed by `scrim`, with the dialog over it — because a
+# reviewer cannot judge a flow from a list of dialog names. These are the sizes that renders at.
+overlay:
+  confirmDialog: { width: 420px, radius: large, elevation: overlay }
+  modal:         { width: 640px, radius: large, elevation: overlay }
+  drawer:        { width: 480px, radius: large, elevation: overlay, edge: right }
+  sheet:         { height: 60%, radius: large, elevation: overlay, edge: bottom }  # mobile
+  toast:         { width: 360px, radius: medium, elevation: raised, edge: bottom }
+
+# Where a tenant's own brand replaces a token. **Only these three** — a white-label surface that
+# lets a tenant restyle the whole palette produces screens the support team cannot recognise, and
+# CF-42 already requires every layout to mirror for RTL rather than merely translate.
+whiteLabel:
+  overridable: [accentSolid, surfaceRaised, typography.family.ui]
+  # **Stated at the 3 August UI/UX workshop and not recorded anywhere until now.** Client sites are
+  # configurable down to header, footer, logo, colours, fonts and hero banner — and the
+  # *"powered by"* credit in the footer is fixed. A white-label surface with no fixed mark is one
+  # nobody can identify when it is the thing that broke.
+  fixedFooterCredit: true
+  fixed: >
+    Semantic pairs are not overridable. A tenant who recolours `danger` to their brand green has
+    made a destructive confirmation look like a success message.

@@ -86,7 +86,11 @@ def main() -> int:
                     changed = True
         if changed:
             head = "".join(l for l in f.read_text(encoding="utf-8").splitlines(keepends=True) if l.startswith("#"))
-            with f.open("w") as out:
+            # **This writes a platform file with `allow_unicode=True`, so the encoding matters.**
+            # Windows defaults to cp1252, which happily encodes an em dash and a curly quote to
+            # bytes no `encoding="utf-8"` reader can decode — the file is written, nothing fails,
+            # and the next tool to open it dies pointing at the wrong culprit.
+            with f.open("w", encoding="utf-8") as out:
                 out.write(head + "\n")
                 yaml.safe_dump(doc, out, sort_keys=False, allow_unicode=True, width=98)
 
@@ -100,7 +104,20 @@ def main() -> int:
     for f in contract_files():
         text = f.read_text(encoding="utf-8")
         # strip any previous block, so the operation is idempotent
-        text = _re.sub(r"\n      x-ticvai-consumed-by:\n(?:        - [^\n]*\n)+", "\n", text)
+        # **Any list indentation, not the one this tool happens to write.** The pattern required
+        # eight-space items; `yaml.safe_dump` writes them at six, level with the key. When five
+        # contracts were reformatted on 10 September the strip stopped matching, the old block
+        # survived, a new one was appended beside it, and `check-package` went from 16 errors to
+        # 508 duplicate keys in a single run.
+        #
+        # **The `safe_load` at the end of this loop did not catch it**: PyYAML accepts a duplicate
+        # key and keeps the last, so the file parsed cleanly the whole time. A guard that only asks
+        # *does it parse* cannot see the one fault this loop is able to cause.
+        # **Line-anchored, because two blocks can sit next to each other.** Matching a leading
+        # `\n` meant the first block's match consumed the newline the second one needed to start,
+        # so a pair was only ever half-removed — which is how the duplicates survived the first
+        # attempt at this fix.
+        text = _re.sub(r"^ +x-ticvai-consumed-by:\n(?:[ ]+- [^\n]*\n)+", "", text, flags=_re.M)
         n = 0
         for oid, screens in sorted(op_screens.items()):
             marker = f"      operationId: {oid}\n"

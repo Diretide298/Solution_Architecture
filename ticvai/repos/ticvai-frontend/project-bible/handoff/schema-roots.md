@@ -23,7 +23,7 @@ tables**, and the distribution is the honest shape of the package:
 
 | Terminal table | Tables that reach it |
 |---|---:|
-| `platform.org_unit` | 322 |
+| `platform.org_unit` | 323 |
 | `identity.role` | 239 |
 | `platform.configuration_profile` | 96 |
 | `ledger.legal_entity` | 84 |
@@ -41,11 +41,11 @@ everything hangs off it.** `identity.role` at 207 is the authorisation spine.
 tables reaching nothing, including `identity.role` itself, because `principal` points
 at `role` rather than the reverse. **The direction was the bug, not the data.**
 
-## `control` — 50 tables
+## `control` — 51 tables
 
-**Root: `control.cell`**  ·  own 18 · reach 18 · out 2
+**Root: `control.cell`**  ·  own 19 · reach 19 · out 2
 
-- **1 step from the root** — `archival_job`, `backup_run`, `cell_cluster`, `cell_job`, `cell_tenant`, `environment`, `migration_plan_cell`, `migration_run`, `migration_run_cell`, `migration_run_tenant`, `rollout_cell`, `rollout_tenant`, `scaling_policy`, `tenant_migration`, `tenant_migration_plan`, `waf_rule`
+- **1 step from the root** — `archival_job`, `backup_run`, `cell_cluster`, `cell_instance`, `cell_job`, `cell_tenant`, `environment`, `migration_plan_cell`, `migration_run`, `migration_run_cell`, `migration_run_tenant`, `rollout_cell`, `rollout_tenant`, `scaling_policy`, `tenant_migration`, `tenant_migration_plan`, `waf_rule`
 
 - **Reaches the root through nothing** — `api_client`, `api_licence`, `api_quota`, `api_version`, `burst_environment`, `channel_listing`, `content_block`, `developer_account`, `footer_config`, `integration_listing`, `invoice`, `invoice_line`, `licence_add_on`, `migration`, `migration_plan`, `onboarding_application`, `partner_agreement`, `partner_user`, `release`, `release_component`, `rollout`, `sandbox`, `seo_metadata`, `subscription`, `subscription_plan`, `support_notice`, `tenant`, `upgrade_schedule`, `url_redirect`, `usage_record`, `venue_type_template`, `webhook_delivery`, `webhook_subscription`
 
@@ -130,16 +130,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `ai` — 16 tables
-
-**Root: `ai.index_source`**  ·  own 3 · reach 6 · out 1
-
-- **1 step from the root** — `index_entry`, `index_failure`, `index_job`
-
-- **Reaches the root through nothing** — `chunk_ref`, `conversation`, `interaction`, `knowledge_collection`, `knowledge_document`, `layout_draft`, `message`, `policy`, `proposed_action`, `provider`, `suggestion`, `suggestion_outcome`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `identity` — 16 tables
 
 **Root: `identity.principal`**  ·  own 12 · reach 123 · out 2
@@ -147,6 +137,16 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **1 step from the root** — `authz_audit`, `delegated_access`, `mfa_challenge`, `mfa_method`, `mfa_recovery_code`, `principal_credential`, `role_permission`, `session`
 
 - **Reaches the root through nothing** — `guest_session`, `otp_challenge`, `password_policy`, `role`, `segregation_rule`, `sso_group_mapping`, `sso_provider`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `ai` — 16 tables
+
+**Root: `ai.index_source`**  ·  own 3 · reach 6 · out 1
+
+- **1 step from the root** — `index_entry`, `index_failure`, `index_job`
+
+- **Reaches the root through nothing** — `chunk_ref`, `conversation`, `interaction`, `knowledge_collection`, `knowledge_document`, `layout_draft`, `message`, `policy`, `proposed_action`, `provider`, `suggestion`, `suggestion_outcome`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -161,16 +161,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `whitelabel` — 13 tables
-
-**Root: `whitelabel.tenant_config`**  ·  own 3 · reach 3 · out 4
-
-- **1 step from the root** — `banner`, `feature_toggle`, `module_enablement`
-
-- **Reaches the root through nothing** — `config_version`, `content_page`, `custom_domain`, `faq_category`, `faq_entry`, `homepage_section`, `navigation_item`, `policy`, `promo_block`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `reporting` — 13 tables
 
 **Root: `reporting.report_definition`**  ·  own 9 · reach 9 · out 1
@@ -179,6 +169,16 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **2 steps from the root** — `export`
 
 - **Reaches the root through nothing** — `alert`, `alert_rule`, `dashboard`, `schedule_recipient`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `whitelabel` — 13 tables
+
+**Root: `whitelabel.tenant_config`**  ·  own 3 · reach 3 · out 4
+
+- **1 step from the root** — `banner`, `feature_toggle`, `module_enablement`
+
+- **Reaches the root through nothing** — `config_version`, `content_page`, `custom_domain`, `faq_category`, `faq_entry`, `homepage_section`, `navigation_item`, `policy`, `promo_block`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -203,17 +203,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `maintenance` — 8 tables
-
-**Root: `maintenance.asset`**  ·  own 4 · reach 13 · out 4
-
-- **1 step from the root** — `incident`, `inspection`, `maintenance_plan`, `work_order`
-- **2 steps from the root** — `work_order_attachment`
-
-- **Reaches the root through nothing** — `inspection_template`, `inspection_template_item`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
 ## `access` — 8 tables
 
 **Root: `access.entitlement`**  ·  own 2 · reach 7 · out 4
@@ -228,20 +217,32 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
 ## `games` — 8 tables
 
-**Root: `games.play`**  ·  own 1 · reach 1 · out 2
+**Root: `games.redemption`**  ·  own 1 · reach 1 · out 2
 
+- **1 step from the root** — `redemption_line`
 
-- **Reaches the root through nothing** — `card`, `credit_ledger`, `game`, `prize`, `reader_profile`, `redemption`, `redemption_line`
+- **Reaches the root through nothing** — `card`, `credit_ledger`, `game`, `play`, `prize`, `reader_profile`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `approvals` — 7 tables
+## `approvals` — 8 tables
 
 **Root: `approvals.request`**  ·  own 3 · reach 8 · out 2
 
 - **1 step from the root** — `accreditation_badge`, `decision`, `escalation`
 
-- **Reaches the root through nothing** — `delegation`, `matrix`, `rule`
+- **Reaches the root through nothing** — `delegation`, `matrix`, `rule`, `step_up_policy`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `maintenance` — 8 tables
+
+**Root: `maintenance.asset`**  ·  own 4 · reach 13 · out 4
+
+- **1 step from the root** — `incident`, `inspection`, `maintenance_plan`, `work_order`
+- **2 steps from the root** — `work_order_attachment`
+
+- **Reaches the root through nothing** — `inspection_template`, `inspection_template_item`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -255,12 +256,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
-## `pii` — 4 tables
-
-**Root: `pii.subject`**  ·  own 4 · reach 59 · out 1
-
-- **1 step from the root** — `subject_biometric`, `subject_contact`, `subject_document`
-
 ## `assets` — 4 tables
 
 **Root: `assets.media_asset`**  ·  own 2 · reach 4 · out 2
@@ -268,6 +263,22 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **1 step from the root** — `media_collection`, `media_usage`
 
 - **Reaches the root through nothing** — `media_upload`
+
+  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
+
+## `pii` — 4 tables
+
+**Root: `pii.subject`**  ·  own 4 · reach 59 · out 1
+
+- **1 step from the root** — `subject_biometric`, `subject_contact`, `subject_document`
+
+## `resources` — 4 tables
+
+**Root: `resources.resource`**  ·  own 2 · reach 3 · out 2
+
+- **1 step from the root** — `booking`
+
+- **Reaches the root through nothing** — `qualification`, `session_participant`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 
@@ -284,16 +295,6 @@ at `role` rather than the reverse. **The direction was the bug, not the data.**
 - **1 step from the root** — `path`
 
 - **Reaches the root through nothing** — `import_job`, `map`
-
-  Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
-
-## `resources` — 4 tables
-
-**Root: `resources.resource`**  ·  own 2 · reach 3 · out 2
-
-- **1 step from the root** — `booking`
-
-- **Reaches the root through nothing** — `qualification`, `session_participant`
 
   Standalone configuration, or a table whose foreign key is not declared. **Not a defect on its own** — a password policy belongs to a scope rather than to a principal — but it is where an undeclared key hides.
 

@@ -9,9 +9,9 @@ about: '**A multi-tenant venue platform.** One tenant operates several venues; a
   contracts persist to 26 schemas, and every artefact in the package is drawn by resolving against that
   join rather than by being written twice.'
 scale:
-  operations: 1626
+  operations: 1635
   contracts: 28
-  tables: 390
+  tables: 392
   tablesNote: '**Postgres tables only.** `status.json` reports 379 because it counts five non-table
     stores. **They own no service and should not**: a cache entry is derived from something already
     read, invalidated by an event already consumed, and losable without consequence. **Both numbers
@@ -27,11 +27,11 @@ scale:
   services: 16
   platforms: 15
   apps: 12
-  screens: 1091
-  flows: 94
-  stateModels: 124
+  screens: 1235
+  flows: 168
+  stateModels: 125
   events: 29
-  decisions: 42
+  decisions: 45
   requirements: 3184
   buildPercent: 0
 actors:
@@ -51,13 +51,13 @@ actors:
   - P08
   - P15
   - P16
-  operations: 1504
+  operations: 1513
   note: Sells, admits, cooks, counts, configures. **Authority is carried by the person, not the device**
     (ADR-0002) — which is what makes a shared handheld safe.
 - actor: partner
   reaches:
   - P10
-  operations: 162
+  operations: 164
   note: Resellers and agents, with their own credit and settlement.
 - actor: platform operator
   reaches:
@@ -74,7 +74,7 @@ actors:
   reaches:
   - P07
   - P15
-  operations: 12
+  operations: 13
   note: Turnstiles, scanners, kitchen displays. **A device authenticates and does not authorise.**
 surfaces:
 - platform: P01
@@ -147,7 +147,7 @@ surfaces:
   app: venue-pos
   formFactor: posTerminal
   offlineCapable: true
-  screens: 24
+  screens: 30
   modules:
   - analytics
   - core
@@ -249,7 +249,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 363
+  screens: 393
   modules:
   - access
   - ai
@@ -289,7 +289,7 @@ surfaces:
   app: ticvai-web
   formFactor: web
   offlineCapable: false
-  screens: 318
+  screens: 367
   modules:
   - ai
   - analytics
@@ -341,7 +341,6 @@ surfaces:
   - accreditation
   callsServices:
   - TenancyService
-  - VenueOpsService
   ref: diagrams/lld/platforms/P11.yaml
 - platform: P12
   name: Venue Support — Agent Console
@@ -423,7 +422,7 @@ surfaces:
   app: venue-management-web
   formFactor: web
   offlineCapable: false
-  screens: 10
+  screens: 69
   modules:
   - ai
   - analytics
@@ -466,12 +465,12 @@ services:
     - WhiteLabelService
 stores:
 - store: postgres
-  operations: 1612
+  operations: 1621
   usedBy:
   - service: CatalogueService
-    operations: 340
+    operations: 344
   - service: OrderService
-    operations: 186
+    operations: 187
   - service: AccessService
     operations: 177
   - service: PlatformService
@@ -483,12 +482,12 @@ stores:
   - service: FnbService
     operations: 96
   - service: TenancyService
-    operations: 76
+    operations: 78
   - service: LedgerService
     operations: 56
-  - service: InventoryService
-    operations: 50
   - service: WhiteLabelService
+    operations: 51
+  - service: InventoryService
     operations: 50
   - service: IdentityService
     operations: 39
@@ -499,18 +498,18 @@ stores:
   - service: AiService
     operations: 26
   - service: CrossRegionService
-    operations: 16
+    operations: 17
   note: '**One Postgres per cell**, 26 schemas inside it. Not one database per tenant (ADR-0005) — tenancy
     is a partition key, not a deployment boundary.'
 - store: redis
-  operations: 1268
+  operations: 1277
   usedBy:
   - service: CatalogueService
-    operations: 285
+    operations: 289
   - service: AccessService
     operations: 163
   - service: OrderService
-    operations: 159
+    operations: 160
   - service: MarketingService
     operations: 134
   - service: PlatformService
@@ -520,9 +519,9 @@ stores:
   - service: VenueOpsService
     operations: 66
   - service: TenancyService
-    operations: 61
+    operations: 63
   - service: WhiteLabelService
-    operations: 37
+    operations: 38
   - service: IdentityService
     operations: 35
   - service: LedgerService
@@ -536,7 +535,7 @@ stores:
   - service: ReportingService
     operations: 15
   - service: CrossRegionService
-    operations: 11
+    operations: 12
   note: Sessions, resolution caches, idempotency. **Losable without consequence** — nothing treats a
     cache entry as a source of truth.
 - store: postgres-analytical
@@ -628,9 +627,9 @@ layers:
 - layer: frontend
   holds: 477 screens, 93 flows, 15 platforms, 12 apps
 - layer: contracts
-  holds: 1626 operations across 28 contracts — the join
+  holds: 1635 operations across 28 contracts — the join
 - layer: backend
-  holds: 390 tables in 26 schemas, 910 relationships
+  holds: 392 tables in 26 schemas, 910 relationships
 - layer: domain
   holds: 113 state models, 29 events
 - layer: decisions

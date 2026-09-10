@@ -1,0 +1,155 @@
+id: F141
+name: 'Order   Reservation Management board 2: Amendment & After-Sales Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Order   Reservation Management board 2. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-314
+  entryPoints:
+  - Arrives at Amendment & After-Sales Command Center
+steps:
+- step: 1
+  screen: BO-314
+  action: Opens Amendment & After-Sales Command Center
+  operations:
+  - listAmendmentAfterSale
+  outcome: Provide one operational workspace for all post-sale activities affecting confirmed orders and
+    reservations.
+- step: 2
+  screen: BO-315
+  action: Works in Order Amendment Workspace
+  operations:
+  - setOrderAmendment
+  outcome: Provide agents with a controlled workspace for modifying an existing order without directly
+    editing historical transaction records. The original order must always remain reconstructable.
+- step: 3
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-316
+  action: Works in Amendment Eligibility & Policy Rule Builder
+  operations:
+  - setAmendmentEligibilityPolicy
+  outcome: Define when an order or reservation may be amended and which changes are permitted.
+- step: 5
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-317
+  action: Works in Cancellation & Partial Cancellation Policy Configuration
+  operations:
+  - setCancellationPartialPolicy
+  outcome: Configure whether an order, reservation, or selected order lines may be cancelled.
+- step: 7
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-318
+  action: Works in Refund Policy & Refund Calculation Configuration
+  operations:
+  - setRefundPolicy
+  outcome: Define when a cancellation/amendment creates a refundable amount and how refund entitlement
+    is determined.
+- step: 9
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-319
+  action: Works in Void, Reversal & Same-Day Correction Management
+  operations:
+  - listVoidReversalSame
+  outcome: Separate genuine void/correction operations from normal customer cancellations and refunds.
+    This is important financially and operationally.
+- step: 11
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-320
+  action: Works in Ticket Reissue & Fulfillment Regeneration
+  operations:
+  - listTicketReissueFulfillment
+  outcome: Manage ticket/media regeneration following an amendment, correction, loss, delivery failure,
+    or other authorized event.
+- step: 13
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-321
+  action: Works in After-Sales Financial Settlement & Adjustment Workspace
+  operations:
+  - setAfterSaleFinancial
+  outcome: Provide a consolidated view of the financial consequences of amendments, cancellations, refunds,
+    exchanges and corrections. This is not the payment engine; it is the after-sales financial orchestration
+    layer.
+- step: 15
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-322
+  action: Works in Approval, Exception & Service Recovery Management
+  operations:
+  - approveExceptionServiceRecovery
+  outcome: Govern after-sales actions that fall outside normal policies or exceed financial/operational
+    authority.
+- step: 17
+  screen: BO-314
+  action: Returns to the board's landing screen
+  operations:
+  - listAmendmentAfterSale
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-323
+  action: Works in Amendment History, Audit & After-Sales Analytics
+  operations:
+  - listAmendmentAfterSale2
+  outcome: Provide complete traceability and analytical visibility across all changes made after original
+    order creation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Amendment & After-Sales Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Order   Reservation Management board 2 visited
+primaryContract: orders
+contracts:
+- orders

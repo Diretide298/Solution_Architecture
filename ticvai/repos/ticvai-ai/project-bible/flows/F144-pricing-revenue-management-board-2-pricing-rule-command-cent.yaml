@@ -1,0 +1,149 @@
+id: F144
+name: 'Pricing   Revenue Management board 2: Pricing Rule Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Pricing   Revenue Management board 2. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-058
+  entryPoints:
+  - Arrives at Pricing Rule Command Center
+steps:
+- step: 1
+  screen: ADM-058
+  action: Opens Pricing Rule Command Center
+  operations:
+  - listPricingRule
+  outcome: Provide administrators with a centralized workspace for all pricing eligibility and contextual
+    pricing rules.
+- step: 2
+  screen: ADM-059
+  action: Works in Customer Segment & Profile Pricing Rules
+  operations:
+  - listCustomerSegmentProfile
+  outcome: Define price eligibility based on customer characteristics and commercial segments.
+- step: 3
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-060
+  action: Works in Membership & Loyalty Pricing Rules
+  operations:
+  - listMembershipLoyaltyPricing
+  outcome: Control member-specific and loyalty-tier pricing.
+- step: 5
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-061
+  action: Works in Residency, Nationality & Market Pricing Rules
+  operations:
+  - listResidencyNationalityMarket
+  outcome: Support geographically differentiated commercial pricing.
+- step: 7
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-062
+  action: Works in Channel-Based Pricing Rules
+  operations:
+  - listChannelBasedPricing
+  outcome: Determine which commercial rate applies based on sales channel.
+- step: 9
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-063
+  action: Works in Location, Venue & Event Pricing Rules
+  operations:
+  - listLocationVenueEvent
+  outcome: Allow rates to vary according to where and for which event/experience the product is sold.
+- step: 11
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-064
+  action: Works in Quantity, Group & Volume Pricing Rules
+  operations:
+  - listQuantityGroupVolume
+  outcome: Support commercial rates based on purchased quantity or group size.
+- step: 13
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-065
+  action: Works in Effective Date, Season & Day-Based Pricing Rules
+  operations:
+  - listEffectiveDateSeason
+  outcome: Control commercial price selection over time.
+- step: 15
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-066
+  action: Works in Timeslot, Performance & Time-of-Day Pricing Rules
+  operations:
+  - listTimeslotPerformanceTime
+  outcome: Allow commercial pricing to differ across times within the same day or event.
+- step: 17
+  screen: ADM-058
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingRule
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-067
+  action: Works in Pricing Rule Priority, Conflict Resolution & Testing
+  operations:
+  - listPricingRulePriority
+  outcome: Define how TICVAI decides the final applicable rate when multiple pricing rules match. This
+    is the critical control screen for Board 2. Board 1 established what commercial prices exist. Board
+    2 determines which commercial rate applies to a transaction.
+branches:
+- at: 1
+  condition: Nothing has been set up on Pricing Rule Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Pricing   Revenue Management board 2 visited
+primaryContract: catalogue
+contracts:
+- catalogue

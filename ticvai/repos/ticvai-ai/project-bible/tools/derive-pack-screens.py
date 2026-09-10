@@ -1,8 +1,20 @@
 #!/usr/bin/env python3
 """Turn the workshop pack into screen definitions, and register what they still need.
 
-**590 screens across 59 boards**, from `sources/workshop/pack.json`. Writes them into the existing
-`screens/P*.yaml` files and prints the contract gap.
+**770 screens across 77 boards**, from `sources/workshop/pack.json`. Adds the ones no screen
+claims to the existing `screens/P*.yaml` files and prints the contract gap.
+
+## It adds; it does not rebuild
+
+The first version dropped every screen carrying `source.pack` and wrote it again, and that was
+idempotent for exactly as long as this tool was the only thing that had ever touched those screens.
+`generate-screens-from-pack.py` and `generate-screens-from-contracts.py` have since rebuilt all
+1,091 with their components, provenance, patterns, overlays and gaps. **Re-running the old version
+today would have replaced 590 of them with `searchField` / `dataTable` / `detailPanel` — the exact
+regression the September rebuild was undoing** — and its docstring would have said it was safe.
+
+So a pack entry a screen already claims is skipped, and ids for new ones come from
+`screens/_id-register.yaml`, not from the highest id present in the file.
 
 ## What this does not do
 
@@ -66,10 +78,39 @@ PLACEMENT = {
     "Ticket Upgrade, Exchange & Conversion": ("P09", "ticketing", "Commercial"),
     "Ticket Resale Marketplace": ("P09", "ticketing", "Commercial"),
 
+    # The 9 September books. Both are placed by board rather than whole — see `BOARD_PLACEMENT`.
+    "Approval Workflows and Governance": ("P09", "core", "Platform"),
+    "Unified BI Reporting and AI Analytics Platform": ("P16", "analytics", "Analytics"),
+
     "B2B, Reseller & OTA Partner Management": ("P10", "partner", "Partners"),
     "Customer Service": ("P12", "marketing", "Support"),
     "Privacy  Consent   Preference Management": ("P13", "core", "Policy"),
     "Waiver, Consent & Digital Form Management": ("P13", "core", "Policy"),
+}
+
+# (module, board) -> placement, or None for a board that is not drawn as screens of its own.
+# **Two of the 9 September books do not belong to one platform each**, and placing them by module
+# would have put a venue approver's inbox in the platform console and reversed a decision P16 had
+# already recorded.
+#
+#   **Approval Workflows & Governance splits on the line P08 and P09 already draw.** Boards 2, 3,
+#   6, 7 and 8 configure and measure the approval engine centrally; boards 1, 4 and 5 are worked
+#   by whoever approves — an inbox, a decision workspace, an escalation desk — and those are
+#   venue-operated.
+#
+#   **Unified BI's boards 5 to 8 are the same four screens under four domain names.** Sales,
+#   Finance, Operations and Customer each get a command centre, an analytics set and an AI
+#   screen. P16's platform note already settled this shape once: *"a domain is a filter on an
+#   analytics screen, not a copy of it"*, when 26 board screens became nine. Drawing all forty
+#   would build the duplication that note describes removing, so they stay in `pack.json` and are
+#   listed in `docs/active/bi-domain-boards-9-september.md` against the domain filter that covers
+#   them. **Recorded, not dropped** — a screen nobody can find again has been lost, whatever the
+#   commit message says.
+BOARD_PLACEMENT: dict[tuple[str, str], tuple[str, str, str] | None] = {
+    **{("Approval Workflows and Governance", b): ("P08", "core", "Venue Operations")
+       for b in ("1", "4", "5")},
+    **{("Unified BI Reporting and AI Analytics Platform", b): None
+       for b in ("5", "6", "7", "8")},
 }
 
 # **A word in a title that says what the screen is.** Used only to choose components, so a
@@ -175,22 +216,52 @@ def main() -> int:
         print("  no placement for: " + ", ".join(unplaced))
         return 1
 
-    docs, prefix, nextnum = {}, {}, {}
+    # **Ids come from `screens/_id-register.yaml`, not from the highest id in the file.** The
+    # register is the high-water mark including retired numbers, and taking max+1 of what is
+    # present is how ADM-038 was issued twice on 4 September.
+    register = yaml.safe_load((SCREENS / "_id-register.yaml").read_text(encoding="utf-8"))
+    docs, prefix, nextnum, held = {}, {}, {}, {}
     for f in sorted(SCREENS.glob("P*.yaml")):
         d = yaml.safe_load(f.read_text(encoding="utf-8"))
         code = d["platform"]["code"]
         docs[code] = (f, d)
-        # **Idempotent.** A screen carrying `source.pack` came from a previous run of this tool;
-        # dropping those first is what lets it be re-run without appending 590 more each time.
-        d["screens"] = [s for s in d["screens"] if not (s.get("source") or {}).get("pack")]
-        pre = d["screens"][0]["id"].split("-")[0]
-        prefix[code] = pre
-        nextnum[code] = max(int(s["id"].split("-")[1]) for s in d["screens"]) + 1
+        # **Incremental, not rebuilt.** This used to drop every screen carrying `source.pack` and
+        # write it again, which was idempotent while this tool was the only thing that had ever
+        # touched them. It is not any more: `generate-screens-from-pack.py` and
+        # `generate-screens-from-contracts.py` have since rebuilt all 1,091 with their components,
+        # provenance, patterns, overlays and gaps, and the rebuild here would have replaced 590 of
+        # those with `searchField` / `dataTable` / `detailPanel` again — **the exact regression the
+        # September rebuild was undoing**, applied by a tool whose docstring calls it safe.
+        #
+        # So a pack screen is now left alone, and only a pack entry no screen claims is added.
+        prefix[code] = d["screens"][0]["id"].split("-")[0]
+        for s in d["screens"]:
+            src = s.get("source") or {}
+            if src.get("pack"):
+                held[(src["pack"], str(src.get("number")), str(src.get("page")))] = (code, s)
+
+    for code, pre in prefix.items():
+        nextnum[code] = int((register["prefixes"].get(pre) or {}).get("nextFree") or 1)
 
     added = defaultdict(list)
     gap = defaultdict(list)
+    not_drawn: list[dict] = []
+    claimed = 0
     for rec in pack:
-        code, licensed, section = PLACEMENT[rec["module"]]
+        if (existing := held.get((rec["source"], str(rec["number"]), str(rec["page"])))):
+            claimed += 1
+            # **The register is every pack screen still waiting on an operation, not only the
+            # ones added today.** Rebuilding it from the newly added screens alone would have
+            # shrunk it from 590 rows to 140 and read as though 450 questions had been answered.
+            if not (existing[1].get("apis") or []):
+                gap[(rec["module"], rec["board"])].append(
+                    (existing[1]["id"], rec["title"], rec.get("terms") or []))
+            continue
+        place = BOARD_PLACEMENT.get((rec["module"], rec["board"]), PLACEMENT[rec["module"]])
+        if place is None:
+            not_drawn.append(rec)
+            continue
+        code, licensed, section = place
         kind = archetype(rec["title"])
         sid = f"{prefix[code]}-{nextnum[code]:03d}"
         nextnum[code] += 1
@@ -209,7 +280,7 @@ def main() -> int:
             # The board is generated by `derive-wireframes.py` from these very screens, so the
             # anchor is predictable — and a screen that does not name one is reported by
             # `check-wireframes` as having no board at all.
-            "wireframe": {"status": "generated",
+            "wireframe": {"status": "notStarted",
                           "board": f"{docs[code][1]['platform']['wireframeBoard']}#{sid.lower()}"},
             "source": {"pack": rec["source"], "board": rec["board"],
                        "number": rec["number"], "page": rec["page"]},
@@ -217,12 +288,21 @@ def main() -> int:
         added[code].append(screen)
         gap[(rec["module"], rec["board"])].append((sid, rec["title"], rec.get("terms") or []))
 
-    print(f"{len(pack)} pack screens placed\n")
+    print(f"{len(pack)} pack entries: {claimed} already have a screen, "
+          f"{sum(len(v) for v in added.values())} would be added, "
+          f"{len(not_drawn)} covered by a filter on another screen\n")
     print(f"  {'platform':6} {'was':>5} {'added':>7} {'now':>6}")
     for code in sorted(added):
         f, d = docs[code]
         print(f"  {code:6} {len(d['screens']):>5} {len(added[code]):>7} "
               f"{len(d['screens']) + len(added[code]):>6}")
+
+    still_open = sum(len(v) for v in gap.values())
+    print(f"  {still_open} pack screens carry no operation yet")
+
+    if not added:
+        print("\n  every pack entry already has a screen — nothing to add")
+        return 0
 
     if not a.apply:
         print("\n  nothing written — pass --apply")
@@ -235,12 +315,13 @@ def main() -> int:
         f.write_text(yaml.safe_dump(d, sort_keys=False, allow_unicode=True, width=100),
                      encoding="utf-8")
         print(f"  -> {f.relative_to(ROOT)}")
+    print("  ids issued — run `tools/derive-id-register.py --apply` and commit it in this change")
 
     # ---- the register ----------------------------------------------------------------------
     lines = [
         "# Workshop pack — what the new screens need from the contracts",
         "",
-        f"**{len(pack)} screens landed with `apis: []`.** Generated by "
+        f"**{still_open} of the {len(pack)} pack screens still carry `apis: []`.** Generated by "
         "`tools/derive-pack-screens.py`; regenerate rather than editing.",
         "",
         "The 500 screens already in the package carry 2,569 operation references, about five "

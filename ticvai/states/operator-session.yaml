@@ -1,0 +1,35 @@
+# Operator session — state model
+# Contract: identity.SessionStatus
+# Checked by tools/check-states.py against the contract enum and the event catalogue.
+
+entity: Operator session
+contract: identity
+enum: SessionStatus
+enumKind: named
+enumSchema: SessionStatus
+owner: identity
+initial:
+- active
+terminal:
+- signedOut
+- terminated
+- expired
+transitions:
+- from: active
+  to: signedOut
+  operation: logout
+  trigger: operation
+  guard: The principal ends their own session. The shift is not closed by this — a cashier
+    signing out of a workstation and a till being cashed up are different acts
+- from: active
+  to: terminated
+  operation: forceLogout
+  trigger: operation
+  guard: A supervisor ends a session somebody walked away from, on a workstation the next
+    person needs. Audited against the supervisor, never the abandoning principal
+  requiresApproval: true
+- from: active
+  to: expired
+  trigger: timer
+  guard: Idle past the session timeout. The registry drops it and the workstation is free
+    again — this is the only path that needs no person, and the only one that runs at 3am

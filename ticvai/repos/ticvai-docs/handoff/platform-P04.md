@@ -4,23 +4,22 @@
 
 | | |
 |---|---|
-| Screens | 24 |
-| Operations | 118 |
-| Contracts | 18 |
+| Screens | 30 |
+| Operations | 139 |
+| Contracts | 19 |
 | Modules | 4 |
 | Undrawn | 0 |
-| Operations with no screen | 170 |
-| Waves | wave1 21 · wave2 3 |
+| Operations with no screen | 172 |
+| Waves | wave1 27 · wave2 3 |
 
 ## Gaps
 
-### 170 operations with no screen here
+### 172 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
-| `issueAccreditationBadge` | approvals | POST | Issue a badge |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -31,6 +30,8 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
+| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
+| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
@@ -48,7 +49,6 @@
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
 | `validateRecognitionSchedules` | finance | POST | Find product kinds claimed by more than one schedule |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
-| `clearTable` | fnb | POST | Mark a table cleared and free |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
@@ -60,7 +60,7 @@
 | `requestBill` | fnb | POST | The party asked to pay |
 | `resolveBookingConflict` | fnb | GET | Two bookings, one table — and what to do about it |
 | `sendBookingConfirmation` | fnb | POST | Confirm a booking, and ask them to confirm back |
-| … | | | 130 more |
+| … | | | 132 more |
 
 ### 2 modules split across waves
 
@@ -73,8 +73,8 @@
 
 | Module | Screens | Waves |
 |---|---|---|
-| Sell | 19 | 1, 2 |
-| Shift | 3 | 1, 2 |
+| Sell | 24 | 1, 2 |
+| Shift | 4 | 1, 2 |
 | Payment | 1 | 1 |
 | Reports | 1 | 2 |
 
@@ -82,6 +82,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
+| `POS-000` | Sign In | Shift | 1 | 5 | yes |
 | `POS-001` | Begin Shift | Shift | 1 | 17 | yes |
 | `POS-002` | Sell — Ticket Catalogue | Sell | 1 | 41 | yes |
 | `POS-003` | Sell — Timed Entry | Sell | 1 | 10 | yes |
@@ -97,7 +98,7 @@
 | `POS-013` | Mobile POS, Event Sales & Offline Operations | Sell | 1 | 8 | yes |
 | `POS-014` | Sales Exceptions, Controls & Operational Actions | Sell | 1 | 3 | yes |
 | `POS-015` | Cash Operations Dashboard | Sell | 1 | 2 | yes |
-| `POS-016` | Till Configuration | Sell | 1 | 2 | yes |
+| `POS-016` | Till Configuration | Sell | 1 | 5 | yes |
 | `POS-017` | Cash In / Cash Out Operations | Sell | 1 | 1 | yes |
 | `POS-018` | Safe Drop & Cash Transfer Management | Sell | 1 | 5 | yes |
 | `POS-019` | Shift Templates & Policies | Sell | 1 | 3 | yes |
@@ -106,4 +107,9 @@
 | `POS-022` | Send to Kitchen | Sell | 1 | 4 | yes |
 | `POS-023` | Sell — Merchandise | Sell | 1 | 5 | yes |
 | `POS-024` | Outlet Setup | Sell | 1 | 5 | yes |
+| `POS-025` | Till Home | Sell | 1 | 5 | yes |
+| `POS-026` | Receipt & Reprint | Sell | 1 | 3 | yes |
+| `POS-027` | Guest Lookup | Sell | 1 | 2 | yes |
+| `POS-028` | Table Service | Sell | 1 | 8 | yes |
+| `POS-029` | Order Queue | Sell | 1 | 4 | yes |
 

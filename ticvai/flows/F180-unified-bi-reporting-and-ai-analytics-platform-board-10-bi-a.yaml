@@ -1,0 +1,133 @@
+id: F180
+name: 'Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+  Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P16 Venue Analytics
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Unified BI Reporting and AI Analytics Platform board 10.
+    **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: ANL-061
+  entryPoints:
+  - Arrives at BI & Analytics Administration Command Center
+steps:
+- step: 1
+  screen: ANL-061
+  action: Opens BI & Analytics Administration Command Center
+  operations: []
+  outcome: Provide administrators with one consolidated view of the health and governance of the TICVAI
+    analytics platform.
+- step: 2
+  screen: ANL-062
+  action: Works in Enterprise KPI Library
+  operations: []
+  outcome: Maintain the authoritative catalogue of approved TICVAI business KPIs. This is essential because
+    every dashboard must use the same definition of a metric.
+- step: 3
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ANL-063
+  action: Works in KPI Targets, Thresholds & Scorecards
+  operations: []
+  outcome: Centrally configure performance targets and thresholds used throughout TICVAI analytics.
+- step: 5
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ANL-064
+  action: Works in Benchmark & Comparative Analytics Configuration
+  operations: []
+  outcome: Define how TICVAI compares performance between sites, periods and peer groups.
+- step: 7
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ANL-065
+  action: Works in Data Source & Integration Registry
+  operations: []
+  outcome: Maintain a centralized catalogue of data sources feeding the analytics platform.
+- step: 9
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ANL-066
+  action: Works in Semantic Model & Business Data Catalogue
+  operations: []
+  outcome: Create the governed business layer between raw data and dashboards/AI. This is one of the most
+    important technical screens in Board 10.
+- step: 11
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ANL-067
+  action: Works in Data Refresh, Pipeline & Data Health Monitor
+  operations: []
+  outcome: Monitor movement of information from operational systems into the analytics platform.
+- step: 13
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ANL-068
+  action: Works in Embedded BI, Workspace & Tenant Administration
+  operations: []
+  outcome: Configure how BI technology is embedded inside TICVAI and separated across clients/tenants.
+- step: 15
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ANL-069
+  action: Works in Analytics Performance, Usage & Cost Monitor
+  operations: []
+  outcome: Monitor BI adoption, system performance, capacity consumption and analytical operating costs.
+- step: 17
+  screen: ANL-061
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ANL-070
+  action: Works in Analytics Governance, Security & Audit Center
+  operations: []
+  outcome: Provide final governance over the entire BI and analytics environment.
+branches:
+- at: 1
+  condition: Nothing has been set up on BI & Analytics Administration Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Unified BI Reporting and AI Analytics Platform board 10 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -443,6 +443,7 @@ paths:
         - "P04 POS-007 Close Shift"
         - "P04 POS-009 Staff Roster"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-003 Home — on duty"
         - "P06 EMP-008 Shift summary"
         - "P06 EMP-009 End shift"

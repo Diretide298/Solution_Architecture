@@ -1,6 +1,8 @@
 # ADR-0017 — Deployment models
 
-**Status:** Accepted
+**Status:** Accepted — **amended by [ADR-0038](0038-cell-is-a-region-database-per-tenant.md)**:
+the placement table below describes Postgres *instances*, one per region, each holding a database
+per tenant. The four `CellKind` values and every consequence keep their meaning.
 **Date:** 14 August 2026
 **Consolidates:** the cell-kind material in [ADR-0001](0001-cell-architecture-one-tenant-per-jurisdiction.md), **whose split rule is superseded by ADR-0014**
 and [ADR-0014](0014-cell-per-region.md), both of which have been amended twice. This ADR is
@@ -86,7 +88,7 @@ licence lapsed over a weekend is a worse outcome than one running unlicensed unt
 
 **Cross-cell entitlements do not work both ways.** A pass sold elsewhere and redeemed at an
 on-premise venue requires that venue to reach the issuing cell at the moment of redemption. It
-may not be able to. Either the on-premise venue is excluded from cross-cell programmes, or
+may not be able to. Either the on-premise venue is excluded from cross-region programmes, or
 redemption is local-then-reconcile with the double-redemption risk that carries.
 **This needs a decision before the first on-premise sale**, and the honest default is
 exclusion.
@@ -114,7 +116,7 @@ licensing and support purposes with `isReachable: false`, and every operation th
 reachability must handle its absence rather than timing out.
 
 **Three things must be decided before the first on-premise sale**, and all three are commercial
-as much as technical: whether on-premise venues participate in cross-cell entitlements, what an
+as much as technical: whether on-premise venues participate in cross-region entitlements, what an
 expired licence does, and who is contractually responsible for backups.
 
 ### Costs accepted

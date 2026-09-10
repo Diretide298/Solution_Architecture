@@ -107,8 +107,14 @@ def derive(code: str, lineage, platforms, screens, flows) -> dict:
              if len(w) > 1]
 
     # gap 3 — screens nobody has drawn
+    #
+    # **This read `status == "notStarted"` and was empty for a different reason than it looked.**
+    # No screen ever held that value — 958 read `generated` and 133 `designed`, neither legal —
+    # so the gap list was empty by accident, not because every screen had a frame. Since
+    # 8 September `status` carries intent only; whether a frame exists is `board`, and that is
+    # what a drawing gap has to be measured against.
     undrawn = [{"id": s["id"], "name": s["name"], "wave": s["wave"]}
-               for s in rows if (s.get("wireframe") or {}).get("status") == "notStarted"]
+               for s in rows if not (s.get("wireframe") or {}).get("board")]
 
     # gap 4 — a flow steps through this platform and names a screen it does not have
     mine = {s["id"] for s in rows}
@@ -149,7 +155,15 @@ def derive(code: str, lineage, platforms, screens, flows) -> dict:
         "screens": [{"id": s["id"], "name": s["name"], "module": s.get("module"),
                      "wave": s["wave"], "route": s["implementation"]["route"],
                      "operations": len(s.get("apis") or []),
-                     "drawn": (s.get("wireframe") or {}).get("status") != "notStarted"}
+                     # **`drawn` means a frame exists in the package's board set**, which is
+                     # `board` and never `status`. Read off `status` this was unconditionally
+                     # true, because no screen held the value it compared against.
+                     #
+                     # It is not the same question as Claude Design's board coverage, which
+                     # counts a different, newer board set. **CF pending: which set coverage is
+                     # published against.** Until that is answered this field says only that
+                     # the package has a frame for the screen.
+                     "drawn": bool((s.get("wireframe") or {}).get("board"))}
                     for s in sorted(rows, key=lambda x: x["id"])],
         "gaps": {
             "operationsWithNoScreen": sorted(reachable, key=lambda x: (x["contract"], x["operation"])),

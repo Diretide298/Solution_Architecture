@@ -1,0 +1,151 @@
+id: F164
+name: 'Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rules  Workflow  Approval   Automation Engine board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-238
+  entryPoints:
+  - Arrives at Rules & Workflow Command Center
+steps:
+- step: 1
+  screen: ADM-238
+  action: Opens Rules & Workflow Command Center
+  operations:
+  - listRuleWorkflow
+  outcome: Provide administrators with a centralized portfolio of all business rules, workflows, approvals
+    and automations configured across TICVAI.
+- step: 2
+  screen: ADM-239
+  action: Works in Visual Business Rule Builder
+  operations:
+  - setVisualBusinessRule
+  outcome: Allow administrators to create business rules without software development.
+- step: 3
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-240
+  action: Works in Conditions, Decision Logic & Decision Tables
+  operations:
+  - listConditionDecisionLogic
+  outcome: Configure advanced decision logic where simple IF/THEN rules are insufficient.
+- step: 5
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-241
+  action: Works in Visual Workflow Designer
+  operations:
+  - setVisualWorkflow
+  outcome: Allow administrators to visually design complete business processes.
+- step: 7
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-242
+  action: Works in Approval Matrix & Multi-Level Approval Configuration
+  operations:
+  - approveMatrixMultiLevel
+  outcome: Configure when approvals are required and who must approve.
+- step: 9
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-243
+  action: Works in Roles, Authority, Delegation & Approval Limits
+  operations:
+  - approveRoleAuthorityDelegation
+  outcome: Define who has authority to perform or approve specific actions. This should work with TICVAI
+    RBAC/PBAC rather than replace it.
+- step: 11
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-244
+  action: Works in SLA, Escalation, Reminder & Timeout Rules
+  operations:
+  - listSlaEscalationReminder
+  outcome: Define how workflows behave when people or systems do not act within the expected time.
+- step: 13
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-245
+  action: Works in Trigger, Action & Cross-Module Orchestration Configuration
+  operations:
+  - setTriggerActionCross
+  outcome: Define what starts a workflow and what TICVAI services may be called during execution.
+- step: 15
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-246
+  action: Works in Workflow Testing, Simulation & Impact Analysis
+  operations:
+  - simulateWorkflowTestingImpact
+  outcome: Allow administrators to test rules and workflows before they affect live operations. This is
+    a critical screen.
+- step: 17
+  screen: ADM-238
+  action: Returns to the board's landing screen
+  operations:
+  - listRuleWorkflow
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-247
+  action: Works in Versioning, Governance, Approval & Publication
+  operations:
+  - approveVersioningGovernance
+  outcome: Control how rules and workflows move safely from configuration into production. Board 1 configured
+    the rules and workflows. Board 2 is the live operational layer where TICVAI executes, monitors, manages,
+    troubleshoots, analyzes, and optimizes those workflows across the entire platform.
+branches:
+- at: 1
+  condition: Nothing has been set up on Rules & Workflow Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rules  Workflow  Approval   Automation Engine board 1 visited
+primaryContract: approvals
+contracts:
+- approvals

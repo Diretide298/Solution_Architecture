@@ -9,12 +9,12 @@
 | Contracts | 7 |
 | Modules | 5 |
 | Undrawn | 0 |
-| Operations with no screen | 82 |
+| Operations with no screen | 81 |
 | Waves | wave2 2 · wave3 26 |
 
 ## Gaps
 
-### 82 operations with no screen here
+### 81 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -59,8 +59,8 @@
 | `listMessageTriggers` | marketing-crm | GET | What fires a message, and when |
 | `listReviews` | marketing-crm | GET | List guest reviews and ratings |
 | `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
-| `matchGuest` | marketing-crm | POST | Is this the same person we already have? |
-| … | | | 42 more |
+| `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
+| … | | | 41 more |
 
 ## Modules
 
@@ -76,7 +76,7 @@
 
 | | Name | Module | Wave | Ops | Drawn |
 |---|---|---|---|---|---|
-| `SUP-001` | Agent Login | Access & Availability | 3 | 8 | yes |
+| `SUP-001` | Venue Management Sign In | Access & Availability | 3 | 8 | yes |
 | `SUP-002` | Agent Dashboard | Overview | 3 | 9 | yes |
 | `SUP-003` | Availability & Routing Settings | Access & Availability | 3 | 1 | yes |
 | `SUP-004` | Conversation Queue | Conversations | 2 | 10 | yes |

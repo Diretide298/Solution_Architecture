@@ -1,0 +1,153 @@
+id: F174
+name: 'Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Ticket Upgrade, Exchange & Conversion board 1. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-308
+  entryPoints:
+  - Arrives at Upgrade & Conversion Command Center
+steps:
+- step: 1
+  screen: ADM-308
+  action: Opens Upgrade & Conversion Command Center
+  operations:
+  - listUpgradeConversion
+  outcome: Provide administrators and operations teams with one centralized view of all ticket upgrade,
+    exchange and conversion configurations and operational activity.
+- step: 2
+  screen: ADM-309
+  action: Works in Upgrade & Conversion Path Builder
+  operations:
+  - setUpgradeConversionPath
+  outcome: Define exactly which products/tickets may be converted into which other products. This becomes
+    the central conversion relationship engine.
+- step: 3
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-310
+  action: Works in Upgrade Eligibility & Qualification Rules
+  operations:
+  - listUpgradeEligibilityQualification
+  outcome: Determine whether a particular ticket/customer/transaction qualifies for a configured upgrade
+    or conversion path. A path existing does not automatically mean every ticket can use it.
+- step: 5
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-311
+  action: Works in Upgrade Timing, Usage & Ticket Status Rules
+  operations:
+  - listUpgradeTimingUsage
+  outcome: Define how ticket lifecycle state affects upgrade and conversion behavior. This deserves its
+    own screen because a ticket may already have been partially consumed.
+- step: 7
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-312
+  action: Works in Upgrade Financial Treatment & Price Difference Rules
+  operations:
+  - listUpgradeFinancialTreatment
+  outcome: Define how the financial relationship between the old and new product should be treated.
+- step: 9
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-313
+  action: Works in Pro-Rata, Residual Value & Entitlement Credit Configuration
+  operations:
+  - setProRataResidual
+  outcome: Handle complex upgrades where part of the original product has already been consumed.
+- step: 11
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-314
+  action: Works in Person-Type, Product & Entitlement Conversion Rules
+  operations:
+  - listPersonTypeProduct
+  outcome: Handle conversions that change more than simply the commercial level of a ticket.
+- step: 13
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-315
+  action: Works in Bulk, Group & Assisted Upgrade Operations
+  operations:
+  - listBulkGroupAssisted
+  outcome: Support operational upgrades involving multiple tickets rather than requiring staff to process
+    each individually.
+- step: 15
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-316
+  action: Works in Upgrade Execution, Credential Regeneration & Channel Controls
+  operations:
+  - createUpgradeCredentialRegeneration
+  outcome: Control what happens operationally once an upgrade or conversion is approved and financially
+    completed.
+- step: 17
+  screen: ADM-308
+  action: Returns to the board's landing screen
+  operations:
+  - listUpgradeConversion
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-317
+  action: Works in Upgrade History, Exception Management & Audit Explorer
+  operations:
+  - listUpgradeException
+  outcome: Provide complete operational and financial traceability for every upgrade, downgrade, exchange
+    and conversion.
+branches:
+- at: 1
+  condition: Nothing has been set up on Upgrade & Conversion Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Ticket Upgrade, Exchange & Conversion board 1 visited
+primaryContract: orders
+contracts:
+- orders

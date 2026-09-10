@@ -24,7 +24,7 @@ transitions:
     guest take the seat between the calls'
 - from: held
   to: released
-  operation: releaseSeatHold
+  operation: relinquishSeatHold
   trigger: operation
   guard: Given up deliberately
 - from: held

@@ -984,6 +984,7 @@ paths:
     post:
       operationId: joinWaitlist
       x-ticvai-consumed-by:
+        - "P01 WEB-040 Virtual Queue"
         - "P02 GST-070 Reserve a Table or Cabana"
       x-ticvai-audience:
       - guest
@@ -1036,6 +1037,7 @@ paths:
     delete:
       operationId: leaveWaitlist
       x-ticvai-consumed-by:
+        - "P01 WEB-040 Virtual Queue"
         - "P02 GST-070 Reserve a Table or Cabana"
       x-ticvai-audience:
       - guest
@@ -1391,6 +1393,7 @@ paths:
       operationId: listProductVariants
       x-ticvai-consumed-by:
         - "P01 WEB-005 Ticket Type Selection"
+        - "P02 GST-041 Checkout Entry"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-003 Sell — Timed Entry"
         - "P05 KSK-004 Choose tickets"
@@ -2005,6 +2008,7 @@ paths:
     get:
       operationId: listCatalogueBundles
       x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-052 Suggested Itineraries"
         - "P02 GST-056 Bundle Package"
         - "P06 EMP-018 Offline package"
@@ -2256,6 +2260,7 @@ paths:
       operationId: acquireInventoryHold
       x-ticvai-consumed-by:
         - "P01 WEB-006 Date & Session Selection"
+        - "P02 GST-009 Review & Payment"
         - "P04 POS-003 Sell — Timed Entry"
         - "P05 KSK-005 Choose a session"
         - "P08 BO-018 Allocation & Holds"
@@ -3038,6 +3043,7 @@ paths:
     get:
       operationId: getPerformance
       x-ticvai-consumed-by:
+        - "P01 WEB-006 Date & Session Selection"
         - "P02 GST-006 Event / Exhibition Details"
         - "P04 POS-004 Sell — Seat Map"
         - "P08 BO-002 Queue Configuration"

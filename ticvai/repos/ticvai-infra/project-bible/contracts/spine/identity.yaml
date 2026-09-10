@@ -61,11 +61,12 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
         - "P02 GST-042 Simple Registration & OTP"
+        - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - anonymous
       - partner
@@ -117,6 +118,7 @@ paths:
       operationId: verifyGuestEmail
       x-ticvai-consumed-by:
         - "P01 WEB-020 Profile & Preferences"
+        - "P02 GST-073 Security & Sign-in"
       summary: Send a verification link, or consume one
       description: '**Raised in review by Deep.** `registerGuest` creates an account and nothing verifies
         the address on it — and **a guest account with an unverified email can receive somebody else''s
@@ -277,6 +279,7 @@ paths:
     post:
       operationId: exportSubjectData
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
       summary: Everything the platform holds about one guest
       description: 'BL-149. **A subject access request has a statutory clock**, and answering it by hand
@@ -335,6 +338,7 @@ paths:
     get:
       operationId: listDelegations
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
       summary: Who may act for this guest, and for whom they may act
       description: 'CF-132. **Both directions, because a guest is usually in both.** A parent holds authority
@@ -374,6 +378,7 @@ paths:
     post:
       operationId: grantDelegation
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-015 Memberships"
       summary: Let one guest act for another
       description: 'CF-132, CL-05. **A portfolio is delegated authority, not a household table.**
@@ -462,6 +467,7 @@ paths:
     post:
       operationId: selectRole
       x-ticvai-consumed-by:
+        - "P04 POS-000 Sign In"
         - "P04 POS-001 Begin Shift"
         - "P06 EMP-002 Select venue & role"
         - "P07 SCN-001 Sign in"
@@ -577,9 +583,10 @@ paths:
     post:
       operationId: forceLogout
       x-ticvai-consumed-by:
+        - "P04 POS-000 Sign In"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - staff
       - partner
@@ -625,13 +632,14 @@ paths:
     get:
       operationId: getCurrentSession
       x-ticvai-consumed-by:
+        - "P04 POS-000 Sign In"
         - "P06 EMP-001 Sign in"
         - "P06 EMP-002 Select venue & role"
         - "P06 EMP-042 Profile"
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -1388,7 +1396,7 @@ paths:
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - guest
       - partner
@@ -1503,6 +1511,7 @@ paths:
     delete:
       operationId: deleteGuestAccount
       x-ticvai-consumed-by:
+        - "P01 WEB-024 Devices, Wishlist & Consent"
         - "P02 GST-066 Privacy & My Data"
       x-ticvai-audience:
       - guest
@@ -1558,7 +1567,7 @@ paths:
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - anonymous
       - partner
@@ -1776,8 +1785,9 @@ paths:
         - "P06 EMP-042 Profile"
         - "P07 SCN-001 Sign in"
         - "P09 ADM-001 Platform Login / MFA"
+        - "P09 ADM-342 Authentication & MFA Policy Manager"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-self-service: true
       x-ticvai-audience:
       - staff
@@ -1964,6 +1974,7 @@ paths:
     post:
       operationId: createMfaChallenge
       x-ticvai-consumed-by:
+        - "P01 WEB-016 Login / Register"
         - "P02 GST-073 Security & Sign-in"
       x-ticvai-self-service: true
       x-ticvai-audience:
@@ -2086,9 +2097,10 @@ paths:
     get:
       operationId: listActiveSessions
       x-ticvai-consumed-by:
+        - "P04 POS-000 Sign In"
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - staff
       - partner
@@ -2137,7 +2149,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-001 Platform Login / MFA"
         - "P10 PTR-001 Partner Login / MFA"
-        - "P12 SUP-001 Agent Login"
+        - "P12 SUP-001 Venue Management Sign In"
       x-ticvai-audience:
       - staff
       - partner
@@ -2671,15 +2683,41 @@ components:
         expiresAt:
           type: string
           format: date-time
+    SessionStatus:
+      type: string
+      description: >
+        **The life of one signed-in session, which is not the life of a shift.** A shift holds the
+        float and survives a break; a session holds the person and does not. `ShiftStatus.suspended`
+        is where a break lives — *break cover; float intact, workstation released* — and the release
+        of the workstation is exactly why the session ends rather than pausing: the next person
+        opens their own.
+
+        **One principal, one active session per workstation.** Enforced by the `ActiveSession`
+        registry rather than by a state, because it is a fact about the set of sessions and not
+        about any one of them.
+      enum:
+        - active            # signed in and working; the only non-terminal state
+        - signedOut         # the principal ended it themselves
+        - terminated        # a supervisor ended an abandoned session somebody else needed
+        - expired           # idle past the timeout; the registry dropped it and freed the workstation
+
     ActiveSession:
       x-ticvai-persistence: none — Redis session registry
       type: object
       required:
       - sessionId
       - principalId
+      - status
       - startedAt
       - lastSeenAt
       properties:
+        status:
+          allOf:
+          - $ref: '#/components/schemas/SessionStatus'
+          description: >
+            **A registry that only holds live sessions cannot answer why one ended.** Kept on the
+            record so a supervisor asking *what happened to till 4* gets `terminated` or `expired`
+            rather than an absence.
         sessionId:
           type: string
         principalId:
@@ -3037,12 +3075,32 @@ components:
           maxLength: 256
         credential:
           type: string
-          description: Password, card token or RFID token depending on `method`.
+          description: 'Password, PIN, card token or RFID token depending on `method`.
+
+            '
           maxLength: 512
         method:
           type: string
+          description: '**`pin` is how a till is actually used.** A cashier signs in at a shared
+            terminal between guests, and a password on a touchscreen with somebody waiting is a
+            password that gets shortened, shared or written on the drawer. The employee number
+            goes in `username` and the PIN in `credential`, so the shape of the request does not
+            change — only what the operator types.
+
+
+            **A PIN is weaker than a password and the difference is bounded by the device, not by
+            the secret.** `workstationId` is required on every login and is *NOT a permission
+            source*: it says which till, and the till is on a venue network in a staff area. A PIN
+            is a reasonable credential there and nowhere else, which is why this is an enum value
+            and not a policy flag — a surface that wants it has to ask for it by name.
+
+
+            Added 10 September 2026 for `POS-000 Sign In`.
+
+            '
           enum:
           - password
+          - pin
           - card
           - rfid
           - sso

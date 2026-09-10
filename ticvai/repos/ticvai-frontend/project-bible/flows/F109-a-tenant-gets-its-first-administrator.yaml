@@ -1,0 +1,119 @@
+id: F109
+name: A tenant gets its first administrator
+actor: platformAdmin
+wave: 1
+frequency: rare
+criticality: foundational
+platforms:
+- P09 TICVAI Web
+offlineBehaviour: Not offline. Identity is issued by the Control Plane by definition.
+# **This is the management half of TICVAI onboarding.** F16 provisions the tenant — cell, scope
+# tree, licences, chart of accounts — and hands off at its step 7 with "creates the first venue
+# manager". This flow is that step opened up, because the question it answers is the one the
+# package could not answer on 10 September: **who holds the permission to give permissions?**
+#
+# The B2B half is F110.
+trigger:
+  description: >
+    A tenant exists and nobody inside it can sign in yet. Someone has to issue the first identity,
+    and that someone cannot be inside the tenant.
+  entryScreen: ADM-001
+  entryPoints:
+  - A tenant has just been provisioned by F16
+  - A tenant's last administrator was removed and the account must be re-issued
+steps:
+- step: 1
+  screen: ADM-001
+  action: The platform operator signs in
+  operations:
+  - login
+  - listMfaMethods
+  outcome: A session scoped to the platform, not to any tenant
+  note: >
+    **The identity used here is the one nothing created.** Every other principal in the system is
+    created by a principal above it; the platform's own root is seeded at deployment and has no
+    creator inside the product. That is not a gap to be closed — it is where the chain has to
+    start — but it is the account that most deserves an audit trail, and F16 already calls it
+    "the break-glass local account".
+- step: 2
+  screen: ADM-002
+  action: Opens the console and picks the tenant
+  operations:
+  - listTenants
+  - getTenant
+  outcome: The tenant exists, is licensed, and has no principals
+- step: 3
+  screen: ADM-021
+  action: Defines the role the first administrator will hold
+  operations:
+  - listRoles
+  - createRole
+  outcome: A role carrying the permissions a tenant administrator needs
+  note: >
+    **`createRole` requires `ROLE_MANAGE`, which no role in `roles.yaml` grants.** The contracts
+    declare 127 permission keys in SCREAMING_SNAKE; `roles.yaml` grants 35 in lowercase-dotted
+    form, all of them POS. The two vocabularies do not share a single key, so as written this step
+    can be performed by nobody. The step is correct; the role model is what is missing.
+- step: 4
+  screen: ADM-002
+  action: Returns to the console
+  operations:
+  - listTenants
+  outcome: Role defined, no one holding it
+  note: >
+    **The hop through the dashboard is not padding.** ADM-020 and ADM-021 each declare exactly one
+    way in — from ADM-002 — so this is the navigation the screens actually describe. A wizard that
+    ran the two together would need a lateral edge neither screen declares.
+- step: 5
+  screen: ADM-020
+  action: Creates the first principal and grants it the role
+  operations:
+  - listPrincipals
+  - createPrincipal
+  outcome: One identity inside the tenant that can now create every other one
+  note: >
+    **`createPrincipal` requires `USER_MANAGE`** — the same unheld key. From here the chain is
+    self-sustaining: this principal creates the venue managers, who create the supervisors, who
+    create the cashiers, each bounded by `Session.scope`.
+branches:
+- at: 1
+  condition: The seeded platform account cannot sign in
+  behaviour: >
+    **There is no second door.** MFA unreachable or the identity provider down leaves nobody able
+    to issue an identity to anybody. This is the single point at which the whole permission tree
+    is unrecoverable from inside the product.
+  severity: abandonsFlow
+  resolvedBy: Platform operations, out of band
+- at: 3
+  condition: No role exists yet for this tenant
+  behaviour: >
+    ADM-021 shows `emptyFirstRun` rather than `emptyNoResults`. **The distinction matters here more
+    than anywhere** — an empty role list on a brand-new tenant is the expected state, and an empty
+    one on an established tenant means something was deleted.
+  severity: expected
+  resolvedBy: Automatic
+- at: 3
+  condition: The operator holds no key that satisfies ROLE_MANAGE
+  behaviour: >
+    The screen shows `emptyNoAccess`. **On the package as written this is every operator**, because
+    no role grants the key. Until the two permission vocabularies are joined, this branch is the
+    happy path.
+  severity: requiresStaff
+  resolvedBy: Unresolved — see the permission join
+- at: 5
+  condition: The principal is created but the role was never attached
+  behaviour: >
+    An identity that can sign in and do nothing. It reads as success on this screen and fails on
+    the tenant's first real action, which is the worst place to discover it.
+  severity: recoverable
+  resolvedBy: Platform admin
+exitStates:
+- state: completed
+  description: The tenant holds one identity that can create the rest
+- state: blocked
+  description: No operator holds ROLE_MANAGE or USER_MANAGE
+primaryContract: identity
+contracts:
+- identity
+- tenancy
+- subscription

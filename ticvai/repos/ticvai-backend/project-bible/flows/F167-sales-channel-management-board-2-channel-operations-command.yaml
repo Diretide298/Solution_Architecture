@@ -1,0 +1,151 @@
+id: F167
+name: 'Sales Channel Management board 2: Channel Operations Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Sales Channel Management board 2. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-268
+  entryPoints:
+  - Arrives at Channel Operations Command Center
+steps:
+- step: 1
+  screen: ADM-268
+  action: Opens Channel Operations Command Center
+  operations:
+  - listChannel
+  outcome: Provide a real-time operational view of all active TICVAI sales channels.
+- step: 2
+  screen: ADM-269
+  action: Works in Channel Connection & Integration Manager
+  operations:
+  - listChannelConnectionIntegration
+  outcome: Configure and manage the technical connection between TICVAI and external or internal sales
+    channels.
+- step: 3
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-270
+  action: Works in Product, Price & Availability Synchronization
+  operations:
+  - listProductPriceAvailability
+  outcome: Control how TICVAI distributes commercial information to connected channels and receives supported
+    updates.
+- step: 5
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-271
+  action: Works in Real-Time Channel Availability & Inventory Monitor
+  operations:
+  - listRealTimeChannel
+  outcome: Provide operations with a live view of what each channel can currently sell.
+- step: 7
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-272
+  action: Works in Channel Allocation & Rebalancing Operations
+  operations:
+  - listChannelAllocationRebalancing
+  outcome: Allow authorized users to operationally adjust inventory allocations as demand changes. Board
+    1 defines the allocation rules. Board 2 manages those allocations during live operations.
+- step: 9
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-273
+  action: Works in Channel Exceptions, Incidents & Recovery
+  operations:
+  - listChannelExceptionIncident
+  outcome: Provide one operational workspace for resolving channel problems.
+- step: 11
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-274
+  action: Works in Channel Performance & Commercial Analytics
+  operations:
+  - listChannelPerformanceCommercial
+  outcome: Compare the commercial effectiveness of TICVAI sales channels.
+- step: 13
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-275
+  action: Works in Channel Audit, Logs & Transaction Traceability
+  operations:
+  - listChannelLogTransaction
+  outcome: Provide complete traceability across channel configuration, synchronization and transactions.
+- step: 15
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-276
+  action: Works in Channel Governance, SLA & Partner Control
+  operations:
+  - listChannelGovernanceSla
+  outcome: Govern live channels and ensure that internal/external channels operate within approved commercial
+    and service conditions.
+- step: 17
+  screen: ADM-268
+  action: Returns to the board's landing screen
+  operations:
+  - listChannel
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-277
+  action: Works in AI Channel Optimization & Intelligence Center
+  operations:
+  - listChannel2
+  outcome: Create the AI intelligence layer that looks across all sales channels together rather than
+    optimizing each channel in isolation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Channel Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Sales Channel Management board 2 visited
+primaryContract: catalogue
+contracts:
+- catalogue

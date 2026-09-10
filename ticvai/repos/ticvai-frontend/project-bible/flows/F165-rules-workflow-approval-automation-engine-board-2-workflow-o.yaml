@@ -1,0 +1,152 @@
+id: F165
+name: 'Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Rules  Workflow  Approval   Automation Engine board 2. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-248
+  entryPoints:
+  - Arrives at Workflow Operations Command Center
+steps:
+- step: 1
+  screen: ADM-248
+  action: Opens Workflow Operations Command Center
+  operations:
+  - listWorkflow
+  outcome: Provide administrators and operational managers with a real-time view of all workflow activity
+    across TICVAI.
+- step: 2
+  screen: ADM-249
+  action: Works in Unified Approval Inbox & Decision Workspace
+  operations:
+  - approveUnifiedDecision
+  outcome: Provide users with one approval inbox across all TICVAI modules. This is extremely important.
+    A manager should not need to open Finance for one approval, Pricing for another, Procurement for another,
+    and Customer Service for another.
+- step: 3
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-250
+  action: Works in Workflow Instance Monitor & Process Timeline
+  operations:
+  - listWorkflowInstanceProcess
+  outcome: Allow administrators to inspect exactly what is happening inside an individual running workflow.
+- step: 5
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-251
+  action: Works in Workflow Exception, Failure & Recovery Center
+  operations:
+  - listWorkflowExceptionFailure
+  outcome: Provide one controlled workspace for failed workflow executions.
+- step: 7
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-252
+  action: Works in SLA, Escalation & Bottleneck Monitor
+  operations:
+  - listSlaEscalationBottleneck
+  outcome: Monitor workflows approaching or exceeding configured time limits.
+- step: 9
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-253
+  action: Works in Automation Execution & Autonomous Action Monitor
+  operations:
+  - createAutomationAutonomouAction
+  outcome: Provide visibility and governance over actions executed automatically by TICVAI. This becomes
+    especially important as TICVAI becomes more AI-driven.
+- step: 11
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-254
+  action: Works in Cross-Module Orchestration Monitor
+  operations:
+  - listCrossModuleOrchestration
+  outcome: Monitor complex workflows involving multiple TICVAI services. Example — Group Booking Confirmation
+- step: 13
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-255
+  action: Works in Workflow Analytics & Process Performance
+  operations:
+  - listWorkflowProcessPerformance
+  outcome: Measure how effectively TICVAI's business workflows are performing.
+- step: 15
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-256
+  action: Works in Process Optimization & Automation Opportunity Center
+  operations:
+  - listProcessAutomationOpportunity
+  outcome: Identify business processes that should be simplified, redesigned or automated. This is where
+    TICVAI moves beyond simply running workflows.
+- step: 17
+  screen: ADM-248
+  action: Returns to the board's landing screen
+  operations:
+  - listWorkflow
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-257
+  action: Works in AI Workflow Intelligence & Autonomous Governance Center
+  operations:
+  - listWorkflowAutonomouGovernance
+  outcome: Create the AI intelligence layer across TICVAI's entire rules, workflow and automation ecosystem.
+    This is the management-level AI brain for Area 13.
+branches:
+- at: 1
+  condition: Nothing has been set up on Workflow Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Rules  Workflow  Approval   Automation Engine board 2 visited
+primaryContract: approvals
+contracts:
+- approvals

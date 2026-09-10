@@ -1,0 +1,158 @@
+id: F158
+name: 'Promotions   Bundles Management board 5: Bundle & Combo Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 5. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-178
+  entryPoints:
+  - Arrives at Bundle & Combo Command Center
+steps:
+- step: 1
+  screen: ADM-178
+  action: Opens Bundle & Combo Command Center
+  operations:
+  - listBundleCombo
+  outcome: Provide centralized visibility and management of all bundles and combo products across
+- step: 2
+  screen: ADM-179
+  action: Works in Bundle Definition & Setup
+  operations:
+  - setBundleDefinition
+  outcome: Create the commercial identity and high-level behavior of a bundle.
+- step: 3
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-180
+  action: Works in Bundle Component Builder
+  operations:
+  - setBundleComponent
+  outcome: Define exactly what products and services make up the bundle.
+- step: 5
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-181
+  action: Works in Guest Choice & Build-Your-Own Bundle Designer
+  operations:
+  - setGuestChoiceBuild
+  outcome: Configure bundles where the guest chooses products from predefined groups. The matrix specifically
+    requires the guest to be able to choose attractions, experiences, F&B, retail products, or services
+    from predefined categories while maintaining bundle pricing rules.
+- step: 7
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-182
+  action: Works in Bundle Pricing & Commercial Model
+  operations:
+  - listBundlePricingCommercial
+  outcome: Determine how the bundle is commercially priced.
+- step: 9
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-183
+  action: Works in Bundle Availability, Capacity & Validation
+  operations:
+  - listBundleAvailabilityCapacity
+  outcome: 'Ensure that TICVAI does not sell a bundle unless all required components can actually be fulfilled.
+    This is a direct requirement of the matrix: each bundle component maintains independent inventory,
+    capacity, validity, redemption rules, and availability, and the system validates included products
+    before confirming the sale.'
+- step: 11
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-184
+  action: Works in Bundle Validity, Scheduling & Redemption Rules
+  operations:
+  - listBundleValidityScheduling
+  outcome: Control when bundle components may be consumed and whether they must be redeemed together or
+    separately.
+- step: 13
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-185
+  action: Works in Partner & External Product Bundle Manager
+  operations:
+  - listPartnerExternalProduct
+  outcome: Allow TICVAI bundles to include products or services owned by external operators. The matrix
+    requires combinations with external products/services and bundles across different destinations, including
+    systems that may use different databases.
+- step: 15
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-186
+  action: Works in Revenue Allocation, Cost & Settlement Rules
+  operations:
+  - listRevenueAllocationCost
+  outcome: Determine how bundle revenue is allocated across its components. This is explicitly required
+    by the matrix for allocation across products, attractions, departments, partners, operators, and accounting
+    entities.
+- step: 17
+  screen: ADM-178
+  action: Returns to the board's landing screen
+  operations:
+  - listBundleCombo
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-187
+  action: Works in Bundle Preview, Simulation & AI Recommendation
+  operations:
+  - simulateBundlePreviewRecommendation
+  outcome: Allow administrators to test promotional rules before activating them. This is critical because
+    the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and
+    financial performance before activation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Bundle & Combo Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 5 visited
+primaryContract: promotions
+contracts:
+- promotions

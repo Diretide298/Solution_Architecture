@@ -1,0 +1,161 @@
+id: F160
+name: 'Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 7. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-198
+  entryPoints:
+  - Arrives at Targeting & Eligibility Command Center
+steps:
+- step: 1
+  screen: ADM-198
+  action: Opens Targeting & Eligibility Command Center
+  operations:
+  - listTargetingEligibility
+  outcome: Provide centralized visibility into all promotion audiences, eligibility rules, segments, targeting
+    strategies, and their performance.
+- step: 2
+  screen: ADM-199
+  action: Works in Eligibility Rule Builder
+  operations:
+  - setEligibilityRule
+  outcome: Provide a no-code rule engine for determining promotion eligibility.
+- step: 3
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-200
+  action: Works in CRM & Customer Segment Manager
+  operations:
+  - listCrmCustomerSegment
+  outcome: Connect promotion eligibility directly to TICVAI CRM segmentation. The board should consume
+    CRM segments rather than recreate CRM functionality.
+- step: 5
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-201
+  action: Works in Membership, Loyalty & Guest Eligibility
+  operations:
+  - listMembershipLoyaltyGuest
+  outcome: Configure targeting based on membership, loyalty status, guest categories, and entitlement
+    relationships.
+- step: 7
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-202
+  action: Works in Behavioral & Transaction Targeting
+  operations:
+  - listBehavioralTransactionTargeting
+  outcome: Target promotions according to what the guest has previously purchased or done.
+- step: 9
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-203
+  action: Works in Context, Location, Channel & Time Targeting
+  operations:
+  - listContextLocationChannel
+  outcome: Determine promotion eligibility according to the customer's current commercial context.
+- step: 11
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-204
+  action: Works in Partner, B2B & Payment Eligibility
+  operations:
+  - listPartnerPaymentEligibility
+  outcome: Configure eligibility for partner, corporate, reseller, B2B, and payment-related campaigns.
+- step: 13
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-205
+  action: Works in Audience Preview, Reach & Eligibility Simulator
+  operations:
+  - listAudiencePreviewReach
+  outcome: Allow administrators to understand exactly who will qualify before activating the targeting
+    rule. This is a critical safeguard.
+- step: 15
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-206
+  action: Works in Targeting Conflict, Frequency & Exclusion Controls
+  operations:
+  - listTargetingConflictFrequency
+  outcome: Prevent customers from being over-targeted and prevent inappropriate promotional eligibility.
+- step: 17
+  screen: ADM-198
+  action: Returns to the board's landing screen
+  operations:
+  - listTargetingEligibility
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-207
+  action: Works in AI Audience Discovery & Targeting Optimization
+  operations:
+  - listAudienceDiscoveryTargeting
+  outcome: 'Use TICVAI''s AI layer to identify customer audiences and promotion opportunities that business
+    users may not have manually defined. Board 8 shall provide TICVAI with the centralized Promotion Decision
+    Engine responsible for determining what happens when multiple promotions, discounts, coupons, bundles,
+    loyalty benefits, membership benefits, payment offers, BOGO mechanics, partner offers, or special
+    prices qualify for the same transaction. This is one of the most important boards in the Promotions
+    module because the previous boards may all produce valid offers simultaneously. For example, a guest
+    could qualify for: Annual Pass Holder — 15% discount SUMMER20 coupon — 20% discount Emirates NBD card
+    — 10% discount Buy 4 Pay 3 — promotional mechanic Loyalty Gold — 5% benefit Can they combine? In what
+    order? Which promotion wins? What is the maximum permitted benefit? The matrix explicitly requires
+    configurable promotion hierarchy, stacking and conflict resolution, including scenarios where promotions
+    are combined, mutually exclusive, or prioritized, with clear explanation of which promotion was applied
+    and why. Board 8 shall contain 10 backend screens.'
+branches:
+- at: 1
+  condition: Nothing has been set up on Targeting & Eligibility Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 7 visited
+primaryContract: promotions
+contracts:
+- promotions

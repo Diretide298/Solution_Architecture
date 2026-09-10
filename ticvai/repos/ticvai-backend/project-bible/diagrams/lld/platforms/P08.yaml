@@ -1,5 +1,5 @@
 id: LLD-P08
-title: P08 Venue Management — Back Office — 363 screens
+title: P08 Venue Management — Back Office — 393 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -24,7 +24,7 @@ modulesUsed:
 - module: ticketing
   screens: 82
 - module: core
-  screens: 46
+  screens: 76
 - module: membership
   screens: 20
 - module: fnb
@@ -79,9 +79,9 @@ servicesCalled:
 - service: WhiteLabelService
   operationCalls: 1
 coverage:
-  screens: 363
-  inAFlow: 66
-  drawn: 363
+  screens: 393
+  inAFlow: 316
+  drawn: 393
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -155,6 +155,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -165,9 +166,10 @@ screens:
   - BO-001
   - BO-003
   - BO-004
+  - BO-023
   boardFrames:
   - Seat Board 2.dc.html#seat-2c
-  wireframe: wireframes/Seat Board 2.dc.html#seat-2c
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-002
   inFlows:
   - F09 Event is cancelled and refunded
 - screen: BO-003
@@ -184,6 +186,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -340,11 +343,13 @@ screens:
   - BO-008
   - BO-009
   - BO-010
+  - BO-045
+  - BO-112
   boardFrames:
   - FnB Board 2.dc.html#fnb-2c
   - Retail Board 2.dc.html#ret-2a
   - Retail Board 2.dc.html#ret-2b
-  wireframe: wireframes/Retail Board 2.dc.html#ret-2a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-007
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
   - F85 Production is planned, costed and released
@@ -378,7 +383,7 @@ screens:
   boardFrames:
   - FnB Board 2.dc.html#fnb-2d
   - Retail Board 2.dc.html#ret-2c
-  wireframe: wireframes/Retail Board 2.dc.html#ret-2c
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-008
   inFlows:
   - F10 Partner books, uses and settles
   - F85 Production is planned, costed and released
@@ -413,7 +418,7 @@ screens:
   - BO-010
   boardFrames:
   - Retail Board 2.dc.html#ret-2f
-  wireframe: wireframes/Retail Board 2.dc.html#ret-2f
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-009
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
 - screen: BO-010
@@ -467,7 +472,7 @@ screens:
   - Retail Board 5.dc.html#ret-5b
   - Retail Board 5.dc.html#ret-5c
   - Retail Board 5.dc.html#ret-5e
-  wireframe: wireframes/POS Board 4.dc.html#pos-4e
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-010
   inFlows:
   - F77 A promotion is built, bundled, published and measured
   - F90 An audience is built, offered to, and the result is judged
@@ -500,7 +505,7 @@ screens:
   boardFrames:
   - FnB Board 2.dc.html#fnb-2g
   - Retail Board 5.dc.html#ret-5h
-  wireframe: wireframes/Retail Board 5.dc.html#ret-5h
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-011
   inFlows:
   - F77 A promotion is built, bundled, published and measured
 - screen: BO-012
@@ -552,7 +557,7 @@ screens:
   - listChannelListings
   - listProducts
   - publishBundle
-  - releaseChannelAllocation
+  - relinquishChannelAllocation
   - setChannelAllocations
   - setChannelListing
   - updateChannelCapacity
@@ -570,9 +575,10 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-011
   boardFrames:
   - Retail Board 5.dc.html#ret-5g
-  wireframe: wireframes/Retail Board 5.dc.html#ret-5g
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-013
   inFlows:
   - F77 A promotion is built, bundled, published and measured
 - screen: BO-014
@@ -615,7 +621,7 @@ screens:
   boardFrames:
   - FnB Board 2.dc.html#fnb-2h
   - Retail Board 2.dc.html#ret-2h
-  wireframe: wireframes/Retail Board 2.dc.html#ret-2h
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-014
   inFlows: null
 - screen: BO-015
   name: Session Calendar
@@ -652,7 +658,7 @@ screens:
   - BO-009
   boardFrames:
   - Seat Board 2.dc.html#seat-2a
-  wireframe: wireframes/Seat Board 2.dc.html#seat-2a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-015
   inFlows: null
 - screen: BO-016
   name: Session Template
@@ -689,7 +695,7 @@ screens:
   - BO-009
   boardFrames:
   - Seat Board 2.dc.html#seat-2b
-  wireframe: wireframes/Seat Board 2.dc.html#seat-2b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-016
   inFlows: null
 - screen: BO-017
   name: Capacity Management
@@ -701,7 +707,7 @@ screens:
   - createChannelCapacity
   - getChannelAllocations
   - listChannelCapacities
-  - releaseChannelAllocation
+  - relinquishChannelAllocation
   - setChannelAllocations
   - updateChannelCapacity
   states:
@@ -731,7 +737,7 @@ screens:
   - acquireInventoryHold
   - forceReleaseInventoryHold
   - listInventoryHolds
-  - releaseInventoryHold
+  - relinquishInventoryHold
   - renewInventoryHold
   states:
   - emptyFirstRun
@@ -788,7 +794,7 @@ screens:
   - BO-009
   boardFrames:
   - Seat Board 2.dc.html#seat-2d
-  wireframe: wireframes/Seat Board 2.dc.html#seat-2d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-019
   inFlows: null
 - screen: BO-020
   name: F&B Order Management
@@ -848,7 +854,7 @@ screens:
   - BO-104
   boardFrames:
   - Retail Board 3.dc.html#ret-3a
-  wireframe: wireframes/Retail Board 3.dc.html#ret-3a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-021
   inFlows:
   - F11 Guest orders food to a lounger
   - F81 A retail sale runs from overview to tender
@@ -924,6 +930,7 @@ screens:
   - venueId<-session
   goesTo:
   - BO-001
+  - BO-004
   - BO-007
   - BO-008
   - BO-009
@@ -960,7 +967,7 @@ screens:
   - BO-009
   boardFrames:
   - Retail Board 3.dc.html#ret-3k
-  wireframe: wireframes/Retail Board 3.dc.html#ret-3k
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-024
   inFlows:
   - F32 A till opens, trades and settles
   - F99 A chargeback arrives and is defended
@@ -990,6 +997,7 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-024
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-025
   inFlows:
@@ -1031,7 +1039,7 @@ screens:
   - BO-009
   boardFrames:
   - Seat Platform Board 7.dc.html#seatp-7e
-  wireframe: wireframes/Seat Platform Board 7.dc.html#seatp-7e
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-026
   inFlows: null
 - screen: BO-027
   name: Reissue & Media Replacement
@@ -1047,6 +1055,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1071,6 +1080,7 @@ screens:
   - createRefundRequest
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   offlineState: false
@@ -1346,11 +1356,12 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-124
   boardFrames:
   - POS Board 1.dc.html#pos-1a
   - POS Board 1.dc.html#pos-1b
   - POS Board 1.dc.html#pos-1c
-  wireframe: wireframes/POS Board 1.dc.html#pos-1a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-036
   inFlows:
   - F79 A workstation is registered, configured and rolled out
   - F95 A fleet is watched, a fault is found, and a station is fixed
@@ -1384,11 +1395,12 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-128
   boardFrames:
   - POS Board 5.dc.html#pos-5a
   - POS Board 5.dc.html#pos-5c
   - Retail Board 3.dc.html#ret-3j
-  wireframe: wireframes/POS Board 5.dc.html#pos-5a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-037
   inFlows:
   - F89 Offline policy is set, cached, monitored and reconciled
 - screen: BO-038
@@ -1602,6 +1614,7 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-074
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-043
   inFlows:
@@ -1662,7 +1675,7 @@ screens:
   - Retail Board 1.dc.html#ret-1h
   - Retail Board 1.dc.html#ret-1j
   - Retail Board 1.dc.html#ret-1k
-  wireframe: wireframes/Retail Board 1.dc.html#ret-1b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-044
   inFlows:
   - F28 A temperature excursion is caught and signed off
 - screen: BO-045
@@ -1694,6 +1707,7 @@ screens:
   - menuId<-deepLink
   - menuItemId<-deepLink
   goesTo:
+  - BO-008
   - BO-104
   - BO-111
   boardFrames:
@@ -1702,7 +1716,7 @@ screens:
   - FnB Board 2.dc.html#fnb-2e
   - FnB Board 2.dc.html#fnb-2j
   - FnB Board 2.dc.html#fnb-2k
-  wireframe: wireframes/FnB Board 2.dc.html#fnb-2a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-045
   inFlows:
   - F31 A menu is drafted, scheduled and rolled back
   - F85 Production is planned, costed and released
@@ -1735,7 +1749,7 @@ screens:
   wireframe: wireframes/P08 Venue Management.dc.html#bo-046
   inFlows: null
 - screen: BO-047
-  name: F&B Order Management
+  name: Order Corrections & Exceptions
   module: Orders & Money
   requiresModule: ticketing
   wave: 2
@@ -1831,13 +1845,14 @@ screens:
   - BO-009
   - BO-079
   - BO-080
+  - BO-081
   - BO-082
   boardFrames:
   - FnB Board 5.dc.html#fnb-5a
   - FnB Board 5.dc.html#fnb-5b
   - Retail Board 4.dc.html#ret-4a
   - Retail Board 4.dc.html#ret-4h
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-049
   inFlows:
   - F35 Stock arrives short and an oversell is resolved
   - F92 Store stock is watched, replenished and reconciled
@@ -1853,6 +1868,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1940,7 +1956,7 @@ screens:
   - BO-049
   boardFrames:
   - Retail Board 4.dc.html#ret-4e
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4e
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-052
   inFlows:
   - F15 A part is needed and ordered
   - F35 Stock arrives short and an oversell is resolved
@@ -1973,7 +1989,7 @@ screens:
   - BO-009
   boardFrames:
   - Marketing Board 1.dc.html#crm-1b
-  wireframe: wireframes/Marketing Board 1.dc.html#crm-1b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-053
   inFlows: null
 - screen: BO-054
   name: Role Assignment
@@ -2112,9 +2128,10 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-061
   boardFrames:
   - Retail Board 6.dc.html#ret-6h
-  wireframe: wireframes/Retail Board 6.dc.html#ret-6h
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-058
   inFlows:
   - F107 A report is defined, scheduled and delivered
   - F20 A manager asks a question and gets an answer
@@ -2226,6 +2243,7 @@ screens:
   - BO-007
   - BO-008
   - BO-009
+  - BO-060
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-061
   inFlows:
@@ -2297,7 +2315,7 @@ screens:
   - BO-009
   boardFrames:
   - Seat Board 1.dc.html#seat-1c
-  wireframe: wireframes/Seat Board 1.dc.html#seat-1c
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-063
   inFlows: null
 - screen: BO-064
   name: Zones & Areas
@@ -2405,6 +2423,8 @@ screens:
   - listWebhookSubscriptions
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2417,7 +2437,7 @@ screens:
   - BO-009
   boardFrames:
   - Seat Platform Board 13.dc.html#seatp-13d
-  wireframe: wireframes/Seat Platform Board 13.dc.html#seatp-13d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-067
   inFlows: null
 - screen: BO-068
   name: Audit Log
@@ -2443,7 +2463,7 @@ screens:
   - BO-009
   boardFrames:
   - Retail Board 6.dc.html#ret-6j
-  wireframe: wireframes/Retail Board 6.dc.html#ret-6j
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-068
   inFlows:
   - F106 A security dashboard surfaces something and it is investigated
 - screen: BO-069
@@ -2763,7 +2783,7 @@ screens:
   - FnB Board 5.dc.html#fnb-5f
   - Retail Board 4.dc.html#ret-4c
   - Retail Board 4.dc.html#ret-4k
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4c
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-078
   inFlows:
   - F15 A part is needed and ordered
   - F76 Stock is counted, requested, transferred and received
@@ -2798,10 +2818,11 @@ screens:
   - BO-078
   - BO-080
   - BO-081
+  - BO-137
   boardFrames:
   - FnB Board 5.dc.html#fnb-5h
   - Retail Board 4.dc.html#ret-4f
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4f
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-079
   inFlows:
   - F30 A count is entered, varied and posted
   - F35 Stock arrives short and an oversell is resolved
@@ -2830,12 +2851,13 @@ screens:
   - transferId<-deepLink
   goesTo:
   - BO-001
+  - BO-052
   - BO-078
   - BO-079
   - BO-081
   boardFrames:
   - Retail Board 4.dc.html#ret-4d
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-080
   inFlows:
   - F76 Stock is counted, requested, transferred and received
   - F92 Store stock is watched, replenished and reconciled
@@ -2869,7 +2891,7 @@ screens:
   - BO-080
   boardFrames:
   - Retail Board 4.dc.html#ret-4b
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-081
   inFlows:
   - F76 Stock is counted, requested, transferred and received
   - F92 Store stock is watched, replenished and reconciled
@@ -2899,7 +2921,7 @@ screens:
   - BO-080
   boardFrames:
   - Retail Board 4.dc.html#ret-4g
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4g
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-082
   inFlows:
   - F34 A retail sale, from scan to return
   - F35 Stock arrives short and an oversell is resolved
@@ -2926,12 +2948,13 @@ screens:
   - supplierId<-deepLink
   goesTo:
   - BO-001
+  - BO-007
   - BO-078
   - BO-079
   - BO-080
   boardFrames:
   - Retail Board 2.dc.html#ret-2g
-  wireframe: wireframes/Retail Board 2.dc.html#ret-2g
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-083
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
 - screen: BO-084
@@ -3149,6 +3172,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3181,7 +3205,7 @@ screens:
   - BO-094
   boardFrames:
   - Seat Board 2.dc.html#seat-2e
-  wireframe: wireframes/Seat Board 2.dc.html#seat-2e
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-092
   inFlows:
   - F26 A venue maps its site
 - screen: BO-093
@@ -3207,7 +3231,7 @@ screens:
   - BO-094
   boardFrames:
   - Seat Board 1.dc.html#seat-1a
-  wireframe: wireframes/Seat Board 1.dc.html#seat-1a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-093
   inFlows:
   - F26 A venue maps its site
 - screen: BO-094
@@ -3226,6 +3250,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3236,7 +3261,7 @@ screens:
   - BO-092
   boardFrames:
   - Seat Board 1.dc.html#seat-1b
-  wireframe: wireframes/Seat Board 1.dc.html#seat-1b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-094
   inFlows:
   - F26 A venue maps its site
 - screen: BO-095
@@ -3296,11 +3321,10 @@ screens:
   - authoriseStoredValue
   - checkInResource
   - checkOutResource
-  - releaseStoredValue
+  - relinquishStoredValue
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -3326,7 +3350,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3376,7 +3399,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -3389,6 +3411,9 @@ screens:
   - BO-106
   - BO-107
   - BO-108
+  - BO-364
+  - BO-374
+  - BO-384
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-100
   inFlows: null
@@ -3737,7 +3762,7 @@ screens:
   - BO-102
   boardFrames:
   - FnB Board 2.dc.html#fnb-2b
-  wireframe: wireframes/FnB Board 2.dc.html#fnb-2b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-109
   inFlows: null
 - screen: BO-110
   name: Recipe & BOM Management
@@ -3776,7 +3801,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3789,7 +3813,7 @@ screens:
   - BO-102
   boardFrames:
   - FnB Board 2.dc.html#fnb-2l
-  wireframe: wireframes/FnB Board 2.dc.html#fnb-2l
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-111
   inFlows:
   - F31 A menu is drafted, scheduled and rolled back
   - F93 A recipe changes and its allergen claim is re-verified
@@ -3804,17 +3828,17 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
   entryParams:
   - venueId<-session
   goesTo:
+  - BO-009
   - BO-102
   boardFrames:
   - Retail Board 2.dc.html#ret-2e
-  wireframe: wireframes/Retail Board 2.dc.html#ret-2e
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-112
   inFlows:
   - F78 A supplier is set up and a catalogue is priced and published
 - screen: BO-113
@@ -3829,7 +3853,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3840,7 +3863,7 @@ screens:
   - BO-102
   boardFrames:
   - Retail Board 2.dc.html#ret-2d
-  wireframe: wireframes/Retail Board 2.dc.html#ret-2d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-113
   inFlows: null
 - screen: BO-114
   name: Variants, Attributes, Barcode & RFID Management
@@ -3864,7 +3887,7 @@ screens:
   - BO-102
   boardFrames:
   - Retail Board 4.dc.html#ret-4j
-  wireframe: wireframes/Retail Board 4.dc.html#ret-4j
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-114
   inFlows: null
 - screen: BO-115
   name: Category, Brand & Merchandise Hierarchy
@@ -3890,9 +3913,10 @@ screens:
   - reportId<-deepLink
   goesTo:
   - BO-102
+  - BO-116
   boardFrames:
   - POS Board 4.dc.html#pos-4a
-  wireframe: wireframes/POS Board 4.dc.html#pos-4a
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-115
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
 - screen: BO-116
@@ -3923,9 +3947,10 @@ screens:
   - saleBoardId<-deepLink
   goesTo:
   - BO-102
+  - BO-117
   boardFrames:
   - POS Board 4.dc.html#pos-4b
-  wireframe: wireframes/POS Board 4.dc.html#pos-4b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-116
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
 - screen: BO-117
@@ -3952,9 +3977,10 @@ screens:
   - saleBoardId<-deepLink
   goesTo:
   - BO-102
+  - BO-118
   boardFrames:
   - POS Board 4.dc.html#pos-4c
-  wireframe: wireframes/POS Board 4.dc.html#pos-4c
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-117
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
 - screen: BO-118
@@ -3983,9 +4009,10 @@ screens:
   - saleBoardId<-deepLink
   goesTo:
   - BO-102
+  - BO-126
   boardFrames:
   - POS Board 4.dc.html#pos-4d
-  wireframe: wireframes/POS Board 4.dc.html#pos-4d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-118
   inFlows:
   - F86 A POS layout is designed, previewed and deployed
 - screen: BO-119
@@ -4007,10 +4034,11 @@ screens:
   entryParams:
   - venueId<-session
   goesTo:
+  - BO-010
   - BO-102
   boardFrames:
   - Retail Board 5.dc.html#ret-5d
-  wireframe: wireframes/Retail Board 5.dc.html#ret-5d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-119
   inFlows:
   - F90 An audience is built, offered to, and the result is judged
 - screen: BO-120
@@ -4035,7 +4063,7 @@ screens:
   - BO-102
   boardFrames:
   - Retail Board 5.dc.html#ret-5g
-  wireframe: wireframes/Retail Board 5.dc.html#ret-5g
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-120
   inFlows: null
 - screen: BO-121
   name: Personalized Offers & Guest Engagement
@@ -4059,7 +4087,7 @@ screens:
   - BO-102
   boardFrames:
   - Retail Board 5.dc.html#ret-5f
-  wireframe: wireframes/Retail Board 5.dc.html#ret-5f
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-121
   inFlows: null
 - screen: BO-122
   name: POS Experience Dashboard
@@ -4082,7 +4110,7 @@ screens:
   - BO-102
   boardFrames:
   - Retail Board 5.dc.html#ret-5j
-  wireframe: wireframes/Retail Board 5.dc.html#ret-5j
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-122
   inFlows: null
 - screen: BO-123
   name: POS Profile Management
@@ -4134,9 +4162,10 @@ screens:
   - profileId<-deepLink
   goesTo:
   - BO-102
+  - BO-125
   boardFrames:
   - POS Board 1.dc.html#pos-1d
-  wireframe: wireframes/POS Board 1.dc.html#pos-1d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-124
   inFlows:
   - F79 A workstation is registered, configured and rolled out
   - F95 A fleet is watched, a fault is found, and a station is fixed
@@ -4169,7 +4198,7 @@ screens:
   - BO-102
   boardFrames:
   - POS Board 1.dc.html#pos-1e
-  wireframe: wireframes/POS Board 1.dc.html#pos-1e
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-125
   inFlows:
   - F95 A fleet is watched, a fault is found, and a station is fixed
 - screen: BO-126
@@ -4200,11 +4229,12 @@ screens:
   - reportId<-deepLink
   - rolloutId<-deepLink
   goesTo:
+  - BO-036
   - BO-102
   boardFrames:
   - POS Board 1.dc.html#pos-1f
   - POS Board 4.dc.html#pos-4f
-  wireframe: wireframes/POS Board 1.dc.html#pos-1f
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-126
   inFlows:
   - F79 A workstation is registered, configured and rolled out
   - F86 A POS layout is designed, previewed and deployed
@@ -4255,9 +4285,10 @@ screens:
   - workstationId<-deepLink
   goesTo:
   - BO-108
+  - BO-129
   boardFrames:
   - POS Board 5.dc.html#pos-5b
-  wireframe: wireframes/POS Board 5.dc.html#pos-5b
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-128
   inFlows:
   - F89 Offline policy is set, cached, monitored and reconciled
 - screen: BO-129
@@ -4286,9 +4317,10 @@ screens:
   - workstationId<-deepLink
   goesTo:
   - BO-108
+  - BO-130
   boardFrames:
   - POS Board 5.dc.html#pos-5d
-  wireframe: wireframes/POS Board 5.dc.html#pos-5d
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-129
   inFlows:
   - F89 Offline policy is set, cached, monitored and reconciled
 - screen: BO-130
@@ -4315,7 +4347,7 @@ screens:
   - BO-108
   boardFrames:
   - POS Board 5.dc.html#pos-5e
-  wireframe: wireframes/POS Board 5.dc.html#pos-5e
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-130
   inFlows:
   - F33 A till goes offline and comes back
   - F89 Offline policy is set, cached, monitored and reconciled
@@ -4330,7 +4362,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4392,7 +4423,7 @@ screens:
   - BO-108
   boardFrames:
   - POS Board 5.dc.html#pos-5f
-  wireframe: wireframes/POS Board 5.dc.html#pos-5f
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-133
   inFlows:
   - F33 A till goes offline and comes back
 - screen: BO-134
@@ -4417,7 +4448,7 @@ screens:
   - BO-104
   boardFrames:
   - FnB Board 1.dc.html#fnb-1h
-  wireframe: wireframes/FnB Board 1.dc.html#fnb-1h
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-134
   inFlows: null
 - screen: BO-135
   name: Order Routing & KDS/Printer Rules
@@ -4441,7 +4472,7 @@ screens:
   - BO-104
   boardFrames:
   - FnB Board 1.dc.html#fnb-1j
-  wireframe: wireframes/FnB Board 1.dc.html#fnb-1j
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-135
   inFlows: null
 - screen: BO-136
   name: F&B Global Settings & Controls
@@ -4467,11 +4498,12 @@ screens:
   - planId<-deepLink
   goesTo:
   - BO-104
+  - BO-137
   boardFrames:
   - FnB Board 2.dc.html#fnb-2m
   - FnB Board 2.dc.html#fnb-2n
   - FnB Board 5.dc.html#fnb-5d
-  wireframe: wireframes/FnB Board 2.dc.html#fnb-2m
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-136
   inFlows:
   - F85 Production is planned, costed and released
 - screen: BO-137
@@ -4497,11 +4529,12 @@ screens:
   - countId<-deepLink
   - runId<-deepLink
   goesTo:
+  - BO-008
   - BO-105
   boardFrames:
   - FnB Board 2.dc.html#fnb-2f
   - FnB Board 5.dc.html#fnb-5c
-  wireframe: wireframes/FnB Board 2.dc.html#fnb-2f
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-137
   inFlows:
   - F30 A count is entered, varied and posted
   - F85 Production is planned, costed and released
@@ -4541,7 +4574,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4626,7 +4658,7 @@ screens:
   - BO-102
   boardFrames:
   - Retail Board 1.dc.html#ret-1j
-  wireframe: wireframes/Retail Board 1.dc.html#ret-1j
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-142
   inFlows: null
 - screen: BO-143
   name: Retail Global Settings & Controls
@@ -4650,7 +4682,7 @@ screens:
   - BO-102
   boardFrames:
   - Retail Board 1.dc.html#ret-1k
-  wireframe: wireframes/Retail Board 1.dc.html#ret-1k
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-143
   inFlows: null
 - screen: BO-144
   name: Access Control Command Center
@@ -4681,7 +4713,8 @@ screens:
   - BO-153
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-144
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-145
   name: Venue & Park Access Structure
   module: Access & Venue
@@ -4702,7 +4735,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-145
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-146
   name: Access Area & Zone Builder
   module: Access & Venue
@@ -4723,7 +4757,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-146
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-147
   name: Attraction Access Configuration
   module: Access & Venue
@@ -4744,7 +4779,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-147
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-148
   name: Access Point Directory
   module: Access & Venue
@@ -4756,7 +4792,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4765,7 +4800,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-148
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-149
   name: Gate & Lane Configuration
   module: Access & Venue
@@ -4786,7 +4822,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-149
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-150
   name: Access Control Graphical Map Designer
   module: Access & Venue
@@ -4807,7 +4844,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-150
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-151
   name: Access Location Grouping
   module: Access & Venue
@@ -4828,7 +4866,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-151
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-152
   name: Operating Calendar & Special Access Days
   module: Access & Venue
@@ -4840,7 +4879,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4849,7 +4887,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-152
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-153
   name: Topology Validation & Publication
   module: Access & Venue
@@ -4870,7 +4909,8 @@ screens:
   - BO-144
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-153
-  inFlows: null
+  inFlows:
+  - 'F111 Access Control board 1: Access Control Command Center'
 - screen: BO-154
   name: Access Rule Command Center
   module: Access & Venue
@@ -4900,7 +4940,8 @@ screens:
   - BO-163
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-154
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-155
   name: Visual Access Rule Builder
   module: Access & Venue
@@ -4921,7 +4962,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-155
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-156
   name: Entry, Exit & Re-entry Rules
   module: Access & Venue
@@ -4942,7 +4984,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-156
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-157
   name: Anti-Passback & Journey Sequence
   module: Access & Venue
@@ -4954,7 +4997,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4963,7 +5005,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-157
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-158
   name: Access Validity & Time Rules
   module: Access & Venue
@@ -4975,7 +5018,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4984,7 +5026,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-158
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-159
   name: Entitlement Consumption Engine
   module: Access & Venue
@@ -5005,7 +5048,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-159
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-160
   name: Multi-Park & Crossover Rules
   module: Access & Venue
@@ -5026,7 +5070,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-160
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-161
   name: Guest, Companion & Eligibility Rules
   module: Access & Venue
@@ -5038,7 +5083,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5047,7 +5091,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-161
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-162
   name: Group Admission & Quantity Validation
   module: Access & Venue
@@ -5068,7 +5113,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-162
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-163
   name: Rule Simulation, Conflict Check & Publication
   module: Access & Venue
@@ -5089,7 +5135,8 @@ screens:
   - BO-154
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-163
-  inFlows: null
+  inFlows:
+  - 'F112 Access Control board 2: Access Rule Command Center'
 - screen: BO-164
   name: Digital Credential Security Command Center
   module: Access & Venue
@@ -5119,7 +5166,8 @@ screens:
   - BO-173
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-164
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-165
   name: Dynamic QR Security Profile Builder
   module: Access & Venue
@@ -5131,7 +5179,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5140,7 +5187,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-165
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-166
   name: Credential Activation & Display Rules
   module: Access & Venue
@@ -5161,7 +5209,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-166
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-167
   name: Device Binding & Session Security
   module: Access & Venue
@@ -5182,7 +5231,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-167
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-168
   name: BLE Beacon & Geofence Configuration
   module: Access & Venue
@@ -5194,7 +5244,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5203,7 +5252,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-168
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-169
   name: Credential Transfer & Rebinding
   module: Access & Venue
@@ -5215,7 +5265,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5224,7 +5273,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-169
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-170
   name: Credential Revocation & Lifecycle Events
   module: Access & Venue
@@ -5245,7 +5295,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-170
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-171
   name: Offline Cryptographic Validation Profile
   module: Access & Venue
@@ -5266,7 +5317,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-171
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-172
   name: Embedded Entitlement Payload Designer
   module: Access & Venue
@@ -5287,7 +5339,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-172
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-173
   name: Credential Security Simulation, Audit & Publication
   module: Access & Venue
@@ -5308,7 +5361,8 @@ screens:
   - BO-164
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-173
-  inFlows: null
+  inFlows:
+  - 'F113 Access Control board 3: Digital Credential Security Command Center'
 - screen: BO-174
   name: Media & Credential Command Center
   module: Access & Venue
@@ -5338,7 +5392,8 @@ screens:
   - BO-183
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-174
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-175
   name: Media Type & Technology Library
   module: Access & Venue
@@ -5350,7 +5405,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5359,7 +5413,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-175
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-176
   name: Virtual Credential & Media Association
   module: Access & Venue
@@ -5380,7 +5435,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-176
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-177
   name: Verification Method Selection & Locking
   module: Access & Venue
@@ -5401,7 +5457,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-177
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-178
   name: Media Issuance & Encoding Profile
   module: Access & Venue
@@ -5422,7 +5479,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-178
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-179
   name: Media Swap & Replacement
   module: Access & Venue
@@ -5443,7 +5501,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-179
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-180
   name: RFID & NFC Configuration
   module: Access & Venue
@@ -5455,7 +5514,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5464,7 +5522,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-180
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-181
   name: External & Partner Credential Mapping
   module: Access & Venue
@@ -5476,7 +5535,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5485,7 +5543,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-181
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-182
   name: Hotel, Wallet & External Media Integration
   module: Access & Venue
@@ -5506,7 +5565,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-182
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-183
   name: Media Compatibility, Testing & Publication
   module: Access & Venue
@@ -5527,7 +5587,8 @@ screens:
   - BO-174
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-183
-  inFlows: null
+  inFlows:
+  - 'F114 Access Control board 4: Media & Credential Command Center'
 - screen: BO-184
   name: Biometric Access Command Center
   module: Access & Venue
@@ -5557,7 +5618,8 @@ screens:
   - BO-193
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-184
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-185
   name: Biometric Verification Profile Builder
   module: Access & Venue
@@ -5569,7 +5631,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5578,7 +5639,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-185
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-186
   name: Face Pass Enrollment Configuration
   module: Access & Venue
@@ -5590,7 +5652,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5599,7 +5660,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-186
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-187
   name: Biometric Consent & Guardian Management
   module: Access & Venue
@@ -5611,7 +5673,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5620,7 +5681,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-187
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-188
   name: Face Tag Temporary Enrollment
   module: Access & Venue
@@ -5632,7 +5694,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5641,7 +5702,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-188
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-189
   name: Face Matching & Verification Thresholds
   module: Access & Venue
@@ -5653,7 +5715,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5662,7 +5723,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-189
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-190
   name: Face Change, Re-enrollment & Identity Protection
   module: Access & Venue
@@ -5683,7 +5745,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-190
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-191
   name: Biometric Validation at Gate
   module: Access & Venue
@@ -5704,7 +5767,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-191
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-192
   name: Biometric Lifecycle, Retention & Deletion
   module: Access & Venue
@@ -5716,7 +5780,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5725,7 +5788,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-192
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-193
   name: Biometric Simulation, Audit & Publication
   module: Access & Venue
@@ -5746,7 +5810,8 @@ screens:
   - BO-184
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-193
-  inFlows: null
+  inFlows:
+  - 'F115 Access Control board 5: Biometric Access Command Center'
 - screen: BO-194
   name: Device & Gate Command Center
   module: Access & Venue
@@ -5776,7 +5841,8 @@ screens:
   - BO-203
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-194
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-195
   name: Device Type & Hardware Library
   module: Access & Venue
@@ -5797,7 +5863,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-195
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-196
   name: Physical Device Registration & Provisioning
   module: Access & Venue
@@ -5809,7 +5876,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5818,7 +5884,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-196
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-197
   name: Turnstile & Lane Behavior Configuration
   module: Access & Venue
@@ -5830,7 +5897,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5839,7 +5905,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-197
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-198
   name: Validation Outcome & Guest Feedback Designer
   module: Access & Venue
@@ -5851,7 +5918,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5860,7 +5926,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-198
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-199
   name: Reader, Scanner & Peripheral Configuration
   module: Access & Venue
@@ -5881,7 +5948,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-199
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-200
   name: Handheld & Mobile Access Device Configuration
   module: Access & Venue
@@ -5893,7 +5961,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5902,7 +5969,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-200
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-201
   name: Gate Modes, Free Spin & Emergency Controls
   module: Access & Venue
@@ -5914,7 +5982,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5923,7 +5990,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-201
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-202
   name: Device Software, Content & Remote Configuration
   module: Access & Venue
@@ -5935,7 +6003,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5944,7 +6011,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-202
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-203
   name: Hardware Compatibility, Health, Testing & Deployment
   module: Access & Venue
@@ -5965,7 +6033,8 @@ screens:
   - BO-194
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-203
-  inFlows: null
+  inFlows:
+  - 'F116 Access Control board 6: Device & Gate Command Center'
 - screen: BO-204
   name: Offline & Edge Operations Command Center
   module: Access & Venue
@@ -5995,7 +6064,8 @@ screens:
   - BO-213
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-204
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-205
   name: Edge Node & Local Processing Configuration
   module: Access & Venue
@@ -6007,7 +6077,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6016,7 +6085,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-205
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-206
   name: Offline Validation Policy Builder
   module: Access & Venue
@@ -6037,7 +6107,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-206
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-207
   name: Edge Package & Data Distribution
   module: Access & Venue
@@ -6049,7 +6120,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6058,7 +6128,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-207
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-208
   name: Offline Credential & Revocation Cache
   module: Access & Venue
@@ -6079,7 +6150,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-208
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-209
   name: Offline Entitlement & Usage Ledger
   module: Access & Venue
@@ -6100,7 +6172,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-209
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-210
   name: Connectivity Failure & Degraded Mode Policy
   module: Access & Venue
@@ -6121,7 +6194,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-210
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-211
   name: Reconnection, Synchronization & Conflict Resolution
   module: Access & Venue
@@ -6142,7 +6216,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-211
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-212
   name: Offline Simulation & Resilience Testing
   module: Access & Venue
@@ -6163,7 +6238,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-212
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-213
   name: Edge Security, Audit & Deployment
   module: Access & Venue
@@ -6184,7 +6260,8 @@ screens:
   - BO-204
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-213
-  inFlows: null
+  inFlows:
+  - 'F117 Access Control board 7: Offline & Edge Operations Command Center'
 - screen: BO-214
   name: Guest Journey Command Center
   module: Access & Venue
@@ -6214,7 +6291,8 @@ screens:
   - BO-223
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-214
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-215
   name: Group & B2B Admission Profile Builder
   module: Access & Venue
@@ -6226,7 +6304,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6235,7 +6312,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-215
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-216
   name: Group Leader & Fast B2B Validation
   module: Access & Venue
@@ -6256,7 +6334,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-216
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-217
   name: Group Attendance & Partial Entry Manager
   module: Access & Venue
@@ -6277,7 +6356,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-217
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-218
   name: Family, Child, POD & Companion Journey
   module: Access & Venue
@@ -6289,7 +6369,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6298,7 +6377,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-218
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-219
   name: Re-entry & Temporary Exit Journey
   module: Access & Venue
@@ -6310,7 +6390,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6319,7 +6398,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-219
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-220
   name: Multi-Park & Crossover Journey Orchestrator
   module: Access & Venue
@@ -6340,7 +6420,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-220
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-221
   name: Fast Pass & Attraction Access Journey
   module: Access & Venue
@@ -6352,7 +6433,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6361,7 +6441,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-221
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-222
   name: Special Event, Free View & Alternative Admission
   module: Access & Venue
@@ -6373,7 +6454,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6382,7 +6462,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-222
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-223
   name: Journey Simulation, Audit & Publication
   module: Access & Venue
@@ -6403,7 +6484,8 @@ screens:
   - BO-214
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-223
-  inFlows: null
+  inFlows:
+  - 'F118 Access Control board 8: Guest Journey Command Center'
 - screen: BO-224
   name: Live Access Operations Command Center
   module: Access & Venue
@@ -6433,7 +6515,8 @@ screens:
   - BO-233
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-224
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-225
   name: Podium Operations Console
   module: Access & Venue
@@ -6454,7 +6537,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-225
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-226
   name: Ticket & Credential Investigation Console
   module: Access & Venue
@@ -6475,7 +6559,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-226
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-227
   name: Validation Exception & Reason Code Manager
   module: Access & Venue
@@ -6496,7 +6581,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-227
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-228
   name: Manual Override & Supervisor Approval
   module: Access & Venue
@@ -6508,7 +6594,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6517,7 +6602,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-228
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-229
   name: Credential Disable, Blacklist & Whitelist Operations
   module: Access & Venue
@@ -6538,7 +6624,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-229
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-230
   name: Live Gate Mode & Lane Control
   module: Access & Venue
@@ -6559,7 +6646,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-230
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-231
   name: Queue, Throughput & Lane Optimization
   module: Access & Venue
@@ -6580,7 +6668,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-231
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-232
   name: Operational Incident & Exception Workspace
   module: Access & Venue
@@ -6601,7 +6690,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-232
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-233
   name: Operations Audit, Shift Handover & Control Summary
   module: Access & Venue
@@ -6622,7 +6712,8 @@ screens:
   - BO-224
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-233
-  inFlows: null
+  inFlows:
+  - 'F119 Access Control board 9: Live Access Operations Command Center'
 - screen: BO-234
   name: Dynamic Access Policy Command Center
   module: Access & Venue
@@ -6652,7 +6743,8 @@ screens:
   - BO-243
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-234
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-235
   name: Access Attribute Catalog
   module: Access & Venue
@@ -6673,7 +6765,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-235
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-236
   name: Visual Dynamic Policy Builder
   module: Access & Venue
@@ -6694,7 +6787,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-236
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-237
   name: Context, Time, Event & Capacity Policy Builder
   module: Access & Venue
@@ -6715,7 +6809,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-237
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-238
   name: Identity, Membership & Accreditation Policies
   module: Access & Venue
@@ -6736,7 +6831,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-238
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-239
   name: Policy Scope, Hierarchy & Inheritance
   module: Access & Venue
@@ -6748,7 +6844,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6757,7 +6852,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-239
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-240
   name: Authorization Governance & Temporary Access
   module: Access & Venue
@@ -6778,7 +6874,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-240
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-241
   name: Policy Evaluation Architecture & Offline Distribution
   module: Access & Venue
@@ -6799,7 +6896,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-241
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-242
   name: Policy Simulation, Conflict & Impact Analysis
   module: Access & Venue
@@ -6820,7 +6918,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-242
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-243
   name: Policy Approval, Audit, Analytics & AI Optimization
   module: Access & Venue
@@ -6841,7 +6940,8 @@ screens:
   - BO-234
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-243
-  inFlows: null
+  inFlows:
+  - 'F120 Access Control board 10: Dynamic Access Policy Command Center'
 - screen: BO-244
   name: Access Security & Fraud Command Center
   module: Access & Venue
@@ -6871,7 +6971,8 @@ screens:
   - BO-253
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-244
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-245
   name: Fraud Detection Rule & Signal Library
   module: Access & Venue
@@ -6892,7 +6993,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-245
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-246
   name: Credential Sharing & Concurrent Usage Detection
   module: Access & Venue
@@ -6913,7 +7015,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-246
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-247
   name: Unified Identity & Credential Lock Manager
   module: Access & Venue
@@ -6934,7 +7037,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-247
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-248
   name: Biometric & Identity Integrity Monitoring
   module: Access & Venue
@@ -6955,7 +7059,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-248
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-249
   name: Relationship & Companion Fraud Monitoring
   module: Access & Venue
@@ -6967,7 +7072,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6976,7 +7080,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-249
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-250
   name: Access Risk Scoring & Decision Engine
   module: Access & Venue
@@ -6997,7 +7102,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-250
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-251
   name: Real-Time Security Response & Playbook Builder
   module: Access & Venue
@@ -7018,7 +7124,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-251
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-252
   name: Security Investigation & Evidence Workspace
   module: Access & Venue
@@ -7039,7 +7146,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-252
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-253
   name: Security Analytics, AI Detection & Governance
   module: Access & Venue
@@ -7060,7 +7168,8 @@ screens:
   - BO-244
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-253
-  inFlows: null
+  inFlows:
+  - 'F121 Access Control board 11: Access Security & Fraud Command Center'
 - screen: BO-254
   name: Access Monitoring & Analytics Command Center
   module: Access & Venue
@@ -7090,7 +7199,8 @@ screens:
   - BO-263
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-254
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-255
   name: Live Venue Occupancy & People Counting
   module: Access & Venue
@@ -7111,7 +7221,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-255
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-256
   name: Graphical Access Map & Live Gate Performance
   module: Access & Venue
@@ -7132,7 +7243,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-256
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-257
   name: Attendance & Admission Analytics
   module: Access & Venue
@@ -7153,7 +7265,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-257
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-258
   name: Entry, Exit, Re-entry & Crossover Analytics
   module: Access & Venue
@@ -7174,7 +7287,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-258
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-259
   name: Throughput, Queue & Validation Performance Analytics
   module: Access & Venue
@@ -7195,7 +7309,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-259
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-260
   name: Validation Outcome & Rejection Analytics
   module: Access & Venue
@@ -7216,7 +7331,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-260
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-261
   name: Guest Dwell Time, Length of Stay & Attraction Flow
   module: Access & Venue
@@ -7237,7 +7353,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-261
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-262
   name: Access Reports, Scheduled Reporting & Data Export
   module: Access & Venue
@@ -7258,7 +7375,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-262
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-263
   name: AI Access Intelligence, Forecasting & Executive Insights
   module: Access & Venue
@@ -7279,7 +7397,8 @@ screens:
   - BO-254
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-263
-  inFlows: null
+  inFlows:
+  - 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
 - screen: BO-264
   name: Group Sales Command Center
   module: Sell
@@ -7309,7 +7428,8 @@ screens:
   - BO-273
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-264
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-265
   name: Group Enquiry & Opportunity Capture
   module: Sell
@@ -7321,7 +7441,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7330,7 +7449,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-265
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-266
   name: Group Customer & Organization Profile
   module: Sell
@@ -7351,7 +7471,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-266
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-267
   name: Group Requirements, Availability & Capacity Planner
   module: Sell
@@ -7372,7 +7493,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-267
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-268
   name: Group Package & Experience Builder
   module: Sell
@@ -7393,7 +7515,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-268
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-269
   name: Group Quotation Builder & Proposal Generation
   module: Sell
@@ -7405,7 +7528,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7414,7 +7536,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-269
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-270
   name: Quote Revision, Negotiation & Version Management
   module: Sell
@@ -7426,7 +7549,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7435,7 +7557,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-270
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-271
   name: Group Discount, Exception & Approval Workflow
   module: Sell
@@ -7456,7 +7579,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-271
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-272
   name: Quote-to-Booking Conversion & Confirmation
   module: Sell
@@ -7477,7 +7601,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-272
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-273
   name: Group Booking 360° & Handover Workspace
   module: Sell
@@ -7498,7 +7623,8 @@ screens:
   - BO-264
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-273
-  inFlows: null
+  inFlows:
+  - 'F136 Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
 - screen: BO-274
   name: Group Booking Operations Command Center
   module: Sell
@@ -7528,7 +7654,8 @@ screens:
   - BO-283
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-274
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-275
   name: Group Operational Planning & Task Workspace
   module: Sell
@@ -7540,7 +7667,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7549,7 +7675,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-275
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-276
   name: Participants, Guest Lists & Group Structure
   module: Sell
@@ -7570,7 +7697,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-276
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-277
   name: Group Payment, Deposit & Balance Management
   module: Sell
@@ -7591,7 +7719,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-277
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-278
   name: Group Ticket, Seat & Entitlement Allocation
   module: Sell
@@ -7612,7 +7741,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-278
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-279
   name: Group Ticket Fulfillment & Distribution
   module: Sell
@@ -7633,7 +7763,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-279
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-280
   name: Group Arrival, Check-In & Admission Operations
   module: Sell
@@ -7654,7 +7785,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-280
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-281
   name: Group Amendments, Cancellation & Refund Operations
   module: Sell
@@ -7675,7 +7807,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-281
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-282
   name: Group Booking Reconciliation, Closure & Performance
   module: Sell
@@ -7696,7 +7829,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-282
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-283
   name: Group Sales Analytics & AI Intelligence Center
   module: Sell
@@ -7717,7 +7851,8 @@ screens:
   - BO-274
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-283
-  inFlows: null
+  inFlows:
+  - 'F137 Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
 - screen: BO-284
   name: Membership & Annual Pass Command Center
   module: Sell
@@ -7747,7 +7882,8 @@ screens:
   - BO-293
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-284
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-285
   name: Membership Product & Tier Builder
   module: Sell
@@ -7759,7 +7895,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7768,7 +7903,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-285
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-286
   name: Membership Eligibility & Qualification Rule Builder
   module: Sell
@@ -7780,7 +7916,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7789,7 +7924,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-286
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-287
   name: Validity, Activation & Expiry Configuration
   module: Sell
@@ -7810,7 +7946,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-287
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-288
   name: Membership Entitlement & Admission Benefit Builder
   module: Sell
@@ -7822,7 +7959,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7831,7 +7967,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-288
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-289
   name: Membership Usage, Visit & Consumption Rules
   module: Sell
@@ -7852,7 +7989,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-289
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-290
   name: Family, Household & Dependent Membership Configuration
   module: Sell
@@ -7864,7 +8002,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7873,7 +8010,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-290
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-291
   name: Membership Commercial, Pricing & Channel Association
   module: Sell
@@ -7885,7 +8023,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7894,7 +8031,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-291
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-292
   name: Renewal, Auto-Renewal & Membership Continuity Configuration
   module: Sell
@@ -7906,7 +8044,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7915,7 +8052,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-292
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-293
   name: Membership Product Validation, Approval, Publication & Versioning
   module: Sell
@@ -7927,7 +8065,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7936,7 +8073,8 @@ screens:
   - BO-284
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-293
-  inFlows: null
+  inFlows:
+  - 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
 - screen: BO-294
   name: Member Operations Command Center
   module: Sell
@@ -7966,7 +8104,8 @@ screens:
   - BO-303
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-294
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-295
   name: Member 360° Membership Account Workspace
   module: Sell
@@ -7987,7 +8126,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-295
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-296
   name: Membership Activation, Assignment & Credential Management
   module: Sell
@@ -8008,7 +8148,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-296
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-297
   name: Visit, Admission & Entitlement Usage Monitor
   module: Sell
@@ -8029,7 +8170,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-297
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-298
   name: Membership Freeze, Suspension & Reactivation Management
   module: Sell
@@ -8041,7 +8183,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8050,7 +8191,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-298
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-299
   name: Membership Upgrade, Downgrade & Product Migration Operations
   module: Sell
@@ -8071,7 +8213,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-299
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-300
   name: Renewal Operations & Auto-Renewal Management
   module: Sell
@@ -8092,7 +8235,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-300
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-301
   name: Member Exceptions, Overrides & Service Recovery
   module: Sell
@@ -8113,7 +8257,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-301
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-302
   name: Member Lifecycle History, Audit & Case Timeline
   module: Sell
@@ -8134,7 +8279,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-302
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-303
   name: Membership Analytics, Renewal Intelligence & AI Retention Center
   module: Sell
@@ -8155,7 +8301,8 @@ screens:
   - BO-294
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-303
-  inFlows: null
+  inFlows:
+  - 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - screen: BO-304
   name: Order & Reservation Command Center
   module: Orders & Money
@@ -8185,7 +8332,8 @@ screens:
   - BO-313
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-304
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-305
   name: Order Detail & Transaction Workspace
   module: Orders & Money
@@ -8206,7 +8354,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-305
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-306
   name: Reservation & Hold Policy Configuration
   module: Orders & Money
@@ -8218,7 +8367,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8227,7 +8375,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-306
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-307
   name: Order & Reservation Status Lifecycle Configuration
   module: Orders & Money
@@ -8239,7 +8388,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8248,7 +8396,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-307
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-308
   name: Order Creation & Source/Channel Configuration
   module: Orders & Money
@@ -8260,7 +8409,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8269,7 +8417,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-308
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-309
   name: Customer, Guest & Account Assignment
   module: Orders & Money
@@ -8281,7 +8430,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8290,7 +8438,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-309
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-310
   name: Order Line, Product & Entitlement Composition
   module: Orders & Money
@@ -8302,7 +8451,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8311,7 +8459,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-310
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-311
   name: Capacity Reservation & Inventory Commitment
   module: Orders & Money
@@ -8332,7 +8481,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-311
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-312
   name: Reservation Confirmation, Expiry & Fulfillment Readiness
   module: Orders & Money
@@ -8344,7 +8494,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8353,7 +8502,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-312
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-313
   name: Order Lifecycle Timeline, SLA, Exceptions & AI Operations
   module: Orders & Money
@@ -8374,7 +8524,8 @@ screens:
   - BO-304
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-313
-  inFlows: null
+  inFlows:
+  - 'F140 Order   Reservation Management board 1: Order & Reservation Command Center'
 - screen: BO-314
   name: Amendment & After-Sales Command Center
   module: Orders & Money
@@ -8404,7 +8555,8 @@ screens:
   - BO-323
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-314
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-315
   name: Order Amendment Workspace
   module: Orders & Money
@@ -8425,7 +8577,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-315
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-316
   name: Amendment Eligibility & Policy Rule Builder
   module: Orders & Money
@@ -8437,7 +8590,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8446,7 +8598,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-316
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-317
   name: Cancellation & Partial Cancellation Policy Configuration
   module: Orders & Money
@@ -8467,7 +8620,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-317
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-318
   name: Refund Policy & Refund Calculation Configuration
   module: Orders & Money
@@ -8479,7 +8633,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8489,7 +8642,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-318
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-319
   name: Void, Reversal & Same-Day Correction Management
   module: Orders & Money
@@ -8501,7 +8655,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8510,7 +8663,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-319
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-320
   name: Ticket Reissue & Fulfillment Regeneration
   module: Orders & Money
@@ -8522,7 +8676,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8531,7 +8684,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-320
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-321
   name: After-Sales Financial Settlement & Adjustment Workspace
   module: Orders & Money
@@ -8552,7 +8706,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-321
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-322
   name: Approval, Exception & Service Recovery Management
   module: Orders & Money
@@ -8564,7 +8719,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8573,7 +8727,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-322
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-323
   name: Amendment History, Audit & After-Sales Analytics
   module: Orders & Money
@@ -8594,7 +8749,8 @@ screens:
   - BO-314
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-323
-  inFlows: null
+  inFlows:
+  - 'F141 Order   Reservation Management board 2: Amendment & After-Sales Command Center'
 - screen: BO-324
   name: Payment & Order Financial Command Center
   module: Orders & Money
@@ -8624,7 +8780,8 @@ screens:
   - BO-333
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-324
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-325
   name: Order Payment Detail & Transaction Ledger
   module: Orders & Money
@@ -8645,7 +8802,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-325
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-326
   name: Multi-Payment, Split Tender & Payment Allocation Configuration
   module: Orders & Money
@@ -8657,7 +8815,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8666,7 +8823,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-326
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-327
   name: Deposit, Partial Payment & Outstanding Balance Management
   module: Orders & Money
@@ -8687,7 +8845,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-327
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-328
   name: Order Split, Merge & Transaction Relationship Management
   module: Orders & Money
@@ -8708,7 +8867,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-328
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-329
   name: Related Order & Transaction Relationship Explorer
   module: Orders & Money
@@ -8729,7 +8889,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-329
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-330
   name: External Payment, Partner & Settlement Reference Mapping
   module: Orders & Money
@@ -8741,7 +8902,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8750,7 +8910,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-330
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-331
   name: Payment Reconciliation & Exception Management
   module: Orders & Money
@@ -8771,7 +8932,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-331
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-332
   name: Financial Traceability, Control & Audit Explorer
   module: Orders & Money
@@ -8783,7 +8945,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8792,7 +8953,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-332
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-333
   name: Order Financial Analytics & AI Reconciliation Intelligence
   module: Orders & Money
@@ -8813,7 +8975,8 @@ screens:
   - BO-324
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-333
-  inFlows: null
+  inFlows:
+  - 'F142 Order   Reservation Management board 3: Payment & Order Financial Command Center'
 - screen: BO-334
   name: Virtual Ticket Command Center
   module: Access & Venue
@@ -8843,7 +9006,8 @@ screens:
   - BO-343
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-334
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-335
   name: Virtual Ticket Identity & Master Record Configuration
   module: Access & Venue
@@ -8855,7 +9019,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8864,7 +9027,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-335
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-336
   name: Virtual Ticket Status & Lifecycle Model
   module: Access & Venue
@@ -8885,7 +9049,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-336
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-337
   name: Media Type & Credential Technology Registry
   module: Access & Venue
@@ -8897,7 +9062,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8906,7 +9070,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-337
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-338
   name: Multi-Media Binding & Association Rules
   module: Access & Venue
@@ -8918,7 +9083,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8927,7 +9091,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-338
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-339
   name: Credential Identity, Token & Reference Mapping
   module: Access & Venue
@@ -8948,7 +9113,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-339
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-340
   name: Entitlement & Cross-Media Synchronization Rules
   module: Access & Venue
@@ -8969,7 +9135,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-340
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-341
   name: Media Activation, Priority & Fallback Rules
   module: Access & Venue
@@ -8981,7 +9148,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -8990,7 +9156,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-341
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-342
   name: Media Replacement, Revocation & Rebinding Rules
   module: Access & Venue
@@ -9002,7 +9169,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9011,7 +9177,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-342
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-343
   name: Virtual Ticket Architecture Testing, Governance & Audit
   module: Access & Venue
@@ -9023,7 +9190,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9032,7 +9198,8 @@ screens:
   - BO-334
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-343
-  inFlows: null
+  inFlows:
+  - 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
 - screen: BO-344
   name: Media Design Studio Command Center
   module: Access & Venue
@@ -9062,7 +9229,8 @@ screens:
   - BO-353
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-344
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-345
   name: Digital QR & Barcode Ticket Designer
   module: Access & Venue
@@ -9074,7 +9242,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9083,7 +9250,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-345
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-346
   name: PDF, Printable & POS Ticket Designer
   module: Access & Venue
@@ -9095,7 +9263,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9104,7 +9271,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-346
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-347
   name: Apple Wallet Pass Designer
   module: Access & Venue
@@ -9116,7 +9284,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9125,7 +9292,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-347
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-348
   name: Google Wallet Pass Designer
   module: Access & Venue
@@ -9137,7 +9305,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9146,7 +9313,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-348
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-349
   name: RFID, NFC, Card & Wristband Media Designer
   module: Access & Venue
@@ -9158,7 +9326,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9167,7 +9334,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-349
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-350
   name: Digital Card, Membership & Wearable Designer
   module: Access & Venue
@@ -9179,7 +9347,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9188,7 +9355,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-350
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-351
   name: Dynamic Fields, Data Mapping & Content Builder
   module: Access & Venue
@@ -9200,7 +9368,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9209,7 +9376,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-351
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-352
   name: Branding, Localization & Template Inheritance
   module: Access & Venue
@@ -9230,7 +9398,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-352
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-353
   name: Multi-Media Preview, Testing, Approval & Publication
   module: Access & Venue
@@ -9251,7 +9420,8 @@ screens:
   - BO-344
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-353
-  inFlows: null
+  inFlows:
+  - 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
 - screen: BO-354
   name: Credential Operations Command Center
   module: Access & Venue
@@ -9281,7 +9451,8 @@ screens:
   - BO-363
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-354
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-355
   name: Virtual Ticket & Credential 360° Workspace
   module: Access & Venue
@@ -9302,7 +9473,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-355
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-356
   name: Credential Generation & Issuance Monitor
   module: Access & Venue
@@ -9323,7 +9495,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-356
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-357
   name: Credential Delivery & Distribution Operations
   module: Access & Venue
@@ -9344,7 +9517,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-357
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-358
   name: Media Binding, Activation & Assignment Operations
   module: Access & Venue
@@ -9365,7 +9539,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-358
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-359
   name: Credential Replacement, Reissue, Revocation & Recovery
   module: Access & Venue
@@ -9377,7 +9552,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9386,7 +9560,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-359
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-360
   name: Failed Generation, Delivery & Credential Exception Management
   module: Access & Venue
@@ -9407,7 +9582,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-360
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-361
   name: Credential Usage & Cross-Media Traceability
   module: Access & Venue
@@ -9419,7 +9595,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -9428,7 +9603,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-361
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-362
   name: Credential Security, Audit & Operational Evidence
   module: Access & Venue
@@ -9449,7 +9625,8 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-362
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - screen: BO-363
   name: Ticket Media Analytics & AI Operations Intelligence
   module: Access & Venue
@@ -9470,4 +9647,659 @@ screens:
   - BO-354
   boardFrames: null
   wireframe: wireframes/P08 Venue Management.dc.html#bo-363
-  inFlows: null
+  inFlows:
+  - 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
+- screen: BO-364
+  name: Approval Command Center Dashboard
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-365
+  - BO-366
+  - BO-367
+  - BO-368
+  - BO-369
+  - BO-370
+  - BO-371
+  - BO-372
+  - BO-373
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-364
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-365
+  name: My Approval Inbox
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-365
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-366
+  name: Team / Shared Approval Queue
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-366
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-367
+  name: Approval Request Detail
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-367
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-368
+  name: AI Decision Support
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-368
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-369
+  name: High Priority & Risk Queue
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-369
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-370
+  name: Escalated Approval Center
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-370
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-371
+  name: Completed Approval History
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-371
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-372
+  name: Approval SLA & Workload Monitor
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-372
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-373
+  name: Approval Activity & Notification Center
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-364
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-373
+  inFlows:
+  - 'F123 Approval Workflows and Governance board 1: Approval Command Center Dashboard'
+- screen: BO-374
+  name: Approval Decision Workspace
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-375
+  - BO-376
+  - BO-377
+  - BO-378
+  - BO-379
+  - BO-380
+  - BO-381
+  - BO-382
+  - BO-383
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-374
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-375
+  name: Business Context & Evidence Viewer
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-375
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-376
+  name: Approval Timeline & Decision Chain
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-376
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-377
+  name: Approve & Sensitive Action Confirmation
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-377
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-378
+  name: Reject / Return / Request Information
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-378
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-379
+  name: Requester Modification & Resubmission
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-379
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-380
+  name: Withdrawal, Cancellation, Expiration & Reopening
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-380
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-381
+  name: Segregation of Duties & Four-Eyes Control
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-381
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-382
+  name: Approved Action Execution & Status
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-382
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-383
+  name: Decision Record & Immutable Audit View
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-374
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-383
+  inFlows:
+  - 'F126 Approval Workflows and Governance board 4: Approval Decision Workspace'
+- screen: BO-384
+  name: Delegation & Escalation Command Center
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-100
+  - BO-385
+  - BO-386
+  - BO-387
+  - BO-388
+  - BO-389
+  - BO-390
+  - BO-391
+  - BO-392
+  - BO-393
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-384
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-385
+  name: Delegation Management
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-385
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-386
+  name: Temporary Delegation & Availability Calendar
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-386
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-387
+  name: Out-of-Office & Substitute Routing
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-387
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-388
+  name: Approval SLA Policy Configuration
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-388
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-389
+  name: Reminder & Breach Notification Rules
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-389
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-390
+  name: Escalation Policy Builder
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-390
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-391
+  name: Live Escalation Operations Center
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-391
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-392
+  name: SLA & Escalation Performance Analytics
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-392
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'
+- screen: BO-393
+  name: AI SLA & Escalation Advisor
+  module: Venue Operations
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - BO-384
+  boardFrames: null
+  wireframe: wireframes/P08 Venue Management.dc.html#bo-393
+  inFlows:
+  - 'F127 Approval Workflows and Governance board 5: Delegation & Escalation Command Center'

@@ -1,0 +1,124 @@
+id: F124
+name: 'Approval Workflows and Governance board 2: Approval Workflow Library'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 2. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-319
+  entryPoints:
+  - Arrives at Approval Workflow Library
+steps:
+- step: 1
+  screen: ADM-319
+  action: Opens Approval Workflow Library
+  operations: []
+  outcome: Provide a centralized directory of every approval workflow configured within the tenant.
+- step: 2
+  screen: ADM-320
+  action: Works in Create Approval Workflow
+  operations: []
+  outcome: Provide a guided setup wizard for creating a new approval workflow. Step 1 — Basic Information
+- step: 3
+  screen: ADM-319
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-322
+  action: Works in Approval Stage Configuration
+  operations: []
+  outcome: Configure each approval stage in detail. When the administrator clicks an Approval Node in
+    Screen 3, this screen/panel opens.
+- step: 5
+  screen: ADM-319
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-323
+  action: Works in Condition & Decision Rule Builder
+  operations: []
+  outcome: Allow administrators to determine when a particular approval path should apply. The rule builder
+    should use business-friendly configuration rather than programming.
+- step: 7
+  screen: ADM-319
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-324
+  action: Works in Approval Sequence & Parallel Routing
+  operations: []
+  outcome: Configure complex multi-level approval structures.
+- step: 9
+  screen: ADM-319
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-325
+  action: Works in Workflow Outcome & Action Configuration
+  operations: []
+  outcome: Define what TICVAI should actually do after the approval process reaches an outcome. This is
+    important because approval and execution should be separated.
+- step: 11
+  screen: ADM-319
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-326
+  action: Works in Workflow Validation & Simulation
+  operations: []
+  outcome: Allow administrators to test workflows before putting them into production. This is something
+    I strongly recommend adding to the UX because these workflows can directly affect money, access and
+    customer operations.
+- step: 13
+  screen: ADM-319
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-327
+  action: Works in Workflow Publication & Lifecycle
+  operations: []
+  outcome: Govern the transition of workflow configurations into production.
+- step: 15
+  screen: ADM-319
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-328
+  action: Works in Workflow Versioning & Change History
+  operations: []
+  outcome: Maintain complete governance over changes made to approval workflows. The matrix specifically
+    requires Approval Workflow Versioning.
+branches:
+- at: 1
+  condition: Nothing has been set up on Approval Workflow Library yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

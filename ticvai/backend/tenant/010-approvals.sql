@@ -1,8 +1,11 @@
--- approvals — 7 tables
+-- approvals — 8 tables
 -- **Derived. Do not hand-edit.**
 
--- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is
+-- The badge an approved accreditation actually issues, held apart from the request that granted
+-- it. zones is the access it carries and state walks issued, expired and revoked — a badge
+-- outlives the decision behind it, which is why revoking one is a row here and not an edit to
+-- approvals.request. revoked_reason is required in practice for the same reason an empty state is:
+-- a badge that stops working w
 CREATE TABLE IF NOT EXISTS approvals.accreditation_badge (
     id                                uuid PRIMARY KEY NOT NULL,
     approval_request_id               uuid,
@@ -122,5 +125,16 @@ CREATE TABLE IF NOT EXISTS approvals.rule (
     escalate_to_role_ids              text[],
     expires_after_minutes             integer,
     matrix_id                         uuid NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS approvals.step_up_policy (
+    id                                uuid PRIMARY KEY NOT NULL,
+    operation_id                      text NOT NULL,
+    required                          text NOT NULL,
+    contract_floor                    text,
+    scope_level                       text,
+    reason                            text,
+    set_by                            uuid,
+    set_at                            timestamptz
 );
 

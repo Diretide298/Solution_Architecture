@@ -47,7 +47,7 @@
 | P01, P02 | WEB-046 In-Venue Notifications<br>GST-030 In-Venue Notifications | `claimLocationSession` |
 | P02, P05 | GST-002 Explore Categories<br>KSK-003 What are you buying | `listProducts` |
 | P06, P07 | EMP-017 Sync & reconciliation<br>SCN-014 Sync & reconciliation | `getOfflinePackage`, `listScans`, `listSyncRejections`, `lookupTicket`, `overrideAccess`, `syncOrders` +3 |
-| P06, P08 | EMP-033 Capacity view<br>BO-017 Capacity Management | `createChannelCapacity`, `getChannelAllocations`, `listChannelCapacities`, `releaseChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity` |
+| P06, P08 | EMP-033 Capacity view<br>BO-017 Capacity Management | `createChannelCapacity`, `getChannelAllocations`, `listChannelCapacities`, `relinquishChannelAllocation`, `setChannelAllocations`, `updateChannelCapacity` |
 | P06, P08 | EMP-024 Clock in / out<br>BO-056 Time & Attendance | `amendAttendance`, `listAttendance`, `recordAttendance` |
 | P06, P08 | EMP-026 Incident report<br>BO-072 Incident Log | `getIncident`, `listIncidents`, `recordAuthorityNotification`, `reportIncident`, `updateIncident` |
 | P06, P08 | EMP-069 Barcode, RFID, Serialized Stock & Traceability<br>BO-114 Variants, Attributes, Barcode & RFID Management | `listSerialisedItems`, `lookupMerchandise` |
@@ -71,7 +71,7 @@
 | P08, P10 | BO-025 Chargebacks & Disputes<br>PTR-014 Settlement & Payment History | `getSettlement`, `ingestSettlementFile`, `listSettlementExceptions`, `listSettlements`, `resolveSettlementException` |
 | P08, P09 | BO-054 Role Assignment<br>ADM-021 Platform Role Management | `createRole`, `listRoles` |
 | P09, P12 | ADM-001 Platform Login / MFA<br>SUP-001 Agent Login | `forceLogout`, `getCurrentSession`, `getGuestSession`, `listActiveSessions`, `listMfaMethods`, `listSsoProviders` +2 |
-| P09, P13 | ADM-017 Domain & Certificate Management<br>CMS-017 Domain & Certificate | `claimCustomDomain`, `listCustomDomains`, `releaseCustomDomain`, `verifyCustomDomain` |
+| P09, P13 | ADM-017 Domain & Certificate Management<br>CMS-017 Domain & Certificate | `claimCustomDomain`, `listCustomDomains`, `relinquishCustomDomain`, `verifyCustomDomain` |
 
 ### a pair - one step and its next
 

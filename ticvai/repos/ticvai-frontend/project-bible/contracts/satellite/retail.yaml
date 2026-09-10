@@ -112,6 +112,7 @@ paths:
     post:
       operationId: transferWalletBalance
       x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
       summary: Send balance to another guest
       description: >
@@ -575,6 +576,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
         - "P01 WEB-042 Retail & Shop and Drop"
+        - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-023 Sell — Merchandise"
         - "P05 KSK-017 Shop"
@@ -777,6 +779,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-005 Payment"
         - "P04 POS-007 Close Shift"
+        - "P04 POS-026 Receipt & Reprint"
       x-ticvai-audience: [staff]
       summary: Reprint or resend a receipt
       tags: [sale]
@@ -1181,6 +1184,7 @@ paths:
       operationId: getGiftCard
       x-ticvai-consumed-by:
         - "P01 WEB-021 Wallet & Gift Cards"
+        - "P02 GST-071 Payment Methods"
       x-ticvai-audience: [staff, guest]
       x-ticvai-read-routing: primary   # bearer instrument. Stale balance is double-spend
       summary: Check a gift card balance
@@ -1446,6 +1450,7 @@ paths:
       x-ticvai-consumed-by:
         - "P01 WEB-033 Shop"
         - "P01 WEB-042 Retail & Shop and Drop"
+        - "P02 GST-026 Retail / Merchandise"
         - "P04 POS-012 Omnichannel Order & Fulfilment Center"
         - "P05 KSK-017 Shop"
         - "P06 EMP-068 Reservation, Allocation & Omnichannel Inventory"

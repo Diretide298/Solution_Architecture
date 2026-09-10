@@ -1,0 +1,149 @@
+id: F161
+name: 'Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 8. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-208
+  entryPoints:
+  - Arrives at Stacking & Conflict Command Center
+steps:
+- step: 1
+  screen: ADM-208
+  action: Opens Stacking & Conflict Command Center
+  operations:
+  - listStackingConflict
+  outcome: Provide centralized operational visibility into promotion interactions across TICVAI.
+- step: 2
+  screen: ADM-209
+  action: Works in Promotion Priority & Hierarchy Manager
+  operations:
+  - listPromotionPriorityHierarchy
+  outcome: Define the relative priority of different promotion families and individual offers.
+- step: 3
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-210
+  action: Works in Promotion Stacking Rule Builder
+  operations:
+  - setPromotionStackingRule
+  outcome: Define which promotions can be combined.
+- step: 5
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-211
+  action: Works in Promotion Exclusion & Compatibility Matrix
+  operations:
+  - listPromotionExclusionCompatibility
+  outcome: Provide administrators with a visual matrix showing which promotion categories can interact.
+- step: 7
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-212
+  action: Works in Discount Calculation & Application Sequence
+  operations:
+  - listDiscountCalculationApplication
+  outcome: Control the mathematical order in which multiple permitted benefits are calculated.
+- step: 9
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-213
+  action: Works in Best Offer & Customer Benefit Resolver
+  operations:
+  - listBestOfferCustomer
+  outcome: Determine which promotion or combination gives the guest the correct/best permitted commercial
+    outcome.
+- step: 11
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-214
+  action: Works in Discount Cap & Maximum Benefit Controller
+  operations:
+  - listDiscountCapMaximum
+  outcome: Prevent stacked promotions from exceeding financial or contractual limits.
+- step: 13
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-215
+  action: Works in Conflict Detection & Resolution Center
+  operations:
+  - listConflictDetectionResolution
+  outcome: Detect promotion conflicts during both configuration and runtime.
+- step: 15
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-216
+  action: Works in Promotion Decision Trace & Transaction Explainer
+  operations:
+  - listPromotionDecisionTrace
+  outcome: 'Provide complete explainability of how TICVAI arrived at the final promotional price. This
+    screen will be extremely important for: Customer service Finance Operations Audit Partner disputes
+    Technical support'
+- step: 17
+  screen: ADM-208
+  action: Returns to the board's landing screen
+  operations:
+  - listStackingConflict
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-217
+  action: Works in Conflict Simulation & AI Optimization
+  operations:
+  - listConflict
+  outcome: Test promotion interaction scenarios before publishing campaigns.
+branches:
+- at: 1
+  condition: Nothing has been set up on Stacking & Conflict Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 8 visited
+primaryContract: promotions
+contracts:
+- promotions

@@ -16,95 +16,95 @@ _note: '**The issue log for screen ids, and the reason it exists.** On 4 Septemb
   `tools/check-screens.py` fails on a screen issued above the recorded high-water mark. Regenerate with
   `tools/derive-id-register.py --apply` and commit it in the same change.'
 generatedBy: tools/derive-id-register.py
-updated: '2026-09-08'
+updated: '2026-09-10'
 prefixes:
   ACC:
     issued: 8
     highWaterMark: 8
     nextFree: 9
     authored: 1-8
-    generatedPack: null
+    fromClientPack: null
   ADM:
-    issued: 318
-    highWaterMark: 318
-    nextFree: 319
+    issued: 367
+    highWaterMark: 368
+    nextFree: 369
     authored: 1-318
-    generatedPack: 38-317
+    fromClientPack: 38-368
   ANL:
-    issued: 10
-    highWaterMark: 10
-    nextFree: 11
+    issued: 69
+    highWaterMark: 70
+    nextFree: 71
     authored: 1-10
-    generatedPack: null
+    fromClientPack: 12-70
   BO:
-    issued: 363
-    highWaterMark: 363
-    nextFree: 364
+    issued: 393
+    highWaterMark: 393
+    nextFree: 394
     authored: 1-143
-    generatedPack: 144-363
+    fromClientPack: 144-393
   CMS:
     issued: 60
     highWaterMark: 60
     nextFree: 61
     authored: 1-20
-    generatedPack: 21-60
+    fromClientPack: 21-60
   DEV:
     issued: 8
     highWaterMark: 8
     nextFree: 9
     authored: 1-8
-    generatedPack: null
+    fromClientPack: null
   EMP:
     issued: 66
     highWaterMark: 70
     nextFree: 71
     authored: 1-70
-    generatedPack: null
+    fromClientPack: null
   GST:
     issued: 71
     highWaterMark: 73
     nextFree: 74
     authored: 1-73
-    generatedPack: null
+    fromClientPack: null
   KIT:
     issued: 10
     highWaterMark: 10
     nextFree: 11
     authored: 1-10
-    generatedPack: null
+    fromClientPack: null
   KSK:
     issued: 17
     highWaterMark: 17
     nextFree: 18
     authored: 1-17
-    generatedPack: null
+    fromClientPack: null
   POS:
-    issued: 24
-    highWaterMark: 24
-    nextFree: 25
-    authored: 1-24
-    generatedPack: null
+    issued: 30
+    highWaterMark: 29
+    nextFree: 30
+    authored: 0-29
+    fromClientPack: null
   PTR:
     issued: 51
     highWaterMark: 51
     nextFree: 52
     authored: 1-21
-    generatedPack: 22-51
+    fromClientPack: 22-51
   SCN:
     issued: 11
     highWaterMark: 16
     nextFree: 17
     authored: 1-16
-    generatedPack: null
+    fromClientPack: null
   SUP:
     issued: 28
     highWaterMark: 28
     nextFree: 29
     authored: 1-8
-    generatedPack: 9-28
+    fromClientPack: 9-28
   WEB:
     issued: 46
     highWaterMark: 46
     nextFree: 47
     authored: 1-46
-    generatedPack: null
+    fromClientPack: null

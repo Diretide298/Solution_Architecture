@@ -50,8 +50,11 @@ ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "sources" / "workshop"
 OUT = SRC / "pack.json"
 
-EXPECTED_SCREENS = 590
-EXPECTED_BOARDS = 59
+# 17 documents and 590 screens on 3 September; `Approval Workflows & Governance`
+# (8 boards) and `Unified BI Reporting & AI Analytics` (10 boards) arrived on
+# 9 September in the OneDrive export.
+EXPECTED_SCREENS = 770
+EXPECTED_BOARDS = 77
 
 DASH = r"[—–-]"
 
@@ -59,6 +62,14 @@ DASH = r"[—–-]"
 # area-numbered form never carries it.
 SCREEN_LINE = re.compile(r"^(?:Screen\s+)?(\d+(?:\.\d+){0,2})\s*" + DASH + r"\s*(.+)$")
 BOARD_LINE = re.compile(r"^Board\s+(\d+)\s*(?:of\s+\d+\s*)?" + DASH + r"?\s*(.*)$")
+# **Where a screen's specification stops, other than at the next screen.** The last screen of a
+# board is followed by that board's summary table and the next board's objective, and neither
+# belongs to it: without this, screen 10 of every board acquired a directory of its own nine
+# siblings as its fields, and the eight boards of `Approval Workflows` each did it once.
+BOARD_BOUNDARY = re.compile(
+    r"^Board\s+\d+\s*(?:" + DASH + r"|:)?\s*(?:Screen Summary|Acceptance Criteria|Core Flow)\b",
+    re.I)
+
 AREA_LINE = re.compile(r"^Area\s+(\d+)\s*" + DASH + r"\s*(.+)$")
 
 # Section headings inside a screen's own specification. The pack is consistent about these, which
@@ -136,6 +147,13 @@ def parse_toc(block: str) -> tuple[list[dict], list[str], list[str]]:
     #
     # The numbering already carries it: `11.1.7` is area 11 board 1, `2.7` is board 2, and a bare
     # `7` only ever occurs in a document's first board.
+    assign_boards(screens)
+    boards = sorted({s_["board"] for s_ in screens}, key=int)
+    return screens, boards, areas
+
+
+def assign_boards(screens: list[dict]) -> None:
+    """The board comes from the screen number, whichever list the screens came from."""
     bare = 0
     seq = 0
     for s_ in screens:
@@ -153,8 +171,43 @@ def parse_toc(block: str) -> tuple[list[dict], list[str], list[str]]:
                 seq += 1
             bare = n
             s_["board"] = str(seq + 1)
-    boards = sorted({s_["board"] for s_ in screens}, key=int)
-    return screens, boards, areas
+
+
+# **`Screen` spelled out, for the documents whose contents list boards only.** The bare-number
+# form `1 — Title` is fine to match inside a contents block, where every line is a screen entry;
+# matched against a whole document it also takes `0–10% → Automatic / Supervisor`,
+# `201 — Approval Request Created` and `1–30 Days`. The keyword is what separates a heading
+# from a table row, and both board-listing documents carry it on every real screen.
+SCREEN_HEADING = re.compile(r"^Screen\s+(\d+(?:\.\d+){0,2})\s*" + DASH + r"\s*(.+)$")
+
+
+def body_screens(pages: list[str]) -> list[dict]:
+    """Screens read from the body, for a document whose contents lists boards and not screens.
+
+    **Two of the nineteen documents index themselves by board.** `Approval Workflows & Governance`
+    and `Unified BI Reporting & AI Analytics` list `Board 3 — Screen Summary` in their contents and
+    never name a screen there, so `parse_toc` returns nothing and the document parses to zero —
+    which is what it did, silently, until the reconciliation refused.
+
+    The docstring's warning about body scans stands and is why this is not the default: a body
+    scan that matches titles over-counts, because every document cross-references its own screens.
+    It does not apply to a scan for *headings*, which each screen has exactly one of. The board is
+    still taken from the numbering rather than from the `Board N` line above, because both
+    documents repeat that line in prose between the screens it is supposed to introduce —
+    `Board 4: Schedule → Subscribe → Distribute` sits four lines above screen 4.1.
+    """
+    out, seen = [], set()
+    for i, text in enumerate(pages):
+        for line in text.split(chr(10)):
+            m = SCREEN_HEADING.match(line.strip())
+            if not m or len(m.group(2).strip()) < 4:
+                continue
+            title = m.group(2).strip()
+            if title in seen:
+                continue
+            seen.add(title)
+            out.append({"number": m.group(1), "title": title, "board": None})
+    return out
 
 
 def body_headings(pages: list[str], start: int = 0) -> list[dict]:
@@ -199,17 +252,33 @@ def spec_for(screen: dict, pages: list[str], headings: list[dict]) -> dict:
     if not best or score < 70:
         return {"page": None, "body": "", "match": score}
 
-    text = pages[best["index"]][best["offset"]:]
-    # Continue into following pages until the next screen heading.
     nxt = next((h for h in headings if (h["index"], h["offset"]) > (best["index"], best["offset"])),
                None)
+    # **Cut at the next heading even when it is on the same page.** Two screens share a page
+    # wherever one is short, and taking the first page whole ran each of those specifications
+    # into the one below it: `Approval Request Detail` carried `Screen 5 - AI Decision Support`
+    # and its prose as its own fields, which is a screen's directory attributed to its neighbour.
+    first = pages[best["index"]]
+    if nxt and nxt["index"] == best["index"]:
+        first = first[:nxt["offset"]]
+    text = first[best["offset"]:]
+    # Continue into following pages until the next screen heading.
     last = nxt["index"] if nxt else min(best["index"] + 5, len(pages) - 1)
     for j in range(best["index"] + 1, last + 1):
         chunk = pages[j]
         if nxt and j == nxt["index"]:
             chunk = chunk[:nxt["offset"]]
         text += "\n" + chunk
-    return {"page": best["page"], "body": text[:9000], "match": score}
+    return {"page": best["page"], "body": cut_at_board(text)[:9000], "match": score}
+
+
+def cut_at_board(text: str) -> str:
+    """Everything up to the board's own summary, which belongs to the board and not the screen."""
+    lines = text.split(chr(10))
+    for i, line in enumerate(lines):
+        if BOARD_BOUNDARY.match(line.strip()):
+            return chr(10).join(lines[:i])
+    return text
 
 
 def sections(body: str, doc_title: str) -> dict:
@@ -234,7 +303,11 @@ def sections(body: str, doc_title: str) -> dict:
             continue
         # **The running header and footer are on every page of every document.** Left in, the
         # module name became the most common "field" in the pack.
-        if line.startswith("TICVAI") or line == doc_title or re.match(r"^TICVAI\s*[.]\s*\d+$", line):
+        # `N | Pa g e` is the second footer form, and pdfplumber's letter spacing is why it is
+        # written that way here rather than as `Page`.
+        if (line.startswith("TICVAI") or line == doc_title
+                or re.match(r"^TICVAI\s*[.]\s*\d+$", line)
+                or re.match(r"^\d+\s*\|\s*Pa\s*g\s*e$", line)):
             continue
         if line[0] in BULLET:
             t = line.lstrip(BULLET).strip()
@@ -270,11 +343,19 @@ def main() -> int:
         print(f"no {SRC.relative_to(ROOT)} — extract Workshop Docs.zip there first")
         return 1
 
-    records, per_doc = [], []
+    records, per_doc, indexed_by_board = [], [], []
     for pdf in sorted(SRC.glob("*.pdf")):
         pages = page_texts(pdf)
         toc, body_starts_at = toc_block(pages)
         screens, boards, areas = parse_toc(toc)
+        # **A contents list that indexes boards names no screens**, and the document then parses
+        # to zero without failing. Falling back on the body is safe here and only here: the
+        # contents block has already been shown not to be a screen list.
+        if len(screens) < 5:
+            screens = body_screens(pages)
+            assign_boards(screens)
+            boards = sorted({s_["board"] for s_ in screens}, key=int)
+            indexed_by_board.append(pdf.name)
         # **The area number is scanned over the whole document, not the contents block.** Four
         # documents state their area only in a body heading, and four area numbers are claimed by
         # two documents each — 10, 11, 12 and 13. Screen ids cannot be assigned until the client
@@ -317,12 +398,23 @@ def main() -> int:
     boards_total = sum(b for _, _, b, _ in per_doc)
     print(f"\n{'TOTAL':46} {'':7} {boards_total:>7} {len(records):>8}")
 
+    if indexed_by_board:
+        print(f"{chr(10)}  read from the body, contents indexes boards not screens: "
+              f"{', '.join(indexed_by_board)}")
+
+    # **Every board in this pack is ten screens.** A global total can reconcile while one document
+    # is short and another long, and only the per-document check catches that.
+    ragged = [(n, nb, ns) for n, _, nb, ns in per_doc if ns != nb * 10]
+    for name, nb, ns in ragged:
+        print(f"{chr(10)}  {name} parsed {ns} screens across {nb} boards - not ten per board")
+
     unspecified = [r for r in records if not r["page"]]
     if unspecified:
         print(f"\n  {len(unspecified)} screen(s) with no specification body found — "
               f"first: {unspecified[0]['title']}")
 
-    ok = len(records) == EXPECTED_SCREENS and boards_total == EXPECTED_BOARDS
+    ok = (len(records) == EXPECTED_SCREENS and boards_total == EXPECTED_BOARDS
+          and not ragged)
     if not ok:
         print(f"\n  DOES NOT RECONCILE — expected {EXPECTED_BOARDS} boards and "
               f"{EXPECTED_SCREENS} screens. **A partial parse of a source document is a number "

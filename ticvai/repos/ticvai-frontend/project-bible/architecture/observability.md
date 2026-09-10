@@ -18,7 +18,7 @@ Without it, *"the tenant is slow"* is unactionable — and with cells, *"which c
 | Tracing | OpenTelemetry → OTLP | tenant, region, venue, cell, correlation ID, session ID |
 | Metrics | Prometheus-compatible | Same dimensions, plus workstation for POS metrics |
 | Logging | Structured, never concatenated | Same dimensions. **Never PII** |
-| Aggregation | Central, cross-cell | Cell as a first-class dimension |
+| Aggregation | Central, cross-region | Cell as a first-class dimension |
 
 Central aggregation is a control-plane function. Metrics and traces are operational telemetry, not personal data — but see compliance/data-residency: logs must be PII-free **by construction**, not by filtering, if they leave the jurisdiction.
 

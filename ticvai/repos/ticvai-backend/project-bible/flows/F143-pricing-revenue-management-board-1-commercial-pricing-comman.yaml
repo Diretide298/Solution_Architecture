@@ -1,0 +1,155 @@
+id: F143
+name: 'Pricing   Revenue Management board 1: Commercial Pricing Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Pricing   Revenue Management board 1. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-048
+  entryPoints:
+  - Arrives at Commercial Pricing Command Center
+steps:
+- step: 1
+  screen: ADM-048
+  action: Opens Commercial Pricing Command Center
+  operations:
+  - listCommercialPricing
+  outcome: Provide the central administrative workspace for all commercial pricing structures across This
+    is the first page a Revenue/Pricing Administrator sees when entering the module.
+- step: 2
+  screen: ADM-049
+  action: Works in Price List Master Configuration
+  operations:
+  - setPriceListMaster
+  outcome: Create the master container that holds commercial rates. A Price List should be reusable across
+    products and channels.
+- step: 3
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-050
+  action: Works in Price Category & Rate Type Library
+  operations:
+  - listPriceCategoryRate
+  outcome: 'Define standardized commercial rate categories used across TICVAI. This avoids different venues
+    independently creating categories such as: “Adult,” “Adult Standard,” “Normal Adult,” and “Full Adult.”'
+- step: 5
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-051
+  action: Works in Rate Structure Builder
+  operations:
+  - setRateStructure
+  outcome: Define the actual monetary rates contained within a price list. This is the core commercial
+    configuration screen.
+- step: 7
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-052
+  action: Works in Product & Service Price Assignment
+  operations:
+  - setProductServicePrice
+  outcome: Connect commercial rates to the actual products and services being sold.
+- step: 9
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-053
+  action: Works in Package, Bundle & Add-On Pricing
+  operations:
+  - listPackageBundleAdd
+  outcome: Provide dedicated commercial structures for products containing multiple components. This is
+    separate from the Product Relationship/Bundle module. Product Catalogue defines what the bundle contains.
+    Pricing defines how that bundle is priced.
+- step: 11
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-054
+  action: Works in Market, Venue & Currency Pricing Structure
+  operations:
+  - listMarketVenueCurrency
+  outcome: Support TICVAI's multi-country, multi-market, multi-venue and multi-currency commercial model.
+- step: 13
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-055
+  action: Works in Price Hierarchy & Inheritance Configuration
+  operations:
+  - setPriceHierarchyInheritance
+  outcome: Define where TICVAI should obtain a price when multiple commercial pricing layers exist. This
+    is essential to prevent conflicting prices.
+- step: 15
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-056
+  action: Works in Price List Templates, Clone & Reuse
+  operations:
+  - listPriceListTemplate
+  outcome: Accelerate commercial setup across new venues, events, seasons and markets.
+- step: 17
+  screen: ADM-048
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialPricing
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-057
+  action: Works in Commercial Pricing Structure Validation
+  operations:
+  - listCommercialPricingStructure
+  outcome: Validate that the commercial pricing foundation is structurally complete before it proceeds
+    to rule configuration, governance, or publication. This is not the final publication screen. Board
+    4 owns approval and publication. Board 1 defined what the commercial prices are and how they are structured.
+branches:
+- at: 1
+  condition: Nothing has been set up on Commercial Pricing Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Pricing   Revenue Management board 1 visited
+primaryContract: catalogue
+contracts:
+- catalogue

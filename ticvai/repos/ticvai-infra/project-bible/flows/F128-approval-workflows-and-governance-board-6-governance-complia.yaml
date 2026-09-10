@@ -1,0 +1,139 @@
+id: F128
+name: 'Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 6. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-339
+  entryPoints:
+  - Arrives at Governance & Compliance Command Center
+steps:
+- step: 1
+  screen: ADM-339
+  action: Opens Governance & Compliance Command Center
+  operations: []
+  outcome: Provide administrators, auditors and security teams with an overview of approval governance
+    health across the organization.
+- step: 2
+  screen: ADM-340
+  action: Works in Segregation of Duties Policy Manager
+  operations: []
+  outcome: Define combinations of actions that the same person must not be allowed to perform. The matrix
+    explicitly states that users shall be prevented from approving their own requests.
+- step: 3
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-341
+  action: Works in Four-Eyes & Dual-Control Policy
+  operations: []
+  outcome: Configure sensitive actions requiring approval from at least two independent authorized persons.
+    The source explicitly requires dual approval capability for sensitive operations.
+- step: 5
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-342
+  action: Works in Authentication & MFA Policy Manager
+  operations: []
+  outcome: Define the authentication strength required before an approver can execute sensitive approval
+    decisions. The source requires authentication before approval actions and supports MFA for sensitive
+    approvals.
+- step: 7
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-343
+  action: Works in Sensitive Action Confirmation
+  operations: []
+  outcome: Configure the final confirmation requirements before a sensitive approval becomes binding.
+    The source specifically requires confirmation before execution of sensitive approvals.
+- step: 9
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-344
+  action: Works in Digital Signature Management
+  operations: []
+  outcome: Manage workflows where approval decisions require a digital signature. The matrix explicitly
+    requires digital-signature support for sensitive approvals.
+- step: 11
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-345
+  action: Works in Immutable Approval Record & Tamper Detection
+  operations: []
+  outcome: Protect completed approval records from unauthorized modification. The matrix requires completed
+    approval records to be immutable and requires detection of unauthorized modification attempts.
+- step: 13
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-346
+  action: Works in Approval Record Retention Policy
+  operations: []
+  outcome: Define how long approval and governance records shall be retained. The matrix explicitly requires
+    configurable approval record-retention policies.
+- step: 15
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-347
+  action: Works in Regulatory Audit & Evidence Center
+  operations: []
+  outcome: Provide internal and external auditors with controlled access to complete approval evidence.
+    The source specifically requires approval records suitable for regulatory audits.
+- step: 17
+  screen: ADM-339
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-348
+  action: Works in Governance Risk & AI Compliance Advisor
+  operations: []
+  outcome: Use AI to identify unusual governance patterns, potential policy weaknesses and compliance
+    risks. This screen should assist compliance teams rather than automatically change governance policies.
+branches:
+- at: 1
+  condition: Nothing has been set up on Governance & Compliance Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 6 visited
+primaryContract: unknown
+contracts:
+- unknown

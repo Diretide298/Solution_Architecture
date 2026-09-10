@@ -1,0 +1,154 @@
+id: F155
+name: 'Promotions   Bundles Management board 2: Promotion Rule Builder'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 2. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-148
+  entryPoints:
+  - Arrives at Promotion Rule Builder
+steps:
+- step: 1
+  screen: ADM-148
+  action: Opens Promotion Rule Builder
+  operations:
+  - setPromotionRule
+  outcome: Provide the main no-code workspace for creating the commercial logic behind a promotion.
+- step: 2
+  screen: ADM-149
+  action: Works in Percentage & Fixed Discount Configurator
+  operations:
+  - listPercentageFixedDiscount
+  outcome: Configure the two fundamental discount types required by the matrix. The matrix explicitly
+    states that discounts may be defined as percentage or fixed value.
+- step: 3
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-150
+  action: Works in Cart & Transaction Threshold Rules
+  operations:
+  - listCartTransactionThreshold
+  outcome: Configure promotions triggered by basket value, ticket quantity, transaction value, or purchase
+    composition. The matrix specifically requires rules such as if more than X tickets are purchased,
+    apply Y discount to the entire transaction.
+- step: 5
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-151
+  action: Works in Volume, Bulk & Tier Discount Configurator
+  operations:
+  - listVolumeBulkTier
+  outcome: Manage quantity-based and bulk-purchase commercial rules. The matrix requires configurable
+    bulk thresholds and discount percentages, dedicated group pricing, and tiered bulk purchasing.
+- step: 7
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-152
+  action: Works in Time-Based & Seasonal Discount Rules
+  operations:
+  - listTimeBasedSeasonal
+  outcome: Configure promotional pricing based on when the customer purchases or visits.
+- step: 9
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-153
+  action: Works in Customer, Membership & Segment Discount Rules
+  operations:
+  - listCustomerMembershipSegment
+  outcome: Configure discounts based on who the customer is.
+- step: 11
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-154
+  action: Works in Payment Method, Bank & Partner Discount Rules
+  operations:
+  - listPaymentMethodBank
+  outcome: Configure discounts triggered by how the guest pays or which commercial partner they belong
+    to. The matrix specifically includes discounts for payment types and bank credit/debit cards.
+- step: 13
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-155
+  action: Works in Special Price & Guest Offer Configurator
+  operations:
+  - listSpecialPriceGuest
+  outcome: Manage commercially distinct special-price products and targeted offers without unnecessarily
+    duplicating product SKUs.
+- step: 15
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-156
+  action: Works in Discount Limits, Guardrails & Commercial Controls
+  operations:
+  - listDiscountLimitGuardrail
+  outcome: Protect the business from incorrectly configured discounts and excessive commercial exposure.
+- step: 17
+  screen: ADM-148
+  action: Returns to the board's landing screen
+  operations:
+  - setPromotionRule
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-157
+  action: Works in Rule Test, Simulation & AI Recommendation Workspace
+  operations:
+  - setRuleTestRecommendation
+  outcome: Allow administrators to test promotional rules before activating them. This is critical because
+    the matrix requires simulation of redemption, discount exposure, revenue impact, margin impact and
+    financial performance before activation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Promotion Rule Builder yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 2 visited
+primaryContract: promotions
+contracts:
+- promotions

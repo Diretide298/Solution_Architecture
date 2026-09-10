@@ -49,7 +49,7 @@ def load_screens() -> tuple[set[str], dict[str, set[str]], set[tuple[str, str]],
             nav = s.get("navigation") or {}
             if nav.get("inferred"):
                 inferred.add(sid)
-            for t in nav.get("exitTo", []) or []:
+            for t in (nav.get("exitTo") or []):
                 edges.add((sid, t))
             for t in nav.get("entryFrom", []) or []:
                 edges.add((t, sid))

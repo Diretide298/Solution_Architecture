@@ -254,6 +254,25 @@ components:
   - kind: progressIndicator
     states: [determinate, indeterminate, complete, failed]
 
+  - kind: duplicateMatch
+    description: >
+      **Candidate records that may be the same person, with the reason for each.** The platform
+      proposes; a person decides.
+    states: [searching, none, candidates, reviewing, merged]
+    notes: >
+      **Never auto-merges, and the score must be explained.** `matchGuest` says so in the contract:
+      *"An automatic merge on a name and a birthday joins two families, and the join is far harder
+      to undo than to make"*, and *"same mobile* and *similar name, same postcode* are different
+      levels of certainty, and a host deciding at a podium needs to see which."
+
+      So a bare percentage is not enough — each candidate carries the rule that matched it. The
+      `none` state is a real state and the common one: most bookings are not duplicates, and a
+      component that only renders when it has something to say is one nobody trusts.
+
+      **The merge itself is a `confirmDialog`**, not this. The consequence is stated there: the
+      losing record is superseded rather than deleted, the merge is reversible for thirty days,
+      and consent takes the narrower of the two positions.
+
   - kind: publishGate
     description: >
       Making a draft live, with what it will affect named before it happens.
@@ -274,6 +293,32 @@ components:
       `release*` exclusion: the seven hold-releasing operations were renamed to `relinquish*`
       on 8 September, so `release` now means publish and nothing else.
 
+  - kind: credentialDisplay
+    description: >
+      **A pass, badge or ticket rendered to be presented and scanned.** The counterpart of
+      `scanTarget`, which reads one.
+    states: [loading, valid, expired, revoked, offline, refreshing]
+    notes: >
+      **Screen brightness, code size and offline availability are requirements, not styling.** A
+      credential that needs a network round trip at a gate is a credential that fails at the gate,
+      and the 2 September session decided that a dynamic-QR ticket bought on the web is redirected
+      into the app for exactly this reason.
+
+      `expired` and `revoked` must be unmistakable and must not look like `loading`. Carries the
+      code — QR, barcode or NFC — so a separate `qrCode` component is not needed; the credential is
+      the thing, and the code is how it is read.
+
+  - kind: drawer
+    description: Side sheet over the current screen, for configuring one thing without leaving it.
+    states: [open, closing]
+    notes: >
+      **Distinct from `modal`, which blocks.** A drawer keeps the underlying screen visible and
+      usable-looking, so it suits configuration where the thing being configured is on the page
+      behind. Focus is trapped and returns to the trigger, as with `modal`.
+
+      Like every overlay, it renders as **its own wireframe frame** — the screen behind it with the
+      drawer over it — because a reviewer cannot judge a flow from a list of drawer names.
+
   - kind: scanTarget
     description: Camera viewport for barcode, QR or NFC.
     states: [ready, scanning, success, denied, hardwareError, permissionDenied]
@@ -288,6 +333,27 @@ components:
     notes: >
       `noGeometry` is real — a map imported from a manifest alone can be sold from a list but
       not rendered.
+
+  - kind: assistantPanel
+    description: >
+      An assistant the operator asks in their own words, answering inside the screen they are
+      already on.
+    states: [idle, thinking, answered, refused, unavailable]
+    notes: >
+      **Added 9 September for the 3 August UI/UX workshop, which confirmed an embedded AI
+      assistant on the POS** — "an embedded AI assistant the cashier can query directly, for
+      example to find today's promo code, process a refund, or switch between light/night
+      themes". The package had no word for it, so a confirmed direction had nowhere to be
+      recorded and read as an omission on every POS screen.
+
+      `refused` and `unavailable` are separate states and both are required. **An assistant that
+      declines because the cashier lacks the permission is not the same as one that cannot
+      reach its service**, and a cashier who cannot tell them apart will call support about the
+      wrong thing — the same reasoning that makes `emptyNoAccess` distinct from `emptyNoResults`.
+
+      **It answers; it does not act unattended.** Where the operator accepts a suggestion the
+      screen performs the ordinary action, with the ordinary confirmation and the ordinary
+      permission — a refund the assistant proposed is still a refund.
 
   - kind: saleBoard
     description: Tiled product grid for POS. Pages of tiles from tenant configuration.

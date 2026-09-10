@@ -172,6 +172,23 @@ const CEILING = 420;
 // a wireframe rather than a body.
 const BUDGET = 1700;
 const MOTE_GAIN = 1.3;
+// **The scale the overview opens at.** One knob, and the only one to touch when
+// the constellation stops fitting.
+//
+// It was 1 while the page carried six bodies. It now carries eight, and the ring
+// grew to seat them: the two ends of it — CI/CD out to the left, UI/UX down to
+// the right — reached past the window and the reader arrived already inside the
+// picture, having to scroll out before they could see what it was of.
+//
+// **Zoom rather than spread, deliberately.** Pulling the bodies together would
+// have fitted them too, and would have cost the thing the layout is for: at
+// SPREAD 3 the largest body reads 14:1 against the smallest, and past that
+// `roomFor` starts clamping and the ratio collapses toward 1.2:1. The bodies are
+// the right size and in the right places; the frame was too close.
+//
+// Expect to revisit it the next time a layer is added — the constellation widens
+// each time, and nothing here measures itself.
+const ZOOM = 0.78;
 
 const HINTS = {
   overview: 'Click a layer  ·  ↑ ↓ to step through  ·  drag to turn, scroll to zoom',
@@ -576,6 +593,7 @@ async function main() {
     camera: true,
     hoops: true,
     moteGain: MOTE_GAIN,
+    zoom: ZOOM,
     onSelect: (hub, { open }) => focus(hub.id, { open: open || state.focus === hub.id }),
     onEmpty: () => focus(null),
     onZoom: () => { sayHint(); syncBack(); },

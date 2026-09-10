@@ -1,13 +1,3 @@
-# F23 — A contractor gets a badge and uses it
-#
-# P11 had no flow and Accreditation is workshop-blocked — so this is written as a
-# proposal to take into the workshop rather than a specification. It assumes an
-# accreditation is an entitlement, which is the position worth testing.
-#
-# Validated by tools/check-flows.py.
-#
-# Moved to Wave 3 (CF-101). **Accreditation is workshop-blocked and entirely Wave 3** (CF-21). This flow was written as a proposal to take into that workshop, which is a Wave 3 activity.
-
 id: F23
 name: A contractor gets a badge and uses it
 actor: contractor
@@ -18,11 +8,11 @@ platforms:
 - P11 Accreditation Web
 - P07 Venue Scanner
 - P08 Venue Management
-offlineBehaviour: '**The gate half is offline like every other scan.** An accreditation is validated
-  from the bundle, which is what makes it work at a service entrance with no signal.'
+offlineBehaviour: '**The gate half is offline like every other scan.** An accreditation is validated from
+  the bundle, which is what makes it work at a service entrance with no signal.'
 trigger:
-  description: A contractor needs access to a plant room for a week, and a steward at a service gate
-    must be able to check it.
+  description: A contractor needs access to a plant room for a week, and a steward at a service gate must
+    be able to check it.
   entryScreen: ACC-002
   entryPoints:
   - Contractor applies
@@ -32,9 +22,10 @@ steps:
 - step: 1
   screen: ACC-002
   action: Applies with documents and a photo
-  operations:
-  - listApprovalRequests
+  operations: []
   outcome: Identity, company, what access is needed
+  operationsNote: '**No operation exists for submitting an accreditation application.** The step named
+    `listApprovalRequests`, which is the reviewer''s call on ACC-006/ACC-007, not the applicant''s.'
 - step: 2
   screen: ACC-007
   action: A reviewer checks and approves
@@ -46,7 +37,7 @@ steps:
   screen: ACC-005
   action: The badge is issued
   operations:
-  - listApprovalRequests
+  - issueAccreditationBadge
   outcome: QR, NFC or printed — `MediaKind` already covers all four
 - step: 4
   screen: SCN-003
@@ -69,8 +60,8 @@ branches:
   resolvedBy: Reviewer
 - at: 4
   condition: The contractor arrives outside their hours
-  behaviour: Denied with the reason, which is the hours. **A steward needs to say when they may come
-    back**, not just no.
+  behaviour: Denied with the reason, which is the hours. **A steward needs to say when they may come back**,
+    not just no.
   severity: recoverable
   resolvedBy: Steward
 - at: 4
@@ -81,14 +72,14 @@ branches:
   resolvedBy: Steward
 - at: 5
   condition: The contract ends early
-  behaviour: Revoked, and the blacklist reaches the gate on the next bundle. **Until then the badge
-    works** — which is the argument for short bundle intervals at service gates.
+  behaviour: Revoked, and the blacklist reaches the gate on the next bundle. **Until then the badge works**
+    — which is the argument for short bundle intervals at service gates.
   severity: requiresStaff
   resolvedBy: Venue manager
 - at: 1
   condition: The sponsor company is not registered
-  behaviour: Blocks. A contractor with no sponsor is a person with no accountable employer, and that
-    is the point of accreditation.
+  behaviour: Blocks. A contractor with no sponsor is a person with no accountable employer, and that is
+    the point of accreditation.
   severity: requiresStaff
   resolvedBy: Reviewer
 - at: 3

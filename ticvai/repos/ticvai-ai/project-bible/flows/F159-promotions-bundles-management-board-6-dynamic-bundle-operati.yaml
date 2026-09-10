@@ -1,0 +1,152 @@
+id: F159
+name: 'Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 6. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-188
+  entryPoints:
+  - Arrives at Dynamic Bundle Operations Command Center
+steps:
+- step: 1
+  screen: ADM-188
+  action: Opens Dynamic Bundle Operations Command Center
+  operations:
+  - listDynamicBundle
+  outcome: Provide real-time visibility into the operational health of all active bundles.
+- step: 2
+  screen: ADM-189
+  action: Works in Component Inventory & Availability Matrix
+  operations:
+  - listComponentInventoryAvailability
+  outcome: Provide one centralized matrix showing availability for every component within every active
+    bundle.
+- step: 3
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-190
+  action: Works in Bundle Sellability & Dependency Rule Engine
+  operations:
+  - listBundleSellabilityDependency
+  outcome: Determine whether the overall bundle can be sold based on the state of its underlying components.
+- step: 5
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-191
+  action: Works in Capacity Pool & Reservation Manager
+  operations:
+  - listCapacityPoolReservation
+  outcome: Manage how bundle sales consume capacity from underlying products. This is particularly important
+    because a bundle must not create artificial inventory separate from the actual attraction/product
+    capacity.
+- step: 7
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-192
+  action: Works in Dynamic Component Substitution Engine
+  operations:
+  - listDynamicComponentSubstitution
+  outcome: Automatically replace unavailable bundle components according to predefined commercial rules.
+- step: 9
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-193
+  action: Works in Dynamic Bundle Rule & Composition Engine
+  operations:
+  - listDynamicBundleRule
+  outcome: Allow the actual composition of a bundle to change dynamically according to business and guest
+    conditions. This builds upon the matrix requirement for dynamic bundles where guests select attractions,
+    experiences, F&B, Retail, or services from predefined categories.
+- step: 11
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-194
+  action: Works in Real-Time Availability & Checkout Validation
+  operations:
+  - listRealTimeAvailability
+  outcome: Perform the final authoritative validation immediately before transaction confirmation. This
+    is essential because availability may change between browsing and payment.
+- step: 13
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-195
+  action: Works in Bundle Availability by Channel, Venue & Partner
+  operations:
+  - listBundleAvailabilityChannel
+  outcome: Control where a bundle is sellable based on operational availability.
+- step: 15
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-196
+  action: Works in Bundle Availability Forecast, Alerts & Recovery
+  operations:
+  - listBundleAvailabilityForecast
+  outcome: Predict bundle availability problems before they affect sales.
+- step: 17
+  screen: ADM-188
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicBundle
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-197
+  action: Works in Dynamic Bundle Simulation & AI Optimization
+  operations:
+  - listDynamicBundle2
+  outcome: Test how a bundle behaves under different operational scenarios before activating dynamic rules.
+branches:
+- at: 1
+  condition: Nothing has been set up on Dynamic Bundle Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 6 visited
+primaryContract: promotions
+contracts:
+- promotions

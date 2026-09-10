@@ -9,19 +9,18 @@
 | Contracts | 3 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 31 |
+| Operations with no screen | 30 |
 | Waves | wave2 10 |
 
 ## Gaps
 
-### 31 operations with no screen here
+### 30 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
-| `clearTable` | fnb | POST | Mark a table cleared and free |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |

@@ -40,26 +40,26 @@ modulesUsed:
 - module: games
   screens: 1
 servicesCalled:
-- service: CatalogueService
-  operationCalls: 44
 - service: OrderService
-  operationCalls: 44
+  operationCalls: 52
+- service: CatalogueService
+  operationCalls: 47
 - service: MarketingService
-  operationCalls: 30
+  operationCalls: 36
 - service: IdentityService
-  operationCalls: 23
+  operationCalls: 24
+- service: VenueOpsService
+  operationCalls: 22
 - service: FnbService
   operationCalls: 22
-- service: VenueOpsService
-  operationCalls: 21
 - service: AccessService
   operationCalls: 17
 - service: AiService
   operationCalls: 10
-- service: WhiteLabelService
-  operationCalls: 6
 - service: RetailService
-  operationCalls: 5
+  operationCalls: 8
+- service: WhiteLabelService
+  operationCalls: 7
 - service: LedgerService
   operationCalls: 1
 coverage:
@@ -78,10 +78,12 @@ screens:
   operations:
   - getGuestProfile
   - getTenantAppStatus
+  - getTenantConfig
   - listMyEntitlements
   - searchCatalogue
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -163,6 +165,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -202,7 +205,7 @@ screens:
   - GST-003
   boardFrames:
   - Guest Mobile Board 1.dc.html#gm-1b
-  wireframe: wireframes/Guest Mobile Board 1.dc.html#gm-1b
+  wireframe: wireframes/P02 Guest App.dc.html#gst-005
   inFlows: null
 - screen: GST-006
   name: Event / Exhibition Details
@@ -216,6 +219,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -242,6 +246,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -265,7 +270,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
-  - emptyNoResults
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -286,14 +291,19 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - acquireInventoryHold
   - checkoutCart
+  - createOrder
   - createPayment
   - getCart
+  - getPaymentLink
   - inquirePaymentStatus
+  - payByLink
   - transferOrderTickets
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -302,6 +312,7 @@ screens:
   - cartId<-session
   - orderId<-deepLink
   - paymentId<-deepLink
+  - token<-deepLink
   goesTo:
   - GST-001
   - GST-002
@@ -322,6 +333,8 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -358,6 +371,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-020
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-011
   inFlows:
@@ -377,6 +391,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -389,6 +404,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-013
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-012
   inFlows:
@@ -406,6 +422,8 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -417,6 +435,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-055
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-013
   inFlows:
@@ -433,6 +452,8 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -463,6 +484,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -491,6 +513,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -501,6 +524,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-017
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-016
   inFlows:
@@ -517,6 +541,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -544,6 +569,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -570,6 +596,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -596,6 +623,7 @@ screens:
   - removeFromWishlist
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -637,9 +665,10 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-022
   boardFrames:
   - Seat Board 4.dc.html#seat-4b
-  wireframe: wireframes/Seat Board 4.dc.html#seat-4b
+  wireframe: wireframes/P02 Guest App.dc.html#gst-021
   inFlows:
   - F25 A guest rents a cabana
   - F26 A venue maps its site
@@ -654,6 +683,8 @@ screens:
   - getWaitTimes
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -663,6 +694,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-023
   - GST-059
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-022
@@ -680,8 +712,11 @@ screens:
   - getWaitingGuest
   - joinQueue
   - leaveQueue
+  - listQueues
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -692,6 +727,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-024
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-023
   inFlows:
@@ -713,6 +749,7 @@ screens:
   - listModifierGroups
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -727,6 +764,7 @@ screens:
   - GST-002
   - GST-003
   - GST-009
+  - GST-025
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-024
   inFlows:
@@ -744,6 +782,8 @@ screens:
   - getGuestOrderStatus
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -755,6 +795,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-030
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-025
   inFlows:
@@ -769,15 +810,19 @@ screens:
   operations:
   - getGameCard
   - listMerchandise
+  - lookupMerchandise
+  - reserveMerchandise
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - cardCode<-deepLink
+  - outletId<-session
   goesTo:
   - GST-001
   - GST-002
@@ -799,6 +844,8 @@ screens:
   - updateParkingEntitlement
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -809,6 +856,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-028
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-027
   inFlows:
@@ -825,6 +873,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -834,6 +883,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-012
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-028
   inFlows:
@@ -849,6 +899,8 @@ screens:
   - listDiningOutlets
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -872,6 +924,7 @@ screens:
   - claimLocationSession
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -935,6 +988,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -987,6 +1041,8 @@ screens:
   - replyToMyCase
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1013,7 +1069,7 @@ screens:
   - submitReview
   states:
   - emptyFirstRun
-  - emptyNoResults
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -1040,6 +1096,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1061,21 +1118,25 @@ screens:
   density: comfortable
   operations:
   - evaluatePromotions
+  - getCouponCode
   - getPromotion
   - listPromotions
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - promotionId<-deepLink
+  - code<-deepLink
   goesTo:
   - GST-001
   - GST-002
   - GST-003
+  - GST-011
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-037
   inFlows:
@@ -1093,6 +1154,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1113,9 +1175,10 @@ screens:
   density: comfortable
   operations:
   - recordConsent
+  - updateMyProfile
   states:
   - emptyFirstRun
-  - emptyNoResults
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -1126,6 +1189,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-065
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-039
   inFlows:
@@ -1145,6 +1209,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1166,16 +1231,26 @@ screens:
   wave: 1
   density: comfortable
   operations:
+  - abandonCart
   - checkoutCart
+  - claimCart
+  - extendCart
   - getCart
+  - listProductVariants
+  - removeCartLine
+  - updateCartLine
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - cartId<-session
+  - lineId<-navigation
+  - productId<-navigation
   goesTo:
   - GST-001
   - GST-002
@@ -1210,6 +1285,8 @@ screens:
   - verifyMfaEnrolment
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1235,6 +1312,8 @@ screens:
   operations: []
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1259,6 +1338,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1281,6 +1361,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -1306,6 +1387,8 @@ screens:
   - joinQueue
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1329,6 +1412,8 @@ screens:
   - getTenantAppStatus
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1353,6 +1438,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1379,6 +1465,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1391,7 +1478,7 @@ screens:
   - GST-003
   boardFrames:
   - Seat Board 4.dc.html#seat-4a
-  wireframe: wireframes/Seat Board 4.dc.html#seat-4a
+  wireframe: wireframes/P02 Guest App.dc.html#gst-049
   inFlows: null
 - screen: GST-050
   name: Resource Booking – Cabana
@@ -1406,6 +1493,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1416,6 +1504,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-016
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-050
   inFlows:
@@ -1432,6 +1521,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1441,6 +1531,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-052
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-051
   inFlows:
@@ -1458,6 +1549,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1468,6 +1560,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-053
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-052
   inFlows:
@@ -1486,6 +1579,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1496,6 +1590,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-054
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-053
   inFlows:
@@ -1514,6 +1609,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1525,6 +1621,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-059
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-054
   inFlows:
@@ -1539,6 +1636,7 @@ screens:
   - transferOrderTickets
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - error
   - loading
   - offline
@@ -1566,6 +1664,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1591,6 +1690,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1615,6 +1715,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1624,6 +1725,7 @@ screens:
   - GST-001
   - GST-002
   - GST-003
+  - GST-050
   boardFrames: null
   wireframe: wireframes/P02 Guest App.dc.html#gst-058
   inFlows:
@@ -1641,6 +1743,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1666,6 +1769,8 @@ screens:
   - listModifierGroups
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   - offline
@@ -1689,7 +1794,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -1712,6 +1816,7 @@ screens:
   - searchCatalogue
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1730,8 +1835,10 @@ screens:
   wave: 3
   density: comfortable
   operations:
+  - getMarketingSubscription
   - listConsentPurposes
   - recordConsent
+  - setMarketingSubscription
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -1762,6 +1869,7 @@ screens:
   - uploadGuestDocument
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1786,6 +1894,7 @@ screens:
   - getWaiverStatus
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1810,6 +1919,7 @@ screens:
   - listCases
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1834,6 +1944,7 @@ screens:
   - revokeFacePass
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1863,6 +1974,7 @@ screens:
   - updateTableReservation
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1885,12 +1997,14 @@ screens:
   wave: 2
   density: comfortable
   operations:
+  - getGiftCard
   - listPaymentTokens
   - redeemLoyaltyPoints
   - storePaymentToken
   - transferWalletBalance
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1899,6 +2013,7 @@ screens:
   entryParams:
   - subjectId<-session
   - walletId<-deepLink
+  - cardCode<-navigation
   goesTo:
   - GST-039
   boardFrames: null
@@ -1918,6 +2033,7 @@ screens:
   - shareEntitlement
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -1941,15 +2057,20 @@ screens:
   density: comfortable
   operations:
   - createMfaChallenge
+  - listGuestDevices
+  - registerGuestDevice
+  - revokeGuestDevice
+  - verifyGuestEmail
   states:
   - emptyFirstRun
-  - emptyNoResults
+  - emptyNoAccess
   - error
   - loading
   - offline
   offlineState: true
   entryParams:
   - subjectId<-session
+  - deviceId<-session
   goesTo:
   - GST-039
   boardFrames: null

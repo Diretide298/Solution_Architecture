@@ -34,8 +34,8 @@ levels:
 - level: tenant
   branch: root
   parent: null
-  operations: 307
-  configurations: 27
+  operations: 310
+  configurations: 29
   configuredBy:
   - claimCustomDomain
   - createDashboard
@@ -91,7 +91,7 @@ levels:
 - level: venue
   branch: organisational
   parent: region
-  operations: 1215
+  operations: 1219
   configurations: 43
   configuredBy:
   - configureQueueFeed
@@ -134,7 +134,7 @@ levels:
 - level: workstation
   branch: organisational
   parent: subDepartment
-  operations: 45
+  operations: 47
   configurations: 0
   configuredBy: null
   owns:

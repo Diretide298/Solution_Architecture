@@ -1,0 +1,153 @@
+id: F181
+name: 'Waiver, Consent & Digital Form Management board 1: Waiver & Consent Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P13 Venue CMS
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Waiver, Consent & Digital Form Management board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: CMS-041
+  entryPoints:
+  - Arrives at Waiver & Consent Command Center
+steps:
+- step: 1
+  screen: CMS-041
+  action: Opens Waiver & Consent Command Center
+  operations:
+  - listWaiverConsent
+  outcome: Provide administrators with a centralized workspace for managing every waiver, consent form
+    and digital declaration configured across TICVAI.
+- step: 2
+  screen: CMS-042
+  action: Works in Waiver Template Library & Master Setup
+  operations:
+  - listWaiverTemplateMaster
+  outcome: Create the master definition of a waiver or consent form before individual content and questions
+    are configured.
+- step: 3
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: CMS-043
+  action: Works in Digital Waiver & Form Builder
+  operations:
+  - setDigitalWaiverForm
+  outcome: Provide a no-code visual builder for creating the actual customer-facing waiver or digital
+    form.
+- step: 5
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: CMS-044
+  action: Works in Dynamic Fields, Questions & Conditional Logic
+  operations:
+  - listDynamicFieldQuestion
+  outcome: Configure the information that must be collected from the participant or signatory.
+- step: 7
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: CMS-045
+  action: Works in Signatory, Signature & Guardian Rule Configuration
+  operations:
+  - setSignatorySignatureGuardian
+  outcome: Define who is legally or operationally required to complete and sign the waiver.
+- step: 9
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: CMS-046
+  action: Works in Product, Event & Experience Association
+  operations:
+  - listProductEventExperience
+  outcome: Determine which TICVAI products or activities require each waiver.
+- step: 11
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: CMS-047
+  action: Works in Waiver Trigger, Eligibility & Completion Rules
+  operations:
+  - listWaiverTriggerEligibility
+  outcome: Define when a waiver is required, when it must be completed and what happens if it is not completed.
+- step: 13
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: CMS-048
+  action: Works in Versioning, Effective Dates & Legal Change Control
+  operations:
+  - listVersioningEffectiveDate
+  outcome: Ensure TICVAI maintains a complete historical record of exactly which waiver wording each participant
+    accepted.
+- step: 15
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: CMS-049
+  action: Works in Localization, Branding & Customer Experience Configuration
+  operations:
+  - setLocalizationBrandingCustomer
+  outcome: Configure how the waiver appears across different brands, languages and customer channels.
+- step: 17
+  screen: CMS-041
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiverConsent
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: CMS-050
+  action: Works in Waiver Approval, Testing & Publication Workspace
+  operations:
+  - approveWaiverTesting
+  outcome: Provide the final governance gate before a waiver becomes operational. Board 1 configured what
+    the waiver is, who must sign it, when it applies, and how it is published. Board 2 manages what happens
+    operationally after a waiver requirement is assigned to a booking, ticket, participant, member, rental,
+    group, or activity.
+branches:
+- at: 1
+  condition: Nothing has been set up on Waiver & Consent Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Waiver, Consent & Digital Form Management board 1 visited
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

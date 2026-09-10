@@ -1379,6 +1379,9 @@ paths:
             application/problem+json:
               schema:
                 $ref: ../shared/common.yaml#/components/schemas/Problem
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Posts to the ledger. The entry is the record; there is no undo that is
+        not another entry.
   /journal-entries/{entryId}/reject:
     parameters:
     - name: entryId

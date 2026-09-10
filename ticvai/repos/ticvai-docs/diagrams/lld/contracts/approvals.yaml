@@ -1,5 +1,5 @@
 id: LLD-approvals
-title: approvals — 35 operations
+title: approvals — 37 operations
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/03-contracts.yaml
 tier: spine
@@ -270,6 +270,17 @@ operations:
   offline: false
   reads: []
   writes: []
+- operation: listStepUpPolicies
+  verb: GET
+  path: /step-up-policies
+  scope: tenant
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.step_up_policy
+  writes: []
 - operation: listWorkflow
   verb: GET
   path: /workflow
@@ -363,6 +374,18 @@ operations:
   - approvals.matrix
   - approvals.rule
   - cache:idempotency
+- operation: setStepUpPolicy
+  verb: PUT
+  path: /step-up-policies
+  scope: tenant
+  permission: APPROVAL_CONFIGURE
+  audience:
+  - staff
+  offline: false
+  reads:
+  - approvals.step_up_policy
+  writes:
+  - approvals.step_up_policy
 - operation: setTriggerActionCross
   verb: PUT
   path: /trigger-action-cross

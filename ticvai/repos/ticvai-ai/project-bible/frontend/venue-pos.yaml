@@ -33,6 +33,7 @@ contracts:
 - marketing-crm
 - orders
 - promotions
+- queue
 - reporting
 - retail
 - seating

@@ -1,0 +1,154 @@
+id: F116
+name: 'Access Control board 6: Device & Gate Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 6. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-194
+  entryPoints:
+  - Arrives at Device & Gate Command Center
+steps:
+- step: 1
+  screen: BO-194
+  action: Opens Device & Gate Command Center
+  operations:
+  - listDeviceGate
+  outcome: Provide the central operational/configuration view of the complete access-control hardware
+    estate.
+- step: 2
+  screen: BO-195
+  action: Works in Device Type & Hardware Library
+  operations:
+  - listDeviceTypeHardware
+  outcome: Create reusable hardware definitions independently from physical deployed devices.
+- step: 3
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-196
+  action: Works in Physical Device Registration & Provisioning
+  operations:
+  - listPhysicalDeviceRegistration
+  outcome: Register actual deployed hardware and connect it to the Board 1 topology.
+- step: 5
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-197
+  action: Works in Turnstile & Lane Behavior Configuration
+  operations:
+  - setTurnstileLaneBehavior
+  outcome: Configure how each turnstile or lane behaves. The matrix specifically requires software on
+    turnstiles to behave differently according to card/ticket type and supports different operating modes.
+- step: 7
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-198
+  action: Works in Validation Outcome & Guest Feedback Designer
+  operations:
+  - setValidationOutcomeGuest
+  outcome: Configure what the physical access device does and displays after validation. The matrix explicitly
+    requires valid/non-valid messages, lights, pictograms and sounds, including green/yellow/red behavior.
+- step: 9
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-199
+  action: Works in Reader, Scanner & Peripheral Configuration
+  operations:
+  - setReaderScannerPeripheral
+  outcome: Configure the technologies attached to a gate/device.
+- step: 11
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-200
+  action: Works in Handheld & Mobile Access Device Configuration
+  operations:
+  - setHandheldMobileAccess
+  outcome: Configure mobile access-control devices used by staff. The matrix explicitly requires handheld
+    devices and Android/iOS dedicated mobile applications.
+- step: 13
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-201
+  action: Works in Gate Modes, Free Spin & Emergency Controls
+  operations:
+  - listGateModeFree
+  outcome: Manage non-standard operational modes. The source specifically requires Free Spin and Drop
+    Arm/Emergency behavior.
+- step: 15
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-202
+  action: Works in Device Software, Content & Remote Configuration
+  operations:
+  - setDeviceSoftwareContent
+  outcome: Centrally control access-control device software and guest-facing configuration. The source
+    requires the ability to configure/manage software on turnstiles, add external webpages on supported
+    screens, and enable payment technologies where available.
+- step: 17
+  screen: BO-194
+  action: Returns to the board's landing screen
+  operations:
+  - listDeviceGate
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-203
+  action: Works in Hardware Compatibility, Health, Testing & Deployment
+  operations:
+  - listHardwareCompatibilityHealth
+  outcome: Provide the final testing and governance layer before hardware is used in production. The matrix
+    says venues may select their hardware, while the provider must expose hardware limitations and recommendations.
+branches:
+- at: 1
+  condition: Nothing has been set up on Device & Gate Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 6 visited
+primaryContract: access
+contracts:
+- access

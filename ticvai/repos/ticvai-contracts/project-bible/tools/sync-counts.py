@@ -36,6 +36,13 @@ PHRASES = [
     (r"\b[\d,]+ contracts\b", "{contracts} contracts"),
     (r"\b[\d,]+ relationships\b", "{relationships} relationships"),
     (r"\b[\d,]+ platforms\b", "{platforms} platforms"),
+    # **Three counts that drifted because no phrase watched them.** MANIFEST.md read "12 apps"
+    # after the five shipped apps were decided on 10 September, and "83 boards" after 65 of them
+    # were archived the same day. `apps` is now the shipped unit and `frontends` the build unit;
+    # both are real and the documents have to say which they mean.
+    (r"\b[\d,]+ apps\b", "{apps} apps"),
+    (r"\b[\d,]+ frontends\b", "{frontends} frontends"),
+    (r"\b[\d,]+ boards\b", "{boards} boards"),
     # **Both quoted from memory in three places and wrong in all of them.** They change on
     # every generation of the DDL, which is exactly the kind of number nobody re-reads.
     (r"\b[\d,]+ foreign keys\b", "{foreignKeys} foreign keys"),

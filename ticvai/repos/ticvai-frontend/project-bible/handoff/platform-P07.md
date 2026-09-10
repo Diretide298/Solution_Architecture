@@ -9,12 +9,12 @@
 | Contracts | 5 |
 | Modules | 1 |
 | Undrawn | 0 |
-| Operations with no screen | 31 |
+| Operations with no screen | 32 |
 | Waves | wave1 11 |
 
 ## Gaps
 
-### 31 operations with no screen here
+### 32 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -24,6 +24,7 @@
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
 | `getWalletAllocation` | cross-region | GET | The consuming cell's bounded offline allocation |
 | `releaseWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
+| `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
 | `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
 | `setSegregationRules` | identity | PUT | Which permissions may not be held together |
@@ -44,7 +45,7 @@
 | `printTicketProof` | orders | POST | Print a sample without selling anything |
 | `pushWalletPassUpdate` | orders | POST | Push a change to every device holding it |
 | `quoteUpgrade` | orders | POST | What an upgrade costs, pro-rata |
-| `reissueEntitlement` | orders | POST | Zero-value reissue of an expired entitlement for a later date |
+| `releaseStoredValue` | orders | POST | Give a hold back |
 | `resendPaymentLink` | orders | POST |  |
 | `respondToChargeback` | orders | POST | Submit evidence, or accept the loss |
 | `setFraudRules` | orders | PUT |  |

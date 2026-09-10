@@ -49,6 +49,14 @@ screenStates:
       **The person may not see this.** Never rendered as empty — an empty list where the truth is
       a permission is a lie a person will act on, and they will ask why the data vanished.
     requiredWhen: the screen resolves a permission that some roles lack
+  - key: emptyNoEvents
+    required: false
+    requiredWhen: the screen renders a timeline it does not write to
+    description: >
+      **The record is complete and nothing has happened yet.** No action, and saying so is the
+      point: an audit trail that offers to create its first entry is offering to author
+      evidence. Distinct from `emptyFirstRun`, which is correct only where the person reading
+      the screen is the person who would create the first row.
   - key: error
     required: true
     description: The fetch failed. Says what is unaffected, because a person needs to know what they can still do.
@@ -246,6 +254,71 @@ components:
   - kind: progressIndicator
     states: [determinate, indeterminate, complete, failed]
 
+  - kind: duplicateMatch
+    description: >
+      **Candidate records that may be the same person, with the reason for each.** The platform
+      proposes; a person decides.
+    states: [searching, none, candidates, reviewing, merged]
+    notes: >
+      **Never auto-merges, and the score must be explained.** `matchGuest` says so in the contract:
+      *"An automatic merge on a name and a birthday joins two families, and the join is far harder
+      to undo than to make"*, and *"same mobile* and *similar name, same postcode* are different
+      levels of certainty, and a host deciding at a podium needs to see which."
+
+      So a bare percentage is not enough — each candidate carries the rule that matched it. The
+      `none` state is a real state and the common one: most bookings are not duplicates, and a
+      component that only renders when it has something to say is one nobody trusts.
+
+      **The merge itself is a `confirmDialog`**, not this. The consequence is stated there: the
+      losing record is superseded rather than deleted, the merge is reversible for thirty days,
+      and consent takes the narrower of the two positions.
+
+  - kind: publishGate
+    description: >
+      Making a draft live, with what it will affect named before it happens.
+    states: [draft, validating, blocked, publishable, publishing, published, overridden]
+    requiredWhen: >
+      the screen declares an operation that publishes, deploys, promotes or activates
+    notes: >
+      `blocked` names what is wrong and what to do — a disabled Publish with no reason is the
+      state operators escalate. `overridden` is a publish that went past a warning; it is
+      recorded, because the person who authorised it is the whole value of the record.
+      Saving is not publishing. A gate that shares its button with save will be pressed by
+      somebody who meant to save.
+
+      **A component, not a template.** `BO-094` is a canvas that publishes and `BO-153` is a
+      dashboard that publishes; a template can only be one of those.
+
+      `requiredWhen` keys off the declared operation, not the screen's subject. It needs no
+      `release*` exclusion: the seven hold-releasing operations were renamed to `relinquish*`
+      on 8 September, so `release` now means publish and nothing else.
+
+  - kind: credentialDisplay
+    description: >
+      **A pass, badge or ticket rendered to be presented and scanned.** The counterpart of
+      `scanTarget`, which reads one.
+    states: [loading, valid, expired, revoked, offline, refreshing]
+    notes: >
+      **Screen brightness, code size and offline availability are requirements, not styling.** A
+      credential that needs a network round trip at a gate is a credential that fails at the gate,
+      and the 2 September session decided that a dynamic-QR ticket bought on the web is redirected
+      into the app for exactly this reason.
+
+      `expired` and `revoked` must be unmistakable and must not look like `loading`. Carries the
+      code — QR, barcode or NFC — so a separate `qrCode` component is not needed; the credential is
+      the thing, and the code is how it is read.
+
+  - kind: drawer
+    description: Side sheet over the current screen, for configuring one thing without leaving it.
+    states: [open, closing]
+    notes: >
+      **Distinct from `modal`, which blocks.** A drawer keeps the underlying screen visible and
+      usable-looking, so it suits configuration where the thing being configured is on the page
+      behind. Focus is trapped and returns to the trigger, as with `modal`.
+
+      Like every overlay, it renders as **its own wireframe frame** — the screen behind it with the
+      drawer over it — because a reviewer cannot judge a flow from a list of drawer names.
+
   - kind: scanTarget
     description: Camera viewport for barcode, QR or NFC.
     states: [ready, scanning, success, denied, hardwareError, permissionDenied]
@@ -260,6 +333,27 @@ components:
     notes: >
       `noGeometry` is real — a map imported from a manifest alone can be sold from a list but
       not rendered.
+
+  - kind: assistantPanel
+    description: >
+      An assistant the operator asks in their own words, answering inside the screen they are
+      already on.
+    states: [idle, thinking, answered, refused, unavailable]
+    notes: >
+      **Added 9 September for the 3 August UI/UX workshop, which confirmed an embedded AI
+      assistant on the POS** — "an embedded AI assistant the cashier can query directly, for
+      example to find today's promo code, process a refund, or switch between light/night
+      themes". The package had no word for it, so a confirmed direction had nowhere to be
+      recorded and read as an omission on every POS screen.
+
+      `refused` and `unavailable` are separate states and both are required. **An assistant that
+      declines because the cashier lacks the permission is not the same as one that cannot
+      reach its service**, and a cashier who cannot tell them apart will call support about the
+      wrong thing — the same reasoning that makes `emptyNoAccess` distinct from `emptyNoResults`.
+
+      **It answers; it does not act unattended.** Where the operator accepts a suggestion the
+      screen performs the ordinary action, with the ordinary confirmation and the ordinary
+      permission — a refund the assistant proposed is still a refund.
 
   - kind: saleBoard
     description: Tiled product grid for POS. Pages of tiles from tenant configuration.

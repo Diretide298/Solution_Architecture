@@ -1066,7 +1066,7 @@ paths:
         '404':
           $ref: ../shared/common.yaml#/components/responses/NotFound
     delete:
-      operationId: releaseSeatHold
+      operationId: relinquishSeatHold
       x-ticvai-consumed-by:
         - "P04 POS-004 Sell — Seat Map"
       x-ticvai-audience:
@@ -1216,7 +1216,7 @@ paths:
         type: string
         format: uuid
     delete:
-      operationId: releaseSeatBlock
+      operationId: relinquishSeatBlock
       x-ticvai-consumed-by:
         - "P10 PTR-009 Group / Bulk Booking"
       x-ticvai-audience:

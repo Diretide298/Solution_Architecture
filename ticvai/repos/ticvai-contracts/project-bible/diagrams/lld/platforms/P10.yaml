@@ -29,7 +29,7 @@ servicesCalled:
 - service: PlatformService
   operationCalls: 41
 - service: CatalogueService
-  operationCalls: 39
+  operationCalls: 33
 - service: IdentityService
   operationCalls: 15
 - service: MarketingService
@@ -40,7 +40,7 @@ servicesCalled:
   operationCalls: 6
 coverage:
   screens: 51
-  inAFlow: 9
+  inAFlow: 37
   drawn: 51
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
@@ -73,17 +73,18 @@ screens:
   offlineState: false
   entryParams:
   - accountId<-deepLink
-  - sessionId<-session
   goesTo:
   - PTR-002
   - PTR-003
   - PTR-004
   - PTR-005
+  - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-001
   inFlows:
   - F10 Partner books, uses and settles
   - F104 A platform operator signs in under MFA
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-002
   name: Partner Dashboard
   module: Overview
@@ -110,6 +111,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -123,7 +125,7 @@ screens:
   - PTR-007
   boardFrames:
   - Dashboards Board.dc.html#ptr-002
-  wireframe: wireframes/Dashboards Board.dc.html#ptr-002
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-002
   inFlows:
   - F03 Partner books on credit
 - screen: PTR-003
@@ -165,6 +167,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -196,7 +199,7 @@ screens:
   - listOrderRefunds
   - listOrders
   - modifyOrder
-  - releaseChannelAllocation
+  - relinquishChannelAllocation
   - reprintOrder
   - rescheduleOrder
   - resumeOrder
@@ -312,6 +315,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -337,7 +341,7 @@ screens:
   - allocateBlockedSeats
   - createSeatBlock
   - listSeatBlocks
-  - releaseSeatBlock
+  - relinquishSeatBlock
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -353,7 +357,7 @@ screens:
   - PTR-003
   boardFrames:
   - Seat Board 3.dc.html#seat-3d
-  wireframe: wireframes/Seat Board 3.dc.html#seat-3d
+  wireframe: wireframes/P10 Partner Web.dc.html#ptr-009
   inFlows: null
 - screen: PTR-010
   name: Cart & Quote
@@ -365,19 +369,13 @@ screens:
   - addCartLine
   - analysePromotionConflicts
   - checkoutCart
-  - createPromotion
-  - endPromotion
   - evaluatePromotions
   - getCart
   - getPromotion
   - getPromotionUsage
   - listPromotions
-  - pausePromotion
-  - publishPromotion
   - removeCartLine
-  - unschedulePromotion
   - updateCartLine
-  - updatePromotion
   states:
   - emptyFirstRun
   - emptyNoAccess
@@ -410,6 +408,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -461,6 +460,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -621,6 +621,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -647,6 +648,8 @@ screens:
   - rotateApiCredential
   states:
   - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -672,6 +675,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -744,7 +748,8 @@ screens:
   - PTR-031
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-022
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-023
   name: Partner Profile & Organization Setup
   module: Partners
@@ -756,7 +761,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -765,7 +769,8 @@ screens:
   - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-023
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-024
   name: Partner Onboarding & Application Workflow
   module: Partners
@@ -777,7 +782,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -786,7 +790,8 @@ screens:
   - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-024
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-025
   name: Partner Contacts & User Administration
   module: Partners
@@ -798,7 +803,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -807,7 +811,8 @@ screens:
   - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-025
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-026
   name: Territory, Market & Distribution Rights
   module: Partners
@@ -819,7 +824,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -849,7 +853,8 @@ screens:
   - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-027
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-028
   name: Partner Documentation & Compliance Repository
   module: Partners
@@ -861,7 +866,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -870,7 +874,8 @@ screens:
   - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-028
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-029
   name: Partner Access, Roles & Permission Profile
   module: Partners
@@ -882,7 +887,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -891,7 +895,8 @@ screens:
   - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-029
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-030
   name: Partner Approval, Status & Lifecycle Management
   module: Partners
@@ -903,7 +908,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -912,7 +916,8 @@ screens:
   - PTR-022
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-030
-  inFlows: null
+  inFlows:
+  - F110 A partner is onboarded onto the B2B portal
 - screen: PTR-031
   name: Partner 360° Profile, Readiness & AI Review
   module: Partners
@@ -963,7 +968,8 @@ screens:
   - PTR-041
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-032
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-033
   name: Agreement & Contract Terms Builder
   module: Partners
@@ -975,7 +981,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -984,7 +989,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-033
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-034
   name: Partner Rate & Net Pricing Configuration
   module: Partners
@@ -996,7 +1002,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1005,7 +1010,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-034
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-035
   name: Commission, Margin & Incentive Management
   module: Partners
@@ -1026,7 +1032,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-035
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-036
   name: Credit Limit & Exposure Management
   module: Partners
@@ -1038,7 +1045,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1047,7 +1053,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-036
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-037
   name: Deposit, Guarantee & Financial Security Management
   module: Partners
@@ -1068,7 +1075,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-037
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-038
   name: Payment Terms, Billing & Account Configuration
   module: Partners
@@ -1089,7 +1097,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-038
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-039
   name: Commercial Allocation, Quota & Commitment Management
   module: Partners
@@ -1110,7 +1119,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-039
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-040
   name: Booking Limits, Commercial Exceptions & Approval
   module: Partners
@@ -1122,7 +1132,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1131,7 +1140,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-040
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-041
   name: Commercial Agreement 360°, Health & AI Review
   module: Partners
@@ -1152,7 +1162,8 @@ screens:
   - PTR-032
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-041
-  inFlows: null
+  inFlows:
+  - 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
 - screen: PTR-042
   name: Partner Operations Command Center
   module: Partners
@@ -1182,7 +1193,8 @@ screens:
   - PTR-051
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-042
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-043
   name: Partner Orders & Booking Management
   module: Partners
@@ -1203,7 +1215,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-043
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-044
   name: Reservations, Holds & Release Management
   module: Partners
@@ -1224,7 +1237,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-044
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-045
   name: Partner Cancellations, Refunds & Amendments
   module: Partners
@@ -1245,7 +1259,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-045
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-046
   name: Partner Statement & Account Activity
   module: Partners
@@ -1266,7 +1281,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-046
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-047
   name: Partner Reconciliation & Exception Management
   module: Partners
@@ -1287,7 +1303,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-047
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-048
   name: Commission Calculation & Settlement Management
   module: Partners
@@ -1308,7 +1325,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-048
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-049
   name: Partner Disputes, Cases & Service Management
   module: Partners
@@ -1329,7 +1347,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-049
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-050
   name: Partner Performance Scorecard & Risk Monitoring
   module: Partners
@@ -1350,7 +1369,8 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-050
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
 - screen: PTR-051
   name: Partner AI Intelligence & Relationship Optimization
   module: Partners
@@ -1371,4 +1391,5 @@ screens:
   - PTR-042
   boardFrames: null
   wireframe: wireframes/P10 Partner Web.dc.html#ptr-051
-  inFlows: null
+  inFlows:
+  - 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'

@@ -7,11 +7,11 @@
  "audience": "guest",
  "formFactor": "mobileApp",
  "offlineCapable": true,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 71,
-  "operations": 132,
+  "operations": 155,
   "contracts": 16,
   "modules": 16,
   "undrawn": 0,
@@ -147,23 +147,23 @@
  "contracts": [
   {
    "contract": "marketing-crm",
-   "operations": 24
-  },
-  {
-   "contract": "identity",
-   "operations": 23
+   "operations": 30
   },
   {
    "contract": "orders",
-   "operations": 21
+   "operations": 29
+  },
+  {
+   "contract": "identity",
+   "operations": 24
+  },
+  {
+   "contract": "catalogue",
+   "operations": 13
   },
   {
    "contract": "fnb",
    "operations": 12
-  },
-  {
-   "contract": "catalogue",
-   "operations": 11
   },
   {
    "contract": "access",
@@ -171,42 +171,42 @@
   },
   {
    "contract": "retail",
-   "operations": 5
+   "operations": 8
   },
   {
    "contract": "promotions",
+   "operations": 6
+  },
+  {
+   "contract": "queue",
    "operations": 5
+  },
+  {
+   "contract": "white-label",
+   "operations": 4
   },
   {
    "contract": "ai",
    "operations": 4
   },
   {
-   "contract": "queue",
-   "operations": 4
-  },
-  {
-   "contract": "white-label",
-   "operations": 3
-  },
-  {
    "contract": "seating",
    "operations": 3
-  },
-  {
-   "contract": "venue-map",
-   "operations": 2
   },
   {
    "contract": "resources",
    "operations": 2
   },
   {
-   "contract": "finance",
-   "operations": 1
+   "contract": "venue-map",
+   "operations": 2
   },
   {
    "contract": "games",
+   "operations": 1
+  },
+  {
+   "contract": "finance",
    "operations": 1
   }
  ],
@@ -217,7 +217,7 @@
    "module": "Discovery & Browse",
    "wave": 1,
    "route": "/general/home-default",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -289,7 +289,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/review-and-payment",
-   "operations": 5,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -415,7 +415,7 @@
    "module": "In-venue Services",
    "wave": 3,
    "route": "/general/virtual-queue-join-queue",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -442,7 +442,7 @@
    "module": "Retail",
    "wave": 2,
    "route": "/general/retail-merchandise",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -541,7 +541,7 @@
    "module": "Promotions",
    "wave": 2,
    "route": "/general/offers-and-promotions",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -559,7 +559,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/general/profile",
-   "operations": 1,
+   "operations": 2,
    "drawn": true
   },
   {
@@ -577,7 +577,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/general/checkout-entry",
-   "operations": 2,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -775,7 +775,7 @@
    "module": "Marketing",
    "wave": 3,
    "route": "/newsletter-preferences",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -829,7 +829,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/account/payment-methods",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -847,7 +847,7 @@
    "module": "Account & Self-Service",
    "wave": 2,
    "route": "/account/security-sign-in",
-   "operations": 1,
+   "operations": 5,
    "drawn": true
   }
  ],

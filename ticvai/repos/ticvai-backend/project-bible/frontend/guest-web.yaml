@@ -25,11 +25,13 @@ contracts:
 - catalogue
 - finance
 - fnb
+- games
 - identity
 - marketing-crm
 - orders
 - promotions
 - queue
+- resources
 - retail
 - seating
 - venue-map

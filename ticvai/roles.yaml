@@ -1,0 +1,204 @@
+$id: "ticvai/roles.yaml"
+title: TICVAI roles and permissions
+
+description: >
+  ## What this is
+
+  **The role model the package referenced for three weeks and did not have.**
+
+  1,231 screens carry a `permission:` string, and every component may carry one. Until this file
+  existed **nothing defined what a permission was, which role held it, or what a role was** — so
+  `permission: refund.large` on a screen pointed at nothing, and `states.denied` could not be
+  written, which is why it stood at 3 screens out of 1,231.
+
+  ## Where it came from
+
+  **Lifted from the POS board delivered 9 September 2026** (`ROLE_BASE_PERMS`, `permKeys`), which
+  is the only artefact in the project that had a working one. Its shape is kept deliberately:
+  roles are **cumulative** and permissions are **action keys**, because that is what the board
+  proved out against a real escalation flow.
+
+  ## Cumulative, and why that is a decision rather than a convenience
+
+  A role holds its own permissions **and every permission of the roles below it**. A Duty Manager
+  can still do everything a Cashier can, which is the behaviour a venue actually needs at 11pm
+  when the Cashier has gone home.
+
+  The alternative — disjoint sets per role — was rejected because it makes the common case
+  (a manager covering a till) an explicit grant somebody has to remember to make.
+
+  ## Escalation
+
+  A restricted action resolves in one of three ways, in order:
+
+  1. **Self-authorised** — the operator's role holds the permission. Proceed, and still write the
+     audit record.
+  2. **Escalated** — it does not. A supervisor PIN is captured in place, the action proceeds, and
+     the audit record names the approver.
+  3. **Refused** — no approver is available or the action is not escalatable. The screen shows its
+     `denied` state, which is why every screen with a `permission` needs one.
+
+  **Escalation is not the same as denial**, and the two were the same word before this file.
+
+  ## What this file is not
+
+  **It is not enforcement.** Permissions are enforced server-side against the operation, and this
+  file is the vocabulary both sides name. A frontend that hides a button is a courtesy; a backend
+  that refuses the call is the control.
+
+escalation:
+  method: supervisorPin
+  digits: 4
+  approverMinimumRole: supervisor
+  auditRequired: true
+  auditFields: [user, role, action, transactionRef, amount, reason, approver, terminal, shift, at]
+  note: >
+    **Every restricted action writes one audit record whether it was self-authorised or escalated.**
+    Recording only the escalations loses the case where the person who had the permission was the
+    problem, which is the case internal audit actually asks about.
+
+# Roles are listed weakest first. Each inherits everything above it.
+roleOrder: [cashier, seniorCashier, supervisor, dutyManager, venueManager, sysAdmin]
+
+roles:
+  cashier:
+    label: Cashier
+    description: Takes money at a till. The default role for a signed-in operator.
+    grants:
+      - key: sale.create
+        label: Create sale
+      - key: payment.take
+        label: Take payment
+      - key: receipt.print
+        label: Print receipt
+      - key: sale.hold
+        label: Hold sale
+      - key: sale.resume
+        label: Resume sale
+      - key: discount.basic
+        label: Basic discount
+        note: Below the auto-approve threshold only. See `thresholds.discount`.
+      - key: txn.view.own
+        label: View own transactions
+
+  seniorCashier:
+    label: Senior Cashier
+    description: A cashier trusted with the discount band above auto-approve.
+    grants:
+      - key: discount.elevated
+        label: Discount above the auto-approve threshold
+      - key: payment.comp.approve
+        label: Approve complimentary transactions
+      - key: txn.view.terminal
+        label: View terminal transactions
+
+  supervisor:
+    label: Supervisor
+    description: >
+      **The lowest role that can approve somebody else's action**, and therefore the floor for PIN
+      escalation.
+    grants:
+      - key: refund.standard
+        label: Refund below the large-refund threshold
+      - key: void.standard
+        label: Void
+      - key: receipt.reprint
+        label: Reprint receipt
+      - key: cash.adjustment
+        label: Cash adjustment
+      - key: exception.approve
+        label: Approve exceptions
+      - key: payment.reversal
+        label: Reverse a completed payment
+      - key: hardware.drawer.manual
+        label: Open the cash drawer without a sale
+        note: >
+          **A no-sale is the single most reliable indicator of till theft** (F32 step 5), so this is
+          a permission and a reason code, not a button.
+      - key: txn.view.outlet
+        label: View outlet transactions
+
+  dutyManager:
+    label: Duty Manager
+    description: On shift, accountable for the cash position of the venue.
+    grants:
+      - key: refund.large
+        label: Refund above the large-refund threshold
+      - key: discount.large
+        label: Discount above the elevated threshold
+      - key: shift.override
+        label: Shift override
+      - key: cash.variance.approve
+        label: Approve a cash variance at close
+      - key: shift.reopen
+        label: Reopen or force-close a shift
+      - key: adjustment.manual
+        label: Manual adjustment
+      - key: inventory.conflict.resolve
+        label: Resolve an inventory conflict raised on sync
+
+  venueManager:
+    label: Venue Manager
+    description: Accountable for the venue rather than the shift.
+    grants:
+      - key: txn.view.venue
+        label: View venue transactions
+      - key: reporting.venue
+        label: Venue reporting
+      - key: pricing.override
+        label: Pricing override
+      - key: staff.manage
+        label: Manage staff
+
+  sysAdmin:
+    label: System Administrator
+    description: Configures the estate. **Not a trading role** — it holds no approval it cannot audit.
+    grants:
+      - key: terminal.config
+        label: Terminal configuration
+      - key: tax.config
+        label: Tax configuration
+      - key: payment.config
+        label: Payment configuration
+      - key: user.role.config
+        label: User and role configuration
+      - key: venue.config
+        label: Venue configuration
+      - key: txn.view.tenant
+        label: View tenant transactions
+
+# --- Thresholds -------------------------------------------------------------------------
+# **A threshold is declared once and read everywhere.** The POS board carried each of these twice
+# — once in the text shown to the operator and once in the branch that enforced it — and the two
+# disagreed on refunds: the screen said "above AED 300 a manager PIN is required" while the code
+# escalated at AED 1,000. See POS-BOARD-AUDIT.md C-2.
+thresholds:
+  discount:
+    autoApproveMaxPercent: 15
+    autoApproveMaxAmount: 200
+    elevatedPermission: discount.elevated
+    largeAmount: 500
+    largePermission: discount.large
+    currency: AED
+  refund:
+    standardPermission: refund.standard
+    largeAmount: 1000
+    largePermission: refund.large
+    currency: AED
+  taxInvoice:
+    fullInvoiceAtOrAbove: 10000
+    currency: AED
+    requiresBuyerDetails: [name, address, trn]
+    note: >
+      **Above this a simplified tax invoice is not lawful** — a full UAE tax invoice must carry the
+      buyer's name, address and TRN. The POS board relabels the receipt at this threshold and
+      captures none of the three. Raised as POS-BOARD-AUDIT.md C-11; needs a field on `POS-005`.
+
+# --- Multi-tenant scope chain ------------------------------------------------------------
+# Every permission resolves against a scope, and the scope is resolved at sign-in and stamped
+# onto every transaction, sync record and audit entry.
+scopeChain: [platform, tenant, venue, outlet, terminal, operator, shift, transaction]
+scopeChainNote: >
+  Taken from the POS board's `TENANT_CONTEXT`, which is the only place the full chain was written
+  down. `txn.view.own` … `txn.view.tenant` are the same chain expressed as permissions, and they
+  should stay aligned: a role that can view at a level can view everything below it.

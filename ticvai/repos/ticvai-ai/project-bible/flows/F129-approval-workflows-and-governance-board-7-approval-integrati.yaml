@@ -1,0 +1,135 @@
+id: F129
+name: 'Approval Workflows and Governance board 7: Approval Integration Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 7. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-349
+  entryPoints:
+  - Arrives at Approval Integration Command Center
+steps:
+- step: 1
+  screen: ADM-349
+  action: Opens Approval Integration Command Center
+  operations: []
+  outcome: Provide administrators and technical teams with a centralized overview of all systems connected
+    to the Approval Engine.
+- step: 2
+  screen: ADM-350
+  action: Works in Module Integration Registry
+  operations: []
+  outcome: Define which TICVAI modules are allowed to initiate and consume approval workflows.
+- step: 3
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-351
+  action: Works in Approval API Management
+  operations: []
+  outcome: Configure and monitor APIs used to create, retrieve and process approval requests. The matrix
+    explicitly requires approval workflows to be exposed through APIs.
+- step: 5
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-352
+  action: Works in Workflow Event Framework
+  operations: []
+  outcome: Configure the business events published by the Approval Engine. The matrix requires workflow
+    events to be published through the platform event framework.
+- step: 7
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-353
+  action: Works in Webhook Configuration & Subscription Manager
+  operations: []
+  outcome: Allow external or internal systems to subscribe to approval events. The source explicitly requires
+    webhook notifications for approval events.
+- step: 9
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-354
+  action: Works in External Workflow System Integration
+  operations: []
+  outcome: Allow TICVAI to integrate with third-party workflow/governance platforms when a client already
+    operates an enterprise approval environment. The matrix specifically requires integration with third-party
+    workflow systems.
+- step: 11
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-355
+  action: Works in Data & Workflow Mapping Studio
+  operations: []
+  outcome: Map external system data to TICVAI's approval data model without requiring custom development
+    for every integration.
+- step: 13
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-356
+  action: Works in Integration Security & Access Control
+  operations: []
+  outcome: Govern which applications and external systems can access the Approval Engine.
+- step: 15
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-357
+  action: Works in Integration Monitoring, Error & Retry Center
+  operations: []
+  outcome: Provide technical teams with real-time monitoring of integration failures.
+- step: 17
+  screen: ADM-349
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-358
+  action: Works in Integration Analytics & AI Health Advisor
+  operations: []
+  outcome: Provide technical and business teams with analytics on Approval Engine integration performance.
+branches:
+- at: 1
+  condition: Nothing has been set up on Approval Integration Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 7 visited
+primaryContract: unknown
+contracts:
+- unknown

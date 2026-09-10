@@ -1,0 +1,157 @@
+id: F115
+name: 'Access Control board 5: Biometric Access Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 5. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-184
+  entryPoints:
+  - Arrives at Biometric Access Command Center
+steps:
+- step: 1
+  screen: BO-184
+  action: Opens Biometric Access Command Center
+  operations:
+  - listBiometricAccess
+  outcome: Central dashboard for biometric access configuration and operational health.
+- step: 2
+  screen: BO-185
+  action: Works in Biometric Verification Profile Builder
+  operations:
+  - setBiometricVerificationProfile
+  outcome: Configure which ticket/credential types can or must use biometric verification. The matrix
+    specifically requires biometric checks to be configurable by ticket type, including memberships, annual
+    passes, multi-day and multi-attraction products.
+- step: 3
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-186
+  action: Works in Face Pass Enrollment Configuration
+  operations:
+  - setFacePassEnrollment
+  outcome: Configure persistent Face Pass registration. The source specifies that Face Pass may be registered
+    through the App, ticket counters or Annual Pass counter.
+- step: 5
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-187
+  action: Works in Biometric Consent & Guardian Management
+  operations:
+  - listBiometricConsentGuardian
+  outcome: Manage consent requirements associated with persistent biometric enrollment. The matrix requires
+    App users to provide consent before Face Pass registration and requires guardian consent for minors.
+    On-site enrollment also requires consent before facial data is captured.
+- step: 7
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-188
+  action: Works in Face Tag Temporary Enrollment
+  operations:
+  - listFaceTagTemporary
+  outcome: Configure the temporary biometric model separately from Face Pass. The matrix describes Face
+    Tag as temporarily stored facial data, enrollable at ticket counters or entry gates, with biometric
+    data permanently deleted once the associated ticket is fully redeemed.
+- step: 9
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-189
+  action: Works in Face Matching & Verification Thresholds
+  operations:
+  - listFaceMatchingVerification
+  outcome: Configure biometric verification behavior. The source requires a configurable Biometric Check
+    Level determining the scoring of biometric comparison.
+- step: 11
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-190
+  action: Works in Face Change, Re-enrollment & Identity Protection
+  operations:
+  - listFaceChangeEnrollment
+  outcome: Prevent guests from replacing a registered biometric identity with another person's face. The
+    source explicitly states that customers may re-register Face Pass, but the system must compare the
+    new facial data with the previous profile. If the difference exceeds an acceptable threshold, the
+    update is blocked and venue assistance is required.
+- step: 13
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-191
+  action: Works in Biometric Validation at Gate
+  operations:
+  - listBiometricValidationGate
+  outcome: Configure how facial verification interacts with the physical access-control journey.
+- step: 15
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-192
+  action: Works in Biometric Lifecycle, Retention & Deletion
+  operations:
+  - listBiometricLifecycleRetention
+  outcome: Manage biometric-data lifecycle and deletion rules.
+- step: 17
+  screen: BO-184
+  action: Returns to the board's landing screen
+  operations:
+  - listBiometricAccess
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-193
+  action: Works in Biometric Simulation, Audit & Publication
+  operations:
+  - listBiometric
+  outcome: Test biometric configurations before live deployment.
+branches:
+- at: 1
+  condition: Nothing has been set up on Biometric Access Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 5 visited
+primaryContract: access
+contracts:
+- access

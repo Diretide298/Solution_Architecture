@@ -1,0 +1,160 @@
+id: F150
+name: 'Privacy  Consent   Preference Management board 1: Privacy & Consent Configuration Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P13 Venue CMS
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Privacy  Consent   Preference Management board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: CMS-021
+  entryPoints:
+  - Arrives at Privacy & Consent Configuration Command Center
+steps:
+- step: 1
+  screen: CMS-021
+  action: Opens Privacy & Consent Configuration Command Center
+  operations:
+  - listPrivacyConsent
+  outcome: Provide administrators with one central dashboard for configuring and governing TICVAI's privacy
+    framework across tenants, brands, venues and customer channels.
+- step: 2
+  screen: CMS-022
+  action: Works in Data Processing Purpose & Lawful Basis Registry
+  operations:
+  - listDataProcessingPurpose
+  outcome: Create a central registry explaining why customer data is being collected or processed. This
+    becomes the foundation used by consent forms, policies, customer journeys and downstream systems.
+    Ticket Purchase & Fulfillment Customer Account Management Membership Administration Customer Support
+    Transactional Communication Marketing Communication Personalization Analytics Fraud Prevention Security
+    Biometric Processing Location-Based Services Loyalty Customer Research
+- step: 3
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: CMS-023
+  action: Works in Consent Purpose & Consent Type Builder
+  operations:
+  - setConsentPurposes
+  outcome: Configure the actual consent objects that TICVAI may request from customers.
+- step: 5
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: CMS-024
+  action: Works in Communication Preference & Marketing Permission Configuration
+  operations:
+  - setCommunicationPreferenceMarketing
+  outcome: Define how customers control the communications they wish to receive. This screen should integrate
+    strongly with CRM and Marketing but remain governed by the central Privacy Engine.
+- step: 7
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: CMS-025
+  action: Works in Cookie, Tracking & Digital Technology Registry
+  operations:
+  - listCookieTrackingDigital
+  outcome: Maintain a centralized registry of cookies, SDKs, pixels and other governed tracking technologies
+    used by TICVAI digital channels. This should cover more than traditional browser cookies.
+- step: 9
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: CMS-026
+  action: Works in Cookie Banner & Preference Center Designer
+  operations:
+  - listCookieBannerPreference
+  outcome: Provide a no-code designer for privacy/cookie interfaces displayed on digital channels.
+- step: 11
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: CMS-027
+  action: Works in Consent Capture Point & Customer Journey Configuration
+  operations:
+  - setConsentCapturePoint
+  outcome: Define where, when and under what circumstances privacy notices and consent requests appear.
+    This prevents each channel from implementing consent independently.
+- step: 13
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: CMS-028
+  action: Works in Privacy Notice, Policy & Terms Version Management
+  operations:
+  - listPrivacyNoticePolicy
+  outcome: Manage customer-facing privacy notices and related governed documents with complete version
+    control.
+- step: 15
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: CMS-029
+  action: Works in Minor, Guardian & Age-Based Privacy Configuration
+  operations:
+  - setMinorGuardianAge
+  outcome: 'Provide specialized privacy configuration for journeys involving children and guardians. This
+    is especially important for TICVAI customers operating: Theme parks Attractions Camps Academies Family
+    entertainment Children''s events'
+- step: 17
+  screen: CMS-021
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacyConsent
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: CMS-030
+  action: Works in Privacy Configuration Testing, Approval & Publication
+  operations:
+  - approvePrivacyTesting
+  outcome: Act as the final governance gate before privacy configurations are deployed into production.
+    No major privacy configuration should move directly from editing to production without validation.
+    Board 1 defines what TICVAI's privacy rules are. Board 2 manages what happens after those rules are
+    live and customers begin interacting with them.
+branches:
+- at: 1
+  condition: Nothing has been set up on Privacy & Consent Configuration Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Privacy  Consent   Preference Management board 1 visited
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

@@ -1,0 +1,160 @@
+id: F118
+name: 'Access Control board 8: Guest Journey Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 8. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-214
+  entryPoints:
+  - Arrives at Guest Journey Command Center
+steps:
+- step: 1
+  screen: BO-214
+  action: Opens Guest Journey Command Center
+  operations:
+  - listGuestJourney
+  outcome: Central configuration and monitoring screen for all special and multi-person admission journeys.
+- step: 2
+  screen: BO-215
+  action: Works in Group & B2B Admission Profile Builder
+  operations:
+  - setGroupAdmissionProfile
+  outcome: Group & B2B Admission Profile Builder
+- step: 3
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-216
+  action: Works in Group Leader & Fast B2B Validation
+  operations:
+  - listGroupLeaderFast
+  outcome: Solve the specific matrix requirement for faster entrance flow when large B2B groups have multiple
+    tickets stored on one device.
+- step: 5
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-217
+  action: Works in Group Attendance & Partial Entry Manager
+  operations:
+  - listGroupAttendancePartial
+  outcome: Manage actual attendance when fewer guests arrive than the quantity purchased. The matrix explicitly
+    requires the scanner to show the exact group size and allow the operator to enter actual attendants
+    so daily attendance is updated correctly.
+- step: 7
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-218
+  action: Works in Family, Child, POD & Companion Journey
+  operations:
+  - listFamilyChildPod
+  outcome: Configure linked-person access journeys. The matrix requires child protection through adult-ticket
+    pairing or biometric validation of the assigned adult. It also requires POD accompanying persons and
+    nannies to be bound to a primary guest and only enter when accompanied by that guest.
+- step: 9
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-219
+  action: Works in Re-entry & Temporary Exit Journey
+  operations:
+  - listEntryTemporaryExit
+  outcome: Manage guests temporarily leaving and returning to the venue. The source matrix requires configurable
+    re-entry and also describes a journey using a designated re-entry gate with both ticket verification
+    and a UV stamp.
+- step: 11
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-220
+  action: Works in Multi-Park & Crossover Journey Orchestrator
+  operations:
+  - listMultiParkCrossover2
+  outcome: Operationalize the multi-park rules configured in Board 2. The matrix specifically distinguishes
+    crossover from normal entry and re-entry and requires crossover to be tracked separately.
+- step: 13
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-221
+  action: Works in Fast Pass & Attraction Access Journey
+  operations:
+  - listFastPassAttraction
+  outcome: Configure the operational experience for limited and unlimited priority-access entitlements.
+    The matrix requires Silver Fast Pass to support three accesses and Gold to support unlimited access
+    with an optional one-access-per-ride restriction.
+- step: 15
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-222
+  action: Works in Special Event, Free View & Alternative Admission
+  operations:
+  - listSpecialEventFree
+  outcome: Configure temporary/special admission processes that differ from normal venue access. The matrix
+    requires special-event products capable of capturing attendance without physical admission, N- person
+    attendance entered through a turnstile/tablet/handheld, and Free View days where main gates are open
+    while attraction gates continue validating tickets.
+- step: 17
+  screen: BO-214
+  action: Returns to the board's landing screen
+  operations:
+  - listGuestJourney
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-223
+  action: Works in Journey Simulation, Audit & Publication
+  operations:
+  - listJourneys
+  outcome: Test an entire guest journey—not merely an individual scan—before deploying it.
+branches:
+- at: 1
+  condition: Nothing has been set up on Guest Journey Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 8 visited
+primaryContract: access
+contracts:
+- access
+- marketing-crm

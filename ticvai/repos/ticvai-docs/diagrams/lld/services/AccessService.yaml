@@ -1537,6 +1537,7 @@ writesOutside:
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
 - P01:WEB-018 My Tickets
+- P01:WEB-024 Devices, Wishlist & Consent
 - P01:WEB-041 Parking – Reserve & Pay
 - P02:GST-001 Home – Default
 - P02:GST-012 My Tickets
@@ -1546,6 +1547,7 @@ screens:
 - P02:GST-069 Face Pass
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-013 Mobile POS, Event Sales & Offline Operations
+- P04:POS-016 Till Configuration
 - P06:EMP-010 Scan — ready
 - P06:EMP-015 Group scan
 - P06:EMP-017 Sync & reconciliation
@@ -1719,6 +1721,21 @@ flows:
 - F06 Guest enters the venue
 - F10 Partner books, uses and settles
 - F107 A report is defined, scheduled and delivered
+- 'F111 Access Control board 1: Access Control Command Center'
+- 'F112 Access Control board 2: Access Rule Command Center'
+- 'F113 Access Control board 3: Digital Credential Security Command Center'
+- 'F114 Access Control board 4: Media & Credential Command Center'
+- 'F115 Access Control board 5: Biometric Access Command Center'
+- 'F116 Access Control board 6: Device & Gate Command Center'
+- 'F117 Access Control board 7: Offline & Edge Operations Command Center'
+- 'F118 Access Control board 8: Guest Journey Command Center'
+- 'F119 Access Control board 9: Live Access Operations Command Center'
+- 'F120 Access Control board 10: Dynamic Access Policy Command Center'
+- 'F121 Access Control board 11: Access Security & Fraud Command Center'
+- 'F122 Access Control board 12: Access Monitoring & Analytics Command Center'
+- 'F168 Ticket Media   Credential Management board 1: Virtual Ticket Command Center'
+- 'F169 Ticket Media   Credential Management board 2: Media Design Studio Command Center'
+- 'F170 Ticket Media   Credential Management board 3: Credential Operations Command Center'
 - F19 A membership works in another country
 - F23 A contractor gets a badge and uses it
 - F50 A guest arrives, parks, and gets in

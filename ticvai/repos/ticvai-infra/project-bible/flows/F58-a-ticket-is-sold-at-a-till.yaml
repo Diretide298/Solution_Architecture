@@ -114,10 +114,10 @@ branches:
   - at: 6
     condition: The payment fails after the lease was taken.
     behaviour: >
-      `releaseInventoryHold` returns the slot immediately rather than waiting for expiry. **A failed payment
+      `relinquishInventoryHold` returns the slot immediately rather than waiting for expiry. **A failed payment
       holding inventory for fifteen minutes is a slot the venue could have sold.**
     severity: high
-    resolvedBy: releaseInventoryHold
+    resolvedBy: relinquishInventoryHold
 
   - at: 8
     condition: The till is offline.

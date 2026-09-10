@@ -1,0 +1,155 @@
+id: F112
+name: 'Access Control board 2: Access Rule Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 2. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-154
+  entryPoints:
+  - Arrives at Access Rule Command Center
+steps:
+- step: 1
+  screen: BO-154
+  action: Opens Access Rule Command Center
+  operations:
+  - listAccessRule
+  outcome: Central configuration dashboard for all access and entitlement rules.
+- step: 2
+  screen: BO-155
+  action: Works in Visual Access Rule Builder
+  operations:
+  - setVisualAccessRule
+  outcome: Provide a no-code rule engine. This is where TICVAI should become significantly easier to configure
+    than traditional access-control systems.
+- step: 3
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-156
+  action: Works in Entry, Exit & Re-entry Rules
+  operations:
+  - listEntryExitRule
+  outcome: Configure admission quantity and journey sequencing. The source matrix explicitly requires
+    configurable quantities for entry, exit and same-day re-entry, anti- passback intervals, required
+    exit before re-entry, and required entry before exit.
+- step: 5
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-157
+  action: Works in Anti-Passback & Journey Sequence
+  operations:
+  - listAntiPassbackJourney
+  outcome: Prevent credential sharing and impossible access sequences.
+- step: 7
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-158
+  action: Works in Access Validity & Time Rules
+  operations:
+  - listAccessValidityTime
+  outcome: Determine when access is permitted.
+- step: 9
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-159
+  action: Works in Entitlement Consumption Engine
+  operations:
+  - listEntitlementConsumption
+  outcome: Determine what gets consumed when access is granted. This is critical because one credential
+    may represent several different entitlements. The matrix specifically describes a single QR capable
+    of carrying park admission, ride entitlement, meal voucher, coupon, photo voucher and re-entry rights.
+- step: 11
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-160
+  action: Works in Multi-Park & Crossover Rules
+  operations:
+  - listMultiParkCrossover
+  outcome: Configure complex access between multiple parks/venues. The matrix specifically requires multi-park
+    access on different days, same-day crossover, park-specific entry quantities and conditional access
+    based on previous park admission.
+- step: 13
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-161
+  action: Works in Guest, Companion & Eligibility Rules
+  operations:
+  - listGuestCompanionEligibility
+  outcome: Apply access conditions based on guest characteristics and relationships.
+- step: 15
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-162
+  action: Works in Group Admission & Quantity Validation
+  operations:
+  - listGroupAdmissionQuantity
+  outcome: Handle B2B groups, school groups, tour groups and family/group tickets efficiently. The matrix
+    specifically calls for faster admission for large B2B groups and the ability for one QR/group ticket
+    to represent multiple admissions.
+- step: 17
+  screen: BO-154
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessRule
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-163
+  action: Works in Rule Simulation, Conflict Check & Publication
+  operations:
+  - publishRuleConflictCheck
+  outcome: No access rule should reach a live gate without being tested.
+branches:
+- at: 1
+  condition: Nothing has been set up on Access Rule Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 2 visited
+primaryContract: access
+contracts:
+- access

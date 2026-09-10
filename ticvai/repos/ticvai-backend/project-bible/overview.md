@@ -107,7 +107,7 @@ Positions below are decided. Reopening requires §9 change control.
 | 3.3.6 | Repository topology is **hybrid**: separate repos per runtime (contracts, backend, frontend, AI, infra); monorepo *within* frontend only | `DESIGN` |
 | 3.3.7 | Services split only where **availability domains** differ — venue edge (offline), AI (residency), reporting (analytical load). Target 6–8 services, not one per bounded context | `DESIGN` |
 | 3.3.8 | Read scaling via replicas + CDN. Access validation reads the **primary unconditionally** to avoid replication lag refusing valid tickets at a turnstile | `DESIGN` |
-| 3.3.9b | **ADR-0010 cross-cell machinery is Wave 1**, not an exception path. Every multi-region tenant exercises it continuously | Derived from ADR-0014 |
+| 3.3.9b | **ADR-0010 cross-region machinery is Wave 1**, not an exception path. Every multi-region tenant exercises it continuously | Derived from ADR-0014 |
 | 3.3.9 | Cross-tenant analytics uses a **central warehouse fed by per-cell event export**. Cells are never queried directly | `DESIGN` |
 
 **Rationale for 3.3.4 (venue partitioning, not separate databases).** The following features

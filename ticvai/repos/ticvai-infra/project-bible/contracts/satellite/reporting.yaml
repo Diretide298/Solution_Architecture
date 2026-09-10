@@ -229,6 +229,7 @@ paths:
       x-ticvai-consumed-by:
         - "P04 POS-009 Staff Roster"
         - "P04 POS-020 Shift Exceptions & Alerts"
+        - "P04 POS-025 Till Home"
         - "P06 EMP-070 Inventory Exceptions, AI Replenishment & Action Center"
         - "P08 BO-036 Device Registry"
         - "P08 BO-125 Product & Category Button Configuration"

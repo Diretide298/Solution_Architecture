@@ -39875,5 +39875,209 @@
    "postgres",
    "redis"
   ]
+ },
+ "relinquishCustomDomain": {
+  "contract": "white-label",
+  "verb": "DELETE",
+  "path": "/tenant-domains/{domainId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "TENANT_CONFIGURE",
+  "offline": false,
+  "summary": "Give the domain up",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "WhiteLabelService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "relinquishInventoryHold": {
+  "contract": "catalogue",
+  "verb": "DELETE",
+  "path": "/inventory-holds/{inventoryHoldId}",
+  "reads": [
+   "catalogue.inventory_hold"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "workstation",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Return unsold units",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "relinquishSeatBlock": {
+  "contract": "seating",
+  "verb": "DELETE",
+  "path": "/seat-blocks/{blockId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Release a block back to sale",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "relinquishSeatHold": {
+  "contract": "seating",
+  "verb": "DELETE",
+  "path": "/seat-holds/{holdId}",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Release a hold",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "relinquishStoredValue": {
+  "contract": "orders",
+  "verb": "POST",
+  "path": "/stored-value/authorisations/{authorisationId}/release",
+  "reads": [
+   "orders.stored_value_authorisation"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Give a hold back",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "device"
+  ],
+  "service": "OrderService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "relinquishWalletAuthorisation": {
+  "contract": "cross-region",
+  "verb": "POST",
+  "path": "/wallet-authorisations/{authorisationId}/release",
+  "reads": [
+   "platform.wallet_authorisation"
+  ],
+  "writes": [],
+  "routing": null,
+  "scope": "workstation",
+  "perm": "ORDER_CREATE",
+  "offline": false,
+  "summary": "Release a hold without capturing",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "CrossRegionService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "listStepUpPolicies": {
+  "contract": "approvals",
+  "verb": "GET",
+  "path": "/step-up-policies",
+  "reads": [
+   "approvals.step_up_policy"
+  ],
+  "writes": [],
+  "routing": "replica",
+  "scope": "tenant",
+  "perm": "APPROVAL_CONFIGURE",
+  "offline": false,
+  "summary": "What needs a second factor here",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "relinquishChannelAllocation": {
+  "contract": "catalogue",
+  "verb": "POST",
+  "path": "/channel-capacities/{channelCapacityId}/channel-allocations/release",
+  "reads": [],
+  "writes": [],
+  "routing": null,
+  "scope": "venue",
+  "perm": "CAPACITY_CONFIGURE",
+  "offline": false,
+  "summary": "Return unsold channel allocation to the general pool",
+  "source": "derived",
+  "audience": [
+   "staff",
+   "partner"
+  ],
+  "service": "CatalogueService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
+ },
+ "setStepUpPolicy": {
+  "contract": "approvals",
+  "verb": "PUT",
+  "path": "/step-up-policies",
+  "reads": [
+   "approvals.step_up_policy"
+  ],
+  "writes": [
+   "approvals.step_up_policy"
+  ],
+  "routing": null,
+  "scope": "tenant",
+  "perm": "APPROVAL_CONFIGURE",
+  "offline": false,
+  "summary": "Raise what needs a second factor",
+  "source": "derived",
+  "audience": [
+   "staff"
+  ],
+  "service": "TenancyService",
+  "stores": [
+   "postgres",
+   "redis"
+  ]
  }
 }

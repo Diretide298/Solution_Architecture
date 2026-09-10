@@ -53,6 +53,14 @@ def screens() -> dict:
     return out
 
 
+# Board file -> the archive directory holding it, filled by `board_anchors()`.
+ARCHIVED: dict[str, str] = {}
+
+# **A hazard is not a break, and neither is a record of something that has been put away.**
+# Both resolve today; both would mislead somebody if they went unsaid.
+ARCHIVE_OK = {"anchor collision", "archived board frame"}
+
+
 def board_anchors() -> dict:
     """Anchors per board file.
 
@@ -64,6 +72,18 @@ def board_anchors() -> dict:
     for f in (ROOT / "wireframes").glob("*.dc.html"):
         txt = f.read_text(encoding="utf-8", errors="replace")
         out[f.name] = set(re.findall(r'(?<![-\w])id="([A-Za-z0-9_-]+)"', txt))
+    # **An archived board is not a missing board.** 67 Claude Design boards were moved to
+    # `_dump/` on 9 September because they are being redrawn, and the 217 `boardFrames` entries
+    # recording which frame drew which screen went on pointing at them. Those entries are *true*
+    # — that frame did draw that screen, and the file is still openable — so calling them broken
+    # sends somebody to fix a correct record. They are reported separately instead.
+    for d in sorted((ROOT / "_dump").glob("wireframes-*")):
+        for f in d.glob("*.html"):
+            if f.name in out:
+                continue
+            txt = f.read_text(encoding="utf-8", errors="replace")
+            out[f.name] = set(re.findall(r'(?<![-\w])id="([A-Za-z0-9_-]+)"', txt))
+            ARCHIVED[f.name] = d.name
     return out
 
 
@@ -79,7 +99,7 @@ def audit(detail: bool = False) -> dict:
         "screen -> operation", "screen -> screen", "screen -> board anchor",
         "flow -> screen", "flow -> operation", "state -> operation",
         "operation -> table", "diagram -> diagram", "operation audience",
-        "anchor collision",
+        "anchor collision", "archived board frame",
     )}
 
     for sid, (code, s) in scr.items():
@@ -97,7 +117,9 @@ def audit(detail: bool = False) -> dict:
         if b and "#" in b:
             fn, _, anc = b.partition("#")
             fn = os.path.basename(fn)
-            if fn not in anchors:
+            if fn in ARCHIVED:
+                broken["archived board frame"].append(f"{sid} -> {fn} (in {ARCHIVED[fn]})")
+            elif fn not in anchors:
                 broken["screen -> board anchor"].append(f"{sid} -> {fn} (no such board)")
             elif anc not in anchors[fn]:
                 broken["screen -> board anchor"].append(f"{sid} -> {fn}#{anc} (no such anchor)")
@@ -110,7 +132,9 @@ def audit(detail: bool = False) -> dict:
         for fr in (s.get("boardFrames") or []):
             if "#" in fr:
                 bn, _, an = fr.partition("#")
-                if bn not in anchors:
+                if bn in ARCHIVED:
+                    broken["archived board frame"].append(f"{sid} claims {fr} (in {ARCHIVED[bn]})")
+                elif bn not in anchors:
                     broken["screen -> board anchor"].append(f"{sid} claims {fr} (no such board)")
                 elif an not in anchors[bn]:
                     broken["screen -> board anchor"].append(f"{sid} claims {fr} (no such anchor)")
@@ -156,7 +180,10 @@ def audit(detail: bool = False) -> dict:
     # needed qualifying, which is why `boardFrames` now carries the board.
     _seen: dict = {}
     for bn, ids in anchors.items():
-        if "Index" in bn:
+        # **A collision needs two boards a reader could actually land on.** Archived boards are
+        # indexed so their `boardFrames` records resolve, not so they can argue with live ones —
+        # counting them turned 728 collisions into 1,049 without a single new hazard.
+        if "Index" in bn or bn in ARCHIVED:
             continue
         for a in ids:
             if re.match(r"^[A-Za-z]{2,6}-\d", a):
@@ -211,7 +238,7 @@ def main() -> int:
     print("=== LINK INTEGRITY ===\n")
     res = audit(a.detail)
     for k, v in res.items():
-        mark = "  " if v == 0 else ("~~" if k in {"anchor collision"} else "!!")
+        mark = "  " if v == 0 else ("~~" if k in ARCHIVE_OK else "!!")
         print(f"  {mark} {k:26}{v}")
 
     print("\n=== REACH ===\n")
@@ -221,13 +248,15 @@ def main() -> int:
     # **A collision is a hazard, not a break.** Every reference that used a bare anchor is now
     # qualified with its board, so nothing resolves wrongly today — but the next tool to store a
     # bare anchor will, and that is worth saying every run rather than discovering twice.
-    WARN_ONLY = {"anchor collision"}
-    bad = sum(v for k, v in res.items() if k not in WARN_ONLY)
-    warn = sum(v for k, v in res.items() if k in WARN_ONLY)
+    bad = sum(v for k, v in res.items() if k not in ARCHIVE_OK)
     print()
-    if warn:
-        print(f"  ~~ {warn} anchor collision(s) — references are qualified, so nothing resolves "
-              "wrongly. A bare anchor stored anywhere would.")
+    if res.get("anchor collision"):
+        print(f"  ~~ {res['anchor collision']} anchor collision(s) — references are qualified, so "
+              "nothing resolves wrongly. A bare anchor stored anywhere would.")
+    if res.get("archived board frame"):
+        print(f"  ~~ {res['archived board frame']} pointer(s) into an archived board — the frame "
+              "opens, it is just no longer part of the package. This is the record of what Claude "
+              "Design drew, and it is kept so the redraw knows what existed.")
     if bad:
         print(f"  {bad} broken link(s). Run with --detail to see them.")
         return 1

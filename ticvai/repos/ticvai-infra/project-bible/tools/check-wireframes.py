@@ -254,8 +254,20 @@ def main() -> int:
         if _mf.exists() and _f.name not in _known:
             continue
         _txt = _f.read_text(encoding="utf-8")
-        _is_index = not set(re.findall(r'id="([^"]+)"', _txt)) and 'href=' in _txt
-        if _f.name not in referenced and "Index" not in _f.name and not _is_index:
+        _own = set(re.findall(r'id="([^"]+)"', _txt))
+        _is_index = not _own and 'href=' in _txt
+        # **A composition is a second view, not a second home.** The app boards render the same
+        # frames as the platform boards they are built from, so no screen will ever name one in
+        # `wireframe.board` — every one of those screens already names its platform board. The
+        # test is whether this board carries an anchor that exists nowhere else: if it does not,
+        # nothing here is homeless and there is nothing to warn about.
+        _elsewhere = set()
+        for _g in BOARDS.glob("*.dc.html"):
+            if _g.name != _f.name and _g.name in referenced:
+                _elsewhere |= set(re.findall(r'id="([^"]+)"', _g.read_text(encoding="utf-8")))
+        _is_composition = bool(_own) and not (_own - _elsewhere)
+        if (_f.name not in referenced and "Index" not in _f.name
+                and not _is_index and not _is_composition):
             WARNINGS.append(f"{_f.name}: on disk and nothing points at it. Either a screen "
                             "declares it or it should not ship")
 

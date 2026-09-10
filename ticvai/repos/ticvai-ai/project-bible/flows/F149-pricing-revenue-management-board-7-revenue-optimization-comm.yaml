@@ -1,0 +1,154 @@
+id: F149
+name: 'Pricing   Revenue Management board 7: Revenue Optimization Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Pricing   Revenue Management board 7. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-108
+  entryPoints:
+  - Arrives at Revenue Optimization Command Center
+steps:
+- step: 1
+  screen: ADM-108
+  action: Opens Revenue Optimization Command Center
+  operations:
+  - listRevenue
+  outcome: Provide Revenue Managers with the operational control center for all dynamic pricing simulations,
+    AI recommendations, automated changes, experiments and revenue optimization activity.
+- step: 2
+  screen: ADM-109
+  action: Works in Pricing Simulation Studio
+  operations:
+  - setPricing
+  outcome: Allow any proposed dynamic-pricing change to be tested before affecting live customers. This
+    should become the sandbox of the Dynamic Pricing Engine.
+- step: 3
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-110
+  action: Works in Scenario Modeling & What-If Analysis
+  operations:
+  - listScenarioModelingWhat
+  outcome: Scenario Modeling & What-If Analysis
+- step: 5
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-111
+  action: Works in A/B Pricing Experiment Studio
+  operations:
+  - setPricingExperiment
+  outcome: Allow TICVAI to scientifically test different pricing strategies using controlled customer
+    groups. This is essential because AI should learn from actual customer behavior, not only historical
+    assumptions.
+- step: 7
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-112
+  action: Works in Revenue & Demand Impact Forecasting
+  operations:
+  - listRevenueDemandImpact
+  outcome: Provide a dedicated commercial impact assessment before a dynamic-pricing action is approved
+    or executed.
+- step: 9
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-113
+  action: Works in AI Recommendation Review & Decision Queue
+  operations:
+  - listRecommendationReviewDecision
+  outcome: Provide the human decision workspace for recommendations produced by Board 6. This should be
+    the Revenue Manager's inbox.
+- step: 11
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-114
+  action: Works in Automation Policy & Autonomous Pricing Orchestrator
+  operations:
+  - listAutomationPolicyAutonomous
+  outcome: Control when TICVAI is allowed to execute pricing changes automatically. Board 5 defines the
+    strategy-level automation permission. This screen manages operational autonomous execution at scale.
+- step: 13
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-115
+  action: Works in Live Dynamic Price Execution & Deployment Monitor
+  operations:
+  - createLiveDynamicPrice
+  outcome: Monitor pricing actions as they are executed across TICVAI's selling ecosystem.
+- step: 15
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-116
+  action: Works in Dynamic Pricing Performance & Optimization Analytics
+  operations:
+  - listDynamicPricingPerformance
+  outcome: Determine whether dynamic pricing actually improves TICVAI's commercial performance.
+- step: 17
+  screen: ADM-108
+  action: Returns to the board's landing screen
+  operations:
+  - listRevenue
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-117
+  action: Works in AI Learning, Model Performance & Optimization Feedback
+  operations:
+  - listLearningModelPerformance
+  outcome: Close the intelligence loop by comparing AI predictions and recommendations with actual commercial
+    outcomes. This is what allows the system to improve over time.
+branches:
+- at: 1
+  condition: Nothing has been set up on Revenue Optimization Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Pricing   Revenue Management board 7 visited
+primaryContract: catalogue
+contracts:
+- catalogue

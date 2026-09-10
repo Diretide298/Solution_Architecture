@@ -1,0 +1,150 @@
+id: F135
+name: 'Customer Service board 2: Contact Center Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P12 Venue Support
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Customer Service board 2. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: SUP-019
+  entryPoints:
+  - Arrives at Contact Center Operations Command Center
+steps:
+- step: 1
+  screen: SUP-019
+  action: Opens Contact Center Operations Command Center
+  operations:
+  - listContact
+  outcome: Provide supervisors and management with a real-time view of customer-service operations across
+- step: 2
+  screen: SUP-020
+  action: Works in Queue Configuration & Management
+  operations:
+  - listQueues
+  outcome: Configure and operate the queues through which customer-service cases are organized.
+- step: 3
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: SUP-021
+  action: Works in Intelligent Routing, Skills & Assignment Engine
+  operations:
+  - setIntelligentRoutingSkill
+  outcome: Determine the best agent or team to handle each customer request.
+- step: 5
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: SUP-022
+  action: Works in SLA Policy & Service-Level Management
+  operations:
+  - listSlaPolicyService
+  outcome: Define and monitor service-level commitments for different customer-service scenarios.
+- step: 7
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: SUP-023
+  action: Works in Agent Workload, Availability & Workforce Control
+  operations:
+  - listAgentWorkloadAvailability
+  outcome: Give supervisors visibility and control over active customer-service resources.
+- step: 9
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: SUP-024
+  action: Works in Escalation & Critical Case Monitor
+  operations:
+  - listEscalationCriticalCase
+  outcome: Provide supervisors with one workspace for cases requiring elevated attention.
+- step: 11
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: SUP-025
+  action: Works in Quality Management & Agent Evaluation
+  operations:
+  - listQualityAgentEvaluation
+  outcome: Measure whether customer-service interactions meet TICVAI's defined service-quality standards.
+- step: 13
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: SUP-026
+  action: Works in Customer Satisfaction, Feedback & Voice of Customer
+  operations:
+  - listCustomerSatisfactionFeedback
+  outcome: Measure customer perception of TICVAI's support experience and identify recurring service problems.
+- step: 15
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: SUP-027
+  action: Works in Service Analytics & Root-Cause Intelligence
+  operations:
+  - listServiceRootCause
+  outcome: Provide comprehensive analytics explaining why customers contact TICVAI and what is driving
+    service demand.
+- step: 17
+  screen: SUP-019
+  action: Returns to the board's landing screen
+  operations:
+  - listContact
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: SUP-028
+  action: Works in AI Contact Center Intelligence & Automation Studio
+  operations:
+  - listContactAutomation
+  outcome: Create the management-level AI intelligence layer for Customer Service. This is different from
+    10.1.10 AI Customer Service Copilot. Board 1 Copilot = helps one agent resolve one case. Board 2 AI
+    Intelligence = improves the entire service operation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Contact Center Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Customer Service board 2 visited
+primaryContract: marketing-crm
+contracts:
+- marketing-crm
+- queue

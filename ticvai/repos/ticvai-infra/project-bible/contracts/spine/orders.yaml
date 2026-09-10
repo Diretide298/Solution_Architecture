@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Order & Payment
   version: 0.1.0
-  x-ticvai-screen-count: 143
+  x-ticvai-screen-count: 144
   x-ticvai-tier: spine
   x-ticvai-module: 2 — Ticketing Sales
   x-ticvai-requirements: 343
@@ -255,6 +255,7 @@ paths:
     get:
       operationId: getGroupBooking
       x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
         - "P02 GST-072 Share & Group Booking"
       summary: A group, its leader and its manifest
       description: 'BL-028. **`orders.group_booking` had ten columns and nothing read it** — a table built
@@ -297,6 +298,7 @@ paths:
       operationId: getPaymentLink
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
+        - "P02 GST-009 Review & Payment"
       summary: What a guest holding a link is being asked to pay for
       description: 'BL-072. **The operation the link needed and did not have.** `createPaymentLink` was
         contracted and nothing could open one.
@@ -364,6 +366,7 @@ paths:
       operationId: payByLink
       x-ticvai-consumed-by:
         - "P01 WEB-014 Pay for a Booking"
+        - "P02 GST-009 Review & Payment"
       summary: Pay for a booking taken at a till
       description: 'BL-072. **Payment against the link, by somebody with no account.**
 
@@ -674,6 +677,8 @@ paths:
         format: uuid
     post:
       operationId: reissueEntitlement
+      x-ticvai-consumed-by:
+        - "P04 POS-026 Receipt & Reprint"
       summary: Zero-value reissue of an expired entitlement for a later date
       description: 'BL-084. **A goodwill act with no money in it**, and treating it as a refund plus a
         sale puts two transactions through the ledger for a gesture that moved nothing.
@@ -736,6 +741,7 @@ paths:
     post:
       operationId: shareEntitlement
       x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
         - "P02 GST-072 Share & Group Booking"
       summary: Let somebody else use this, without giving it away
       description: 'BL-014. **Transfer is contracted and sharing is not, and they are different acts.**
@@ -787,6 +793,7 @@ paths:
     post:
       operationId: issueWalletPass
       x-ticvai-consumed-by:
+        - "P01 WEB-018 My Tickets"
         - "P02 GST-018 Add to Calendar / Reminders"
       summary: Generate an Apple or Google wallet pass
       description: 'BL-029. **A wallet pass is a live object, not a download.** Its value over a PDF is
@@ -885,6 +892,7 @@ paths:
     post:
       operationId: createResaleListing
       x-ticvai-consumed-by:
+        - "P01 WEB-030 Ticket Transfer"
         - "P02 GST-067 Refunds & Resale"
       summary: List an entitlement for resale
       description: 'BL-060. **A resale is a transfer with money attached, and the venue stays in the middle**
@@ -1209,6 +1217,7 @@ paths:
     get:
       operationId: listPaymentTokens
       x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
       summary: A guest's saved payment methods
       description: '**Masked, always.** The last four digits and the brand — enough to choose between
@@ -1241,6 +1250,7 @@ paths:
     post:
       operationId: storePaymentToken
       x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-071 Payment Methods"
       summary: Save a payment method for future use
       description: 'BL-116. **The keystone.** Recurring membership billing, wallet auto-reload, one-click
@@ -1581,12 +1591,13 @@ paths:
       x-ticvai-scope-level: venue
       x-ticvai-lock: rowExclusive
       x-ticvai-lock-excludes:
-        - "retail.wallet_transaction"
-      x-ticvai-lock-excludes-note: >
-        ADR-0037. **Resolved before the transaction opens, never inside the lock.** A Postgres row l
-        ock costs microseconds and this one measured six milliseconds — the difference was a Redis r
-        ound trip and a read the decision does not use. **A lock held across a hop is a lock held fo
-        r the latency of the slowest thing on the path.**
+      - retail.wallet_transaction
+      x-ticvai-lock-excludes-note: 'ADR-0037. **Resolved before the transaction opens, never inside the
+        lock.** A Postgres row l ock costs microseconds and this one measured six milliseconds — the difference
+        was a Redis r ound trip and a read the decision does not use. **A lock held across a hop is a
+        lock held fo r the latency of the slowest thing on the path.**
+
+        '
       x-ticvai-lock-note: "ADR-0031. **Two callers want the same row and both cannot have it.** Optimistic\
         \ retry under  contention is worse than a lock — at 5,000 RPS every retry is another read, and\
         \ the retry st orm is the outage. **Plain FOR UPDATE because the caller chose this row** — they\
@@ -1622,7 +1633,7 @@ paths:
         type: string
         format: uuid
     post:
-      operationId: releaseStoredValue
+      operationId: relinquishStoredValue
       x-ticvai-consumed-by:
         - "P08 BO-097 Check Out & Check In"
       summary: Give a hold back
@@ -1706,6 +1717,7 @@ paths:
       operationId: abandonCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-041 Checkout Entry"
       x-ticvai-audience:
       - guest
       summary: Empty it deliberately
@@ -1816,6 +1828,7 @@ paths:
       operationId: updateCartLine
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - guest
@@ -1863,6 +1876,7 @@ paths:
       operationId: removeCartLine
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-041 Checkout Entry"
         - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - guest
@@ -1896,6 +1910,7 @@ paths:
       operationId: extendCart
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-041 Checkout Entry"
       x-ticvai-audience:
       - guest
       summary: Give the guest more time
@@ -1940,6 +1955,7 @@ paths:
       operationId: claimCart
       x-ticvai-consumed-by:
         - "P01 WEB-016 Login / Register"
+        - "P02 GST-041 Checkout Entry"
       x-ticvai-audience:
       - guest
       summary: Attach an anonymous cart to a guest
@@ -2161,7 +2177,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P08 BO-082 Stock Movements"
@@ -2237,6 +2253,7 @@ paths:
       operationId: createOrder
       x-ticvai-consumed-by:
         - "P01 WEB-012 Checkout — Payment"
+        - "P02 GST-009 Review & Payment"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-004 Sell — Seat Map"
         - "P04 POS-005 Payment"
@@ -2247,7 +2264,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P08 BO-130 Offline Policy & Rules Configuration"
@@ -2335,7 +2352,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -2382,7 +2399,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -2466,7 +2483,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -2525,7 +2542,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -2596,7 +2613,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -2672,7 +2689,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -2714,7 +2731,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P10 PTR-008 Booking Creation"
         - "P10 PTR-015 Order History"
       x-ticvai-audience:
@@ -2820,6 +2837,9 @@ paths:
                 $ref: '#/components/schemas/Refund'
         '403':
           $ref: ../shared/common.yaml#/components/responses/Forbidden
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Money leaves. The one approval a compromised session is most obviously
+        worth taking.
   /refunds/bulk:
     post:
       operationId: createBulkRefund
@@ -2907,6 +2927,7 @@ paths:
     post:
       operationId: createRefundRequest
       x-ticvai-consumed-by:
+        - "P01 WEB-019 Order History"
         - "P02 GST-067 Refunds & Resale"
         - "P08 BO-028 Refund Approval Queue"
       x-ticvai-audience:
@@ -3110,6 +3131,7 @@ paths:
     post:
       operationId: inquirePaymentStatus
       x-ticvai-consumed-by:
+        - "P01 WEB-012 Checkout — Payment"
         - "P02 GST-009 Review & Payment"
         - "P04 POS-005 Payment"
         - "P05 KSK-008 Payment unresolved"
@@ -3426,7 +3448,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -3601,7 +3623,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -3667,7 +3689,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -3749,12 +3771,13 @@ paths:
         - "P02 GST-010 Booking Confirmation"
         - "P04 POS-002 Sell — Ticket Catalogue"
         - "P04 POS-006 Held Orders"
+        - "P04 POS-026 Receipt & Reprint"
         - "P06 EMP-014 Ticket lookup"
         - "P06 EMP-034 Walk-up sale"
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -3993,7 +4016,7 @@ paths:
         - "P08 BO-022 Order Detail"
         - "P08 BO-023 Refunds & Exchanges"
         - "P08 BO-026 Group Bookings"
-        - "P08 BO-047 F&B Order Management"
+        - "P08 BO-047 Order Corrections & Exceptions"
         - "P08 BO-051 Purchase Orders"
         - "P08 BO-070 Work Orders"
         - "P10 PTR-002 Partner Dashboard"
@@ -4362,7 +4385,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-308 Upgrade & Conversion Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Upgrade & Conversion Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4380,43 +4403,43 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: customerSegment
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer Segment
-        - name: ruleStatus
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Rule Status
-        - name: effectiveDate
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Effective Date
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: customerSegment
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer Segment
+      - name: ruleStatus
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Rule Status
+      - name: effectiveDate
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Effective Date
       responses:
         '200':
           description: Upgrade & Conversion Command Center
@@ -4432,7 +4455,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-309 Upgrade & Conversion Path Builder"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Upgrade & Conversion Path Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4449,7 +4472,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4474,7 +4497,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-310 Upgrade Eligibility & Qualification Rules"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Upgrade Eligibility & Qualification Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4492,7 +4515,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4513,7 +4536,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-311 Upgrade Timing, Usage & Ticket Status Rules"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Upgrade Timing, Usage & Ticket Status Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4531,7 +4554,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4552,7 +4575,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-312 Upgrade Financial Treatment & Price Difference Rules"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Upgrade Financial Treatment & Price Difference Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4569,7 +4592,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4590,7 +4613,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-313 Pro-Rata, Residual Value & Entitlement Credit Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Pro-Rata, Residual Value & Entitlement Credit Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4607,7 +4630,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4632,7 +4655,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-314 Person-Type, Product & Entitlement Conversion Rules"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Person-Type, Product & Entitlement Conversion Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4649,7 +4672,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4670,7 +4693,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-315 Bulk, Group & Assisted Upgrade Operations"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Bulk, Group & Assisted Upgrade Operations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4687,7 +4710,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4708,7 +4731,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-316 Upgrade Execution, Credential Regeneration & Channel Controls"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Upgrade Execution, Credential Regeneration & Channel Controls
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4725,7 +4748,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4750,7 +4773,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-317 Upgrade History, Exception Management & Audit Explorer"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Upgrade History, Exception Management & Audit Explorer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4767,43 +4790,43 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: ticket
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Ticket
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: date
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Date
-        - name: exception
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Exception
+      - name: ticket
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Ticket
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Date
+      - name: exception
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Exception
       responses:
         '200':
           description: Upgrade History, Exception Management & Audit Explorer
@@ -4819,7 +4842,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-264 Group Sales Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Sales Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4836,7 +4859,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4857,7 +4880,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-265 Group Enquiry & Opportunity Capture"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Enquiry & Opportunity Capture
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4874,7 +4897,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4895,7 +4918,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-266 Group Customer & Organization Profile"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Customer & Organization Profile
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4912,7 +4935,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4933,7 +4956,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-267 Group Requirements, Availability & Capacity Planner"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Requirements, Availability & Capacity Planner
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4950,7 +4973,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -4971,7 +4994,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-268 Group Package & Experience Builder"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Package & Experience Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4988,7 +5011,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5013,7 +5036,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-269 Group Quotation Builder & Proposal Generation"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Quotation Builder & Proposal Generation
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5030,7 +5053,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
@@ -5056,7 +5079,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-270 Quote Revision, Negotiation & Version Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Quote Revision, Negotiation & Version Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5073,7 +5096,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5094,7 +5117,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-271 Group Discount, Exception & Approval Workflow"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Discount, Exception & Approval Workflow
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5111,7 +5134,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5136,7 +5159,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-272 Quote-to-Booking Conversion & Confirmation"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Quote-to-Booking Conversion & Confirmation
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5153,7 +5176,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5174,7 +5197,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-273 Group Booking 360° & Handover Workspace"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Booking 360° & Handover Workspace
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5192,7 +5215,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5217,7 +5240,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-274 Group Booking Operations Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Booking Operations Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5234,7 +5257,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5255,7 +5278,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-275 Group Operational Planning & Task Workspace"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Operational Planning & Task Workspace
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5272,7 +5295,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5297,7 +5320,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-276 Participants, Guest Lists & Group Structure"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Participants, Guest Lists & Group Structure
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5314,7 +5337,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5335,7 +5358,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-277 Group Payment, Deposit & Balance Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Payment, Deposit & Balance Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5352,7 +5375,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5373,7 +5396,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-278 Group Ticket, Seat & Entitlement Allocation"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Ticket, Seat & Entitlement Allocation
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5390,7 +5413,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5411,7 +5434,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-279 Group Ticket Fulfillment & Distribution"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Ticket Fulfillment & Distribution
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5428,7 +5451,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5449,7 +5472,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-280 Group Arrival, Check-In & Admission Operations"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Arrival, Check-In & Admission Operations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5466,7 +5489,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5487,7 +5510,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-281 Group Amendments, Cancellation & Refund Operations"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Amendments, Cancellation & Refund Operations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5504,7 +5527,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5525,7 +5548,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-282 Group Booking Reconciliation, Closure & Performance"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Booking Reconciliation, Closure & Performance
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5542,7 +5565,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5563,7 +5586,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-283 Group Sales Analytics & AI Intelligence Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Group Sales Analytics & AI Intelligence Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5581,61 +5604,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: customerType
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer Type
-        - name: organization
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Organization
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: salesOwner
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Sales Owner
-        - name: groupType
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Group Type
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: date
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Date
+      - name: customerType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer Type
+      - name: organization
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Organization
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: salesOwner
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Sales Owner
+      - name: groupType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Group Type
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Date
       responses:
         '200':
           description: Group Sales Analytics & AI Intelligence Center
@@ -5651,7 +5674,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-304 Order & Reservation Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order & Reservation Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5668,61 +5691,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: orderNumber
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Order Number
-        - name: reservationNumber
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Reservation Number
-        - name: ticketNumber
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Ticket Number
-        - name: customerName
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer Name
-        - name: email
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Email
-        - name: mobile
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Mobile
-        - name: membershipId
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Membership ID
-        - name: transactionReference
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Transaction Reference
+      - name: orderNumber
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Order Number
+      - name: reservationNumber
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Reservation Number
+      - name: ticketNumber
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Ticket Number
+      - name: customerName
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer Name
+      - name: email
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Email
+      - name: mobile
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Mobile
+      - name: membershipId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Membership ID
+      - name: transactionReference
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Transaction Reference
       responses:
         '200':
           description: Order & Reservation Command Center
@@ -5738,7 +5761,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-305 Order Detail & Transaction Workspace"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Detail & Transaction Workspace
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5755,7 +5778,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5780,7 +5803,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-306 Reservation & Hold Policy Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Reservation & Hold Policy Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5797,7 +5820,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
@@ -5823,7 +5846,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-307 Order & Reservation Status Lifecycle Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order & Reservation Status Lifecycle Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5841,7 +5864,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5866,7 +5889,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-308 Order Creation & Source/Channel Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Creation & Source/Channel Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5883,7 +5906,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5908,7 +5931,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-309 Customer, Guest & Account Assignment"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Customer, Guest & Account Assignment
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5925,7 +5948,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5950,7 +5973,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-310 Order Line, Product & Entitlement Composition"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Line, Product & Entitlement Composition
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5967,7 +5990,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -5988,7 +6011,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-311 Capacity Reservation & Inventory Commitment"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Capacity Reservation & Inventory Commitment
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6006,7 +6029,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6027,7 +6050,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-312 Reservation Confirmation, Expiry & Fulfillment Readiness"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Reservation Confirmation, Expiry & Fulfillment Readiness
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6044,7 +6067,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6065,7 +6088,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-313 Order Lifecycle Timeline, SLA, Exceptions & AI Operations"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Lifecycle Timeline, SLA, Exceptions & AI Operations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6082,7 +6105,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6103,7 +6126,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-314 Amendment & After-Sales Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Amendment & After-Sales Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6120,55 +6143,55 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: agent
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Agent
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Status
-        - name: approval
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Approval
-        - name: date
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Date
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Agent
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Status
+      - name: approval
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Approval
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Date
       responses:
         '200':
           description: Amendment & After-Sales Command Center
@@ -6184,7 +6207,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-315 Order Amendment Workspace"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Amendment Workspace
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6202,7 +6225,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6227,7 +6250,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-316 Amendment Eligibility & Policy Rule Builder"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Amendment Eligibility & Policy Rule Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6244,7 +6267,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
@@ -6270,7 +6293,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-317 Cancellation & Partial Cancellation Policy Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Cancellation & Partial Cancellation Policy Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6287,7 +6310,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
@@ -6313,7 +6336,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-319 Void, Reversal & Same-Day Correction Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Void, Reversal & Same-Day Correction Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6330,7 +6353,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6351,7 +6374,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-320 Ticket Reissue & Fulfillment Regeneration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Ticket Reissue & Fulfillment Regeneration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6368,7 +6391,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6389,7 +6412,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-321 After-Sales Financial Settlement & Adjustment Workspace"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: After-Sales Financial Settlement & Adjustment Workspace
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6407,7 +6430,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6432,7 +6455,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-322 Approval, Exception & Service Recovery Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Approval, Exception & Service Recovery Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6449,7 +6472,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6474,7 +6497,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-323 Amendment History, Audit & After-Sales Analytics"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Amendment History, Audit & After-Sales Analytics
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6491,55 +6514,55 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: agent
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Agent
-        - name: customerSegment
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer Segment
-        - name: reason
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Reason
-        - name: period
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Period
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: agent
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Agent
+      - name: customerSegment
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer Segment
+      - name: reason
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Reason
+      - name: period
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Period
       responses:
         '200':
           description: Amendment History, Audit & After-Sales Analytics
@@ -6555,7 +6578,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-324 Payment & Order Financial Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Payment & Order Financial Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6572,7 +6595,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6593,7 +6616,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-325 Order Payment Detail & Transaction Ledger"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Payment Detail & Transaction Ledger
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6610,7 +6633,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6631,7 +6654,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-326 Multi-Payment, Split Tender & Payment Allocation Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Multi-Payment, Split Tender & Payment Allocation Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6648,7 +6671,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6673,7 +6696,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-327 Deposit, Partial Payment & Outstanding Balance Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Deposit, Partial Payment & Outstanding Balance Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6690,7 +6713,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6711,7 +6734,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-328 Order Split, Merge & Transaction Relationship Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Split, Merge & Transaction Relationship Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6728,7 +6751,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6749,7 +6772,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-329 Related Order & Transaction Relationship Explorer"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Related Order & Transaction Relationship Explorer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6767,43 +6790,43 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: order
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Order
-        - name: ticket
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Ticket
-        - name: customer
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer
-        - name: externalReference
-          in: query
-          required: false
-          schema:
-            type: string
-          description: External Reference
-        - name: partnerBooking
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Partner Booking
+      - name: order
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Order
+      - name: ticket
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Ticket
+      - name: customer
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer
+      - name: externalReference
+        in: query
+        required: false
+        schema:
+          type: string
+        description: External Reference
+      - name: partnerBooking
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Partner Booking
       responses:
         '200':
           description: Related Order & Transaction Relationship Explorer
@@ -6819,7 +6842,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-330 External Payment, Partner & Settlement Reference Mapping"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: External Payment, Partner & Settlement Reference Mapping
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6836,7 +6859,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6857,7 +6880,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-331 Payment Reconciliation & Exception Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Payment Reconciliation & Exception Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6874,7 +6897,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6895,7 +6918,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-332 Financial Traceability, Control & Audit Explorer"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Financial Traceability, Control & Audit Explorer
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6912,7 +6935,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -6933,7 +6956,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-333 Order Financial Analytics & AI Reconciliation Intelligence"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Order Financial Analytics & AI Reconciliation Intelligence
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -6950,61 +6973,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: channel
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Channel
-        - name: paymentMethod
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Payment Method
-        - name: gateway
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Gateway
-        - name: customerSegment
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer Segment
-        - name: b2bPartner
-          in: query
-          required: false
-          schema:
-            type: string
-          description: B2B Partner
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: channel
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Channel
+      - name: paymentMethod
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Payment Method
+      - name: gateway
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Gateway
+      - name: customerSegment
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer Segment
+      - name: b2bPartner
+        in: query
+        required: false
+        schema:
+          type: string
+        description: B2B Partner
       responses:
         '200':
           description: Order Financial Analytics & AI Reconciliation Intelligence
@@ -7020,7 +7043,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-278 Resale Marketplace Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Marketplace Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7037,61 +7060,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: date
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Date
-        - name: listingStatus
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Listing status
-        - name: priceRange
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Price range
-        - name: resaleChannel
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Resale channel
-        - name: riskLevel
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Risk level
-        - name: approvalStatus
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Approval status
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Date
+      - name: listingStatus
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Listing status
+      - name: priceRange
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Price range
+      - name: resaleChannel
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Resale channel
+      - name: riskLevel
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Risk level
+      - name: approvalStatus
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Approval status
       responses:
         '200':
           description: Resale Marketplace Command Center
@@ -7107,7 +7130,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-279 Resale Eligibility Rule Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Eligibility Rule Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7124,7 +7147,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-config-scope: venue
@@ -7150,7 +7173,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-280 Resale Policy & Marketplace Settings"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Policy & Marketplace Settings
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7167,7 +7190,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7188,7 +7211,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-281 Listing Creation & Seller Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Listing Creation & Seller Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7205,7 +7228,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7230,7 +7253,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-282 Resale Pricing & Price Guardrails"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Pricing & Price Guardrails
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7247,7 +7270,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7268,7 +7291,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-283 Resale Fees, Commission & Seller Proceeds"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Fees, Commission & Seller Proceeds
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7285,7 +7308,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7306,7 +7329,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-284 Listing Approval & Moderation"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Listing Approval & Moderation
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7323,7 +7346,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7348,7 +7371,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-285 Resale Inventory & Availability Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Inventory & Availability Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7365,7 +7388,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7386,7 +7409,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-286 Listing Lifecycle, Expiry & Cancellation"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Listing Lifecycle, Expiry & Cancellation
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7403,7 +7426,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7424,7 +7447,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-287 AI Resale Configuration & Marketplace Recommendations"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: AI Resale Configuration & Marketplace Recommendations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7441,7 +7464,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_CREATE
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7466,7 +7489,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-288 Resale Operations Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Operations Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7483,7 +7506,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7504,7 +7527,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-289 Buyer Purchase & Resale Order Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Buyer Purchase & Resale Order Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7521,7 +7544,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7542,7 +7565,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-290 Ticket Ownership Transfer Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Ticket Ownership Transfer Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7559,7 +7582,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7580,7 +7603,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-291 Credential Revocation & Regeneration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Credential Revocation & Regeneration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7598,7 +7621,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7619,7 +7642,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-292 Resale Fraud & Duplicate Sale Protection"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Fraud & Duplicate Sale Protection
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7636,7 +7659,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7657,7 +7680,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-293 Capacity & Inventory Reconciliation"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Capacity & Inventory Reconciliation
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7674,7 +7697,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7695,7 +7718,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-294 Seller Settlement & Payout Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Seller Settlement & Payout Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7712,7 +7735,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7733,7 +7756,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-295 Refunds, Disputes & Resale Exceptions"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Refunds, Disputes & Resale Exceptions
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7750,7 +7773,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7771,7 +7794,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-296 Resale Audit & Ownership History"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Audit & Ownership History
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7788,7 +7811,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7809,7 +7832,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-297 Resale Analytics & AI Intelligence"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Analytics & AI Intelligence
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7826,61 +7849,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: ticketType
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Ticket type
-        - name: section
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Section
-        - name: seatCategory
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Seat category
-        - name: sellerSegment
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Seller segment
-        - name: buyerSegment
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Buyer segment
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: ticketType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Ticket type
+      - name: section
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Section
+      - name: seatCategory
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Seat category
+      - name: sellerSegment
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Seller segment
+      - name: buyerSegment
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Buyer segment
       responses:
         '200':
           description: Resale Analytics & AI Intelligence
@@ -7896,7 +7919,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-298 My Tickets & Resale Marketplace Entry"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: My Tickets & Resale Marketplace Entry
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7915,7 +7938,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7936,7 +7959,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-299 Resale Eligibility & Ticket Selection"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Eligibility & Ticket Selection
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7953,7 +7976,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -7974,7 +7997,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-300 Create Listing & Resale Price Selection"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Create Listing & Resale Price Selection
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -7991,7 +8014,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8012,7 +8035,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-301 Fees, Seller Proceeds & Listing Confirmation"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Fees, Seller Proceeds & Listing Confirmation
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -8029,7 +8052,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8050,7 +8073,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-302 My Resale Listings & Seller Dashboard"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: My Resale Listings & Seller Dashboard
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -8067,7 +8090,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8088,7 +8111,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-303 Official Resale Marketplace & Buyer Discovery"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Official Resale Marketplace & Buyer Discovery
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -8105,7 +8128,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8126,7 +8149,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-304 Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -8143,7 +8166,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8164,7 +8187,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-305 Buyer Checkout, Inventory Hold & Secure Payment"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Buyer Checkout, Inventory Hold & Secure Payment
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -8181,7 +8204,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8202,7 +8225,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-306 Resale Confirmation, Ownership Transfer & Ticket Delivery"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Resale Confirmation, Ownership Transfer & Ticket Delivery
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -8219,7 +8242,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8240,7 +8263,7 @@ paths:
       x-ticvai-consumed-by:
         - "P09 ADM-307 White-Label Marketplace Deployment & Experience Architecture"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: White-Label Marketplace Deployment & Experience Architecture
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -8258,7 +8281,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: ORDER_VIEW
       x-ticvai-scope-level: venue
       x-ticvai-offline-capable: false
@@ -8278,9 +8301,9 @@ components:
     DraftedRecord:
       type: object
       x-ticvai-provisional: true
-      description: '**A provisional envelope, drafted 2026-09-04 from the workshop pack.** It carries what
-        every one of these screens needs to address a row and nothing it has not earned. **There is
-        deliberately no `x-ticvai-persistence`** - naming a table here would put a storage decision
+      description: '**A provisional envelope, drafted 2026-09-04 from the workshop pack.** It carries
+        what every one of these screens needs to address a row and nothing it has not earned. **There
+        is deliberately no `x-ticvai-persistence`** - naming a table here would put a storage decision
         nobody made into the ER model and the DDL.'
       required:
       - id
@@ -11334,9 +11357,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Upgrade Financial Treatment & Price Difference Rules displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Upgrade Financial Treatment & Price Difference Rules displays.** Read from
+        the workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         basedOnRemainingValidity:
           type: string
@@ -11456,9 +11479,10 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Pro-Rata, Residual Value & Entitlement Credit Configuration submits.** The configurable
-        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
-        absent, because a figure the system computed is not a figure a client may send back.'
+      description: '**What Pro-Rata, Residual Value & Entitlement Credit Configuration submits.** The
+        configurable fields from the pack''s directory for this screen; the metrics the screen displays
+        are deliberately absent, because a figure the system computed is not a figure a client may send
+        back.'
       properties:
         multiDayPasses:
           type: string
@@ -11499,8 +11523,8 @@ components:
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
       description: '**What Person-Type, Product & Entitlement Conversion Rules displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         childAdult:
           type: string
@@ -11571,14 +11595,14 @@ components:
         byType:
           type: string
           enum:
-            - order
-            - reservation
-            - group
-            - event
-            - performance
-            - ticketType
-            - seatSection
-            - customerSegment
+          - order
+          - reservation
+          - group
+          - event
+          - performance
+          - ticketType
+          - seatSection
+          - customerSegment
           description: Vocabulary listed under Select by.
         changePersonType:
           type: string
@@ -12239,8 +12263,8 @@ components:
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
       description: '**What Group Requirements, Availability & Capacity Planner displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         venue:
           type: string
@@ -12433,9 +12457,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Group Package & Experience Builder submits.** The configurable fields from the
-        pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
-        a figure the system computed is not a figure a client may send back.'
+      description: '**What Group Package & Experience Builder submits.** The configurable fields from
+        the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
       properties:
         admissionTickets:
           type: string
@@ -12606,8 +12630,8 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is orders.cart at 3%, so this is not an update to anything the package stores today and no new table
-        has been decided
+        is orders.cart at 3%, so this is not an update to anything the package stores today and no new
+        table has been decided
       description: '**What Group Quotation Builder & Proposal Generation submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.
@@ -12716,9 +12740,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Quote Revision, Negotiation & Version Management displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Quote Revision, Negotiation & Version Management displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         v2:
           type: string
@@ -12983,9 +13007,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Group Booking 360° & Handover Workspace displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Group Booking 360° & Handover Workspace displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         arrival:
           type: string
@@ -13104,8 +13128,8 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Group Booking 360° & Handover Workspace submits.** The configurable fields from
-        the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+      description: '**What Group Booking 360° & Handover Workspace submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
       properties:
         notes:
@@ -13143,9 +13167,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Group Booking Operations Command Center displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Group Booking Operations Command Center displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         upcomingGroups:
           type: integer
@@ -13714,9 +13738,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Group Ticket Fulfillment & Distribution displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Group Ticket Fulfillment & Distribution displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         oneGroupQr:
           type: string
@@ -13894,8 +13918,8 @@ components:
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
       description: '**What Group Amendments, Cancellation & Refund Operations displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         increaseGuestCount:
           type: integer
@@ -13998,8 +14022,8 @@ components:
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
       description: '**What Group Booking Reconciliation, Closure & Performance displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         ty:
           type: string
@@ -14388,8 +14412,8 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is orders.cart_line at 14%, so this is not an update to anything the package stores today and no
-        new table has been decided
+        is orders.cart_line at 14%, so this is not an update to anything the package stores today and
+        no new table has been decided
       description: '**What Order Detail & Transaction Workspace submits.** The configurable fields from
         the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.
@@ -14448,9 +14472,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Reservation & Hold Policy Configuration displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Reservation & Hold Policy Configuration displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         cartHold:
           type: string
@@ -14544,10 +14568,10 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today
-        and no new table has been decided
-      description: '**What Reservation & Hold Policy Configuration submits.** The configurable fields from
-        the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores
+        today and no new table has been decided
+      description: '**What Reservation & Hold Policy Configuration submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
       properties:
         cartHold:
@@ -14644,8 +14668,8 @@ components:
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
       description: '**What Order & Reservation Status Lifecycle Configuration displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         fromStatus:
           type: string
@@ -14846,8 +14870,8 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today
-        and no new table has been decided
+        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores
+        today and no new table has been decided
       description: '**What Order Creation & Source/Channel Configuration submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -15372,9 +15396,10 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Order Lifecycle Timeline, SLA, Exceptions & AI Operations displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Order Lifecycle Timeline, SLA, Exceptions & AI Operations displays.** Read
+        from the workshop pack''s own display and configuration directory for this screen; each property
+        names the sentence it came from. **Not a row** - the screen is a view over the module''s existing
+        state.'
       properties:
         timestamp:
           type: string
@@ -15662,8 +15687,8 @@ components:
         is catalogue.channel_capacity at 5%, so this is not an update to anything the package stores today
         and no new table has been decided
       description: '**What Order Amendment Workspace submits.** The configurable fields from the pack''s
-        directory for this screen; the metrics the screen displays are deliberately absent, because a figure
-        the system computed is not a figure a client may send back.'
+        directory for this screen; the metrics the screen displays are deliberately absent, because a
+        figure the system computed is not a figure a client may send back.'
       properties:
         visitDate:
           type: string
@@ -15849,8 +15874,8 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores today
-        and no new table has been decided
+        is catalogue.channel_allocation at 3%, so this is not an update to anything the package stores
+        today and no new table has been decided
       description: '**What Amendment Eligibility & Policy Rule Builder submits.** The configurable fields
         from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
@@ -16028,8 +16053,8 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores today
-        and no new table has been decided
+        is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores
+        today and no new table has been decided
       description: '**What Cancellation & Partial Cancellation Policy Configuration submits.** The configurable
         fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
         absent, because a figure the system computed is not a figure a client may send back.'
@@ -16235,10 +16260,10 @@ components:
         optionsType:
           type: string
           enum:
-            - immediatelyInvalidate
-            - supersede
-            - retainUntilNewCredentialActivated
-            - preserveWhereCredentialRemainsUnchanged
+          - immediatelyInvalidate
+          - supersede
+          - retainUntilNewCredentialActivated
+          - preserveWhereCredentialRemainsUnchanged
           description: Vocabulary listed under Options.
         qr:
           type: string
@@ -16379,9 +16404,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Approval, Exception & Service Recovery Management displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Approval, Exception & Service Recovery Management displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         requestedAction:
           type: string
@@ -16502,9 +16527,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Amendment History, Audit & After-Sales Analytics displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Amendment History, Audit & After-Sales Analytics displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         requestId:
           type: string
@@ -16626,9 +16651,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Payment & Order Financial Command Center displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Payment & Order Financial Command Center displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         grossOrderValue:
           type: string
@@ -16860,8 +16885,8 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Multi-Payment, Split Tender & Payment Allocation Configuration displays.** Read
-        from the workshop pack''s own display and configuration directory for this screen; each property
+      description: '**What Multi-Payment, Split Tender & Payment Allocation Configuration displays.**
+        Read from the workshop pack''s own display and configuration directory for this screen; each property
         names the sentence it came from. **Not a row** - the screen is a view over the module''s existing
         state.'
       properties:
@@ -16917,8 +16942,8 @@ components:
       type: object
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
-        is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores today
-        and no new table has been decided
+        is catalogue.channel_allocation at 6%, so this is not an update to anything the package stores
+        today and no new table has been decided
       description: '**What Multi-Payment, Split Tender & Payment Allocation Configuration submits.** The
         configurable fields from the pack''s directory for this screen; the metrics the screen displays
         are deliberately absent, because a figure the system computed is not a figure a client may send
@@ -16977,9 +17002,10 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Deposit, Partial Payment & Outstanding Balance Management displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Deposit, Partial Payment & Outstanding Balance Management displays.** Read
+        from the workshop pack''s own display and configuration directory for this screen; each property
+        names the sentence it came from. **Not a row** - the screen is a view over the module''s existing
+        state.'
       properties:
         groups:
           type: string
@@ -17181,9 +17207,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Related Order & Transaction Relationship Explorer displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Related Order & Transaction Relationship Explorer displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         amendment:
           type: string
@@ -17406,9 +17432,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Financial Traceability, Control & Audit Explorer displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Financial Traceability, Control & Audit Explorer displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         amount:
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -17485,9 +17511,10 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Order Financial Analytics & AI Reconciliation Intelligence displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Order Financial Analytics & AI Reconciliation Intelligence displays.** Read
+        from the workshop pack''s own display and configuration directory for this screen; each property
+        names the sentence it came from. **Not a row** - the screen is a view over the module''s existing
+        state.'
       properties:
         grossOrderValue:
           type: string
@@ -17948,9 +17975,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Listing Creation & Seller Configuration displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Listing Creation & Seller Configuration displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         acceptTermsSubmitListing:
           type: string
@@ -18055,8 +18082,8 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Listing Creation & Seller Configuration submits.** The configurable fields from
-        the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+      description: '**What Listing Creation & Seller Configuration submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
       properties:
         acceptTermsSubmitListing:
@@ -18313,8 +18340,8 @@ components:
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
       description: '**What Listing Approval & Moderation displays.** Read from the workshop pack''s own
-        display and configuration directory for this screen; each property names the sentence it came from.
-        **Not a row** - the screen is a view over the module''s existing state.'
+        display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         highResalePrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -18386,8 +18413,8 @@ components:
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
       description: '**What Listing Approval & Moderation submits.** The configurable fields from the pack''s
-        directory for this screen; the metrics the screen displays are deliberately absent, because a figure
-        the system computed is not a figure a client may send back.'
+        directory for this screen; the metrics the screen displays are deliberately absent, because a
+        figure the system computed is not a figure a client may send back.'
       properties:
         highResalePrice:
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -18466,9 +18493,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Listing Lifecycle, Expiry & Cancellation displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Listing Lifecycle, Expiry & Cancellation displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         rejected:
           type: integer
@@ -18573,9 +18600,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What AI Resale Configuration & Marketplace Recommendations displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What AI Resale Configuration & Marketplace Recommendations displays.** Read from
+        the workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         highDemand:
           type: string
@@ -18683,9 +18710,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Resale Operations Command Center displays.** Read from the workshop pack''s own
-        display and configuration directory for this screen; each property names the sentence it came from.
-        **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Resale Operations Command Center displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         resaleTransactionsToday:
           type: string
@@ -18781,13 +18808,13 @@ components:
         statusesType:
           type: string
           enum:
-            - paymentFailed
-            - transferFailed
-            - underReview
-            - suspended
-            - refunded
-            - disputed
-            - cancelled
+          - paymentFailed
+          - transferFailed
+          - underReview
+          - suspended
+          - refunded
+          - disputed
+          - cancelled
           description: Vocabulary listed under Exception statuses.
         holdTransaction:
           type: string
@@ -18797,9 +18824,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Buyer Purchase & Resale Order Management displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Buyer Purchase & Resale Order Management displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         confirmationTransfer:
           type: string
@@ -19047,9 +19074,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Resale Fraud & Duplicate Sale Protection displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Resale Fraud & Duplicate Sale Protection displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         multipleResaleAttempts:
           type: integer
@@ -19229,10 +19256,10 @@ components:
         statusesType:
           type: string
           enum:
-            - onHold
-            - failed
-            - reversed
-            - disputed
+          - onHold
+          - failed
+          - reversed
+          - disputed
           description: Vocabulary listed under Exception statuses.
         immediatelyAfterResale:
           type: string
@@ -19380,9 +19407,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Resale Audit & Ownership History displays.** Read from the workshop pack''s own
-        display and configuration directory for this screen; each property names the sentence it came from.
-        **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Resale Audit & Ownership History displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         timestamp:
           type: string
@@ -19779,9 +19806,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Create Listing & Resale Price Selection displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Create Listing & Resale Price Selection displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         faceValueOnly:
           type: string
@@ -20112,9 +20139,10 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over orders state, assembled at read time from tables that
         already exist
-      description: '**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Resale Confirmation, Ownership Transfer & Ticket Delivery displays.** Read
+        from the workshop pack''s own display and configuration directory for this screen; each property
+        names the sentence it came from. **Not a row** - the screen is a view over the module''s existing
+        state.'
       properties:
         followedBy:
           type: string

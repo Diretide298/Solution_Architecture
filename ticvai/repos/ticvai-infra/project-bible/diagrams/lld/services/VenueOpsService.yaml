@@ -1145,6 +1145,8 @@ screens:
 - P01:WEB-002 Event & Attraction Listing
 - P01:WEB-004 Attraction Details
 - P01:WEB-015 Branded Queue / Waiting Room
+- P01:WEB-021 Wallet & Gift Cards
+- P01:WEB-031 My Reservations
 - P01:WEB-039 Venue Map & Wait Times
 - P01:WEB-040 Virtual Queue
 - P02:GST-003 Event & Attraction Listing
@@ -1162,6 +1164,7 @@ screens:
 - P02:GST-070 Reserve a Table or Cabana
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-010 Add to Existing Ticket
+- P04:POS-029 Order Queue
 - P06:EMP-003 Home — on duty
 - P06:EMP-004 Task list
 - P06:EMP-005 Task detail
@@ -1198,7 +1201,6 @@ screens:
 - P08:BO-099 Session Manifest
 - P08:BO-108 Venue Operations
 - P08:BO-125 Product & Category Button Configuration
-- P11:ACC-006 Reviewer Queue
 - P12:SUP-020 Queue Configuration & Management
 - P13:CMS-002 Brand Kit
 - P13:CMS-004 Logo & Assets
@@ -1206,6 +1208,7 @@ screens:
 flows:
 - F08 Steward works a shift on the employee app
 - F12 Asset fails and closes a queue
+- 'F135 Customer Service board 2: Contact Center Operations Command Center'
 - F15 A part is needed and ordered
 - F18 A guest plays an arcade game
 - F21 A ride queue fills and a guest is redirected

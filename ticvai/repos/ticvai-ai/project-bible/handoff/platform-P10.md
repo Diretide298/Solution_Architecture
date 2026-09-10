@@ -5,22 +5,24 @@
 | | |
 |---|---|
 | Screens | 51 |
-| Operations | 141 |
+| Operations | 135 |
 | Contracts | 10 |
 | Modules | 9 |
 | Undrawn | 0 |
-| Operations with no screen | 3 |
+| Operations with no screen | 5 |
 | Waves | wave2 11 · wave3 40 |
 
 ## Gaps
 
-### 3 operations with no screen here
+### 5 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
+| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
 | `issueApiToken` | public-api | POST | Exchange a credential for an access token |
+| `releaseSeatBlock` | seating | DELETE | Release a block back to sale |
 | `createPartnerUser` | subscription | POST | Add a user to a partner branch |
 | `listPartnerUsers` | subscription | GET | Users beneath a partner, by branch |
 
@@ -58,7 +60,7 @@
 | `PTR-007` | Availability Search | Inventory & Pricing | 2 | 1 | yes |
 | `PTR-008` | Booking Creation | Booking & Quotes | 2 | 14 | yes |
 | `PTR-009` | Group / Bulk Booking | Booking & Quotes | 3 | 4 | yes |
-| `PTR-010` | Cart & Quote | Booking & Quotes | 3 | 16 | yes |
+| `PTR-010` | Cart & Quote | Booking & Quotes | 3 | 10 | yes |
 | `PTR-011` | Quote Management | Booking & Quotes | 3 | 4 | yes |
 | `PTR-012` | Checkout / Credit Purchase | Credit & Settlement | 2 | 4 | yes |
 | `PTR-013` | Credit Limit & Balance | Credit & Settlement | 2 | 3 | yes |

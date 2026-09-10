@@ -1,0 +1,177 @@
+id: F110
+name: A partner is onboarded onto the B2B portal
+actor: platformAdmin
+wave: 3
+frequency: rare
+criticality: commercial
+platforms:
+- P10 Partner / Reseller Portal
+offlineBehaviour: Not offline. Onboarding is a Control Plane activity.
+# **This is the B2B half of TICVAI onboarding**; F109 is the management half. They are different
+# journeys and not variations of one: a tenant is provisioned by us and given an administrator,
+# whereas a partner **applies from outside** and is approved. `registerPartner` is the only
+# identity operation in the package declared `anonymous` with no permission at all — that is the
+# front door, and it is deliberately unguarded because the applicant has no account yet.
+trigger:
+  description: >
+    A reseller, OTA or corporate buyer wants to sell our inventory. They have no account, no scope
+    and no credit, and every one of those has to be granted before they can raise a single order.
+  entryScreen: PTR-001
+  entryPoints:
+  - An application arrived through the public registration door
+  - A commercial agreement was signed offline and the account is being opened to match
+steps:
+- step: 1
+  screen: PTR-001
+  action: The partner manager signs in
+  operations:
+  - login
+  - listMfaMethods
+  outcome: A session that can see partner applications
+- step: 2
+  screen: PTR-022
+  action: Opens the partner command centre
+  operations:
+  - listPartner
+  outcome: Every partner and every pending application in one place
+- step: 3
+  screen: PTR-024
+  action: Reads the application the applicant submitted
+  operations:
+  - listPartnerOnboardingApplication
+  outcome: The application, its documents and its declared trading intent
+  note: >
+    **The applicant reached this point without an identity.** `registerPartner` is `anonymous`;
+    `submitOnboardingApplication` is declared `public` and yet carries
+    `x-ticvai-permission: TENANT_CONFIGURE`. **A public caller holds no permissions**, so as
+    written the second door is locked to exactly the people it exists for. One of the two
+    declarations is wrong and the contract should say which.
+- step: 4
+  screen: PTR-022
+  action: Returns to the command centre
+  operations:
+  - listPartner
+  outcome: Application read, nothing yet granted
+  note: >
+    **Every spoke here declares one way in and one way out, both through PTR-022.** The
+    round-trips below are the navigation the screens describe, not padding. Onboarding is
+    genuinely sequential, so a wizard would read better — but a wizard needs lateral edges that
+    none of these nine screens declare, and inventing them here would put the flow and the screens
+    into disagreement.
+- step: 5
+  screen: PTR-023
+  action: Sets up the organisation record
+  operations:
+  - setPartnerProfileOrganization
+  outcome: Legal entity, trading name, tax identity and billing address
+- step: 6
+  screen: PTR-022
+  action: Returns to the command centre
+  operations:
+  - listPartner
+  outcome: Organisation known, scope still unbounded
+- step: 7
+  screen: PTR-027
+  action: Assigns the brands, venues and business scope the partner may sell
+  operations:
+  - setPartnerBrandVenue
+  outcome: '**The commercial boundary**, and the one that becomes `Session.scope` for every user
+    the partner later creates'
+- step: 8
+  screen: PTR-022
+  action: Returns to the command centre
+  operations:
+  - listPartner
+  outcome: Scope set, compliance unverified
+- step: 9
+  screen: PTR-028
+  action: Checks the compliance and documentation file
+  operations:
+  - listPartnerDocumentationCompliance
+  outcome: Licences, insurance and signed agreement present or missing
+- step: 10
+  screen: PTR-022
+  action: Returns to the command centre
+  operations:
+  - listPartner
+  outcome: Compliance checked
+- step: 11
+  screen: PTR-029
+  action: Chooses the permission profile the partner's own users will inherit
+  operations:
+  - listPartnerAccessRole
+  outcome: What a partner user may do, bounded by the scope set at step 7
+- step: 12
+  screen: PTR-022
+  action: Returns to the command centre
+  operations:
+  - listPartner
+  outcome: Profile chosen, nobody holding it
+- step: 13
+  screen: PTR-025
+  action: Creates the partner's first user
+  operations:
+  - listPartnerContactUser
+  outcome: One identity inside the partner organisation
+  note: >
+    **The same chain as F109 step 5, one level further out.** `createPrincipal` is declared for
+    audience `['staff', 'partner']`, which is the package's clearest statement that a partner
+    administers its own users once it has its first one.
+- step: 14
+  screen: PTR-022
+  action: Returns to the command centre
+  operations:
+  - listPartner
+  outcome: Everything configured, nothing yet live
+- step: 15
+  screen: PTR-030
+  action: Approves the partner and moves it to active
+  operations:
+  - approvePartnerStatuLifecycle
+  outcome: '**The partner can trade.** Approval is last on purpose: scope, compliance and
+    permissions are all in place before the account can raise an order'
+branches:
+- at: 3
+  condition: The applicant could not submit an application at all
+  behaviour: >
+    `submitOnboardingApplication` is `public` and requires `TENANT_CONFIGURE`. Until that is
+    reconciled the only working front door is `registerPartner`, and any journey that depends on
+    the application form does not run.
+  severity: abandonsFlow
+  resolvedBy: Unresolved — the contract contradicts itself
+- at: 9
+  condition: Compliance documents are missing or expired
+  behaviour: >
+    **Onboarding pauses rather than fails.** Scope and profile stay configured and the partner sits
+    unapproved, which is why step 15 is separated from step 11 — a partly-onboarded partner must be
+    a resting state, not a half-written one.
+  severity: recoverable
+  resolvedBy: Partner manager
+- at: 11
+  condition: No permission profile exists to choose
+  behaviour: >
+    PTR-029 shows `emptyFirstRun`. The first partner onboarded on a tenant has no profile to
+    inherit and one must be authored, which is a different and slower job than picking one.
+  severity: requiresStaff
+  resolvedBy: Partner manager
+- at: 15
+  condition: The partner is approved before scope or compliance is set
+  behaviour: >
+    Nothing in the screens enforces the order of steps 5 to 13 — they are all spokes off one hub
+    and reachable in any sequence. **An approved partner with unbounded scope can sell inventory
+    it was never granted**, and this is the failure the ordering above exists to prevent and does
+    not actually prevent.
+  severity: requiresStaff
+  resolvedBy: Unresolved — the hub-and-spoke shape permits it
+exitStates:
+- state: completed
+  description: Partner active, scoped, compliant and holding one identity
+- state: deferred
+  description: Configured but unapproved, awaiting compliance
+- state: blocked
+  description: The application door is locked by its own permission declaration
+primaryContract: subscription
+contracts:
+- subscription
+- identity
+- tenancy

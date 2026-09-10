@@ -2,7 +2,7 @@ openapi: 3.1.0
 info:
   title: TICVAI Food & Beverage
   version: 0.1.0
-  x-ticvai-screen-count: 81
+  x-ticvai-screen-count: 82
   x-ticvai-tier: satellite
   x-ticvai-module: 7 — F&B POS  ·  5 — F&B & Guest Management (service)
   x-ticvai-requirements: 151
@@ -2217,6 +2217,7 @@ paths:
     post:
       operationId: moveTableVisit
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
       summary: Move a party to a different table, mid-service
       description: 'Board 4 of the client F&B pack. **`mergeTableVisits` and `transferTableVisit` existed
@@ -2803,6 +2804,7 @@ paths:
     post:
       operationId: joinRestaurantWaitlist
       x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table or Cabana"
         - "P06 EMP-056 Walk-In & Waitlist Management"
         - "P06 EMP-058 Live Table & Service Management"
@@ -2877,6 +2879,7 @@ paths:
     get:
       operationId: listTableReservations
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P06 EMP-054 Reservation Calendar & Timeline"
         - "P06 EMP-060 Reservation & Table Performance"
@@ -2919,6 +2922,7 @@ paths:
     post:
       operationId: createTableReservation
       x-ticvai-consumed-by:
+        - "P01 WEB-036 F&B – Browse & Order"
         - "P02 GST-070 Reserve a Table or Cabana"
         - "P06 EMP-055 Create / Edit Reservation"
       x-ticvai-audience:
@@ -2974,6 +2978,7 @@ paths:
     patch:
       operationId: updateTableReservation
       x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
         - "P02 GST-070 Reserve a Table or Cabana"
       x-ticvai-audience:
       - guest
@@ -3014,6 +3019,7 @@ paths:
     post:
       operationId: seatTableReservation
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
@@ -3960,6 +3966,7 @@ paths:
     get:
       operationId: listFnbOrders
       x-ticvai-consumed-by:
+        - "P04 POS-029 Order Queue"
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P08 BO-020 F&B Order Management"
         - "P08 BO-044 F&B Outlets"
@@ -4267,6 +4274,7 @@ paths:
     get:
       operationId: getTableMap
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-051 Restaurant Service Command Center"
         - "P06 EMP-052 Floor Plan & Table Map"
         - "P06 EMP-060 Reservation & Table Performance"
@@ -4337,6 +4345,7 @@ paths:
     post:
       operationId: openTableVisit
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
@@ -4466,6 +4475,7 @@ paths:
     post:
       operationId: mergeTableVisits
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-058 Live Table & Service Management"
       x-ticvai-audience:
       - staff
@@ -4608,6 +4618,7 @@ paths:
     post:
       operationId: closeTableVisit
       x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
         - "P06 EMP-059 Table Order, Bill & Payment Management"
       x-ticvai-audience:
       - staff
@@ -4684,6 +4695,8 @@ paths:
         format: uuid
     post:
       operationId: clearTable
+      x-ticvai-consumed-by:
+        - "P04 POS-028 Table Service"
       x-ticvai-audience:
       - staff
       summary: Mark a table cleared and free

@@ -1,0 +1,1254 @@
+[
+ {
+  "id": "WEB-010",
+  "name": "Shopping Cart",
+  "module": "Cart & Checkout",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C02",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/cart-and-checkout/shopping-cart",
+   "component": "apps/guest-web/src/routes/cart-and-checkout/ShoppingCartDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-005",
+    "WEB-006",
+    "WEB-007",
+    "WEB-008"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-011",
+    "WEB-012",
+    "WEB-013",
+    "WEB-030"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-011",
+     "trigger": "Enters contact details and answers consent",
+     "provenance": "flow F01 step 5→6, F02 step 3→4, F55 step 1→2"
+    },
+    {
+     "to": "WEB-030",
+     "trigger": "They transfer three tickets",
+     "provenance": "flow F55 step 3→4",
+     "operation": "checkoutCart"
+    },
+    {
+     "to": "WEB-012",
+     "trigger": "Checkout — Payment",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-012 declares entryState.params orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-013",
+     "trigger": "Booking Confirmation",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-013 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getCart` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Review and confirm what is being bought.",
+  "gaps": [
+   {
+    "operation": "getCouponCode",
+    "why": "**1 declared operation reach no component on this screen**: getCouponCode. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected shopping cart",
+       "bindsTo": "Cart",
+       "columns": [
+        "Cart.id",
+        "Cart.token",
+        "Cart.venueId",
+        "Cart.channel",
+        "Cart.subjectId",
+        "Cart.status",
+        "Cart.lines",
+        "Cart.conflicts",
+        "Cart.subtotal",
+        "Cart.discountTotal",
+        "Cart.taxTotal",
+        "Cart.total",
+        "Cart.appliedPromotionIds",
+        "Cart.expiresAt",
+        "Cart.extensionsUsed",
+        "Cart.maxExtensions"
+       ],
+       "operation": "getCart",
+       "provenance": "contract orders.yaml GET /carts/{cartId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addCartLine",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/lines"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateCartLine",
+       "provenance": "contract orders.yaml PATCH /carts/{cartId}/lines/{lineId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeCartLine",
+       "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Extend",
+       "operation": "extendCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/extend"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Checkout",
+       "operation": "checkoutCart",
+       "provenance": "contract orders.yaml POST /carts/{cartId}/checkout"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Abandon",
+       "operation": "abandonCart",
+       "provenance": "contract orders.yaml DELETE /carts/{cartId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Evaluate",
+       "operation": "evaluatePromotions",
+       "provenance": "contract promotions.yaml POST /promotions/evaluate"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Promo code",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "bindsTo": "PromotionEvaluation.rejected",
+       "notes": "When a code does not apply, say which condition failed. \"Expired\" and \"already used\" are very different conversations",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Checkout",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveCartLine",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeCartLine` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml DELETE /carts/{cartId}/lines/{lineId}"
+   },
+   {
+    "id": "confirmAbandonCart",
+    "component": "confirmDialog",
+    "trigger": "Abandon",
+    "body": "**Names what `abandonCart` changes and what it leaves alone**, in the consequence rather than the verb. A shopping cart this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract orders.yaml DELETE /carts/{cartId}"
+   }
+  ],
+  "states": {
+   "loading": "The shopping cart list.",
+   "error": "Could not load. Names which read failed and leaves the shopping cart untouched.",
+   "emptyFirstRun": "No shopping cart yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the shopping cart are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getCart",
+    "contract": "orders",
+    "purpose": "The cart, priced and checked, right now",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "addCartLine",
+    "contract": "orders",
+    "purpose": "Add something",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "updateCartLine",
+    "contract": "orders",
+    "purpose": "Change a quantity",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "removeCartLine",
+    "contract": "orders",
+    "purpose": "Take something out",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "extendCart",
+    "contract": "orders",
+    "purpose": "Give the guest more time",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "checkoutCart",
+    "contract": "orders",
+    "purpose": "Turn the cart into an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "abandonCart",
+    "contract": "orders",
+    "purpose": "Empty it deliberately",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "evaluatePromotions",
+    "contract": "promotions",
+    "purpose": "Evaluate promotions against a cart",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getCouponCode",
+    "contract": "promotions",
+    "purpose": "Look up a code",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "cartId",
+     "from": "WEB-008"
+    },
+    {
+     "name": "code",
+     "from": "deepLink"
+    },
+    {
+     "name": "lineId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `code`, `lineId`."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-010"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 9 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-011",
+  "name": "Guest Details & Attendee Forms",
+  "module": "Cart & Checkout",
+  "requiresModule": "marketing",
+  "wave": 1,
+  "capability": "C03",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/cart-and-checkout/guest-details-and-attendee-forms",
+   "component": "apps/guest-web/src/routes/cart-and-checkout/GuestDetailsAndAttendeeFormsForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-010"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-010",
+    "WEB-012",
+    "WEB-013"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-010",
+     "trigger": "They check out",
+     "provenance": "flow F55 step 2→3"
+    },
+    {
+     "to": "WEB-012",
+     "trigger": "Pays",
+     "provenance": "flow F01 step 6→7, F02 step 4→5"
+    },
+    {
+     "to": "WEB-013",
+     "trigger": "Booking Confirmation",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-013 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Wired 24 August from review**: updateMyProfile. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listGuestDevices` reads the population and `getWishlist` reads one of them — list, select, act",
+  "purpose": "Collect who is coming and how to reach them.",
+  "gaps": [
+   {
+    "operation": "getGuestProfile",
+    "why": "**2 declared operations reach no component on this screen**: getGuestProfile, listConsentPurposes. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every guest attendee forms",
+       "bindsTo": "GuestDevice",
+       "columns": [
+        "GuestDevice.id",
+        "GuestDevice.subjectId",
+        "GuestDevice.platform",
+        "GuestDevice.tokenFingerprint",
+        "GuestDevice.appVersion",
+        "GuestDevice.osVersion",
+        "GuestDevice.deviceModel",
+        "GuestDevice.locale",
+        "GuestDevice.status",
+        "GuestDevice.failureCount",
+        "GuestDevice.registeredAt",
+        "GuestDevice.lastSeenAt"
+       ],
+       "operation": "listGuestDevices",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/devices"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected guest attendee forms",
+       "bindsTo": "Wishlist",
+       "columns": [
+        "Wishlist.subjectId",
+        "Wishlist.items"
+       ],
+       "operation": "getWishlist",
+       "provenance": "contract marketing-crm.yaml GET /guests/{subjectId}/wishlist"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Add",
+       "operation": "addToWishlist",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/wishlist"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Record",
+       "operation": "recordConsent",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/consents"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Register",
+       "operation": "registerGuestDevice",
+       "provenance": "contract marketing-crm.yaml POST /guests/{subjectId}/devices"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Remove",
+       "operation": "removeFromWishlist",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+      },
+      {
+       "kind": "destructiveButton",
+       "label": "Revoke",
+       "operation": "revokeGuestDevice",
+       "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Save changes",
+       "operation": "updateMyProfile",
+       "provenance": "contract marketing-crm.yaml PATCH /guests/me/profile"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "textField",
+       "label": "Full name",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Email",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Mobile",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "detailPanel",
+       "bindsTo": "EntitlementTemplate.isNameBound",
+       "notes": "Per-attendee fields appear only where the entitlement is name-bound. Most are not — identity and entitlement are separate concerns",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "consentBlock",
+       "bindsTo": "ConsentPurposeConfig[]",
+       "notes": "Marketing consent is opt-in and unticked. Transactional is required for service and is presented differently, not as a choice dressed as one",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Continue to payment",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "overlays": [
+   {
+    "id": "confirmRemoveFromWishlist",
+    "component": "confirmDialog",
+    "trigger": "Remove",
+    "body": "**Names what `removeFromWishlist` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/wishlist/{itemId}"
+   },
+   {
+    "id": "confirmRevokeGuestDevice",
+    "component": "confirmDialog",
+    "trigger": "Revoke",
+    "body": "**Names what `revokeGuestDevice` changes and what it leaves alone**, in the consequence rather than the verb. A guest attendee forms this affects should be identified in the dialog, not just counted.",
+    "provenance": "contract marketing-crm.yaml DELETE /guests/{subjectId}/devices/{deviceId}"
+   }
+  ],
+  "states": {
+   "loading": "The guest attendee forms list.",
+   "error": "Could not load. Names which read failed and leaves the guest attendee forms untouched.",
+   "emptyFirstRun": "No guest attendee forms yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the guest attendee forms are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "addToWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Save an item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest's saved items",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listGuestDevices",
+    "contract": "marketing-crm",
+    "purpose": "A guest's registered devices",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "recordConsent",
+    "contract": "marketing-crm",
+    "purpose": "Record a consent decision",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "registerGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Register a device for push",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "removeFromWishlist",
+    "contract": "marketing-crm",
+    "purpose": "Remove a saved item",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "revokeGuestDevice",
+    "contract": "marketing-crm",
+    "purpose": "Revoke a device registration",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "getGuestProfile",
+    "contract": "marketing-crm",
+    "purpose": "Read a guest profile",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listConsentPurposes",
+    "contract": "marketing-crm",
+    "purpose": "Configured consent purposes",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "updateMyProfile",
+    "contract": "marketing-crm",
+    "purpose": "A guest correcting their own details",
+    "trigger": "onAction",
+    "invalidates": [
+     "listGuestDevices"
+    ]
+   },
+   {
+    "operationId": "uploadGuestDocument",
+    "contract": "marketing-crm",
+    "purpose": "Provide a document a booking requires",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "deviceId",
+     "from": "deepLink"
+    },
+    {
+     "name": "itemId",
+     "from": "deepLink"
+    },
+    {
+     "name": "subjectId",
+     "from": "session"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `deviceId`, `itemId`.",
+   "preloaded": [
+    "Wishlist.subjectId",
+    "Wishlist.items"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-011"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 10 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-012",
+  "name": "Checkout — Payment",
+  "module": "Cart & Checkout",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C04",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/cart-and-checkout/checkout-payment",
+   "component": "apps/guest-web/src/routes/cart-and-checkout/CheckoutPaymentForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-011"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-010",
+    "WEB-011",
+    "WEB-013"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-013",
+     "trigger": "Receives confirmation and tickets",
+     "provenance": "flow F01 step 7→8"
+    },
+    {
+     "to": "WEB-010",
+     "trigger": "Shopping Cart",
+     "carries": [
+      "cartId",
+      "code",
+      "lineId"
+     ],
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, lineId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-011",
+     "trigger": "Guest Details & Attendee Forms",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "The unknown outcome is the one to build for. A payment taken but never confirmed must offer inquiry, not a retry — a retry double-charges and the guest finds out. **Card only, so tender currency equals base currency.** A guest paying with a foreign card is converted by their own issuer at their own rate — that is not our conversion and is not recorded as one. The displayed comparison price (`WEB-035`) and the charged amount are different numbers and the screen says so before the guest commits. **Wired 24 August from review**: getOrder. **The operations existed and this screen could not call them** — reviewers reported them as missing APIs, which is what an unreachable operation looks like from a wireframe.",
+  "openQuestions": [
+   "Sandbox credentials for Stripe and Network International are outstanding. The recovery paths cannot be tested without them."
+  ],
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getOrder` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Take payment and create the order.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected checkout payment",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createOrder",
+       "provenance": "contract orders.yaml POST /orders"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Create",
+       "operation": "createPayment",
+       "provenance": "contract orders.yaml POST /payments"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "cartPanel",
+       "notes": "Order summary stays visible throughout. Never collapsed behind a link",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Pay now",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The checkout payment list.",
+   "error": "Could not load. Names which read failed and leaves the checkout payment untouched.",
+   "emptyFirstRun": "No checkout payment yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the checkout payment are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createOrder",
+    "contract": "orders",
+    "purpose": "Create an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "createPayment",
+    "contract": "orders",
+    "purpose": "Take a payment against an order",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "inquirePaymentStatus",
+    "contract": "orders",
+    "purpose": "Ask what happened to a payment that did not answer",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "deepLink"
+    },
+    {
+     "name": "paymentId",
+     "from": "navigation"
+    }
+   ],
+   "coldEntry": "**A guest opening an order link weeks later.** Shows the order if it still resolves; if it was refunded or the performance passed, says which and offers the order list rather than an error."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-012"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-013",
+  "name": "Booking Confirmation",
+  "module": "Cart & Checkout",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C03",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/cart-and-checkout/order-confirmation",
+   "component": "apps/guest-web/src/routes/cart-and-checkout/OrderConfirmationDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-012"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-010",
+    "WEB-011",
+    "WEB-012",
+    "WEB-018"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-010",
+     "trigger": "Shopping Cart",
+     "carries": [
+      "cartId",
+      "code",
+      "lineId"
+     ],
+     "provenance": "derived — WEB-010 declares entryState.params cartId, code, lineId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-011",
+     "trigger": "Guest Details & Attendee Forms",
+     "carries": [
+      "deviceId",
+      "itemId",
+      "subjectId"
+     ],
+     "provenance": "derived — WEB-011 declares entryState.params deviceId, itemId, subjectId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-012",
+     "trigger": "Checkout — Payment",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-012 declares entryState.params orderId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-018",
+     "trigger": "My Tickets",
+     "carries": [
+      "entitlementId",
+      "orderId"
+     ],
+     "provenance": "derived — WEB-018 declares entryState.params entitlementId, orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Renamed 31 August** from *Order Confirmation*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getOrder` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Confirm the purchase and deliver the tickets.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected booking confirmation",
+       "bindsTo": "Order",
+       "columns": [
+        "Order.id",
+        "Order.orderNumber",
+        "Order.channel",
+        "Order.venueId",
+        "Order.scopePath",
+        "Order.status",
+        "Order.currency",
+        "Order.currencyScale",
+        "Order.grossAmount",
+        "Order.taxAmount",
+        "Order.netAmount",
+        "Order.refundedAmount",
+        "Order.totalPriceVariance",
+        "Order.lines",
+        "Order.payments",
+        "Order.principalId"
+       ],
+       "operation": "getOrder",
+       "provenance": "contract orders.yaml GET /orders/{orderId}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Transfer",
+       "operation": "transferOrderTickets",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/transfer"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Reprint",
+       "operation": "reprintOrder",
+       "provenance": "contract orders.yaml POST /orders/{orderId}/reprints"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "banner",
+       "notes": "Confirmation with the order number prominent",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Add to wallet",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Resend confirmation",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The booking confirmation list.",
+   "error": "Could not load. Names which read failed and leaves the booking confirmation untouched.",
+   "emptyFirstRun": "No booking confirmation yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the booking confirmation are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "transferOrderTickets",
+    "contract": "orders",
+    "purpose": "Transfer tickets to another guest",
+    "trigger": "onAction"
+   },
+   {
+    "operationId": "getOrder",
+    "contract": "orders",
+    "purpose": "Read an order",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "reprintOrder",
+    "contract": "orders",
+    "purpose": "Reprint or resend tickets",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "orderId",
+     "from": "WEB-012"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-013"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-014",
+  "name": "Pay for a Booking",
+  "module": "Cart & Checkout",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C04",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/pay/:token",
+   "component": "apps/guest-web/src/routes/cart-and-checkout/PayByLinkForm.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "exitTo": [
+    "WEB-013"
+   ],
+   "entryFrom": [
+    "WEB-013"
+   ],
+   "inferred": false,
+   "notes": "**Reached from WEB-013** — an unpaid booking is paid from the confirmation that says it is unpaid. Stated on 4 September: this screen exited somewhere and nothing exited to it, so it was outside the navigation graph entirely.",
+   "transitions": [
+    {
+     "to": "WEB-013",
+     "trigger": "Booking Confirmation",
+     "carries": [
+      "orderId"
+     ],
+     "provenance": "derived — WEB-013 declares entryState.params orderId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "BL-072, rebuilt 20 August. **Declared `getCart` and `checkoutCart` until then, and `createPaymentLink` takes an `orderId`** — the screen was looking for a cart that was never created, and its entryState said `cartId` came from the session when **a guest arriving from an email has no session.** Wired by name-matching rather than by following the journey.",
+  "density": "compact",
+  "pattern": "statusTracker",
+  "patternReason": "`getPaymentLink` reads one record and nothing reads a population — the screen is about that one thing",
+  "purpose": "Pay for a booking somebody else took, without an account.",
+  "layout": {
+   "template": "detail",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "record",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected pay for booking",
+       "bindsTo": "PaymentLink",
+       "columns": [
+        "PaymentLink.id",
+        "PaymentLink.orderId",
+        "PaymentLink.reservationId",
+        "PaymentLink.token",
+        "PaymentLink.status",
+        "PaymentLink.channel",
+        "PaymentLink.sentTo",
+        "PaymentLink.expiresAt",
+        "PaymentLink.releaseHoldOnExpiry",
+        "PaymentLink.viewedAt",
+        "PaymentLink.paidAt",
+        "PaymentLink.resendCount",
+        "PaymentLink.issuedByPrincipalId",
+        "PaymentLink.scopePath"
+       ],
+       "operation": "getPaymentLink",
+       "provenance": "contract orders.yaml GET /payment-links/{token}"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "rowActions",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Pay",
+       "operation": "payByLink",
+       "provenance": "contract orders.yaml POST /payment-links/{token}/pay"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "bindsTo": "PaymentLink",
+       "notes": "Venue, lines, total. **What they are paying for, before how to pay** — a guest who booked by phone may not recognise a reference number.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "banner",
+       "notes": "The deadline, counted in time remaining rather than as a timestamp. **Expires in 46 minutes** is actionable; **expires at 14:32** needs arithmetic.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "textField",
+       "label": "Email for your tickets (optional)",
+       "notes": "**Optional, and only to send the ticket.** Requiring an account before taking money is how a paid booking becomes an abandoned one.",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "primaryButton",
+       "label": "Pay now",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The lines and the total, with the deadline counting down.",
+   "error": "Could not load the booking. **The hold is unaffected** — a failed page load must not release inventory.",
+   "emptyFirstRun": "**Not reachable empty** — a link always names an order. An empty state here means the token did not resolve, which is the error state.",
+   "emptyNoResults": "The filter narrowed it and the pay for booking are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "**The token is the credential, so there is no permission case** — either it resolves or it has gone."
+  },
+  "apis": [
+   {
+    "operationId": "getPaymentLink",
+    "contract": "orders",
+    "purpose": "What is owed and until when",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "payByLink",
+    "contract": "orders",
+    "purpose": "Take the money and convert the reservation",
+    "trigger": "onAction"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "token",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**Cold is the only way in.** The guest arrives from an email, an SMS or a WhatsApp message with no session and quite possibly no account. **A link opened three days late is the ordinary case, not an edge** — the screen says the hold was released and offers to book again. Expired, already paid and superseded are three different messages, and **404 is never one of them**: telling somebody their booking does not exist when it expired is how a support call starts."
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-014"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

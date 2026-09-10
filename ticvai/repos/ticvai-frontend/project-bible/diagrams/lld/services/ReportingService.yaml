@@ -370,6 +370,7 @@ screens:
 - P04:POS-008 Reports
 - P04:POS-009 Staff Roster
 - P04:POS-020 Shift Exceptions & Alerts
+- P04:POS-025 Till Home
 - P06:EMP-070 Inventory Exceptions, AI Replenishment & Action Center
 - P08:BO-010 Promotions & Coupons
 - P08:BO-029 Report Builder

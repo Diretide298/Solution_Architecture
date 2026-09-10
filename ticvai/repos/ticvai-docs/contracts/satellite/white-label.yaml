@@ -209,7 +209,7 @@ paths:
         type: string
         format: uuid
     delete:
-      operationId: releaseCustomDomain
+      operationId: relinquishCustomDomain
       x-ticvai-consumed-by:
         - "P09 ADM-017 Domain & Certificate Management"
         - "P13 CMS-017 Domain & Certificate"
@@ -363,6 +363,7 @@ paths:
       operationId: getTenantConfig
       x-ticvai-consumed-by:
         - "P01 WEB-001 Home / Landing"
+        - "P02 GST-001 Home – Default"
         - "P05 KSK-002 Language Select"
         - "P13 CMS-012 RTL Preview"
         - "P13 CMS-016 Site Settings"

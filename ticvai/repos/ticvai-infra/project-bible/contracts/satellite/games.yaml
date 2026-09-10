@@ -138,6 +138,7 @@ paths:
     get:
       operationId: getGameCard
       x-ticvai-consumed-by:
+        - "P01 WEB-021 Wallet & Gift Cards"
         - "P02 GST-026 Retail / Merchandise"
       x-ticvai-audience:
       - guest

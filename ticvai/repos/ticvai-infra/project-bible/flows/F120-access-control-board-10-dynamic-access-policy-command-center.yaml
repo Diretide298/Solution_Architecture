@@ -1,0 +1,149 @@
+id: F120
+name: 'Access Control board 10: Dynamic Access Policy Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 10. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-234
+  entryPoints:
+  - Arrives at Dynamic Access Policy Command Center
+steps:
+- step: 1
+  screen: BO-234
+  action: Opens Dynamic Access Policy Command Center
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Provide central governance and visibility over all dynamic access policies.
+- step: 2
+  screen: BO-235
+  action: Works in Access Attribute Catalog
+  operations:
+  - listAccessAttributeCatalog
+  outcome: Define the attributes available to the TICVAI policy engine. This becomes the reusable data
+    dictionary for dynamic access decisions.
+- step: 3
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-236
+  action: Works in Visual Dynamic Policy Builder
+  operations:
+  - setVisualDynamicPolicy
+  outcome: Provide a no-code interface for constructing contextual access policies.
+- step: 5
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-237
+  action: Works in Context, Time, Event & Capacity Policy Builder
+  operations:
+  - setContextTimeEvent
+  outcome: Configure policies driven by changing venue conditions rather than only guest attributes.
+- step: 7
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-238
+  action: Works in Identity, Membership & Accreditation Policies
+  operations:
+  - listIdentityMembershipAccreditation
+  outcome: Configure policies based on who the requesting person is.
+- step: 9
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-239
+  action: Works in Policy Scope, Hierarchy & Inheritance
+  operations:
+  - listPolicyScopeHierarchy
+  outcome: Govern how policies apply across TICVAI's multi-tenant and multi-venue architecture.
+- step: 11
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-240
+  action: Works in Authorization Governance & Temporary Access
+  operations:
+  - listAuthorizationGovernanceTemporary
+  outcome: Apply enterprise governance principles to privileged and temporary access.
+- step: 13
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-241
+  action: Works in Policy Evaluation Architecture & Offline Distribution
+  operations:
+  - listPolicyEvaluationArchitecture
+  outcome: Define where and how policies are evaluated. This screen connects Board 10 with the offline/edge
+    architecture already configured in Board 7.
+- step: 15
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-242
+  action: Works in Policy Simulation, Conflict & Impact Analysis
+  operations:
+  - simulatePolicyConflictImpact
+  outcome: Test policies before they affect live guest admission.
+- step: 17
+  screen: BO-234
+  action: Returns to the board's landing screen
+  operations:
+  - listDynamicAccessPolicy
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-243
+  action: Works in Policy Approval, Audit, Analytics & AI Optimization
+  operations:
+  - listPolicies
+  outcome: Govern the complete policy lifecycle and continuously measure policy effectiveness.
+branches:
+- at: 1
+  condition: Nothing has been set up on Dynamic Access Policy Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 10 visited
+primaryContract: access
+contracts:
+- access
+- white-label

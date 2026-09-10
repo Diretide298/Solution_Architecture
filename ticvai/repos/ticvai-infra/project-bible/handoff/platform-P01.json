@@ -7,12 +7,12 @@
  "audience": "guest",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 46,
-  "operations": 115,
-  "contracts": 14,
+  "operations": 154,
+  "contracts": 16,
   "modules": 13,
   "undrawn": 0,
   "operationsWithNoScreen": 0
@@ -124,39 +124,39 @@
  ],
  "contracts": [
   {
-   "contract": "orders",
-   "operations": 21
+   "contract": "marketing-crm",
+   "operations": 30
   },
   {
-   "contract": "marketing-crm",
-   "operations": 19
+   "contract": "orders",
+   "operations": 29
   },
   {
    "contract": "identity",
-   "operations": 19
+   "operations": 24
   },
   {
    "contract": "catalogue",
-   "operations": 9
+   "operations": 13
   },
   {
    "contract": "fnb",
-   "operations": 9
+   "operations": 12
   },
   {
    "contract": "access",
-   "operations": 8
+   "operations": 10
   },
   {
    "contract": "retail",
-   "operations": 7
-  },
-  {
-   "contract": "queue",
-   "operations": 5
+   "operations": 8
   },
   {
    "contract": "promotions",
+   "operations": 6
+  },
+  {
+   "contract": "queue",
    "operations": 5
   },
   {
@@ -165,15 +165,23 @@
   },
   {
    "contract": "ai",
-   "operations": 3
+   "operations": 4
   },
   {
    "contract": "seating",
    "operations": 3
   },
   {
+   "contract": "resources",
+   "operations": 2
+  },
+  {
    "contract": "venue-map",
    "operations": 2
+  },
+  {
+   "contract": "games",
+   "operations": 1
   },
   {
    "contract": "finance",
@@ -232,7 +240,7 @@
    "module": "Booking & Selection",
    "wave": 1,
    "route": "/booking-and-selection/date-and-session-selection",
-   "operations": 2,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -250,7 +258,7 @@
    "module": "Booking & Selection",
    "wave": 2,
    "route": "/booking-and-selection/add-ons-and-upsell",
-   "operations": 2,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -277,7 +285,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/guest-details-and-attendee-forms",
-   "operations": 10,
+   "operations": 11,
    "drawn": true
   },
   {
@@ -286,7 +294,7 @@
    "module": "Cart & Checkout",
    "wave": 1,
    "route": "/cart-and-checkout/checkout-payment",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -322,7 +330,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/login-register",
-   "operations": 19,
+   "operations": 20,
    "drawn": true
   },
   {
@@ -331,7 +339,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/my-account-dashboard",
-   "operations": 7,
+   "operations": 9,
    "drawn": true
   },
   {
@@ -340,7 +348,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/my-tickets",
-   "operations": 6,
+   "operations": 8,
    "drawn": true
   },
   {
@@ -349,7 +357,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/order-history",
-   "operations": 4,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -358,7 +366,7 @@
    "module": "Account & Self-Service",
    "wave": 1,
    "route": "/account-and-self-service/profile-and-preferences",
-   "operations": 5,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -367,7 +375,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/membership-loyalty-and-value/wallet-and-gift-cards",
-   "operations": 3,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -394,7 +402,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 3,
    "route": "/membership-loyalty-and-value/loyalty-and-rewards",
-   "operations": 7,
+   "operations": 15,
    "drawn": true
   },
   {
@@ -403,7 +411,7 @@
    "module": "Engagement & Support",
    "wave": 1,
    "route": "/engagement-and-support/help-centre-faq",
-   "operations": 1,
+   "operations": 3,
    "drawn": true
   },
   {
@@ -448,7 +456,7 @@
    "module": "Ticketing",
    "wave": 1,
    "route": "/ticket-transfer",
-   "operations": 3,
+   "operations": 4,
    "drawn": true
   },
   {
@@ -457,7 +465,7 @@
    "module": "Ticketing",
    "wave": 2,
    "route": "/my-reservations",
-   "operations": 3,
+   "operations": 7,
    "drawn": true
   },
   {
@@ -502,7 +510,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/fandb--browse-and-order",
-   "operations": 8,
+   "operations": 10,
    "drawn": true
   },
   {
@@ -538,7 +546,7 @@
    "module": "In-venue Services",
    "wave": 2,
    "route": "/virtual-queue",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -565,7 +573,7 @@
    "module": "Membership, Loyalty & Value",
    "wave": 2,
    "route": "/loyalty-and-rewards",
-   "operations": 4,
+   "operations": 6,
    "drawn": true
   },
   {
@@ -574,7 +582,7 @@
    "module": "Engagement & Support",
    "wave": 2,
    "route": "/ai-concierge",
-   "operations": 5,
+   "operations": 7,
    "drawn": true
   },
   {

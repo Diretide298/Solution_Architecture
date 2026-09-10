@@ -1,5 +1,5 @@
 id: LLD-P09
-title: P09 TICVAI Web — Platform Console — 318 screens
+title: P09 TICVAI Web — Platform Console — 367 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: platformAdmin
@@ -24,7 +24,7 @@ modulesUsed:
 - module: marketing
   screens: 110
 - module: core
-  screens: 36
+  screens: 85
 - module: membership
   screens: 19
 - module: ai
@@ -39,9 +39,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 40
 - service: TenancyService
-  operationCalls: 26
+  operationCalls: 28
 - service: IdentityService
-  operationCalls: 25
+  operationCalls: 26
 - service: WhiteLabelService
   operationCalls: 20
 - service: MarketingService
@@ -53,9 +53,9 @@ servicesCalled:
 - service: CrossRegionService
   operationCalls: 3
 coverage:
-  screens: 318
-  inAFlow: 21
-  drawn: 318
+  screens: 367
+  inAFlow: 352
+  drawn: 367
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -81,8 +81,7 @@ screens:
   - error
   - loading
   offlineState: false
-  entryParams:
-  - sessionId<-session
+  entryParams: []
   goesTo:
   - ADM-002
   - ADM-003
@@ -91,6 +90,7 @@ screens:
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-001
   inFlows:
   - F104 A platform operator signs in under MFA
+  - F109 A tenant gets its first administrator
 - screen: ADM-002
   name: Platform Dashboard
   module: Overview & Health
@@ -107,6 +107,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -121,10 +122,18 @@ screens:
   - ADM-007
   - ADM-008
   - ADM-012
+  - ADM-020
+  - ADM-021
+  - ADM-319
+  - ADM-329
+  - ADM-339
+  - ADM-349
+  - ADM-359
   boardFrames:
   - Dashboards Board.dc.html#adm-002
-  wireframe: wireframes/Dashboards Board.dc.html#adm-002
-  inFlows: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-002
+  inFlows:
+  - F109 A tenant gets its first administrator
 - screen: ADM-003
   name: Cross-Tenant Health Dashboard
   module: Overview & Health
@@ -145,6 +154,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -157,7 +167,7 @@ screens:
   - ADM-004
   boardFrames:
   - Dashboards Board.dc.html#adm-003
-  wireframe: wireframes/Dashboards Board.dc.html#adm-003
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-003
   inFlows:
   - F19 A membership works in another country
 - screen: ADM-004
@@ -220,6 +230,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-008
   - ADM-012
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-005
@@ -289,6 +300,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-012
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-007
   inFlows:
@@ -323,6 +335,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -334,6 +347,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-011
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-008
   inFlows:
@@ -421,6 +435,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -430,6 +445,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-007
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-011
   inFlows:
@@ -465,6 +481,7 @@ screens:
   - ADM-002
   - ADM-003
   - ADM-006
+  - ADM-013
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-012
   inFlows:
@@ -488,6 +505,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -497,6 +515,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-014
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-013
   inFlows:
@@ -519,6 +538,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -551,6 +571,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -560,6 +581,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-011
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-015
   inFlows:
@@ -585,6 +607,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -611,11 +634,12 @@ screens:
   operations:
   - claimCustomDomain
   - listCustomDomains
-  - releaseCustomDomain
+  - relinquishCustomDomain
   - verifyCustomDomain
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -629,6 +653,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-016
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-017
   inFlows:
@@ -678,6 +703,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -717,6 +743,7 @@ screens:
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-020
   inFlows:
+  - F109 A tenant gets its first administrator
   - F16 A venue opens for the first time
 - screen: ADM-021
   name: Platform Role Management
@@ -730,6 +757,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -740,7 +768,8 @@ screens:
   - ADM-003
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-021
-  inFlows: null
+  inFlows:
+  - F109 A tenant gets its first administrator
 - screen: ADM-022
   name: Release & Version Management
   module: Releases & Environments
@@ -758,6 +787,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -789,6 +819,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -816,6 +847,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -839,6 +871,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -863,6 +896,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -952,6 +986,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -985,6 +1020,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1011,6 +1047,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1020,6 +1057,7 @@ screens:
   - ADM-001
   - ADM-002
   - ADM-003
+  - ADM-004
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-031
   inFlows:
@@ -1043,6 +1081,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1073,6 +1112,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1103,6 +1143,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1153,6 +1194,7 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
+  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1219,7 +1261,8 @@ screens:
   - ADM-047
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-038
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-039
   name: Channel & Provider Configuration
   module: Platform
@@ -1231,7 +1274,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1240,7 +1282,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-039
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-040
   name: Sender Identity, Domain & Brand Configuration
   module: Platform
@@ -1252,7 +1295,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1261,7 +1303,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-040
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-041
   name: System Transactional Template Registry
   module: Platform
@@ -1273,7 +1316,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1282,7 +1324,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-041
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-042
   name: Business Event & Notification Trigger Mapping
   module: Platform
@@ -1303,7 +1346,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-042
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-043
   name: Routing, Priority, Throttling & Fallback Rules
   module: Platform
@@ -1315,7 +1359,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1324,7 +1367,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-043
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-044
   name: Consent, Preference & Communication Policy Enforcement
   module: Platform
@@ -1345,7 +1389,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-044
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-045
   name: Delivery Queue, Failure & Retry Management
   module: Platform
@@ -1366,7 +1411,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-045
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-046
   name: Provider Health, Usage & Cost Monitoring
   module: Platform
@@ -1387,7 +1433,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-046
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-047
   name: AI Delivery Optimization & Communication Platform Diagnostics
   module: Platform
@@ -1408,7 +1455,8 @@ screens:
   - ADM-038
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-047
-  inFlows: null
+  inFlows:
+  - 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
 - screen: ADM-048
   name: Commercial Pricing Command Center
   module: Commercial
@@ -1438,7 +1486,8 @@ screens:
   - ADM-057
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-048
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-049
   name: Price List Master Configuration
   module: Commercial
@@ -1450,7 +1499,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1459,7 +1507,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-049
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-050
   name: Price Category & Rate Type Library
   module: Commercial
@@ -1480,7 +1529,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-050
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-051
   name: Rate Structure Builder
   module: Commercial
@@ -1501,7 +1551,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-051
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-052
   name: Product & Service Price Assignment
   module: Commercial
@@ -1522,7 +1573,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-052
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-053
   name: Package, Bundle & Add-On Pricing
   module: Commercial
@@ -1534,7 +1586,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1543,7 +1594,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-053
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-054
   name: Market, Venue & Currency Pricing Structure
   module: Commercial
@@ -1555,7 +1607,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1564,7 +1615,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-054
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-055
   name: Price Hierarchy & Inheritance Configuration
   module: Commercial
@@ -1576,7 +1628,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1585,7 +1636,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-055
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-056
   name: Price List Templates, Clone & Reuse
   module: Commercial
@@ -1597,7 +1649,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1606,7 +1657,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-056
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-057
   name: Commercial Pricing Structure Validation
   module: Commercial
@@ -1627,7 +1679,8 @@ screens:
   - ADM-048
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-057
-  inFlows: null
+  inFlows:
+  - 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
 - screen: ADM-058
   name: Pricing Rule Command Center
   module: Commercial
@@ -1657,7 +1710,8 @@ screens:
   - ADM-067
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-058
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-059
   name: Customer Segment & Profile Pricing Rules
   module: Commercial
@@ -1669,7 +1723,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1678,7 +1731,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-059
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-060
   name: Membership & Loyalty Pricing Rules
   module: Commercial
@@ -1690,7 +1744,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1699,7 +1752,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-060
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-061
   name: Residency, Nationality & Market Pricing Rules
   module: Commercial
@@ -1711,7 +1765,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1720,7 +1773,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-061
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-062
   name: Channel-Based Pricing Rules
   module: Commercial
@@ -1741,7 +1795,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-062
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-063
   name: Location, Venue & Event Pricing Rules
   module: Commercial
@@ -1753,7 +1808,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1762,7 +1816,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-063
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-064
   name: Quantity, Group & Volume Pricing Rules
   module: Commercial
@@ -1783,7 +1838,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-064
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-065
   name: Effective Date, Season & Day-Based Pricing Rules
   module: Commercial
@@ -1795,7 +1851,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1804,7 +1859,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-065
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-066
   name: Timeslot, Performance & Time-of-Day Pricing Rules
   module: Commercial
@@ -1825,7 +1881,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-066
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-067
   name: Pricing Rule Priority, Conflict Resolution & Testing
   module: Commercial
@@ -1846,7 +1903,8 @@ screens:
   - ADM-058
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-067
-  inFlows: null
+  inFlows:
+  - 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
 - screen: ADM-068
   name: Tax, Fee & Calculation Command Center
   module: Commercial
@@ -1876,7 +1934,8 @@ screens:
   - ADM-077
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-068
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-069
   name: Tax Profile & Jurisdiction Configuration
   module: Commercial
@@ -1888,7 +1947,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1897,7 +1955,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-069
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-070
   name: Tax Rule & Treatment Builder
   module: Commercial
@@ -1918,7 +1977,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-070
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-071
   name: Fee & Surcharge Library
   module: Commercial
@@ -1930,7 +1990,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1939,7 +1998,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-071
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-072
   name: Fee Applicability & Charging Rule Builder
   module: Commercial
@@ -1951,7 +2011,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1960,7 +2019,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-072
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-073
   name: Fee Waiver, Tax Exemption & Exception Rules
   module: Commercial
@@ -1972,7 +2032,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -1981,7 +2040,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-073
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-074
   name: Price Calculation Sequence & Formula Engine
   module: Commercial
@@ -1993,7 +2053,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2002,7 +2061,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-074
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-075
   name: Currency Precision, Rounding & Monetary Rules
   module: Commercial
@@ -2023,7 +2083,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-075
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-076
   name: Price Breakdown, Calculation Simulation & Explainability
   module: Commercial
@@ -2035,7 +2096,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2044,7 +2104,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-076
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-077
   name: Calculation Validation, Reconciliation & Service Interface
   module: Commercial
@@ -2065,7 +2126,8 @@ screens:
   - ADM-068
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-077
-  inFlows: null
+  inFlows:
+  - 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
 - screen: ADM-078
   name: Pricing Governance Command Center
   module: Commercial
@@ -2095,7 +2157,8 @@ screens:
   - ADM-087
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-078
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-079
   name: Pricing Change Request & Workspace
   module: Commercial
@@ -2107,7 +2170,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2116,7 +2178,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-079
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-080
   name: Bulk Pricing Update, Import & Mass Maintenance
   module: Commercial
@@ -2137,7 +2200,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-080
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-081
   name: Pricing Version & Baseline Management
   module: Commercial
@@ -2158,7 +2222,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-081
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-082
   name: Pricing Change Impact Analysis
   module: Commercial
@@ -2179,7 +2244,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-082
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-083
   name: Pricing Approval Workflow & Authority Matrix
   module: Commercial
@@ -2191,7 +2257,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2200,7 +2265,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-083
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-084
   name: Pricing Publication & Effective-Date Scheduler
   module: Commercial
@@ -2212,7 +2278,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2221,7 +2286,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-084
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-085
   name: Pricing Distribution, Synchronization & Publication Monitor
   module: Commercial
@@ -2242,7 +2308,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-085
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-086
   name: Pricing Rollback & Emergency Control Center
   module: Commercial
@@ -2263,7 +2330,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-086
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-087
   name: Pricing History, Audit & Compliance Explorer
   module: Commercial
@@ -2284,7 +2352,8 @@ screens:
   - ADM-078
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-087
-  inFlows: null
+  inFlows:
+  - 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
 - screen: ADM-088
   name: Dynamic Pricing Strategy Command Center
   module: Commercial
@@ -2314,7 +2383,8 @@ screens:
   - ADM-097
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-088
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-089
   name: Dynamic Pricing Strategy Builder
   module: Commercial
@@ -2326,7 +2396,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2335,7 +2404,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-089
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-090
   name: Demand, Occupancy & Availability Rule Builder
   module: Commercial
@@ -2356,7 +2426,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-090
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-091
   name: Booking Velocity & Time-to-Event Rule Builder
   module: Commercial
@@ -2377,7 +2448,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-091
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-092
   name: Seasonal, Calendar, Day & Timeslot Dynamic Rules
   module: Commercial
@@ -2398,7 +2470,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-092
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-093
   name: Channel, Customer Segment & Location Dynamic Rules
   module: Commercial
@@ -2419,7 +2492,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-093
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-094
   name: Dynamic Price Bands, Ladders & Adjustment Matrix
   module: Commercial
@@ -2431,7 +2505,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2440,7 +2513,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-094
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-095
   name: Dynamic Pricing Guardrails & Commercial Protection
   module: Commercial
@@ -2452,7 +2526,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2461,7 +2534,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-095
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-096
   name: Dynamic Pricing Automation Policy & Control
   module: Commercial
@@ -2473,7 +2547,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2482,7 +2555,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-096
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-097
   name: Rule Priority, Conflict Resolution & Dynamic Pricing Test Console
   module: Commercial
@@ -2503,7 +2577,8 @@ screens:
   - ADM-088
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-097
-  inFlows: null
+  inFlows:
+  - 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
 - screen: ADM-098
   name: AI Pricing Intelligence Command Center
   module: Commercial
@@ -2533,7 +2608,8 @@ screens:
   - ADM-107
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-098
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-099
   name: Internal Demand & Booking Signal Hub
   module: Commercial
@@ -2554,7 +2630,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-099
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-100
   name: Weather Intelligence & Demand Impact Configuration
   module: Commercial
@@ -2575,7 +2652,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-100
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-101
   name: Nearby Event, Exhibition & Local Demand Intelligence
   module: Commercial
@@ -2587,7 +2665,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2596,7 +2673,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-101
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-102
   name: Competitor Pricing & Market Position Intelligence
   module: Commercial
@@ -2617,7 +2695,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-102
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-103
   name: Market, Tourism, Holiday & Contextual Signal Hub
   module: Commercial
@@ -2638,7 +2717,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-103
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-104
   name: AI Demand Forecasting & Booking Curve Studio
   module: Commercial
@@ -2659,7 +2739,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-104
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-105
   name: Price Elasticity & Revenue Response Intelligence
   module: Commercial
@@ -2680,7 +2761,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-105
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-106
   name: AI Pricing Recommendation & Explainability Center
   module: Commercial
@@ -2701,7 +2783,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-106
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-107
   name: AI Signal Registry, Data Quality & Model Governance
   module: Commercial
@@ -2722,7 +2805,8 @@ screens:
   - ADM-098
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-107
-  inFlows: null
+  inFlows:
+  - 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
 - screen: ADM-108
   name: Revenue Optimization Command Center
   module: Commercial
@@ -2752,7 +2836,8 @@ screens:
   - ADM-117
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-108
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-109
   name: Pricing Simulation Studio
   module: Commercial
@@ -2773,7 +2858,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-109
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-110
   name: Scenario Modeling & What-If Analysis
   module: Commercial
@@ -2794,7 +2880,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-110
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-111
   name: A/B Pricing Experiment Studio
   module: Commercial
@@ -2815,7 +2902,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-111
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-112
   name: Revenue & Demand Impact Forecasting
   module: Commercial
@@ -2836,7 +2924,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-112
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-113
   name: AI Recommendation Review & Decision Queue
   module: Commercial
@@ -2857,7 +2946,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-113
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-114
   name: Automation Policy & Autonomous Pricing Orchestrator
   module: Commercial
@@ -2869,7 +2959,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -2878,7 +2967,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-114
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-115
   name: Live Dynamic Price Execution & Deployment Monitor
   module: Commercial
@@ -2899,7 +2989,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-115
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-116
   name: Dynamic Pricing Performance & Optimization Analytics
   module: Commercial
@@ -2920,7 +3011,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-116
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-117
   name: AI Learning, Model Performance & Optimization Feedback
   module: Commercial
@@ -2941,7 +3033,8 @@ screens:
   - ADM-108
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-117
-  inFlows: null
+  inFlows:
+  - 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
 - screen: ADM-118
   name: Product Lifecycle Command Center
   module: Catalogue
@@ -2971,7 +3064,8 @@ screens:
   - ADM-127
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-118
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-119
   name: Product Creation Workspace
   module: Catalogue
@@ -2992,7 +3086,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-119
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-120
   name: Lifecycle Status & Workflow Configuration
   module: Catalogue
@@ -3013,7 +3108,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-120
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-121
   name: Bulk Product Creation & Catalogue Import
   module: Catalogue
@@ -3034,7 +3130,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-121
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-122
   name: Product Import / Export & Environment Transfer
   module: Catalogue
@@ -3055,7 +3152,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-122
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-123
   name: Product Context, Ownership & Assignment
   module: Catalogue
@@ -3076,7 +3174,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-123
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-124
   name: Channel Publication & Availability
   module: Catalogue
@@ -3097,7 +3196,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-124
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-125
   name: Publication & Activation Scheduler
   module: Catalogue
@@ -3118,7 +3218,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-125
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-126
   name: Product Duplication & Template Library
   module: Catalogue
@@ -3130,7 +3231,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3139,7 +3239,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-126
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-127
   name: AI Catalogue Builder & Configuration Review
   module: Catalogue
@@ -3160,7 +3261,8 @@ screens:
   - ADM-118
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-127
-  inFlows: null
+  inFlows:
+  - 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
 - screen: ADM-128
   name: Product Governance Command Center
   module: Catalogue
@@ -3190,7 +3292,8 @@ screens:
   - ADM-137
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-128
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-129
   name: Approval Workflow Designer
   module: Catalogue
@@ -3202,7 +3305,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3211,7 +3313,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-129
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-130
   name: Approval Review & Decision Workspace
   module: Catalogue
@@ -3232,7 +3335,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-130
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-131
   name: Product Version Management
   module: Catalogue
@@ -3254,7 +3358,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-131
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-132
   name: Rollback & Recovery Management
   module: Catalogue
@@ -3275,7 +3380,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-132
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-133
   name: Change Impact Analysis
   module: Catalogue
@@ -3296,7 +3402,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-133
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-134
   name: Change Propagation & Dependency Control
   module: Catalogue
@@ -3317,7 +3424,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-134
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-135
   name: Product Retirement, Suspension & Archive
   module: Catalogue
@@ -3329,7 +3437,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3338,7 +3445,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-135
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-136
   name: Product Audit Trail & Change History
   module: Catalogue
@@ -3359,7 +3467,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-136
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-137
   name: Governance Risk, AI Monitoring & Control Center
   module: Catalogue
@@ -3380,7 +3489,8 @@ screens:
   - ADM-128
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-137
-  inFlows: null
+  inFlows:
+  - 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
 - screen: ADM-138
   name: Promotion Command Center Dashboard
   module: Commercial
@@ -3412,7 +3522,8 @@ screens:
   - ADM-147
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-138
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-139
   name: Promotion & Campaign Directory
   module: Commercial
@@ -3433,7 +3544,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-139
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-140
   name: Promotion Overview
   module: Commercial
@@ -3454,7 +3566,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-140
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-141
   name: Promotion Lifecycle & Status Manager
   module: Commercial
@@ -3475,7 +3588,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-141
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-142
   name: Campaign Calendar & Timeline
   module: Commercial
@@ -3496,7 +3610,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-142
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-143
   name: Promotion Channel & Publication Monitor
   module: Commercial
@@ -3517,7 +3632,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-143
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-144
   name: Promotion Alerts & Exception Center
   module: Commercial
@@ -3529,7 +3645,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3538,7 +3653,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-144
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-145
   name: Promotion Approval Inbox
   module: Commercial
@@ -3562,7 +3678,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-145
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-146
   name: Promotion Health & Performance Monitor
   module: Commercial
@@ -3583,7 +3700,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-146
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-147
   name: Promotion Audit, Activity & Version History
   module: Commercial
@@ -3604,7 +3722,8 @@ screens:
   - ADM-138
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-147
-  inFlows: null
+  inFlows:
+  - 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
 - screen: ADM-148
   name: Promotion Rule Builder
   module: Commercial
@@ -3634,7 +3753,8 @@ screens:
   - ADM-157
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-148
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-149
   name: Percentage & Fixed Discount Configurator
   module: Commercial
@@ -3646,7 +3766,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3655,7 +3774,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-149
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-150
   name: Cart & Transaction Threshold Rules
   module: Commercial
@@ -3676,7 +3796,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-150
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-151
   name: Volume, Bulk & Tier Discount Configurator
   module: Commercial
@@ -3697,7 +3818,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-151
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-152
   name: Time-Based & Seasonal Discount Rules
   module: Commercial
@@ -3718,7 +3840,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-152
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-153
   name: Customer, Membership & Segment Discount Rules
   module: Commercial
@@ -3739,7 +3862,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-153
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-154
   name: Payment Method, Bank & Partner Discount Rules
   module: Commercial
@@ -3751,7 +3875,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3760,7 +3883,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-154
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-155
   name: Special Price & Guest Offer Configurator
   module: Commercial
@@ -3772,7 +3896,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3781,7 +3904,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-155
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-156
   name: Discount Limits, Guardrails & Commercial Controls
   module: Commercial
@@ -3793,7 +3917,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3802,7 +3925,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-156
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-157
   name: Rule Test, Simulation & AI Recommendation Workspace
   module: Commercial
@@ -3823,7 +3947,8 @@ screens:
   - ADM-148
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-157
-  inFlows: null
+  inFlows:
+  - 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
 - screen: ADM-158
   name: Coupon & Promo Code Command Center
   module: Commercial
@@ -3854,7 +3979,8 @@ screens:
   - ADM-167
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-158
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-159
   name: Coupon & Promo Code Builder
   module: Commercial
@@ -3866,7 +3992,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3875,7 +4000,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-159
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-160
   name: Unique Code Generation & Batch Manager
   module: Commercial
@@ -3887,7 +4013,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -3896,7 +4021,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-160
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-161
   name: Code Eligibility & Restriction Manager
   module: Commercial
@@ -3917,7 +4043,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-161
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-162
   name: Usage, Capacity & Frequency Control
   module: Commercial
@@ -3938,7 +4065,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-162
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-163
   name: Validity, Date & Time Control
   module: Commercial
@@ -3959,7 +4087,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-163
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-164
   name: Code Distribution & Assignment Manager
   module: Commercial
@@ -3980,7 +4109,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-164
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-165
   name: Redemption Monitor & Code Lookup
   module: Commercial
@@ -4001,7 +4131,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-165
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-166
   name: Code Security, Fraud & Exception Center
   module: Commercial
@@ -4022,7 +4153,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-166
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-167
   name: Redemption Analytics, Audit & AI Optimization
   module: Commercial
@@ -4043,7 +4175,8 @@ screens:
   - ADM-158
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-167
-  inFlows: null
+  inFlows:
+  - 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
 - screen: ADM-168
   name: Advanced Offer Command Center
   module: Commercial
@@ -4073,7 +4206,8 @@ screens:
   - ADM-177
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-168
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-169
   name: Buy X Get Y / BOGO Rule Builder
   module: Commercial
@@ -4085,7 +4219,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4094,7 +4227,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-169
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-170
   name: Multi-Buy & Quantity Offer Configurator
   module: Commercial
@@ -4106,7 +4240,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4115,7 +4248,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-170
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-171
   name: Cheapest / Lowest-Value Item Promotion
   module: Commercial
@@ -4127,7 +4261,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4136,7 +4269,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-171
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-172
   name: Fixed-Price & “N for X” Offer Builder
   module: Commercial
@@ -4148,7 +4282,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4157,7 +4290,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-172
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-173
   name: Gift, Free Product & Added-Value Offer Builder
   module: Commercial
@@ -4169,7 +4303,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4178,7 +4311,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-173
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-174
   name: Cross-Category Promotion Builder
   module: Commercial
@@ -4199,7 +4333,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-174
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-175
   name: Reward Selection, Substitution & Customer Choice
   module: Commercial
@@ -4220,7 +4355,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-175
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-176
   name: Advanced Offer Guardrails & Conflict Controls
   module: Commercial
@@ -4232,7 +4368,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4241,7 +4376,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-176
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-177
   name: Offer Simulation, Basket Trace & AI Optimization
   module: Commercial
@@ -4262,7 +4398,8 @@ screens:
   - ADM-168
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-177
-  inFlows: null
+  inFlows:
+  - 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
 - screen: ADM-178
   name: Bundle & Combo Command Center
   module: Commercial
@@ -4292,7 +4429,8 @@ screens:
   - ADM-187
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-178
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-179
   name: Bundle Definition & Setup
   module: Commercial
@@ -4304,7 +4442,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4313,7 +4450,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-179
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-180
   name: Bundle Component Builder
   module: Commercial
@@ -4325,7 +4463,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4334,7 +4471,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-180
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-181
   name: Guest Choice & Build-Your-Own Bundle Designer
   module: Commercial
@@ -4346,7 +4484,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4355,7 +4492,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-181
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-182
   name: Bundle Pricing & Commercial Model
   module: Commercial
@@ -4367,7 +4505,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4376,7 +4513,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-182
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-183
   name: Bundle Availability, Capacity & Validation
   module: Commercial
@@ -4397,7 +4535,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-183
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-184
   name: Bundle Validity, Scheduling & Redemption Rules
   module: Commercial
@@ -4418,7 +4557,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-184
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-185
   name: Partner & External Product Bundle Manager
   module: Commercial
@@ -4439,7 +4579,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-185
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-186
   name: Revenue Allocation, Cost & Settlement Rules
   module: Commercial
@@ -4451,7 +4592,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4460,7 +4600,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-186
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-187
   name: Bundle Preview, Simulation & AI Recommendation
   module: Commercial
@@ -4481,7 +4622,8 @@ screens:
   - ADM-178
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-187
-  inFlows: null
+  inFlows:
+  - 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
 - screen: ADM-188
   name: Dynamic Bundle Operations Command Center
   module: Commercial
@@ -4511,7 +4653,8 @@ screens:
   - ADM-197
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-188
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-189
   name: Component Inventory & Availability Matrix
   module: Commercial
@@ -4532,7 +4675,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-189
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-190
   name: Bundle Sellability & Dependency Rule Engine
   module: Commercial
@@ -4553,7 +4697,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-190
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-191
   name: Capacity Pool & Reservation Manager
   module: Commercial
@@ -4565,7 +4710,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4574,7 +4718,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-191
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-192
   name: Dynamic Component Substitution Engine
   module: Commercial
@@ -4586,7 +4731,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4595,7 +4739,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-192
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-193
   name: Dynamic Bundle Rule & Composition Engine
   module: Commercial
@@ -4616,7 +4761,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-193
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-194
   name: Real-Time Availability & Checkout Validation
   module: Commercial
@@ -4628,7 +4774,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4637,7 +4782,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-194
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-195
   name: Bundle Availability by Channel, Venue & Partner
   module: Commercial
@@ -4649,7 +4795,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4658,7 +4803,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-195
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-196
   name: Bundle Availability Forecast, Alerts & Recovery
   module: Commercial
@@ -4679,7 +4825,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-196
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-197
   name: Dynamic Bundle Simulation & AI Optimization
   module: Commercial
@@ -4700,7 +4847,8 @@ screens:
   - ADM-188
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-197
-  inFlows: null
+  inFlows:
+  - 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
 - screen: ADM-198
   name: Targeting & Eligibility Command Center
   module: Commercial
@@ -4730,7 +4878,8 @@ screens:
   - ADM-207
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-198
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-199
   name: Eligibility Rule Builder
   module: Commercial
@@ -4751,7 +4900,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-199
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-200
   name: CRM & Customer Segment Manager
   module: Commercial
@@ -4772,7 +4922,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-200
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-201
   name: Membership, Loyalty & Guest Eligibility
   module: Commercial
@@ -4793,7 +4944,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-201
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-202
   name: Behavioral & Transaction Targeting
   module: Commercial
@@ -4805,7 +4957,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4814,7 +4965,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-202
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-203
   name: Context, Location, Channel & Time Targeting
   module: Commercial
@@ -4835,7 +4987,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-203
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-204
   name: Partner, B2B & Payment Eligibility
   module: Commercial
@@ -4856,7 +5009,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-204
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-205
   name: Audience Preview, Reach & Eligibility Simulator
   module: Commercial
@@ -4877,7 +5031,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-205
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-206
   name: Targeting Conflict, Frequency & Exclusion Controls
   module: Commercial
@@ -4889,7 +5044,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -4898,7 +5052,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-206
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-207
   name: AI Audience Discovery & Targeting Optimization
   module: Commercial
@@ -4919,7 +5074,8 @@ screens:
   - ADM-198
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-207
-  inFlows: null
+  inFlows:
+  - 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
 - screen: ADM-208
   name: Stacking & Conflict Command Center
   module: Commercial
@@ -4949,7 +5105,8 @@ screens:
   - ADM-217
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-208
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-209
   name: Promotion Priority & Hierarchy Manager
   module: Commercial
@@ -4970,7 +5127,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-209
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-210
   name: Promotion Stacking Rule Builder
   module: Commercial
@@ -4991,7 +5149,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-210
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-211
   name: Promotion Exclusion & Compatibility Matrix
   module: Commercial
@@ -5012,7 +5171,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-211
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-212
   name: Discount Calculation & Application Sequence
   module: Commercial
@@ -5024,7 +5184,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5033,7 +5192,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-212
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-213
   name: Best Offer & Customer Benefit Resolver
   module: Commercial
@@ -5054,7 +5214,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-213
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-214
   name: Discount Cap & Maximum Benefit Controller
   module: Commercial
@@ -5066,7 +5227,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5075,7 +5235,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-214
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-215
   name: Conflict Detection & Resolution Center
   module: Commercial
@@ -5096,7 +5257,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-215
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-216
   name: Promotion Decision Trace & Transaction Explainer
   module: Commercial
@@ -5117,7 +5279,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-216
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-217
   name: Conflict Simulation & AI Optimization
   module: Commercial
@@ -5138,7 +5301,8 @@ screens:
   - ADM-208
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-217
-  inFlows: null
+  inFlows:
+  - 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
 - screen: ADM-218
   name: Campaign Governance & Budget Command Center
   module: Commercial
@@ -5168,7 +5332,8 @@ screens:
   - ADM-227
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-218
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-219
   name: Campaign Budget & Financial Limit Setup
   module: Commercial
@@ -5180,7 +5345,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5189,7 +5353,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-219
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-220
   name: Redemption, Discount & Exposure Limit Manager
   module: Commercial
@@ -5201,7 +5366,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5210,7 +5374,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-220
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-221
   name: Budget Consumption & Forecast Monitor
   module: Commercial
@@ -5231,7 +5396,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-221
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-222
   name: Threshold Actions & Automatic Suspension
   module: Commercial
@@ -5252,7 +5418,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-222
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-223
   name: Campaign Approval Workflow Designer
   module: Commercial
@@ -5273,7 +5440,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-223
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-224
   name: Approval Inbox & Decision Workspace
   module: Commercial
@@ -5294,7 +5462,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-224
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-225
   name: Campaign Financial & Commercial Simulator
   module: Commercial
@@ -5315,7 +5484,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-225
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-226
   name: Campaign Experiment & A/B Test Manager
   module: Commercial
@@ -5336,7 +5506,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-226
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-227
   name: Governance Audit, AI Risk & Launch Readiness
   module: Commercial
@@ -5348,7 +5519,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5357,7 +5527,8 @@ screens:
   - ADM-218
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-227
-  inFlows: null
+  inFlows:
+  - 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
 - screen: ADM-228
   name: Promotion Performance Command Center
   module: Commercial
@@ -5387,7 +5558,8 @@ screens:
   - ADM-237
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-228
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-229
   name: Campaign & Promotion Performance Explorer
   module: Commercial
@@ -5408,7 +5580,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-229
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-230
   name: Redemption, Conversion & Funnel Analytics
   module: Commercial
@@ -5429,7 +5602,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-230
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-231
   name: Discount, Margin & Profitability Analytics
   module: Commercial
@@ -5450,7 +5624,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-231
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-232
   name: Bundle, BOGO & Advanced Offer Analytics
   module: Commercial
@@ -5471,7 +5646,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-232
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-233
   name: Upsell, Cross-Sell & Attach-Rate Analytics
   module: Commercial
@@ -5492,7 +5668,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-233
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-234
   name: Customer, Segment, Channel & Partner Analytics
   module: Commercial
@@ -5513,7 +5690,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-234
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-235
   name: Incrementality, Attribution & Cannibalization Analysis
   module: Commercial
@@ -5534,7 +5712,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-235
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-236
   name: AI Optimization & Next-Best-Action Center
   module: Commercial
@@ -5555,7 +5734,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-236
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-237
   name: Executive Promotion Intelligence & Reporting Studio
   module: Commercial
@@ -5576,7 +5756,8 @@ screens:
   - ADM-228
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-237
-  inFlows: null
+  inFlows:
+  - 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
 - screen: ADM-238
   name: Rules & Workflow Command Center
   module: Platform
@@ -5606,7 +5787,8 @@ screens:
   - ADM-247
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-238
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-239
   name: Visual Business Rule Builder
   module: Platform
@@ -5627,7 +5809,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-239
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-240
   name: Conditions, Decision Logic & Decision Tables
   module: Platform
@@ -5648,7 +5831,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-240
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-241
   name: Visual Workflow Designer
   module: Platform
@@ -5660,7 +5844,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5669,7 +5852,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-241
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-242
   name: Approval Matrix & Multi-Level Approval Configuration
   module: Platform
@@ -5681,7 +5865,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5690,7 +5873,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-242
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-243
   name: Roles, Authority, Delegation & Approval Limits
   module: Platform
@@ -5702,7 +5886,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5711,7 +5894,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-243
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-244
   name: SLA, Escalation, Reminder & Timeout Rules
   module: Platform
@@ -5723,7 +5907,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5732,7 +5915,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-244
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-245
   name: Trigger, Action & Cross-Module Orchestration Configuration
   module: Platform
@@ -5744,7 +5928,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -5753,7 +5936,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-245
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-246
   name: Workflow Testing, Simulation & Impact Analysis
   module: Platform
@@ -5774,7 +5958,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-246
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-247
   name: Versioning, Governance, Approval & Publication
   module: Platform
@@ -5795,7 +5980,8 @@ screens:
   - ADM-238
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-247
-  inFlows: null
+  inFlows:
+  - 'F164 Rules  Workflow  Approval   Automation Engine board 1: Rules & Workflow Command Center'
 - screen: ADM-248
   name: Workflow Operations Command Center
   module: Platform
@@ -5825,7 +6011,8 @@ screens:
   - ADM-257
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-248
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-249
   name: Unified Approval Inbox & Decision Workspace
   module: Platform
@@ -5846,7 +6033,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-249
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-250
   name: Workflow Instance Monitor & Process Timeline
   module: Platform
@@ -5867,7 +6055,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-250
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-251
   name: Workflow Exception, Failure & Recovery Center
   module: Platform
@@ -5888,7 +6077,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-251
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-252
   name: SLA, Escalation & Bottleneck Monitor
   module: Platform
@@ -5909,7 +6099,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-252
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-253
   name: Automation Execution & Autonomous Action Monitor
   module: Platform
@@ -5930,7 +6121,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-253
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-254
   name: Cross-Module Orchestration Monitor
   module: Platform
@@ -5951,7 +6143,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-254
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-255
   name: Workflow Analytics & Process Performance
   module: Platform
@@ -5972,7 +6165,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-255
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-256
   name: Process Optimization & Automation Opportunity Center
   module: Platform
@@ -5993,7 +6187,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-256
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-257
   name: AI Workflow Intelligence & Autonomous Governance Center
   module: Platform
@@ -6014,7 +6209,8 @@ screens:
   - ADM-248
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-257
-  inFlows: null
+  inFlows:
+  - 'F165 Rules  Workflow  Approval   Automation Engine board 2: Workflow Operations Command Center'
 - screen: ADM-258
   name: Sales Channel Command Center
   module: Commercial
@@ -6044,7 +6240,8 @@ screens:
   - ADM-267
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-258
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-259
   name: Channel Creation & Profile Configuration
   module: Commercial
@@ -6056,7 +6253,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6065,7 +6261,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-259
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-260
   name: Product & Catalogue Assignment
   module: Commercial
@@ -6086,7 +6283,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-260
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-261
   name: Channel Pricing & Commercial Profile Assignment
   module: Commercial
@@ -6107,7 +6305,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-261
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-262
   name: Inventory, Capacity & Channel Allocation
   module: Commercial
@@ -6128,7 +6327,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-262
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-263
   name: Channel Sales Schedule & Availability Windows
   module: Commercial
@@ -6149,7 +6349,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-263
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-264
   name: Customer & Eligibility Rules by Channel
   module: Commercial
@@ -6161,7 +6362,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6170,7 +6370,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-264
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-265
   name: Channel Sales Rules, Limits & Restrictions
   module: Commercial
@@ -6182,7 +6383,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6191,7 +6391,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-265
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-266
   name: Channel Fees, Payment & Fulfillment Configuration
   module: Commercial
@@ -6203,7 +6404,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6212,7 +6412,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-266
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-267
   name: Channel Publication, Readiness & AI Validation
   module: Commercial
@@ -6224,7 +6425,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6233,7 +6433,8 @@ screens:
   - ADM-258
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-267
-  inFlows: null
+  inFlows:
+  - 'F166 Sales Channel Management board 1: Sales Channel Command Center'
 - screen: ADM-268
   name: Channel Operations Command Center
   module: Commercial
@@ -6263,7 +6464,8 @@ screens:
   - ADM-277
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-268
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-269
   name: Channel Connection & Integration Manager
   module: Commercial
@@ -6275,7 +6477,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6284,7 +6485,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-269
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-270
   name: Product, Price & Availability Synchronization
   module: Commercial
@@ -6305,7 +6507,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-270
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-271
   name: Real-Time Channel Availability & Inventory Monitor
   module: Commercial
@@ -6326,7 +6529,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-271
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-272
   name: Channel Allocation & Rebalancing Operations
   module: Commercial
@@ -6347,7 +6551,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-272
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-273
   name: Channel Exceptions, Incidents & Recovery
   module: Commercial
@@ -6359,7 +6564,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6368,7 +6572,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-273
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-274
   name: Channel Performance & Commercial Analytics
   module: Commercial
@@ -6389,7 +6594,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-274
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-275
   name: Channel Audit, Logs & Transaction Traceability
   module: Commercial
@@ -6410,7 +6616,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-275
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-276
   name: Channel Governance, SLA & Partner Control
   module: Commercial
@@ -6422,7 +6629,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6431,7 +6637,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-276
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-277
   name: AI Channel Optimization & Intelligence Center
   module: Commercial
@@ -6452,7 +6659,8 @@ screens:
   - ADM-268
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-277
-  inFlows: null
+  inFlows:
+  - 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - screen: ADM-278
   name: Resale Marketplace Command Center
   module: Commercial
@@ -6482,7 +6690,8 @@ screens:
   - ADM-287
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-278
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-279
   name: Resale Eligibility Rule Configuration
   module: Commercial
@@ -6494,7 +6703,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6503,7 +6711,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-279
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-280
   name: Resale Policy & Marketplace Settings
   module: Commercial
@@ -6515,7 +6724,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6524,7 +6732,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-280
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-281
   name: Listing Creation & Seller Configuration
   module: Commercial
@@ -6536,7 +6745,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6545,7 +6753,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-281
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-282
   name: Resale Pricing & Price Guardrails
   module: Commercial
@@ -6557,7 +6766,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6566,7 +6774,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-282
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-283
   name: Resale Fees, Commission & Seller Proceeds
   module: Commercial
@@ -6578,7 +6787,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6587,7 +6795,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-283
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-284
   name: Listing Approval & Moderation
   module: Commercial
@@ -6608,7 +6817,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-284
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-285
   name: Resale Inventory & Availability Management
   module: Commercial
@@ -6629,7 +6839,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-285
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-286
   name: Listing Lifecycle, Expiry & Cancellation
   module: Commercial
@@ -6641,7 +6852,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6650,7 +6860,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-286
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-287
   name: AI Resale Configuration & Marketplace Recommendations
   module: Commercial
@@ -6662,7 +6873,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6671,7 +6881,8 @@ screens:
   - ADM-278
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-287
-  inFlows: null
+  inFlows:
+  - 'F171 Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
 - screen: ADM-288
   name: Resale Operations Command Center
   module: Commercial
@@ -6701,7 +6912,8 @@ screens:
   - ADM-297
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-288
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-289
   name: Buyer Purchase & Resale Order Management
   module: Commercial
@@ -6713,7 +6925,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6722,7 +6933,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-289
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-290
   name: Ticket Ownership Transfer Management
   module: Commercial
@@ -6743,7 +6955,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-290
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-291
   name: Credential Revocation & Regeneration
   module: Commercial
@@ -6755,7 +6968,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6764,7 +6976,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-291
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-292
   name: Resale Fraud & Duplicate Sale Protection
   module: Commercial
@@ -6785,7 +6998,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-292
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-293
   name: Capacity & Inventory Reconciliation
   module: Commercial
@@ -6806,7 +7020,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-293
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-294
   name: Seller Settlement & Payout Management
   module: Commercial
@@ -6827,7 +7042,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-294
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-295
   name: Refunds, Disputes & Resale Exceptions
   module: Commercial
@@ -6848,7 +7064,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-295
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-296
   name: Resale Audit & Ownership History
   module: Commercial
@@ -6869,7 +7086,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-296
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-297
   name: Resale Analytics & AI Intelligence
   module: Commercial
@@ -6890,7 +7108,8 @@ screens:
   - ADM-288
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-297
-  inFlows: null
+  inFlows:
+  - 'F172 Ticket Resale Marketplace board 2: Resale Operations Command Center'
 - screen: ADM-298
   name: My Tickets & Resale Marketplace Entry
   module: Commercial
@@ -6902,7 +7121,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -6920,7 +7138,8 @@ screens:
   - ADM-307
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-298
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-299
   name: Resale Eligibility & Ticket Selection
   module: Commercial
@@ -6941,7 +7160,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-299
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-300
   name: Create Listing & Resale Price Selection
   module: Commercial
@@ -6962,7 +7182,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-300
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-301
   name: Fees, Seller Proceeds & Listing Confirmation
   module: Commercial
@@ -6983,7 +7204,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-301
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-302
   name: My Resale Listings & Seller Dashboard
   module: Commercial
@@ -7004,7 +7226,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-302
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-303
   name: Official Resale Marketplace & Buyer Discovery
   module: Commercial
@@ -7025,7 +7248,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-303
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-304
   name: Resale Ticket Detail, Seat Selection & Primary-vs-Resale Experience
   module: Commercial
@@ -7046,7 +7270,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-304
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-305
   name: Buyer Checkout, Inventory Hold & Secure Payment
   module: Commercial
@@ -7058,7 +7283,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7067,7 +7291,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-305
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-306
   name: Resale Confirmation, Ownership Transfer & Ticket Delivery
   module: Commercial
@@ -7088,7 +7313,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-306
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-307
   name: White-Label Marketplace Deployment & Experience Architecture
   module: Commercial
@@ -7100,7 +7326,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7109,7 +7334,8 @@ screens:
   - ADM-298
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-307
-  inFlows: null
+  inFlows:
+  - 'F173 Ticket Resale Marketplace board 3: My Tickets & Resale Marketplace Entry'
 - screen: ADM-308
   name: Upgrade & Conversion Command Center
   module: Commercial
@@ -7139,7 +7365,8 @@ screens:
   - ADM-317
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-308
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-309
   name: Upgrade & Conversion Path Builder
   module: Commercial
@@ -7160,7 +7387,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-309
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-310
   name: Upgrade Eligibility & Qualification Rules
   module: Commercial
@@ -7172,7 +7400,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7181,7 +7408,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-310
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-311
   name: Upgrade Timing, Usage & Ticket Status Rules
   module: Commercial
@@ -7193,7 +7421,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7202,7 +7429,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-311
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-312
   name: Upgrade Financial Treatment & Price Difference Rules
   module: Commercial
@@ -7214,7 +7442,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7223,7 +7450,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-312
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-313
   name: Pro-Rata, Residual Value & Entitlement Credit Configuration
   module: Commercial
@@ -7244,7 +7472,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-313
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-314
   name: Person-Type, Product & Entitlement Conversion Rules
   module: Commercial
@@ -7265,7 +7494,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-314
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-315
   name: Bulk, Group & Assisted Upgrade Operations
   module: Commercial
@@ -7277,7 +7507,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7286,7 +7515,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-315
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-316
   name: Upgrade Execution, Credential Regeneration & Channel Controls
   module: Commercial
@@ -7298,7 +7528,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -7307,7 +7536,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-316
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-317
   name: Upgrade History, Exception Management & Audit Explorer
   module: Commercial
@@ -7328,7 +7558,8 @@ screens:
   - ADM-308
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-317
-  inFlows: null
+  inFlows:
+  - 'F174 Ticket Upgrade, Exchange & Conversion board 1: Upgrade & Conversion Command Center'
 - screen: ADM-318
   name: Dead Letters
   module: Platform Ops
@@ -7352,3 +7583,1067 @@ screens:
   boardFrames: null
   wireframe: wireframes/P09 TICVAI Web.dc.html#adm-318
   inFlows: null
+- screen: ADM-319
+  name: Approval Workflow Library
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-241
+  - ADM-320
+  - ADM-322
+  - ADM-323
+  - ADM-324
+  - ADM-325
+  - ADM-326
+  - ADM-327
+  - ADM-328
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-319
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-320
+  name: Create Approval Workflow
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-320
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-322
+  name: Approval Stage Configuration
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-322
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-323
+  name: Condition & Decision Rule Builder
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-323
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-324
+  name: Approval Sequence & Parallel Routing
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-324
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-325
+  name: Workflow Outcome & Action Configuration
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-325
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-326
+  name: Workflow Validation & Simulation
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-326
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-327
+  name: Workflow Publication & Lifecycle
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-327
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-328
+  name: Workflow Versioning & Change History
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-319
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-328
+  inFlows:
+  - 'F124 Approval Workflows and Governance board 2: Approval Workflow Library'
+- screen: ADM-329
+  name: Approval Matrix Command Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-330
+  - ADM-331
+  - ADM-332
+  - ADM-333
+  - ADM-334
+  - ADM-335
+  - ADM-336
+  - ADM-337
+  - ADM-338
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-329
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-330
+  name: Approval Authority Matrix
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-330
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-331
+  name: Organizational Hierarchy Routing
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-331
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-332
+  name: Department-Based Approval Matrix
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-332
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-333
+  name: Venue & Tenant Approval Matrix
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-333
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-334
+  name: Value & Threshold Routing
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-334
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-335
+  name: Risk-Based & Conditional Routing
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-335
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-336
+  name: Approver Group & Decision Policy
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-336
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-337
+  name: Routing Simulator & Conflict Detection
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-337
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-338
+  name: AI Routing Advisor & Matrix Optimization
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-329
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-338
+  inFlows:
+  - 'F125 Approval Workflows and Governance board 3: Approval Matrix Command Center'
+- screen: ADM-339
+  name: Governance & Compliance Command Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-340
+  - ADM-341
+  - ADM-342
+  - ADM-343
+  - ADM-344
+  - ADM-345
+  - ADM-346
+  - ADM-347
+  - ADM-348
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-339
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-340
+  name: Segregation of Duties Policy Manager
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-340
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-341
+  name: Four-Eyes & Dual-Control Policy
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-341
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-342
+  name: Authentication & MFA Policy Manager
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations:
+  - listMfaMethods
+  - listStepUpPolicies
+  - setStepUpPolicy
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-342
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-343
+  name: Sensitive Action Confirmation
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-343
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-344
+  name: Digital Signature Management
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-344
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-345
+  name: Immutable Approval Record & Tamper Detection
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-345
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-346
+  name: Approval Record Retention Policy
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-346
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-347
+  name: Regulatory Audit & Evidence Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-347
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-348
+  name: Governance Risk & AI Compliance Advisor
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-339
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-348
+  inFlows:
+  - 'F128 Approval Workflows and Governance board 6: Governance & Compliance Command Center'
+- screen: ADM-349
+  name: Approval Integration Command Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-350
+  - ADM-351
+  - ADM-352
+  - ADM-353
+  - ADM-354
+  - ADM-355
+  - ADM-356
+  - ADM-357
+  - ADM-358
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-349
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-350
+  name: Module Integration Registry
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-350
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-351
+  name: Approval API Management
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-351
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-352
+  name: Workflow Event Framework
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-352
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-353
+  name: Webhook Configuration & Subscription Manager
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-353
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-354
+  name: External Workflow System Integration
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-354
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-355
+  name: Data & Workflow Mapping Studio
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-355
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-356
+  name: Integration Security & Access Control
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-356
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-357
+  name: Integration Monitoring, Error & Retry Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-357
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-358
+  name: Integration Analytics & AI Health Advisor
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-349
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-358
+  inFlows:
+  - 'F129 Approval Workflows and Governance board 7: Approval Integration Command Center'
+- screen: ADM-359
+  name: Approval Executive KPI Dashboard
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-002
+  - ADM-360
+  - ADM-361
+  - ADM-362
+  - ADM-363
+  - ADM-364
+  - ADM-365
+  - ADM-366
+  - ADM-367
+  - ADM-368
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-359
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-360
+  name: Approval Volume & Outcome Analytics
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-360
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-361
+  name: Approval Processing Time Analytics
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-361
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-362
+  name: Bottleneck Analysis & Heatmap
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-362
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-363
+  name: Approval Trend & Comparative Analytics
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-363
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-364
+  name: Approver & Team Performance Analytics
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-364
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-365
+  name: Risk & Governance Analytics
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-365
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-366
+  name: AI Approval Intelligence Center
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-366
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-367
+  name: AI Optimization & What-If Simulator
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-367
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+- screen: ADM-368
+  name: AI Governance Executive Advisor
+  module: Platform
+  requiresModule: core
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ADM-359
+  boardFrames: null
+  wireframe: wireframes/P09 TICVAI Web.dc.html#adm-368
+  inFlows:
+  - 'F130 Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'

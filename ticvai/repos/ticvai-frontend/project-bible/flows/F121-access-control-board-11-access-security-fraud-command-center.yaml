@@ -1,0 +1,152 @@
+id: F121
+name: 'Access Control board 11: Access Security & Fraud Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 11. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-244
+  entryPoints:
+  - Arrives at Access Security & Fraud Command Center
+steps:
+- step: 1
+  screen: BO-244
+  action: Opens Access Security & Fraud Command Center
+  operations:
+  - listAccessSecurityFraud
+  outcome: Provide security teams with a real-time command center for access-related fraud and suspicious
+    activity across all venues.
+- step: 2
+  screen: BO-245
+  action: Works in Fraud Detection Rule & Signal Library
+  operations:
+  - listFraudDetectionRule
+  outcome: Configure the signals TICVAI uses to identify suspicious access behavior.
+- step: 3
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-246
+  action: Works in Credential Sharing & Concurrent Usage Detection
+  operations:
+  - listCredentialSharingConcurrent
+  outcome: 'Detect one of the most important access-control fraud scenarios: One valid ticket being shared
+    by multiple people or devices.'
+- step: 5
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-247
+  action: Works in Unified Identity & Credential Lock Manager
+  operations:
+  - listUnifiedIdentityCredential
+  outcome: Provide the single security lock required by the matrix so suspicious activity can immediately
+    stop all access associated with an identity.
+- step: 7
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-248
+  action: Works in Biometric & Identity Integrity Monitoring
+  operations:
+  - listBiometricIdentityIntegrity
+  outcome: Detect suspicious biometric and identity-related changes without duplicating Board 5's biometric
+    configuration. Board 5 configures biometrics. Board 11 monitors biometric security risk.
+- step: 9
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-249
+  action: Works in Relationship & Companion Fraud Monitoring
+  operations:
+  - listRelationshipCompanionFraud
+  outcome: 'Detect abuse involving linked guests such as: Child + Adult POD + Companion Guest + Nanny
+    Group Leader + Group Membership dependents.'
+- step: 11
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-250
+  action: Works in Access Risk Scoring & Decision Engine
+  operations:
+  - listAccessRiskScoring
+  outcome: Convert multiple security signals into a unified access risk score.
+- step: 13
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-251
+  action: Works in Real-Time Security Response & Playbook Builder
+  operations:
+  - setRealTimeSecurity
+  outcome: Configure what TICVAI automatically does when security conditions are detected.
+- step: 15
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-252
+  action: Works in Security Investigation & Evidence Workspace
+  operations:
+  - setSecurityInvestigationEvidence
+  outcome: Provide security specialists with a deeper investigation environment than Board 9's operational
+    incident workspace.
+- step: 17
+  screen: BO-244
+  action: Returns to the board's landing screen
+  operations:
+  - listAccessSecurityFraud
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-253
+  action: Works in Security Analytics, AI Detection & Governance
+  operations:
+  - listSecurityDetectionGovernance
+  outcome: Provide long-term intelligence on fraud patterns, security controls and effectiveness.
+branches:
+- at: 1
+  condition: Nothing has been set up on Access Security & Fraud Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 11 visited
+primaryContract: access
+contracts:
+- access

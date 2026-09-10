@@ -1,0 +1,159 @@
+id: F154
+name: 'Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 1. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-138
+  entryPoints:
+  - Arrives at Promotion Command Center Dashboard
+steps:
+- step: 1
+  screen: ADM-138
+  action: Opens Promotion Command Center Dashboard
+  operations:
+  - listPromotions
+  - getPromotionUsage
+  outcome: Provide management with a real-time executive and operational overview of all promotional activities.
+- step: 2
+  screen: ADM-139
+  action: Works in Promotion & Campaign Directory
+  operations:
+  - listPromotionCampaign
+  outcome: Provide the master searchable list of every promotion and commercial campaign created within
+    TICVAI.
+- step: 3
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-140
+  action: Works in Promotion Overview
+  operations:
+  - listPromotions
+  outcome: Provide the complete business summary of one selected promotion without opening its detailed
+    configuration.
+- step: 5
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-141
+  action: Works in Promotion Lifecycle & Status Manager
+  operations:
+  - listPromotionLifecycleStatus
+  outcome: Control the operational lifecycle of promotions.
+- step: 7
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-142
+  action: Works in Campaign Calendar & Timeline
+  operations:
+  - listCampaignCalendarTimeline
+  outcome: Provide a calendar-based operational view of promotions.
+- step: 9
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-143
+  action: Works in Promotion Channel & Publication Monitor
+  operations:
+  - listPromotionChannel
+  outcome: Ensure promotional configurations are correctly synchronized across every TICVAI sales channel.
+- step: 11
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-144
+  action: Works in Promotion Alerts & Exception Center
+  operations:
+  - listPromotionAlertException
+  outcome: Centralize operational, commercial, and financial alerts affecting promotions.
+- step: 13
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-145
+  action: Works in Promotion Approval Inbox
+  operations:
+  - listPromotions
+  - listApprovalRequests
+  - decideApprovalRequest
+  outcome: Provide one centralized approval workspace for promotional changes.
+- step: 15
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-146
+  action: Works in Promotion Health & Performance Monitor
+  operations:
+  - listPromotionHealthPerformance
+  outcome: Provide near-real-time operational performance monitoring while campaigns are running.
+- step: 17
+  screen: ADM-138
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotions
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-147
+  action: Works in Promotion Audit, Activity & Version History
+  operations:
+  - listPromotionActivityVersion
+  outcome: Provide complete governance and traceability for every promotion. Board 2 is the core commercial
+    rule engine for promotions. It shall allow authorized TICVAI business users to configure discount
+    and promotion mechanics without development, including percentage and fixed discounts, transaction
+    thresholds, volume discounts, bulk pricing, early-bird and last-minute offers, special guest pricing,
+    payment-method discounts, partner discounts, and dynamic conditional discounts. The matrix explicitly
+    requires percentage/value discounts, quantity thresholds, bulk discounts, early-bird/volume/customer-segment
+    conditions, payment-type offers, group pricing, and special individual pricing. The board should contain
+    10 backend screens.
+branches:
+- at: 1
+  condition: Nothing has been set up on Promotion Command Center Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 1 visited
+primaryContract: approvals
+contracts:
+- approvals
+- promotions

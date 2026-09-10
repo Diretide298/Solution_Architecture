@@ -1,0 +1,150 @@
+id: F182
+name: 'Waiver, Consent & Digital Form Management board 2: Waiver Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P13 Venue CMS
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Waiver, Consent & Digital Form Management board 2. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: CMS-051
+  entryPoints:
+  - Arrives at Waiver Operations Command Center
+steps:
+- step: 1
+  screen: CMS-051
+  action: Opens Waiver Operations Command Center
+  operations:
+  - listWaiver
+  outcome: Provide Operations, Customer Service, Compliance and venue teams with a real-time overview
+    of waiver completion across upcoming and active activities.
+- step: 2
+  screen: CMS-052
+  action: Works in Participant Waiver Status & Tracking
+  operations:
+  - listParticipantWaiverStatus
+  outcome: Provide a detailed operational record of the waiver requirements for each participant.
+- step: 3
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: CMS-053
+  action: Works in Digital Signing & Collection Operations
+  operations:
+  - listDigitalSigningCollection
+  outcome: Manage the actual distribution and completion of digital waivers.
+- step: 5
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: CMS-054
+  action: Works in Minor, Guardian & Group Consent Management
+  operations:
+  - listMinorGuardianGroup
+  outcome: Manage complex consent relationships for minors and organized groups. This screen is particularly
+    important for camps, academies, schools, family attractions and youth activities.
+- step: 7
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: CMS-055
+  action: Works in Waiver Verification & Validation Workspace
+  operations:
+  - setWaiverVerificationValidation
+  outcome: Provide authorized staff with a controlled process for reviewing waiver submissions that require
+    verification.
+- step: 9
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: CMS-056
+  action: Works in Missing, Expired & Invalid Waiver Management
+  operations:
+  - listMissingExpiredInvalid
+  outcome: Provide a dedicated exception workspace for waiver requirements preventing operational readiness.
+- step: 11
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: CMS-057
+  action: Works in On-Site Waiver & Exception Handling
+  operations:
+  - listSiteWaiverException
+  outcome: Support customers who arrive at the venue without completing required waivers.
+- step: 13
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: CMS-058
+  action: Works in Compliance Evidence, Audit & Waiver Repository
+  operations:
+  - listComplianceEvidenceWaiver
+  outcome: Maintain the complete evidentiary record of every waiver and consent transaction.
+- step: 15
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: CMS-059
+  action: Works in Waiver Analytics, Compliance & Operational Insights
+  operations:
+  - listWaiverComplianceOperational
+  outcome: Analyze waiver completion, customer behavior and operational effectiveness.
+- step: 17
+  screen: CMS-051
+  action: Returns to the board's landing screen
+  operations:
+  - listWaiver
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: CMS-060
+  action: Works in AI Waiver Compliance & Risk Intelligence Center
+  operations:
+  - listWaiverComplianceRisk
+  outcome: Provide an AI intelligence layer across the complete waiver lifecycle. This should combine
+    Board 1 configuration data + Board 2 operational data.
+branches:
+- at: 1
+  condition: Nothing has been set up on Waiver Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Waiver, Consent & Digital Form Management board 2 visited
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

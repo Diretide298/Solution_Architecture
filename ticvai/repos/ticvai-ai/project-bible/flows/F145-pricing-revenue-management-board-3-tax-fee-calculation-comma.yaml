@@ -1,0 +1,155 @@
+id: F145
+name: 'Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Pricing   Revenue Management board 3. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-068
+  entryPoints:
+  - Arrives at Tax, Fee & Calculation Command Center
+steps:
+- step: 1
+  screen: ADM-068
+  action: Opens Tax, Fee & Calculation Command Center
+  operations:
+  - listTaxFeeCalculation
+  outcome: Provide Finance, Commercial and Pricing administrators with one central view of TICVAI's price-calculation
+    configuration.
+- step: 2
+  screen: ADM-069
+  action: Works in Tax Profile & Jurisdiction Configuration
+  operations:
+  - setTaxProfileJurisdiction
+  outcome: Define reusable tax profiles according to legal entity, country, jurisdiction and commercial
+    context.
+- step: 3
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-070
+  action: Works in Tax Rule & Treatment Builder
+  operations:
+  - setTaxRuleTreatment
+  outcome: Define how taxes are applied to products and transactions.
+- step: 5
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-071
+  action: Works in Fee & Surcharge Library
+  operations:
+  - listFeeSurcharge
+  outcome: Create standardized reusable non-base-price charges.
+- step: 7
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-072
+  action: Works in Fee Applicability & Charging Rule Builder
+  operations:
+  - setFeeApplicabilityCharging
+  outcome: Determine when a fee or surcharge should apply. Screen 10.3.4 defines the fee. Screen 10.3.5
+    defines the conditions that trigger it.
+- step: 9
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-073
+  action: Works in Fee Waiver, Tax Exemption & Exception Rules
+  operations:
+  - listFeeWaiverTax
+  outcome: Govern circumstances under which a normally applicable tax or fee may be reduced, waived or
+    exempted.
+- step: 11
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-074
+  action: Works in Price Calculation Sequence & Formula Engine
+  operations:
+  - listPriceCalculationSequence
+  outcome: Define the exact sequence TICVAI follows to calculate the final payable amount. This is the
+    heart of Board 3.
+- step: 13
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-075
+  action: Works in Currency Precision, Rounding & Monetary Rules
+  operations:
+  - listCurrencyPrecisionRounding
+  outcome: Ensure monetary calculations remain consistent across countries, currencies, channels and payment
+    systems.
+- step: 15
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-076
+  action: Works in Price Breakdown, Calculation Simulation & Explainability
+  operations:
+  - simulatePriceBreakdownCalculation
+  outcome: Allow administrators to test the complete calculation before releasing configuration into production.
+- step: 17
+  screen: ADM-068
+  action: Returns to the board's landing screen
+  operations:
+  - listTaxFeeCalculation
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-077
+  action: Works in Calculation Validation, Reconciliation & Service Interface
+  operations:
+  - listCalculationValidationReconciliation
+  outcome: 'Provide final technical and commercial validation of the pricing calculation engine and define
+    how other TICVAI modules consume it. Boards 1–3 established the commercial and calculation engines:
+    Board 1: What prices exist? Board 2: Which price applies? Board 3: How is the final payable amount
+    calculated?'
+branches:
+- at: 1
+  condition: Nothing has been set up on Tax, Fee & Calculation Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Pricing   Revenue Management board 3 visited
+primaryContract: catalogue
+contracts:
+- catalogue

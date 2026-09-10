@@ -1,0 +1,405 @@
+# Screen patterns
+#
+# **A pattern declares named slots; a screen fills them.** That is the whole idea, and it is what
+# turns 337 identical screens into 337 configurations of one thing.
+#
+# ## Why this file exists
+#
+# Claude Design measured the package on 8 September and found **six patterns covering 625 screens**,
+# with `BP-001` alone covering 337 as `split` + `searchField` + `dataTable` + `detailPanel`. That is
+# not a design system; it is the shape you get when 636 screens declare one operation and 70% of
+# component notes are one of ten strings. **A list-detail workspace, an approval inbox and a
+# configuration editor are three different screens and they had collapsed into one.**
+#
+# ## What a slot is, and why it is not a component
+#
+# A component says *a table is here*. A slot says *this is the collection this screen is about*,
+# and the screen says which schema fills it. **The slot is the question and the screen is the
+# answer**, which is why one React component can serve every screen on a pattern: the structure is
+# the pattern's, the data is the screen's.
+#
+# ## Rules that apply to every pattern
+#
+# **A required slot that is not filled fails the build.** A pattern that says a screen must name its
+# collection is worthless if a screen can omit it silently — that is the failure this whole file
+# exists to correct.
+#
+# **Every collection and selection slot binds to a schema**, checked by `tools/check-bindings.py`
+# against the contracts. 19 of the 78 bindings that existed on 9 September named a schema that does
+# not exist, which is what happens when nothing checks.
+#
+# **Every overlay renders as its own wireframe frame** — the screen behind it, dimmed, with the
+# dialog over it. A reviewer cannot judge a flow from a list of dialog names.
+#
+# Read with `_design-tokens.yaml` (visual) and `_components.yaml` (vocabulary).
+
+meta:
+  generated: 2026-09-09
+  note: >
+    Patterns are added deliberately, not discovered. A screen that fits none of these is either a
+    genuinely new interaction — in which case add a pattern and say when to use it — or it is a
+    screen that has not been thought about, which is the more common case by a wide margin.
+
+patterns:
+
+  # ---------------------------------------------------------------------------------------
+  - id: commandCentre
+    name: Command centre
+    whenToUse: >
+      **One screen that answers "how is this doing right now" across whatever the tenant licensed.**
+      ADR-0041 decided that a command centre is a saved dashboard, and 61 screens in the package are
+      named as one.
+    whenNotToUse: >
+      When the answer is about one record rather than a population — that is `listDetail`. When the
+      user is configuring rather than watching — that is `configEditor`.
+    template: dashboard
+    regions: [appHeader, sideNav, contentBody]
+    # **This is the only pattern whose slots are composed at runtime**, which is why it is written
+    # first: if the slot model survives this, the static patterns are straightforward.
+    composition: licence
+    compositionNote: >
+      **The tiles are the modules the tenant licensed, not a list the screen holds.** Stated
+      9 September: buying F&B, Ticketing or Retail also brings the central command centre and
+      AI Analytics / Reporting / Custom Dashboards. So the same screen renders differently for two
+      tenants, and **`requiresModule` cannot express that** — it names one licence a screen needs,
+      and says nothing about modules implied by owning another.
+
+      **The implied-module rule is a contract change awaiting sign-off** (see
+      `docs/active/screen-regeneration-plan.md` §5b). Until it lands, this pattern's tile list is
+      driven by `LicencePosition` and the implication is applied in the composition layer.
+    slots:
+      - name: headline
+        role: metrics
+        required: true
+        components: [metricTile]
+        bindsTo: required
+        notes: >
+          The four to six numbers a manager checks first. **Not every number the module has** — a
+          command centre that shows everything is a screen nobody reads twice.
+      - name: moduleTiles
+        role: collection
+        required: true
+        composedFrom: licensedModules
+        components: [chart, dataTable, metricTile]
+        notes: >
+          One tile group per licensed module, each linking to that module's own command centre.
+          **A tenant sees their modules and no others** — a tile for a module they have not bought
+          is an advertisement in an operational screen.
+      - name: alerts
+        role: exceptions
+        required: false
+        components: [banner, cardList]
+        notes: >
+          The things that need somebody. Empty is the normal state and must read as reassurance
+          rather than as a broken panel.
+      - name: savedViews
+        role: navigation
+        required: false
+        components: [cardList]
+        bindsTo: Dashboard[]
+        notes: Saved dashboards, mine and shared. `listDashboards`.
+    states: [loading, empty, error, denied]
+    emptyVariants: [emptyFirstRun, emptyNoAccess]
+    overlays:
+      - id: tileConfig
+        component: drawer
+        notes: >
+          Configure one tile — visualisation, parameters, refresh interval. **Must surface
+          `report_definition.estimated_cost` and the dashboard's `aggregate_cost`**: CF-169 records
+          that 24 tiles on a short refresh is a performance incident nobody was warned about.
+    fetch:
+      shape: parallelOnLoad
+      notes: >
+        Tiles load independently and each renders its own loading and error state. **One slow tile
+        must not hold the screen** — a command centre that blanks because one report is slow is
+        worse than one that shows five of six.
+      refresh: interval
+    openQuestions:
+      - >
+        **The four authoring screens do not exist** — dashboard list, tile editor, tile
+        configuration and viewer. CF-169 sizes them and they are the "custom dashboard" screens
+        still outstanding. This pattern describes the *viewing*; authoring needs its own.
+      - >
+        **There is no `deleteDashboard`.** `list`, `create`, `get` and `update` exist and nothing
+        else, so soft or hard delete has to be chosen where `is_shared` is true.
+
+  # ---------------------------------------------------------------------------------------
+  - id: listDetail
+    name: List–detail workspace
+    replaces: BP-001
+    whenToUse: >
+      A population the user searches, scans and then acts on one of. **The most common shape in the
+      package and the one that has been swallowing everything else** — 337 screens carry it today,
+      and a good number of them are really an approval inbox or a configuration editor.
+    whenNotToUse: >
+      When every row needs a decision — `approvalInbox`. When the list is a navigation device rather
+      than the subject — that is a `sideNav`, not a pattern.
+    template: split
+    regions: [appHeader, sideNav, contentBody, contextPanel]
+    slots:
+      - name: filters
+        role: filters
+        required: false
+        components: [searchField, selectField, toggle]
+        notes: >
+          **Name the filters, not "search".** *"Find a record"* appears on 335 screens and tells a
+          builder nothing: which fields does it search, what are the facets, what is the default
+          scope?
+      - name: collection
+        role: collection
+        required: true
+        components: [dataTable, cardList]
+        bindsTo: required
+        columns: required
+        notes: >
+          **Columns are named schema paths, not a sentence.** *"Every record with its status"* is on
+          315 screens and is the reason 337 screens are indistinguishable.
+      - name: selection
+        role: selection
+        required: true
+        components: [detailPanel]
+        bindsTo: required
+        notes: >
+          Filled from the selected row where the list already carries enough — declare that in
+          `entryState.preloaded` rather than fetching twice. **No screen in the package declares
+          `preloaded` today**, which is why detail panels flash a skeleton over data already in hand.
+      - name: rowActions
+        role: actions
+        required: false
+        components: [primaryButton, secondaryButton, destructiveButton]
+        notes: Each action names its operation, its permission, and what it invalidates.
+    states: [loading, empty, error, denied]
+    emptyVariants: [emptyFirstRun, emptyNoResults, emptyNoAccess]
+    overlays:
+      - id: confirmDestructive
+        component: confirmDialog
+        requiredWhen: a row action is destructive
+        notes: >
+          **The consequence goes in the body, not the title.** *"Delete 3 assets in use on the live
+          homepage"* is a confirmation; *"Are you sure?"* is not.
+    fetch:
+      shape: listThenSelect
+      notes: >
+        The collection loads on entry; the selection is preloaded from the row and refetched only
+        for fields the list does not carry. **Mutations invalidate the collection**, and the screen
+        must say so.
+
+  # ---------------------------------------------------------------------------------------
+  - id: approvalInbox
+    name: Approval inbox
+    whenToUse: >
+      A queue where every item is waiting for a person to decide, and the decision is the point.
+      **Distinct from `listDetail` because the empty state is success** — an empty inbox means
+      nothing is waiting, which is good news and must not read as a broken screen.
+    template: split
+    regions: [appHeader, sideNav, contentBody, contextPanel]
+    slots:
+      - name: queue
+        role: collection
+        required: true
+        components: [dataTable, cardList]
+        bindsTo: required
+        columns: required
+        notes: Age matters. A queue that does not show how long an item has waited hides the problem.
+      - name: item
+        role: selection
+        required: true
+        components: [detailPanel]
+        bindsTo: required
+        notes: Everything the decision needs, so the reviewer does not open another screen.
+      - name: decision
+        role: actions
+        required: true
+        components: [primaryButton, destructiveButton]
+        notes: >
+          Approve and refuse, each naming its operation and permission. **A refusal needs a reason**
+          and the reason is part of the record, not a toast.
+    states: [loading, empty, error, denied]
+    emptyVariants: [emptyFirstRun, emptyNoAccess]
+    overlays:
+      - id: refuse
+        component: confirmDialog
+        notes: Captures the reason, which the applicant will read.
+    fetch:
+      shape: listThenSelect
+      refresh: interval
+      notes: A queue is a live thing; a stale inbox produces two people deciding the same item.
+
+  # ---------------------------------------------------------------------------------------
+  - id: configEditor
+    name: Configuration editor
+    whenToUse: >
+      Settings that persist and take effect on something else. **The publication is the risk**, not
+      the editing — which is why `publishGate` belongs here and is at ERROR level in the checker.
+    template: form
+    regions: [appHeader, sideNav, contentBody, actionBar]
+    slots:
+      - name: scope
+        role: filters
+        required: true
+        components: [selectField]
+        notes: >
+          **What this configuration applies to** — tenant, venue, outlet. 137 screens carry a
+          `selectField` annotated *"Scope this applies at"* and none of them say what the options
+          are or what happens to the levels below.
+      - name: fields
+        role: form
+        required: true
+        components: [textField, selectField, toggle, numberField]
+        bindsTo: required
+      - name: publish
+        role: actions
+        required: true
+        components: [publishGate]
+        requiredWhen: the screen makes a draft live
+    states: [loading, empty, error, denied]
+    emptyVariants: [emptyFirstRun, emptyNoAccess]
+    overlays:
+      - id: confirmPublish
+        component: confirmDialog
+        notes: Names what will change and where it will be visible.
+      - id: discard
+        component: confirmDialog
+        requiredWhen: the form can be left dirty
+    fetch:
+      shape: singleFetch
+
+  # ---------------------------------------------------------------------------------------
+  - id: publicPortalLanding
+    name: Public portal landing
+    whenToUse: >
+      An unauthenticated or lightly-authenticated entry point that explains a process and offers
+      two or three ways in. **The explanation is the screen** — this is the one pattern where prose
+      is the primary content.
+    template: detail
+    regions: [appHeader, contentBody]
+    slots:
+      - name: introduction
+        role: content
+        required: true
+        components: [detailPanel]
+        notes: What this is, who it is for, and what the applicant will need before starting.
+      - name: entryActions
+        role: actions
+        required: true
+        components: [primaryButton, secondaryButton]
+        notes: Start, and resume. **Resume is not optional** — an application abandoned at step four
+          is the common case, not the exception.
+      - name: guidance
+        role: content
+        required: false
+        components: [cardList]
+    states: [loading, error]
+    emptyVariants: []
+    overlays: []
+    fetch:
+      shape: staticOrSingleFetch
+
+  # ---------------------------------------------------------------------------------------
+  - id: multiStepForm
+    name: Multi-step form
+    whenToUse: >
+      A submission long enough that a person will leave and come back. Steps, a saved draft, and a
+      review before submit.
+    template: wizard
+    regions: [appHeader, contentBody, actionBar]
+    slots:
+      - name: progress
+        role: navigation
+        required: true
+        components: [progressIndicator]
+      - name: fields
+        role: form
+        required: true
+        components: [textField, selectField, toggle, fileUpload]
+        bindsTo: required
+      - name: review
+        role: content
+        required: true
+        components: [detailPanel]
+        notes: >
+          **Everything entered, before it is submitted**, and editable from here.
+      - name: submit
+        role: actions
+        required: true
+        components: [primaryButton, secondaryButton]
+    states: [loading, empty, error, denied]
+    emptyVariants: [emptyFirstRun]
+    overlays:
+      - id: saveAndExit
+        component: confirmDialog
+      - id: submitConfirm
+        component: confirmDialog
+    fetch:
+      shape: draftAutosave
+      notes: >
+        The draft saves as the applicant works. **A form that loses four steps of typing to a dropped
+        connection is a form people do not come back to.**
+
+  # ---------------------------------------------------------------------------------------
+  - id: statusTracker
+    name: Status tracker
+    whenToUse: >
+      One record whose progress somebody is waiting on. **The state and what happens next are the
+      content**; everything else is supporting detail.
+    template: detail
+    regions: [appHeader, contentBody]
+    slots:
+      - name: state
+        role: status
+        required: true
+        components: [timeline, banner]
+        bindsTo: required
+        notes: >
+          Where it is now and what happens next, **with a date where one is known**. *"In review"*
+          with no expectation set is what generates the phone call this screen exists to prevent.
+      - name: record
+        role: selection
+        required: true
+        components: [detailPanel]
+        bindsTo: required
+      - name: actions
+        role: actions
+        required: false
+        components: [secondaryButton]
+        notes: Withdraw, amend, or supply what was asked for.
+    states: [loading, empty, error, denied]
+    emptyVariants: [emptyNoResults, emptyNoAccess]
+    overlays: []
+    fetch:
+      shape: singleFetch
+      refresh: onFocus
+
+  # ---------------------------------------------------------------------------------------
+  - id: credentialView
+    name: Credential
+    whenToUse: >
+      A pass, badge or ticket the holder presents. **Rendered to be scanned**, which makes it a
+      different pattern from a detail screen that happens to show a QR code.
+    template: fullscreen
+    regions: [contentBody]
+    slots:
+      - name: credential
+        role: content
+        required: true
+        components: [credentialDisplay]
+        bindsTo: required
+        notes: >
+          **Brightness, size and offline availability are the requirements.** A credential that
+          needs a network round trip at a gate is a credential that fails at the gate.
+      - name: identity
+        role: content
+        required: true
+        components: [detailPanel]
+        bindsTo: required
+      - name: validity
+        role: status
+        required: true
+        components: [banner]
+        notes: Valid from, valid to, and what zones. **Expired must be unmistakable.**
+    states: [loading, empty, error, offline]
+    emptyVariants: [emptyNoResults]
+    overlays: []
+    fetch:
+      shape: singleFetch
+      offline: required

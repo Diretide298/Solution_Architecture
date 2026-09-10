@@ -1,5 +1,5 @@
 id: LLD-CatalogueService
-title: CatalogueService — 340 operations, 40 tables
+title: CatalogueService — 344 operations, 40 tables
 generatedBy: tools/derive-diagrams.py
 tier: commerce
 index: diagrams/hld/02-services.yaml
@@ -9,7 +9,7 @@ why: '**What is sold, at what price, in which seat.** Promotions and seating are
 scale: Read-heavy, bundle-published to tills. **The catalogue bundle is this service's output** (ADR-0013).
 ifDown: A bad publish reaches every workstation. Versioned and rollback-able for that reason.
 coverage:
-  operations: 340
+  operations: 344
   inAFlow: 57
   percent: 43%
   note: '**Flow coverage is how much of this service a journey has walked.** A service under 40% is
@@ -29,10 +29,10 @@ schemas:
   tables: 11
   stores:
   - postgres
-  largestTable: seating.seat_hold
+  largestTable: seating.seat_map
 operationsByContract:
 - contract: catalogue
-  count: 174
+  count: 176
   operations:
   - operation: acquireInventoryHold
     verb: POST
@@ -1122,6 +1122,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: relinquishChannelAllocation
+    verb: POST
+    path: /channel-capacities/{channelCapacityId}/channel-allocations/release
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: relinquishInventoryHold
+    verb: DELETE
+    path: /inventory-holds/{inventoryHoldId}
+    scope: workstation
+    permission: ORDER_CREATE
+    offline: false
+    reads: 1
+    writes: 0
   - operation: renewInventoryHold
     verb: POST
     path: /inventory-holds/{inventoryHoldId}/renew
@@ -2478,7 +2494,7 @@ operationsByContract:
     reads: 2
     writes: 2
 - contract: seating
-  count: 35
+  count: 37
   operations:
   - operation: allocateBlockedSeats
     verb: POST
@@ -2720,6 +2736,22 @@ operationsByContract:
     offline: false
     reads: 2
     writes: 2
+  - operation: relinquishSeatBlock
+    verb: DELETE
+    path: /seat-blocks/{blockId}
+    scope: venue
+    permission: CAPACITY_CONFIGURE
+    offline: false
+    reads: 0
+    writes: 0
+  - operation: relinquishSeatHold
+    verb: DELETE
+    path: /seat-holds/{holdId}
+    scope: venue
+    permission: ORDER_CREATE
+    offline: false
+    reads: 0
+    writes: 0
   - operation: setMapZones
     verb: PUT
     path: /seat-maps/{seatMapId}/zones
@@ -3090,6 +3122,7 @@ screens:
 - P01:WEB-023 Membership Management
 - P01:WEB-032 Offers & Promotions
 - P01:WEB-035 Multi-Currency & Pricing
+- P01:WEB-040 Virtual Queue
 - P01:WEB-043 Loyalty & Rewards
 - P02:GST-001 Home – Default
 - P02:GST-002 Explore Categories
@@ -3098,11 +3131,13 @@ screens:
 - P02:GST-005 What's On
 - P02:GST-006 Event / Exhibition Details
 - P02:GST-007 Select Date & Time
+- P02:GST-009 Review & Payment
 - P02:GST-015 Memberships
 - P02:GST-021 Interactive Map
 - P02:GST-036 Loyalty & Rewards
 - P02:GST-037 Offers & Promotions
 - P02:GST-038 Digital Companion Mode
+- P02:GST-041 Checkout Entry
 - P02:GST-044 Multi-Currency & Pricing
 - P02:GST-048 Upsell / Cross-Sell
 - P02:GST-049 Interactive Seat Selection
@@ -3375,6 +3410,27 @@ flows:
 - F09 Event is cancelled and refunded
 - F108 A guest orders food at a counter and collects it
 - F14 A discount needs a manager
+- 'F143 Pricing   Revenue Management board 1: Commercial Pricing Command Center'
+- 'F144 Pricing   Revenue Management board 2: Pricing Rule Command Center'
+- 'F145 Pricing   Revenue Management board 3: Tax, Fee & Calculation Command Center'
+- 'F146 Pricing   Revenue Management board 4: Pricing Governance Command Center'
+- 'F147 Pricing   Revenue Management board 5: Dynamic Pricing Strategy Command Center'
+- 'F148 Pricing   Revenue Management board 6: AI Pricing Intelligence Command Center'
+- 'F149 Pricing   Revenue Management board 7: Revenue Optimization Command Center'
+- 'F152 Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
+- 'F153 Product Lifecycle   Catalogue Governance board 2: Product Governance Command Center'
+- 'F154 Promotions   Bundles Management board 1: Promotion Command Center Dashboard'
+- 'F155 Promotions   Bundles Management board 2: Promotion Rule Builder'
+- 'F156 Promotions   Bundles Management board 3: Coupon & Promo Code Command Center'
+- 'F157 Promotions   Bundles Management board 4: Advanced Offer Command Center'
+- 'F158 Promotions   Bundles Management board 5: Bundle & Combo Command Center'
+- 'F159 Promotions   Bundles Management board 6: Dynamic Bundle Operations Command Center'
+- 'F160 Promotions   Bundles Management board 7: Targeting & Eligibility Command Center'
+- 'F161 Promotions   Bundles Management board 8: Stacking & Conflict Command Center'
+- 'F162 Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
+- 'F163 Promotions   Bundles Management board 10: Promotion Performance Command Center'
+- 'F166 Sales Channel Management board 1: Sales Channel Command Center'
+- 'F167 Sales Channel Management board 2: Channel Operations Command Center'
 - F19 A membership works in another country
 - F21 A ride queue fills and a guest is redirected
 - F31 A menu is drafted, scheduled and rolled back

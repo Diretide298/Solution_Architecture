@@ -2824,7 +2824,14 @@ paths:
       x-ticvai-audience:
       - partner
       summary: Quotes offered to this partner
-      description: '**Drafted 4 September as a stub.** PTR-011 *Quote Management* shared the commission statement''s operations. **The existing `recordQuotation` and `compareQuotations` are supplier procurement** against a `requisitionId` - a different thing wearing the same word, and wiring them here would have pointed a partner screen at the inventory department. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+      description: '**Drafted 4 September as a stub.** PTR-011 *Quote Management* shared the commission
+        statement''s operations. **The existing `recordQuotation` and `compareQuotations` are supplier
+        procurement** against a `requisitionId` - a different thing wearing the same word, and wiring
+        them here would have pointed a partner screen at the inventory department. The screen that needs
+        it existed and this operation did not, so the screen shared a generic set with its neighbours
+        and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum
+        the screen has to show, and the request and response want confirming before anything is built
+        against them.
 
         '
       tags:
@@ -2850,7 +2857,12 @@ paths:
       x-ticvai-audience:
       - partner
       summary: Raise a quote
-      description: '**Drafted 4 September as a stub.** **A quote is an offer with an expiry**, and the expiry is the part that has to be stored rather than calculated at read time. The screen that needs it existed and this operation did not, so the screen shared a generic set with its neighbours and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum the screen has to show, and the request and response want confirming before anything is built against them.
+      description: '**Drafted 4 September as a stub.** **A quote is an offer with an expiry**, and the
+        expiry is the part that has to be stored rather than calculated at read time. The screen that
+        needs it existed and this operation did not, so the screen shared a generic set with its neighbours
+        and read as a duplicate of them. **The shape below is a proposal**: the fields are the minimum
+        the screen has to show, and the request and response want confirming before anything is built
+        against them.
 
         '
       tags:
@@ -2879,7 +2891,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-284 Membership & Annual Pass Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership & Annual Pass Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -2896,7 +2908,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -2917,7 +2929,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-285 Membership Product & Tier Builder"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Product & Tier Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -2934,7 +2946,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -2959,7 +2971,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-286 Membership Eligibility & Qualification Rule Builder"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Eligibility & Qualification Rule Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -2976,7 +2988,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3001,7 +3013,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-287 Validity, Activation & Expiry Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Validity, Activation & Expiry Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3018,7 +3030,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3043,7 +3055,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-288 Membership Entitlement & Admission Benefit Builder"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Entitlement & Admission Benefit Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3060,7 +3072,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3085,7 +3097,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-289 Membership Usage, Visit & Consumption Rules"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Usage, Visit & Consumption Rules
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3103,7 +3115,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3124,7 +3136,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-290 Family, Household & Dependent Membership Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Family, Household & Dependent Membership Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3141,7 +3153,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3166,7 +3178,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-291 Membership Commercial, Pricing & Channel Association"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Commercial, Pricing & Channel Association
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3183,7 +3195,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3204,7 +3216,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-292 Renewal, Auto-Renewal & Membership Continuity Configuration"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Renewal, Auto-Renewal & Membership Continuity Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3221,7 +3233,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3246,7 +3258,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-293 Membership Product Validation, Approval, Publication & Versioning"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Product Validation, Approval, Publication & Versioning
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3263,7 +3275,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3282,13 +3294,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/MembershipProductValidationApprovalPublicationVersioView'
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Platform-level product state, across tenants.
   /member:
     get:
       operationId: listMember
       x-ticvai-consumed-by:
         - "P08 BO-294 Member Operations Command Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Member Operations Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3305,61 +3319,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Status
-        - name: memberType
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Member Type
-        - name: activation
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Activation
-        - name: expiry
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Expiry
-        - name: renewal
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Renewal
-        - name: usage
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Usage
-        - name: customerSegment
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer Segment
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Status
+      - name: memberType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Member Type
+      - name: activation
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Activation
+      - name: expiry
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Expiry
+      - name: renewal
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Renewal
+      - name: usage
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Usage
+      - name: customerSegment
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer Segment
       responses:
         '200':
           description: Member Operations Command Center
@@ -3375,7 +3389,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-295 Member 360° Membership Account Workspace"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Member 360° Membership Account Workspace
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3393,7 +3407,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3418,7 +3432,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-296 Membership Activation, Assignment & Credential Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Activation, Assignment & Credential Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3435,7 +3449,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3456,7 +3470,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-297 Visit, Admission & Entitlement Usage Monitor"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Visit, Admission & Entitlement Usage Monitor
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3473,7 +3487,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3494,7 +3508,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-298 Membership Freeze, Suspension & Reactivation Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Freeze, Suspension & Reactivation Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3511,7 +3525,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3532,7 +3546,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-299 Membership Upgrade, Downgrade & Product Migration Operations"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Upgrade, Downgrade & Product Migration Operations
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3549,7 +3563,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3570,7 +3584,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-300 Renewal Operations & Auto-Renewal Management"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Renewal Operations & Auto-Renewal Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3587,7 +3601,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3608,7 +3622,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-301 Member Exceptions, Overrides & Service Recovery"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Member Exceptions, Overrides & Service Recovery
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3625,7 +3639,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3646,7 +3660,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-302 Member Lifecycle History, Audit & Case Timeline"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Member Lifecycle History, Audit & Case Timeline
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3663,7 +3677,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3684,7 +3698,7 @@ paths:
       x-ticvai-consumed-by:
         - "P08 BO-303 Membership Analytics, Renewal Intelligence & AI Retention Center"
       x-ticvai-audience:
-        - staff
+      - staff
       x-ticvai-provisional: true
       summary: Membership Analytics, Renewal Intelligence & AI Retention Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3701,61 +3715,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: membershipProduct
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Membership Product
-        - name: tier
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Tier
-        - name: purchaseMonth
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Purchase Month
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: acquisitionChannel
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Acquisition Channel
-        - name: customerSegment
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Customer Segment
-        - name: geography
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Geography
-        - name: renewalCohort
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Renewal Cohort
+      - name: membershipProduct
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Membership Product
+      - name: tier
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Tier
+      - name: purchaseMonth
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Purchase Month
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: acquisitionChannel
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Acquisition Channel
+      - name: customerSegment
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Customer Segment
+      - name: geography
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Geography
+      - name: renewalCohort
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Renewal Cohort
       responses:
         '200':
           description: Membership Analytics, Renewal Intelligence & AI Retention Center
@@ -3771,7 +3785,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-022 Partner Management Command Center"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Management Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3788,49 +3802,49 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: brand
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Brand
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: accountManager
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Account Manager
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Status
-        - name: integrationType
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Integration Type
-        - name: risk
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Risk
+      - name: brand
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Brand
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: accountManager
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Account Manager
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Status
+      - name: integrationType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Integration Type
+      - name: risk
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Risk
       responses:
         '200':
           description: Partner Management Command Center
@@ -3846,7 +3860,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-023 Partner Profile & Organization Setup"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Profile & Organization Setup
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3863,7 +3877,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3888,7 +3902,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-024 Partner Onboarding & Application Workflow"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Onboarding & Application Workflow
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3905,7 +3919,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3926,7 +3940,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-025 Partner Contacts & User Administration"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Contacts & User Administration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3943,7 +3957,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -3964,7 +3978,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-026 Territory, Market & Distribution Rights"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Territory, Market & Distribution Rights
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -3981,7 +3995,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4002,7 +4016,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-027 Partner Brand, Venue & Business Scope Assignment"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Brand, Venue & Business Scope Assignment
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4020,7 +4034,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4045,7 +4059,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-028 Partner Documentation & Compliance Repository"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Documentation & Compliance Repository
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4062,7 +4076,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4083,7 +4097,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-029 Partner Access, Roles & Permission Profile"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Access, Roles & Permission Profile
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4100,7 +4114,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4121,7 +4135,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-030 Partner Approval, Status & Lifecycle Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Approval, Status & Lifecycle Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4138,7 +4152,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4157,13 +4171,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/PartnerApprovalStatusLifecycleManagementView'
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Makes a partner able to trade, or stops them.
   /partner-profile-readiness:
     get:
       operationId: listPartnerProfileReadiness
       x-ticvai-consumed-by:
         - "P10 PTR-031 Partner 360° Profile, Readiness & AI Review"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner 360° Profile, Readiness & AI Review
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4181,7 +4197,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4202,7 +4218,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-032 Commercial Agreement Command Center"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Commercial Agreement Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4220,61 +4236,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: partnerType
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Partner Type
-        - name: brand
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Brand
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: country
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Country
-        - name: status
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Status
-        - name: expiry
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Expiry
-        - name: creditStatus
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Credit Status
-        - name: risk
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Risk
+      - name: partnerType
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Partner Type
+      - name: brand
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Brand
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: country
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Country
+      - name: status
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Status
+      - name: expiry
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Expiry
+      - name: creditStatus
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Credit Status
+      - name: risk
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Risk
       responses:
         '200':
           description: Commercial Agreement Command Center
@@ -4290,7 +4306,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-033 Agreement & Contract Terms Builder"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Agreement & Contract Terms Builder
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4307,7 +4323,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4332,7 +4348,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-034 Partner Rate & Net Pricing Configuration"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Rate & Net Pricing Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4349,7 +4365,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4374,7 +4390,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-035 Commission, Margin & Incentive Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Commission, Margin & Incentive Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4391,7 +4407,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4412,7 +4428,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-036 Credit Limit & Exposure Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Credit Limit & Exposure Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4430,7 +4446,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4451,7 +4467,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-037 Deposit, Guarantee & Financial Security Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Deposit, Guarantee & Financial Security Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4468,7 +4484,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4489,7 +4505,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-038 Payment Terms, Billing & Account Configuration"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Payment Terms, Billing & Account Configuration
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4506,7 +4522,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4531,7 +4547,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-039 Commercial Allocation, Quota & Commitment Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Commercial Allocation, Quota & Commitment Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4548,7 +4564,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4569,7 +4585,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-040 Booking Limits, Commercial Exceptions & Approval"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Booking Limits, Commercial Exceptions & Approval
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4586,7 +4602,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a request, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_CELL_MANAGE
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4605,13 +4621,15 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/BookingLimitsCommercialExceptionsApprovalView'
+      x-ticvai-step-up: mfa
+      x-ticvai-step-up-reason: Sets what a partner may commit the venue to.
   /commercial-agreement-health:
     get:
       operationId: listCommercialAgreementHealth
       x-ticvai-consumed-by:
         - "P10 PTR-041 Commercial Agreement 360°, Health & AI Review"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Commercial Agreement 360°, Health & AI Review
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4628,7 +4646,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4649,7 +4667,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-042 Partner Operations Command Center"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Operations Command Center
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4666,43 +4684,43 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: market
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Market
-        - name: channel
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Channel
-        - name: date
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Date
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: market
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Market
+      - name: channel
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Channel
+      - name: date
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Date
       responses:
         '200':
           description: Partner Operations Command Center
@@ -4718,7 +4736,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-043 Partner Orders & Booking Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Orders & Booking Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4735,61 +4753,61 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
       x-ticvai-conflict-policy: serverWins
       x-ticvai-read-routing: replica
       parameters:
-        - name: partner
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Partner
-        - name: partnerOrderReference
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Partner Order Reference
-        - name: ticvaiOrderId
-          in: query
-          required: false
-          schema:
-            type: string
-          description: TICVAI Order ID
-        - name: event
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Event
-        - name: venue
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Venue
-        - name: product
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Product
-        - name: bookingDate
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Booking Date
-        - name: visitEventDate
-          in: query
-          required: false
-          schema:
-            type: string
-          description: Visit/Event Date
+      - name: partner
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Partner
+      - name: partnerOrderReference
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Partner Order Reference
+      - name: ticvaiOrderId
+        in: query
+        required: false
+        schema:
+          type: string
+        description: TICVAI Order ID
+      - name: event
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Event
+      - name: venue
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Venue
+      - name: product
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Product
+      - name: bookingDate
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Booking Date
+      - name: visitEventDate
+        in: query
+        required: false
+        schema:
+          type: string
+        description: Visit/Event Date
       responses:
         '200':
           description: Partner Orders & Booking Management
@@ -4805,7 +4823,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-044 Reservations, Holds & Release Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Reservations, Holds & Release Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4823,7 +4841,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4844,7 +4862,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-045 Partner Cancellations, Refunds & Amendments"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Cancellations, Refunds & Amendments
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4861,7 +4879,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4882,7 +4900,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-046 Partner Statement & Account Activity"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Statement & Account Activity
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4899,7 +4917,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4920,7 +4938,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-047 Partner Reconciliation & Exception Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Reconciliation & Exception Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4937,7 +4955,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4958,7 +4976,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-048 Commission Calculation & Settlement Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Commission Calculation & Settlement Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -4975,7 +4993,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -4996,7 +5014,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-049 Partner Disputes, Cases & Service Management"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Disputes, Cases & Service Management
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5013,7 +5031,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -5034,7 +5052,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-050 Partner Performance Scorecard & Risk Monitoring"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner Performance Scorecard & Risk Monitoring
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5051,7 +5069,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -5072,7 +5090,7 @@ paths:
       x-ticvai-consumed-by:
         - "P10 PTR-051 Partner AI Intelligence & Relationship Optimization"
       x-ticvai-audience:
-        - partner
+      - partner
       x-ticvai-provisional: true
       summary: Partner AI Intelligence & Relationship Optimization
       description: '**Drafted from the workshop pack; the shape below is read out of it, not invented.**
@@ -5090,7 +5108,7 @@ paths:
         **Still provisional.** A shape read out of a PDF has not been agreed with anyone who has to build
         it, and the schema says so in its own persistence tag: it is a projection, not a table.'
       tags:
-        - drafted
+      - drafted
       x-ticvai-permission: PLATFORM_TENANT_VIEW
       x-ticvai-scope-level: tenant
       x-ticvai-offline-capable: false
@@ -5110,9 +5128,9 @@ components:
     DraftedRecord:
       type: object
       x-ticvai-provisional: true
-      description: '**A provisional envelope, drafted 2026-09-04 from the workshop pack.** It carries what
-        every one of these screens needs to address a row and nothing it has not earned. **There is
-        deliberately no `x-ticvai-persistence`** - naming a table here would put a storage decision
+      description: '**A provisional envelope, drafted 2026-09-04 from the workshop pack.** It carries
+        what every one of these screens needs to address a row and nothing it has not earned. **There
+        is deliberately no `x-ticvai-persistence`** - naming a table here would put a storage decision
         nobody made into the ER model and the DDL.'
       required:
       - id
@@ -5130,9 +5148,9 @@ components:
     PartnerQuote:
       type: object
       x-ticvai-persistence: subscription.partner_quote
-      description: '**Drafted 4 September.** A priced offer to a partner, with an expiry. **Not the
-        same as a procurement quotation** - `inventory.quotation` is what a supplier offers this
-        venue, and this is what this venue offers a reseller.'
+      description: '**Drafted 4 September.** A priced offer to a partner, with an expiry. **Not the same
+        as a procurement quotation** - `inventory.quotation` is what a supplier offers this venue, and
+        this is what this venue offers a reseller.'
       required:
       - id
       properties:
@@ -5148,9 +5166,9 @@ components:
         currency:
           type: string
           x-ticvai-persisted: false
-          description: '**Not stored on the row.** Currency is region-scoped and resolves from the
-            scope walk (ADR-0018); a quote that carries its own copy is a quote that disagrees
-            with the region the moment one of them changes.'
+          description: '**Not stored on the row.** Currency is region-scoped and resolves from the scope
+            walk (ADR-0018); a quote that carries its own copy is a quote that disagrees with the region
+            the moment one of them changes.'
         totalMinor:
           type: integer
         state:
@@ -5164,8 +5182,8 @@ components:
         validUntil:
           type: string
           format: date-time
-          description: '**Stored, not calculated** - an offer whose expiry moves when you read it
-            is not an offer.'
+          description: '**Stored, not calculated** - an offer whose expiry moves when you read it is not
+            an offer.'
         createdAt:
           type: string
           format: date-time
@@ -6491,9 +6509,9 @@ components:
             `tools/derive-ddl.py` carried the same claim in its docstring.
 
 
-            **A claim that a question cannot affect your artefact is the one most likely to be left
-            standing after it does**, which is why the correction is recorded here rather than the sentence
-            simply deleted.'
+            **A claim that a question cannot affect your artefact is the one most likely to be left standing
+            after it does**, which is why the correction is recorded here rather than the sentence simply
+            deleted.'
     CellInstance:
       x-ticvai-persistence: control.cell_instance
       description: 'One Postgres instance serving a cell. **A cell is a region and a region may be served
@@ -6525,9 +6543,9 @@ components:
           format: uuid
         name:
           type: string
-          description: 'Unique within the cell. The host a service connects to, and stable across
-            restores — an instance rebuilt from a backup keeps its name, because the tenants pointing at
-            it did not move.'
+          description: Unique within the cell. The host a service connects to, and stable across restores
+            — an instance rebuilt from a backup keeps its name, because the tenants pointing at it did
+            not move.
         status:
           type: string
           enum:
@@ -6535,16 +6553,16 @@ components:
           - live
           - draining
           - retired
-          description: '`draining` takes no new tenants and still serves the ones it has. **Placement and
-            liveness are different questions** — an instance being emptied is not an instance being
-            down, and collapsing them would either strand its tenants or send new ones to a host that is
-            being retired.'
+          description: '`draining` takes no new tenants and still serves the ones it has. **Placement
+            and liveness are different questions** — an instance being emptied is not an instance being
+            down, and collapsing them would either strand its tenants or send new ones to a host that
+            is being retired.'
         maxConnections:
           type: integer
           nullable: true
-          description: 'The instance''s own `max_connections`. **Read rather than assumed**, because the
+          description: The instance's own `max_connections`. **Read rather than assumed**, because the
             placement rule in ADR-0042 measures headroom as a fraction of it and instances in one region
-            need not be the same size.'
+            need not be the same size.
         createdAt:
           type: string
           format: date-time
@@ -6553,8 +6571,8 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: 'Set rather than the row deleted, for the reason `CellTenant.droppedAt` is: a
-            migration run records the host it touched by name, and that record has to stay readable.'
+          description: 'Set rather than the row deleted, for the reason `CellTenant.droppedAt` is: a migration
+            run records the host it touched by name, and that record has to stay readable.'
     CellTenant:
       x-ticvai-persistence: control.cell_tenant
       description: 'Which tenants a cell holds, and the database each one is. **The relation that replaced
@@ -6562,9 +6580,9 @@ components:
         column that is always null is the absence of a rule rather than a weaker version of one.
 
 
-        **`databaseName` does not encode the region.** The instance is the region — a name that repeats it
-        is a name that can contradict it, and residency is then two facts that have to agree instead of
-        one.
+        **`databaseName` does not encode the region.** The instance is the region — a name that repeats
+        it is a name that can contradict it, and residency is then two facts that have to agree instead
+        of one.
 
         '
       type: object
@@ -6588,22 +6606,22 @@ components:
         instanceId:
           type: string
           format: uuid
-          description: 'Which instance of the cell holds this database. **Required, not nullable** — a
+          description: Which instance of the cell holds this database. **Required, not nullable** — a
             cell with one instance still names it, because a column that is only populated once there
             are two is a column every reader has to guess about. **`cellId` and `instanceId` together
-            are the address**; the database name alone has not been one since ADR-0040.'
+            are the address**; the database name alone has not been one since ADR-0040.
         pinnedInstance:
           type: boolean
           default: false
           description: 'True where this tenant was placed by hand and the balancer must leave it. The
             override in ADR-0042''s **emptiest-first with a pin** — a dedicated client is buying a quiet
-            neighbour, and a rule that can silently rebalance them has sold something it does not
-            deliver. **A pin survives migration**: moving a pinned tenant is an operator decision, never
-            a placement one.'
+            neighbour, and a rule that can silently rebalance them has sold something it does not deliver.
+            **A pin survives migration**: moving a pinned tenant is an operator decision, never a placement
+            one.'
         databaseName:
           type: string
-          description: 'Unique within the cell. Derived from the tenant''s stable code, never from its
-            display name — a rename must not rename a database.'
+          description: Unique within the cell. Derived from the tenant's stable code, never from its display
+            name — a rename must not rename a database.
         status:
           type: string
           enum:
@@ -6620,8 +6638,8 @@ components:
           type: string
           format: date-time
           nullable: true
-          description: 'Set rather than the row deleted. **A migration run records what it touched by
-            name**, and a dropped database whose row is gone leaves that record unreadable.'
+          description: Set rather than the row deleted. **A migration run records what it touched by name**,
+            and a dropped database whose row is gone leaves that record unreadable.
     CellDetail:
       x-ticvai-persistence: control.cell
       allOf:
@@ -7317,9 +7335,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Membership & Annual Pass Command Center displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Membership & Annual Pass Command Center displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         activeMembershipProducts:
           type: integer
@@ -7635,8 +7653,8 @@ components:
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
       description: '**What Membership Eligibility & Qualification Rule Builder displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         age:
           type: string
@@ -7883,8 +7901,8 @@ components:
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
       description: '**What Membership Entitlement & Admission Benefit Builder displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         unlimitedAdmission:
           type: string
@@ -8379,9 +8397,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Membership Commercial, Pricing & Channel Association displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Membership Commercial, Pricing & Channel Association displays.** Read from
+        the workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         basePricingProfile:
           type: string
@@ -8555,9 +8573,10 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Renewal, Auto-Renewal & Membership Continuity Configuration submits.** The configurable
-        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
-        absent, because a figure the system computed is not a figure a client may send back.'
+      description: '**What Renewal, Auto-Renewal & Membership Continuity Configuration submits.** The
+        configurable fields from the pack''s directory for this screen; the metrics the screen displays
+        are deliberately absent, because a figure the system computed is not a figure a client may send
+        back.'
       properties:
         manualRenewal:
           type: string
@@ -8845,9 +8864,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Member Operations Command Center displays.** Read from the workshop pack''s own
-        display and configuration directory for this screen; each property names the sentence it came from.
-        **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Member Operations Command Center displays.** Read from the workshop pack''s
+        own display and configuration directory for this screen; each property names the sentence it came
+        from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         activeMembers:
           type: integer
@@ -8928,9 +8947,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Member 360° Membership Account Workspace displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Member 360° Membership Account Workspace displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         memberName:
           type: string
@@ -9039,8 +9058,8 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Member 360° Membership Account Workspace submits.** The configurable fields from
-        the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+      description: '**What Member 360° Membership Account Workspace submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
       properties:
         payments:
@@ -9069,9 +9088,10 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Membership Activation, Assignment & Credential Management displays.** Read from
-        the workshop pack''s own display and configuration directory for this screen; each property names
-        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Membership Activation, Assignment & Credential Management displays.** Read
+        from the workshop pack''s own display and configuration directory for this screen; each property
+        names the sentence it came from. **Not a row** - the screen is a view over the module''s existing
+        state.'
       properties:
         awaitingMemberAssignment:
           type: string
@@ -9159,11 +9179,11 @@ components:
         reason:
           type: string
           enum:
-            - eligibilityFailed
-            - missingDocumentation
-            - duplicateMembership
-            - credentialFailure
-            - configurationIssue
+          - eligibilityFailed
+          - missingDocumentation
+          - duplicateMembership
+          - credentialFailure
+          - configurationIssue
           description: Vocabulary listed under Record reason.
     VisitAdmissionEntitlementUsageMonitorView:
       type: object
@@ -9891,20 +9911,20 @@ components:
         typesType:
           type: string
           enum:
-            - b2bReseller
-            - travelAgent
-            - tourOperator
-            - ota
-            - corporateCustomer
-            - hotelConcierge
-            - destinationManagementCompany
-            - affiliate
-            - wholesaler
-            - distributor
-            - governmentPartner
-            - schoolInstitution
-            - apiPartner
-            - internalGroupCompany
+          - b2bReseller
+          - travelAgent
+          - tourOperator
+          - ota
+          - corporateCustomer
+          - hotelConcierge
+          - destinationManagementCompany
+          - affiliate
+          - wholesaler
+          - distributor
+          - governmentPartner
+          - schoolInstitution
+          - apiPartner
+          - internalGroupCompany
           description: Vocabulary listed under Partner Types.
         partnerId:
           type: string
@@ -10004,20 +10024,20 @@ components:
         typesType:
           type: string
           enum:
-            - b2bReseller
-            - travelAgent
-            - tourOperator
-            - ota
-            - corporateCustomer
-            - hotelConcierge
-            - destinationManagementCompany
-            - affiliate
-            - wholesaler
-            - distributor
-            - governmentPartner
-            - schoolInstitution
-            - apiPartner
-            - internalGroupCompany
+          - b2bReseller
+          - travelAgent
+          - tourOperator
+          - ota
+          - corporateCustomer
+          - hotelConcierge
+          - destinationManagementCompany
+          - affiliate
+          - wholesaler
+          - distributor
+          - governmentPartner
+          - schoolInstitution
+          - apiPartner
+          - internalGroupCompany
           description: Vocabulary listed under Partner Types.
         partnerId:
           type: string
@@ -10312,9 +10332,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Territory, Market & Distribution Rights displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Territory, Market & Distribution Rights displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         country:
           type: string
@@ -10411,9 +10431,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Partner Brand, Venue & Business Scope Assignment displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Partner Brand, Venue & Business Scope Assignment displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         tenant:
           type: string
@@ -10781,9 +10801,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Partner Approval, Status & Lifecycle Management submits.** The configurable fields
-        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
-        because a figure the system computed is not a figure a client may send back.'
+      description: '**What Partner Approval, Status & Lifecycle Management submits.** The configurable
+        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
+        absent, because a figure the system computed is not a figure a client may send back.'
       properties:
         thenPotentially:
           type: string
@@ -11141,9 +11161,9 @@ components:
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
         is control.api_licence at 6%, so this is not an update to anything the package stores today and
         no new table has been decided
-      description: '**What Agreement & Contract Terms Builder submits.** The configurable fields from the
-        pack''s directory for this screen; the metrics the screen displays are deliberately absent, because
-        a figure the system computed is not a figure a client may send back.'
+      description: '**What Agreement & Contract Terms Builder submits.** The configurable fields from
+        the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+        because a figure the system computed is not a figure a client may send back.'
       properties:
         agreementId:
           type: string
@@ -11259,9 +11279,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Partner Rate & Net Pricing Configuration displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Partner Rate & Net Pricing Configuration displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         partner:
           type: string
@@ -11329,8 +11349,8 @@ components:
       x-ticvai-persistence: none — request only; **no existing table covers these fields** — the closest
         is control.api_licence at 10%, so this is not an update to anything the package stores today and
         no new table has been decided
-      description: '**What Partner Rate & Net Pricing Configuration submits.** The configurable fields from
-        the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
+      description: '**What Partner Rate & Net Pricing Configuration submits.** The configurable fields
+        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
         because a figure the system computed is not a figure a client may send back.'
       properties:
         partner:
@@ -11507,8 +11527,8 @@ components:
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
       description: '**What Deposit, Guarantee & Financial Security Management displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         cashDeposit:
           $ref: ../shared/common.yaml#/components/schemas/Money
@@ -11696,9 +11716,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — request only; **no existing table shares a single field with this**,
         so nothing the package stores today is what this configures
-      description: '**What Payment Terms, Billing & Account Configuration submits.** The configurable fields
-        from the pack''s directory for this screen; the metrics the screen displays are deliberately absent,
-        because a figure the system computed is not a figure a client may send back.'
+      description: '**What Payment Terms, Billing & Account Configuration submits.** The configurable
+        fields from the pack''s directory for this screen; the metrics the screen displays are deliberately
+        absent, because a figure the system computed is not a figure a client may send back.'
       properties:
         immediatePayment:
           type: string
@@ -11771,9 +11791,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Commercial Allocation, Quota & Commitment Management displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Commercial Allocation, Quota & Commitment Management displays.** Read from
+        the workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         guaranteedAllocation:
           type: string
@@ -11870,9 +11890,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Booking Limits, Commercial Exceptions & Approval displays.** Read from the workshop
-        pack''s own display and configuration directory for this screen; each property names the sentence
-        it came from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Booking Limits, Commercial Exceptions & Approval displays.** Read from the
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         maximumTicketsPerBooking:
           type: string
@@ -12321,9 +12341,9 @@ components:
       x-ticvai-drafted-shape: true
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
-      description: '**What Reservations, Holds & Release Management displays.** Read from the workshop pack''s
-        own display and configuration directory for this screen; each property names the sentence it came
-        from. **Not a row** - the screen is a view over the module''s existing state.'
+      description: '**What Reservations, Holds & Release Management displays.** Read from the workshop
+        pack''s own display and configuration directory for this screen; each property names the sentence
+        it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         activeHolds:
           type: integer
@@ -12627,15 +12647,15 @@ components:
         mismatchType:
           type: string
           enum:
-            - missingTransaction
-            - duplicateTransaction
-            - price
-            - quantity
-            - tax
-            - commission
-            - payment
-            - cancellation
-            - settlement
+          - missingTransaction
+          - duplicateTransaction
+          - price
+          - quantity
+          - tax
+          - commission
+          - payment
+          - cancellation
+          - settlement
           description: Vocabulary listed under Exception Types.
         match:
           type: string
@@ -12964,8 +12984,8 @@ components:
       x-ticvai-persistence: none — projection over subscription state, assembled at read time from tables
         that already exist
       description: '**What Partner AI Intelligence & Relationship Optimization displays.** Read from the
-        workshop pack''s own display and configuration directory for this screen; each property names the
-        sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
+        workshop pack''s own display and configuration directory for this screen; each property names
+        the sentence it came from. **Not a row** - the screen is a view over the module''s existing state.'
       properties:
         partnerProfile:
           type: string

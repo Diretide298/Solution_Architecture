@@ -4,7 +4,7 @@
 **Date:** 7 September 2026
 **Amends:** [ADR-0038](0038-cell-is-a-region-database-per-tenant.md) — its decision read *"One Postgres instance per region. The instance is the cell."* The first sentence becomes *one or more*, and the second no longer holds
 **Amends:** [ADR-0032](0032-load-shedding-and-pooling.md), whose pool cap is a per-tenant limit and not a reservation
-**Raises:** **CF-168** — when a second instance is added, and who decides
+**Raises:** **CF-168** — when a second instance is added, and who decides. **Decided 8 September by [ADR-0042](0042-when-a-region-grows-and-where-a-tenant-lands.md)**
 
 ---
 
@@ -88,11 +88,14 @@ are required before a second instance can exist.
 
 **This ADR does not make that change.** It is named here so that the gap is a decision rather than
 an omission — and so nobody adds an instance believing the control plane can already find it.
+[ADR-0042](0042-when-a-region-grows-and-where-a-tenant-lands.md) makes it: `control.cell_instance`
+exists and `cell_tenant.instance_id` is required from the first row.
 
 **Placement becomes a real choice on provisioning.** ADR-0039 said provisioning is *apply the
 template, record the tenant's membership of the cell, seed nothing.* It now also picks an instance.
 **A rule is needed and this ADR does not set one** — fullest-first, emptiest-first and pinned all
-behave differently on the day a tenant grows, which is CF-168.
+behave differently on the day a tenant grows, which is CF-168. **ADR-0042 sets it: emptiest-first by
+trailing-week peak connections, with a pin.**
 
 **Migration fan-out is unchanged in mechanism and wider in one dimension.**
 `control.migration_run_tenant` is per tenant database and does not care which host it is on. What
@@ -115,7 +118,8 @@ rather than a new thing.
 
 **A tenant outgrows the instance it sits on.** Already specified — `planTenantMigration` and
 `executeTenantMigration` — and moving one database between two instances in the same region is the
-cheapest form that operation has ever had. What is missing is a threshold rather than a complaint.
+cheapest form that operation has ever had. What is missing is a threshold rather than a complaint —
+**ADR-0042 supplies one for adding an instance**, and leaves the per-tenant outgrowing threshold open.
 
 **Instances per region reach a number where placement wants a scheduler.** Two or three is a column
 on a table. Ten is a component nobody has designed, and the point at which this decision should be

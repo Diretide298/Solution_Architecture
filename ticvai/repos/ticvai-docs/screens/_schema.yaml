@@ -56,6 +56,27 @@ properties:
           every layout mirrored, not merely translated.
       breakpoints: { type: array, items: { type: string } }
       screenCount: { type: integer }
+      navigationSets:
+        type: object
+        description: >
+          **Named sets of destinations that several screens share.** `navigation.uses` names one;
+          until 9 September nothing defined any, so 16 P04 screens pointed at `posPrimaryRail` and
+          `posSaleToPayment` and neither existed anywhere in the package — a pointer to nothing,
+          which reads like a fact.
+
+          A set is defined from what its members actually do, not from what the name suggests.
+          Where every member exits to the same destinations, those are the set and `provenance`
+          says so. Where they share none, `unrealised` says that instead: **a set nobody
+          implements is worth recording as unimplemented, and worth nothing at all if given a
+          plausible membership to make it look finished.**
+        additionalProperties:
+          type: object
+          additionalProperties: false
+          properties:
+            members: { type: array, items: { type: string } }
+            destinations: { type: array, items: { type: string } }
+            provenance: { type: string }
+            unrealised: { type: string }
 
   screens:
     type: array
@@ -63,7 +84,13 @@ properties:
       type: object
       required: [id, name, module, wave, states]
       properties:
-        id: { type: string, pattern: '^[A-Z]{3}-[0-9]{3}$' }
+        # **Two or three letters, not three.** This read `{3}` until 8 September, which **all 363
+        # `BO-` screens failed** — a third of the package outside its own schema, on the field
+        # every other artefact keys on. Nothing validated it, which is the same reason the
+        # `wireframe` block drifted: a schema nothing reads is a document, not a constraint.
+        # Widened to describe the prefixes that exist rather than renaming 363 screens, because
+        # the id is what `board-data.js`, the traceability map and every board anchor join on.
+        id: { type: string, pattern: '^[A-Z]{2,3}-[0-9]{3}$' }
         name: { type: string }
         module: { type: string }
         requiresModule:
@@ -107,12 +134,29 @@ properties:
               operationId: { type: string }
               purpose: { type: string }
               trigger: { type: string, enum: [onLoad, onAction, onInterval, onScan, background] }
+              invalidates:
+                type: array
+                items: { type: string }
+                description: >
+                  **What has to be refetched after this operation succeeds.** The object a data
+                  layer is configured from, and the reason a list still shows a row somebody just
+                  deleted when nobody writes it down.
         layout:
           type: object
           properties:
             template:
               type: string
-              enum: [list, detail, form, dashboard, wizard, split, canvas, modal, fullscreen, board]
+              enum: [list, detail, form, dashboard, wizard, split, canvas, modal, fullscreen,
+                     board, calendar]
+              description: >
+                **`calendar` was added 9 September, after the enum started being enforced.**
+                `BO-096 Resource Calendar` had declared it since August — the only one of 1,083
+                templates outside this list — and passed every check, because until that day
+                nothing read the enum. It is a real layout rather than a mistake: the screen
+                renders a `timeline` of resource availability against `getResourceAvailability`,
+                and none of the other ten express a scheduling grid. **Adding it was the choice
+                between a vocabulary that describes the package and a screen that lies to satisfy
+                the schema.**
             regions:
               type: array
               items:
@@ -120,6 +164,9 @@ properties:
                 required: [name, components]
                 properties:
                   name: { type: string }
+                  slot:
+                    type: string
+                    description: Which slot of the screen's `pattern` this region fills.
                   ref: { type: string, description: Shared region from `_components.yaml`. }
                   components:
                     type: array
@@ -140,6 +187,27 @@ properties:
                             Hides the component when absent. Hiding is the default; a disabled
                             control the user cannot explain is worse than one that is not there.
                         notes: { type: string }
+                        # --- added 9 September, with the pattern layer -------------------
+                        columns:
+                          type: array
+                          items: { type: string }
+                          description: >
+                            **Named schema paths, not a sentence.** *"Every record with its
+                            status"* was the note on 315 `dataTable` components and is the reason
+                            337 screens were indistinguishable from one another.
+                        operation:
+                          type: string
+                          description: >
+                            Which of the screen's declared operations fills this component. A
+                            screen with three `onLoad` calls and three components says nothing
+                            about which fills which without it.
+                        provenance:
+                          type: string
+                          description: >
+                            **Where this came from** — a frame, a pack page, a contract schema
+                            path, a minute, or `authored`. A field that can cite nothing should not
+                            have been written: *"Find a record"* cited nothing and appeared 335
+                            times.
         states:
           type: object
           required: [loading, empty, error]
@@ -153,6 +221,87 @@ properties:
                 Required where the platform is offline-capable. Served from the local bundle,
                 queued, or refused with a reason.
             denied: { type: string }
+        machine:
+          type: object
+          # **The process vocabulary, which this package has never had.** `states` above is a
+          # *rendering* vocabulary — `loading`, `empty`, `error`, `offline`, `denied` — and it is
+          # correct as it stands. It cannot express the thing that actually breaks a till.
+          #
+          # **A cashier mid-payment is not "loading".** The terminal has charged a card and not
+          # answered, and the only safe move is to inquire rather than retry, because a retry
+          # takes the money twice. No value of `states` can say that, and until this block existed
+          # the six machines already implemented in the POS prototype — `payStage`, `closeStep`,
+          # `dstep`, `reversalStage`, `netStatus` and the top-level `screen` — lived only in
+          # somebody's JavaScript.
+          #
+          # **These are transcribed, not invented.** Every state and edge below came off a working
+          # prototype or a flow; `provenance` says which. A machine nobody has observed does not
+          # belong here.
+          #
+          # It is also where `navigation.transitions[].onFailure` lands: an anchor like
+          # `POS-005#paymentUnknown` names a state in this block, and `check-screens.py` reports
+          # it as landing nowhere until the block declares it.
+          additionalProperties: false
+          required: [key, initial, states]
+          properties:
+            key:
+              type: string
+              description: >
+                The variable a developer implements — `payStage`, `closeStep`. **One screen, one
+                machine**: a screen needing two is usually two screens.
+            initial:
+              type: string
+              description: >
+                The state the screen holds on entry. Must be one of `states`.
+            provenance:
+              type: string
+              description: >
+                Where the machine was read from — a prototype, a flow, a minute. **Required in
+                practice**: an unattributed machine is a guess about how a till behaves.
+            states:
+              type: object
+              description: >
+                Every state the key can hold. **A state nothing transitions into is unreachable**
+                and the checker says so — that is usually a state somebody renamed halfway.
+              additionalProperties:
+                type: object
+                additionalProperties: false
+                properties:
+                  operation:
+                    type: string
+                    description: >
+                      The operation in flight while the screen holds this state — one of the
+                      screen's own `apis[]`.
+                  note:
+                    type: string
+                    description: >
+                      What is true of the world here, in the words that matter to whoever is
+                      standing at the till. *"The terminal charged a card and never answered.
+                      Inquiry, never retry."*
+                  terminal:
+                    type: boolean
+                    description: The machine stops here; nothing leaves.
+                  goes:
+                    type: string
+                    description: >
+                      Where a terminal state sends the operator — a screen id or `id#anchor`.
+                  retryTo:
+                    type: string
+                    description: The state a retry from here returns to.
+            transitions:
+              type: array
+              description: >
+                The edges. **`on` is the event as the operator or the gateway causes it** — the
+                words on a control, or the name of what came back.
+              items:
+                type: object
+                additionalProperties: false
+                required: [from, "on", to]
+                properties:
+                  from: { type: string }
+                  "on": { type: string }
+                  to: { type: string }
+                  note: { type: string }
         entryState:
           type: object
           description: >
@@ -202,10 +351,129 @@ properties:
                 answer here is one that renders empty and blames the network.
         navigation:
           type: object
+          # **Six of this block's nine keys were undeclared while 1,091 screens used them.**
+          # `inferred` (1,020 screens), `notes` (757), `fromFlows` (66), `uses` (16),
+          # `transitions` (11) and `flowDerived` (7) were all written, read and rendered without
+          # ever appearing here — the same drift that let `wireframe.status` carry a value outside
+          # its own enum on every screen in the package. **The block is closed now**: a key not
+          # listed is a typo, and the checker says so rather than the field going quietly nowhere.
+          #
+          # **`exitTo` is the graph and stays bare strings.** `check-screens`, `screen-index.json`,
+          # `board-data.js` and the reachability check all join on it, and labelling it in place
+          # was tried on 9 September and reverted — it broke eleven consumers that read the entry
+          # as a string, none of which crashed. They compared a dict to a set of ids and reported
+          # a dangling link to a screen named `{'to': 'POS-005'}`: loud enough to notice, quiet
+          # enough to be mistaken for a data error.
+          #
+          # **`transitions` is that same edge with the answers attached**, alongside rather than
+          # inside. An edge with no entry is unwritten, not illegal.
+          additionalProperties: false
           properties:
             entryFrom: { type: array, items: { type: string } }
             exitTo: { type: array, items: { type: string } }
             isEntryPoint: { type: boolean }
+            inferred:
+              type: boolean
+              description: >
+                The edges were derived by a generator rather than read off a flow or a board.
+                **Marking a block non-inferred turns a disagreement with the flows from a warning
+                into a failure** — it is a claim that somebody stands behind these edges.
+            fromFlows: { type: boolean }
+            flowDerived: { type: boolean }
+            notes: { type: string }
+            uses:
+              type: array
+              items: { type: string }
+              description: >
+                Named shared navigation sets this screen joins. **Nothing defines these sets.**
+                Sixteen P04 screens name `posPrimaryRail` and `posSaleToPayment`; neither exists
+                in any file in the package, so the checker warns rather than resolving them.
+                Either the sets get declared or the key goes — a pointer to nothing is worse than
+                no pointer, because it reads like a fact.
+            transitions:
+              type: array
+              description: >
+                **What a frontend developer cannot guess**: which control makes the move, what
+                gates it, what state travels with it, where cancel lands, and what a failure does.
+              items:
+                type: object
+                additionalProperties: false
+                required: [to, trigger, provenance]
+                properties:
+                  to:
+                    type: string
+                    description: >
+                      A screen id, or `id#anchor` for a state or overlay within it.
+                  trigger:
+                    type: string
+                    description: The words on the control, as the operator reads them.
+                  control:
+                    type: string
+                    description: >
+                      `kind#id` naming the component in `layout.regions` that makes the move —
+                      `primaryButton#charge`, `drawer#drawerSeatSelection`. The kind alone is not
+                      enough on a screen carrying four buttons.
+                  operation:
+                    type: string
+                    description: One of this screen's own `apis[]` entries, by operationId.
+                  precondition:
+                    type: string
+                    description: >
+                      The condition on screen state that makes the control live —
+                      `cart.lineCount > 0`. **Distinct from `guard`, which is about the principal
+                      rather than the data.**
+                  guard:
+                    type: string
+                    description: >
+                      A permission key from `roles.yaml`. Absent means any principal who can reach
+                      the screen can make the move. **A gated exit needs `states.denied`** — a
+                      refusal with nowhere to land is a dead control.
+                  escalatable:
+                    type: boolean
+                    description: >
+                      A principal without `guard` can raise it to one who holds it, per
+                      `roles.yaml` `escalation`, rather than being refused outright.
+                  carries:
+                    type: array
+                    items: { type: string }
+                    description: >
+                      **The field this block exists for.** The state that travels with the move.
+                      Without it a developer reads somebody's JavaScript to find out.
+                  returnsTo:
+                    type: string
+                    description: >
+                      Where closing or cancelling lands — for a drawer, usually the screen behind.
+                  discards:
+                    type: array
+                    items: { type: string }
+                    description: >
+                      What `returnsTo` throws away. **A drawer that returns a seat selection to
+                      the cart is a different thing from one that discards it**, and 199 overlays
+                      in the package said which they were nowhere at all.
+                  onFailure:
+                    type: array
+                    description: Where a failed attempt lands, per failure mode.
+                    items:
+                      type: object
+                      additionalProperties: false
+                      required: [when, to]
+                      properties:
+                        when: { type: string }
+                        to: { type: string }
+                        note: { type: string }
+                  back:
+                    type: boolean
+                    description: Whether the operator can come back the way they came.
+                  crossesDevice:
+                    type: boolean
+                    description: >
+                      A handover to another device rather than a link (the 24 August rule). The
+                      operator does not navigate; they pick the work up somewhere else.
+                  provenance:
+                    type: string
+                    description: >
+                      Where the transition was read from — a flow step, a board interaction, a
+                      minute. **Required**: an unattributed transition is somebody's guess.
         accessibility:
           type: object
           properties:
@@ -214,8 +482,52 @@ properties:
             notes: { type: string }
         wireframe:
           type: object
+          # **This block described four fields and carried seven.** Until 8 September `status`
+          # was the only declared one with an enum, and **not one of the 1,091 screens held a
+          # legal value** — 958 read `generated` and 133 `designed`, neither in the enum, and
+          # nothing validated it. `board`, `workshopBoard`, `source`, `note`,
+          # `generatedFallback` and `derivedFrom` were not declared at all.
+          #
+          # The defect underneath was **one field carrying intent and fact**. `generated` and
+          # `designed` say how a frame came to exist; they are not places in a review workflow,
+          # and putting them in `status` left four consumers reading four different numbers off
+          # it — 0, 1091, 133 and a permanent 0.
+          #
+          # **`status` is intent. `provenance` is fact.** Neither is coverage: coverage is the
+          # board join, and no field here should be read as a substitute for it.
+          additionalProperties: false
           properties:
-            status: { type: string, enum: [notStarted, inProgress, review, approved] }
+            status:
+              type: string
+              enum: [notStarted, inProgress, review, approved]
+              description: >
+                **Where this screen has reached in the design workflow, and nothing else.**
+                Hand-set. `notStarted` is the honest default and is not a claim that no frame
+                exists — a generated frame is a frame nobody has reviewed.
+            provenance:
+              type: string
+              enum: [generated, designed]
+              description: >
+                **How the frame came to exist.** `generated` is the tool's output from the
+                screen's own name and operations; `designed` is a frame a person drew. A
+                generated frame agreeing with the operation it was generated from is not
+                corroboration.
+            board:
+              type: string
+              description: The frame this screen renders as, as `<board file>#<anchor>`.
+            workshopBoard:
+              type: string
+              description: The workshop frame this screen was drawn on, where one exists.
+            generatedFallback:
+              type: string
+              description: >
+                The generated frame kept alongside a drawn one, so a board that stops opening
+                does not take the screen's only frame with it.
+            derivedFrom:
+              type: string
+              description: The frame this screen's layout was taken from, where it reuses another.
+            source: { type: string }
+            note: { type: string }
             figmaNodeId: { type: string }
             owner: { type: string }
         notes: { type: string }
@@ -225,3 +537,202 @@ properties:
           description: >
             What has to be answered before this screen can be drawn. Preferable to drawing it
             and discovering the question at build.
+        pattern:
+          type: string
+          description: >
+            **Which pattern from `_patterns.yaml` this screen is an instance of.** The pattern owns
+            the structure; the screen fills its slots. Added 9 September, and it is what turns 337
+            identical `searchField + dataTable + detailPanel` screens into 337 configurations of
+            one thing rather than 337 hand-written layouts.
+        patternReason:
+          type: string
+          description: >
+            **What in the source chose that pattern** — named sections of the workshop pack, a
+            frame, or `authored`. Added 9 September with the P09 regeneration, because the first
+            generation chose every screen's shape from its own title and nothing recorded that it
+            had. A screen whose pack supports no pattern says so here rather than presenting a
+            default as a decision: **72 of P09's 230 Commercial screens do exactly that**, and
+            being able to count them is the point of the field.
+        overlays:
+          type: array
+          description: >
+            **Popups, drawers and sheets, declared apart from the layout because each renders as its
+            own wireframe frame** — the screen behind it, dimmed, with the dialog over it. A
+            reviewer cannot judge a flow from a list of dialog names, and no screen in the package
+            declared a `modal` or a `toast` before this existed.
+          items:
+            type: object
+            # **199 overlays declared what opens them and not one said what closing them does.**
+            # A drawer that returns a seat selection to the cart is a different thing from one
+            # that discards it, and a developer reading only `trigger` and `body` cannot tell
+            # which — so they guess, and the guess is where the cart quietly loses the seats.
+            additionalProperties: false
+            required: [id, component]
+            properties:
+              id: { type: string }
+              component: { type: string, description: From `_components.yaml`. }
+              trigger: { type: string, description: The action or state that opens it. }
+              body:
+                type: string
+                description: >
+                  **The consequence, in the words the user reads.** *"Delete 3 assets in use on the
+                  live homepage"* is a confirmation; *"Are you sure?"* is not.
+              bindsTo: { type: string }
+              confirm:
+                type: object
+                additionalProperties: false
+                description: >
+                  **What accepting it does.** The affirmative control, where it lands, and what it
+                  hands forward.
+                properties:
+                  label:
+                    type: string
+                    description: The words on the control — `Recall`, not `OK`.
+                  to:
+                    type: string
+                    description: Where it lands — a screen id or `id#anchor`.
+                  carries:
+                    type: array
+                    items: { type: string }
+                    description: The state that survives the close and travels on.
+                  operation:
+                    type: string
+                    description: One of the screen's own `apis[]`, called on confirm.
+              dismiss:
+                type: object
+                additionalProperties: false
+                description: >
+                  **What closing it does** — and closing is not always cancelling. A drawer
+                  dismissed after a valid pick may still carry that pick back.
+                properties:
+                  label: { type: string }
+                  to:
+                    type: string
+                    description: Where dismissing lands — usually the screen behind.
+                  carries:
+                    type: array
+                    items: { type: string }
+                    description: What survives the dismiss. Empty means nothing does.
+                  discards:
+                    type: array
+                    items: { type: string }
+                    description: >
+                      What is thrown away, named explicitly. **The field that stops "close" being
+                      ambiguous** — a reader should not have to infer loss from silence.
+              provenance: { type: string }
+        gaps:
+          type: array
+          description: >
+            **What this screen needs and the package does not have.** An operation that should
+            exist, or a field a component needs and no schema carries.
+
+            Recorded on the screen rather than only in a register, because the screen is where
+            somebody notices — and because a screen that names the operation it is missing has done
+            the thinking the title-stamp rule demands, which is why that rule exempts it.
+          items:
+            type: object
+            properties:
+              operation: { type: string }
+              field: { type: string }
+              removed:
+                type: boolean
+                description: True where the entry records an operation taken *off* the screen.
+              why: { type: string }
+              source: { type: string }
+        apisNote:
+          type: string
+          description: >
+            Why the operation list is what it is — used where **zero operations is correct** and
+            would otherwise read as an omission, as on a landing page that fetches nothing.
+        purposeNote:
+          type: string
+          description: Why the purpose was rewritten, where it had been wrong rather than merely thin.
+        resolvedQuestions:
+          type: array
+          items: { type: string }
+          description: >
+            **A question that has been answered, kept with its answer.** Added 9 September, when
+            `openQuestions` was found to be holding three different things at once: 24 open
+            questions, 41 pieces of pre-contract residue, and 9 answers that had been written
+            into the question they resolved. **74 read as open and 24 were.**
+
+            Answers move here rather than being deleted, because losing which minute settled a
+            thing is how it gets asked again — `BO-006` waited three weeks on a question the
+            14 August minute had already answered.
+
+        # --- Declared 9 September ---------------------------------------------------------
+        # **Ten keys were in use at screen level and none of them were declared here.** The same
+        # defect as the `wireframe` block one level up: a schema that describes less than the
+        # files hold is a schema nothing can be validated against. They are described now.
+        #
+        # **Closure is deliberately not set.** `additionalProperties: false` here would be a rule
+        # `check-screens.py` does not read, and an unenforced rule is the thing this file has
+        # already been caught doing three times — the `wireframe` block, the `id` pattern and the
+        # `layout.template` enum. Close it in the same change that enforces it.
+        source:
+          type: object
+          description: >
+            **Where the screen came from, as a citation.** The client pack, the board within it
+            and the frame number. On 590 screens. Structured because it is joined against
+            `sources/packs/` by `tools/audit-pack-citations.py`.
+          properties:
+            pack: { type: string }
+            board: { type: string }
+            number: { type: string }
+        sourceNote:
+          type: string
+          description: >
+            **The prose form of `source`**, on 128 screens — *"client board, specified"*,
+            *"MoM 10 August 2026 §4.8"*. Disjoint from `source`: no screen carries both.
+
+            **Named `provenance` until 9 September**, which collided head-on with
+            `wireframe.provenance` — prose against the enum `generated|designed`, on 128 screens
+            that carried both. Third instance of one word doing two jobs, after `release` (a hold,
+            and a publication) and `generatedPack` (the client drew it, against `generated`
+            meaning nobody did).
+        implementation:
+          type: object
+          description: >
+            Where the screen lives in the codebase — app, route and component path. On all 1,091.
+            Read by `check-frontend.py` and `derive-platform.py`.
+          properties:
+            app: { type: string }
+            route: { type: string }
+            component: { type: string }
+        density:
+          type: string
+          enum: [compact, comfortable, touchLarge]
+          description: >
+            **How much the screen fits per square inch, and it is a hardware question.**
+            `touchLarge` is a screen operated with a finger, often wet or gloved; `compact` is a
+            desk with a mouse. 892 compact, 148 comfortable, 51 touchLarge.
+        densityReason:
+          type: string
+          description: >
+            Why this screen departs from its platform's default density. On 11 screens, and
+            required only where the value is surprising — *"bumped by somebody with flour on their
+            hands, read from two metres"*.
+        statesDerived:
+          type: boolean
+          description: >
+            True where the four states were written by `derive-empty-states.py` rather than by a
+            person. On 401 screens. **A derived state is a placeholder that reads like a
+            decision**, which is the distinction this flag exists to keep.
+        boardFrames:
+          type: array
+          items: { type: string }
+          description: >
+            Every frame this screen appears on, as `<board file>#<anchor>`. On 145 screens.
+            Distinct from `wireframe.board`, which names the one canonical frame.
+        offline:
+          type: boolean
+          description: >
+            An explicit *this screen does not work offline* on a platform that otherwise does.
+            On 8 screens, all `false`. **A value rather than an absence**, because an unstated
+            offline story and a deliberate refusal look identical and only one is a decision.
+        audience:
+          type: string
+          enum: [guest, staff, device, partner, platform]
+          description: >
+            Overrides the platform's own audience for a single screen. On 2 screens. Checked
+            against operation audiences by `check-screens.py`.

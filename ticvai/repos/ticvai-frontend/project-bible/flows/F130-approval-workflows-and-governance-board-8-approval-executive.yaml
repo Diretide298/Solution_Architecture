@@ -1,0 +1,135 @@
+id: F130
+name: 'Approval Workflows and Governance board 8: Approval Executive KPI Dashboard'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Approval Workflows and Governance board 8. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-359
+  entryPoints:
+  - Arrives at Approval Executive KPI Dashboard
+steps:
+- step: 1
+  screen: ADM-359
+  action: Opens Approval Executive KPI Dashboard
+  operations: []
+  outcome: Provide executives and senior management with a high-level view of approval performance across
+    TICVAI.
+- step: 2
+  screen: ADM-360
+  action: Works in Approval Volume & Outcome Analytics
+  operations: []
+  outcome: Analyze how many approval requests are being generated and what happens to them.
+- step: 3
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-361
+  action: Works in Approval Processing Time Analytics
+  operations: []
+  outcome: Measure exactly how long approval processes and individual stages take. The matrix explicitly
+    requires processing-time analytics.
+- step: 5
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-362
+  action: Works in Bottleneck Analysis & Heatmap
+  operations: []
+  outcome: Automatically identify where approval processes are becoming slow or congested. The source
+    explicitly requires approval bottleneck analysis.
+- step: 7
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-363
+  action: Works in Approval Trend & Comparative Analytics
+  operations: []
+  outcome: Identify whether approval performance is improving or deteriorating over time. The matrix specifically
+    requires approval trend reporting.
+- step: 9
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-364
+  action: Works in Approver & Team Performance Analytics
+  operations: []
+  outcome: Understand workload and operational performance at approver and team level without reducing
+    governance to a simplistic employee ranking.
+- step: 11
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-365
+  action: Works in Risk & Governance Analytics
+  operations: []
+  outcome: Provide management with consolidated visibility of approval risk.
+- step: 13
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-366
+  action: Works in AI Approval Intelligence Center
+  operations: []
+  outcome: Provide one centralized location for AI-generated approval intelligence. This should be one
+    of the strongest screens in the entire module.
+- step: 15
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-367
+  action: Works in AI Optimization & What-If Simulator
+  operations: []
+  outcome: Allow management to evaluate proposed governance changes before implementing them.
+- step: 17
+  screen: ADM-359
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-368
+  action: Works in AI Governance Executive Advisor
+  operations: []
+  outcome: 'Turn all approval analytics into prioritized management recommendations. Instead of management
+    examining dozens of dashboards, TICVAI AI should answer: “What requires my attention?”'
+branches:
+- at: 1
+  condition: Nothing has been set up on Approval Executive KPI Dashboard yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Approval Workflows and Governance board 8 visited
+primaryContract: unknown
+contracts:
+- unknown

@@ -1,0 +1,151 @@
+id: F163
+name: 'Promotions   Bundles Management board 10: Promotion Performance Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 10. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-228
+  entryPoints:
+  - Arrives at Promotion Performance Command Center
+steps:
+- step: 1
+  screen: ADM-228
+  action: Opens Promotion Performance Command Center
+  operations:
+  - listPromotionPerformance
+  outcome: Provide executives, Marketing, Commercial, Revenue, and Finance with the overall performance
+    of promotions and bundles.
+- step: 2
+  screen: ADM-229
+  action: Works in Campaign & Promotion Performance Explorer
+  operations:
+  - listCampaignPromotionPerformance
+  outcome: Allow users to compare every promotion and campaign using consistent commercial KPIs.
+- step: 3
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-230
+  action: Works in Redemption, Conversion & Funnel Analytics
+  operations:
+  - listRedemptionConversionFunnel
+  outcome: Measure how effectively offers move customers from exposure to purchase and redemption.
+- step: 5
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-231
+  action: Works in Discount, Margin & Profitability Analytics
+  operations:
+  - listDiscountMarginProfitability
+  outcome: Determine whether promotions are commercially profitable rather than merely generating sales.
+- step: 7
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-232
+  action: Works in Bundle, BOGO & Advanced Offer Analytics
+  operations:
+  - listBundleBogoAdvanced
+  outcome: Measure performance specifically for the commercial mechanics created in Boards 4–6.
+- step: 9
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-233
+  action: Works in Upsell, Cross-Sell & Attach-Rate Analytics
+  operations:
+  - listUpsellCrossSell
+  outcome: Measure whether promotions and bundles successfully increase the customer's basket beyond the
+    original purchase. This screen is particularly important for the cross-sale metrics you originally
+    raised.
+- step: 11
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-234
+  action: Works in Customer, Segment, Channel & Partner Analytics
+  operations:
+  - listCustomerSegmentChannel
+  outcome: Determine which audiences and distribution channels respond best to promotions.
+- step: 13
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-235
+  action: Works in Incrementality, Attribution & Cannibalization Analysis
+  operations:
+  - listIncrementalityAttributionCannibalization
+  outcome: Incrementality, Attribution & Cannibalization Analysis
+- step: 15
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-236
+  action: Works in AI Optimization & Next-Best-Action Center
+  operations:
+  - listNextBestAction
+  outcome: Turn analytics into actionable commercial recommendations. This should be one of the strongest
+    AI screens in the Promotions module.
+- step: 17
+  screen: ADM-228
+  action: Returns to the board's landing screen
+  operations:
+  - listPromotionPerformance
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-237
+  action: Works in Executive Promotion Intelligence & Reporting Studio
+  operations:
+  - listExecutivePromotionReporting
+  outcome: Provide executive reporting and configurable analytics output across the complete Promotions
+    & Bundles module.
+branches:
+- at: 1
+  condition: Nothing has been set up on Promotion Performance Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 10 visited
+primaryContract: promotions
+contracts:
+- promotions

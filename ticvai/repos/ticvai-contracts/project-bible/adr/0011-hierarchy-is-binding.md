@@ -80,7 +80,7 @@ not: `platform.outlet` hung off `venue_id` as a business unit with no scope path
 
 **`outlet` is a sibling of `department`, not a child.** They answer different questions. A
 department has requisitions, rotas and workstations — `inventory.requisition.department_id` and
-`platform.workstation.department_id` both resolve to `platform.scope_node`. An outlet has a menu,
+`platform.workstation.department_id` both resolve to `platform.org_unit`. An outlet has a menu,
 stock and opening hours. **Modelling a restaurant as a department would put it in the staffing
 tree and give every rota a restaurant to schedule against.**
 
@@ -96,6 +96,6 @@ outlet was always in the package — fourteen tables reference it, all F&B or re
 configure.** The amendment names what was already there.
 
 **What it costs.** `scope_path` is an `ltree` and gains a segment for outlets. 76 tables resolve
-against `platform.scope_node` and none of them changes — an outlet appears on the path only where
+against `platform.org_unit` and none of them changes — an outlet appears on the path only where
 one exists, and no other domain has one.
 

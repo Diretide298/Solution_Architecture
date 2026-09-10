@@ -1,0 +1,147 @@
+id: F137
+name: 'Group Sales   Corporate Booking Management board 2: Group Booking Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Group Sales   Corporate Booking Management board 2. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-274
+  entryPoints:
+  - Arrives at Group Booking Operations Command Center
+steps:
+- step: 1
+  screen: BO-274
+  action: Opens Group Booking Operations Command Center
+  operations:
+  - listGroupBooking
+  outcome: Provide Operations with a real-time command center for all confirmed and upcoming group bookings.
+- step: 2
+  screen: BO-275
+  action: Works in Group Operational Planning & Task Workspace
+  operations:
+  - setGroupOperationalPlanning
+  outcome: Convert the commercial booking into a detailed operational execution plan.
+- step: 3
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-276
+  action: Works in Participants, Guest Lists & Group Structure
+  operations:
+  - listParticipantGuestList
+  outcome: Manage the people participating in the group where individual information is required.
+- step: 5
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-277
+  action: Works in Group Payment, Deposit & Balance Management
+  operations:
+  - listGroupPaymentDeposit
+  outcome: Track the complete payment lifecycle of a group booking.
+- step: 7
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-278
+  action: Works in Group Ticket, Seat & Entitlement Allocation
+  operations:
+  - listGroupTicketSeat
+  outcome: Allocate the confirmed group inventory to individual guests, subgroups or quantity blocks.
+- step: 9
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-279
+  action: Works in Group Ticket Fulfillment & Distribution
+  operations:
+  - listGroupTicketFulfillment
+  outcome: Control how tickets and other credentials are delivered to the group.
+- step: 11
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-280
+  action: Works in Group Arrival, Check-In & Admission Operations
+  operations:
+  - listGroupArrivalCheck
+  outcome: Manage the physical arrival and admission of large groups efficiently.
+- step: 13
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-281
+  action: Works in Group Amendments, Cancellation & Refund Operations
+  operations:
+  - listGroupAmendmentCancellation
+  outcome: Manage changes occurring after group confirmation.
+- step: 15
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-282
+  action: Works in Group Booking Reconciliation, Closure & Performance
+  operations:
+  - listGroupBookingReconciliation
+  outcome: Close the group booking after the visit and reconcile what was sold against what actually occurred.
+- step: 17
+  screen: BO-274
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupBooking
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-283
+  action: Works in Group Sales Analytics & AI Intelligence Center
+  operations:
+  - listGroupSale2
+  outcome: Provide management with intelligence across the complete group-sales lifecycle. This should
+    combine data from Board 1 + Board 2.
+branches:
+- at: 1
+  condition: Nothing has been set up on Group Booking Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Group Sales   Corporate Booking Management board 2 visited
+primaryContract: orders
+contracts:
+- orders

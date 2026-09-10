@@ -7,20 +7,20 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 363,
+  "screens": 393,
   "operations": 666,
   "contracts": 27,
   "modules": 8,
   "undrawn": 0,
-  "operationsWithNoScreen": 228
+  "operationsWithNoScreen": 229
  },
  "waves": {
   "wave1": 60,
   "wave2": 79,
-  "wave3": 224
+  "wave3": 254
  },
  "modules": [
   {
@@ -52,10 +52,11 @@
   },
   {
    "module": "Venue Operations",
-   "screens": 15,
+   "screens": 45,
    "waves": [
     1,
-    2
+    2,
+    3
    ]
   },
   {
@@ -110,11 +111,11 @@
    "operations": 46
   },
   {
-   "contract": "fnb",
+   "contract": "finance",
    "operations": 43
   },
   {
-   "contract": "finance",
+   "contract": "fnb",
    "operations": 43
   },
   {
@@ -619,7 +620,7 @@
   },
   {
    "id": "BO-047",
-   "name": "F&B Order Management",
+   "name": "Order Corrections & Exceptions",
    "module": "Orders & Money",
    "wave": 2,
    "route": "/venue-operations/f-b-order-management",
@@ -3469,6 +3470,276 @@
    "route": "/access-venue/ticket-media-analytics-ai-operations-intelligence-bo-363",
    "operations": 1,
    "drawn": true
+  },
+  {
+   "id": "BO-364",
+   "name": "Approval Command Center Dashboard",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approval-command-center-dashboard-bo-364",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-365",
+   "name": "My Approval Inbox",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/my-approval-inbox-bo-365",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-366",
+   "name": "Team / Shared Approval Queue",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/team-shared-approval-queue-bo-366",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-367",
+   "name": "Approval Request Detail",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approval-request-detail-bo-367",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-368",
+   "name": "AI Decision Support",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/ai-decision-support-bo-368",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-369",
+   "name": "High Priority & Risk Queue",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/high-priority-risk-queue-bo-369",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-370",
+   "name": "Escalated Approval Center",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/escalated-approval-center-bo-370",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-371",
+   "name": "Completed Approval History",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/completed-approval-history-bo-371",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-372",
+   "name": "Approval SLA & Workload Monitor",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approval-sla-workload-monitor-bo-372",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-373",
+   "name": "Approval Activity & Notification Center",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approval-activity-notification-center-bo-373",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-374",
+   "name": "Approval Decision Workspace",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approval-decision-workspace-bo-374",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-375",
+   "name": "Business Context & Evidence Viewer",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/business-context-evidence-viewer-bo-375",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-376",
+   "name": "Approval Timeline & Decision Chain",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approval-timeline-decision-chain-bo-376",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-377",
+   "name": "Approve & Sensitive Action Confirmation",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approve-sensitive-action-confirmation-bo-377",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-378",
+   "name": "Reject / Return / Request Information",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/reject-return-request-information-bo-378",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-379",
+   "name": "Requester Modification & Resubmission",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/requester-modification-resubmission-bo-379",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-380",
+   "name": "Withdrawal, Cancellation, Expiration & Reopening",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/withdrawal-cancellation-expiration-reopening-bo-380",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-381",
+   "name": "Segregation of Duties & Four-Eyes Control",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/segregation-of-duties-four-eyes-control-bo-381",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-382",
+   "name": "Approved Action Execution & Status",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approved-action-execution-status-bo-382",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-383",
+   "name": "Decision Record & Immutable Audit View",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/decision-record-immutable-audit-view-bo-383",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-384",
+   "name": "Delegation & Escalation Command Center",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/delegation-escalation-command-center-bo-384",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-385",
+   "name": "Delegation Management",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/delegation-management-bo-385",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-386",
+   "name": "Temporary Delegation & Availability Calendar",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/temporary-delegation-availability-calendar-bo-386",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-387",
+   "name": "Out-of-Office & Substitute Routing",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/out-of-office-substitute-routing-bo-387",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-388",
+   "name": "Approval SLA Policy Configuration",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/approval-sla-policy-configuration-bo-388",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-389",
+   "name": "Reminder & Breach Notification Rules",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/reminder-breach-notification-rules-bo-389",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-390",
+   "name": "Escalation Policy Builder",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/escalation-policy-builder-bo-390",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-391",
+   "name": "Live Escalation Operations Center",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/live-escalation-operations-center-bo-391",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-392",
+   "name": "SLA & Escalation Performance Analytics",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/sla-escalation-performance-analytics-bo-392",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "BO-393",
+   "name": "AI SLA & Escalation Advisor",
+   "module": "Venue Operations",
+   "wave": 3,
+   "route": "/venue-operations/ai-sla-escalation-advisor-bo-393",
+   "operations": 0,
+   "drawn": true
   }
  ],
  "gaps": {
@@ -3534,12 +3805,6 @@
     "summary": ""
    },
    {
-    "operation": "issueAccreditationBadge",
-    "contract": "approvals",
-    "verb": "POST",
-    "summary": "Issue a badge"
-   },
-   {
     "operation": "assessProductChange",
     "contract": "catalogue",
     "verb": "POST",
@@ -3598,6 +3863,18 @@
     "contract": "catalogue",
     "verb": "POST",
     "summary": "Lift a suspension"
+   },
+   {
+    "operation": "releaseChannelAllocation",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Return unsold channel allocation to the general pool"
+   },
+   {
+    "operation": "releaseInventoryHold",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Return unsold units"
    },
    {
     "operation": "restoreProductVersion",
@@ -3700,12 +3977,6 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Give an item its choices"
-   },
-   {
-    "operation": "clearTable",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Mark a table cleared and free"
    },
    {
     "operation": "closeCorrectiveAction",
@@ -3954,18 +4225,6 @@
     "summary": "List guests currently matching a segment"
    },
    {
-    "operation": "matchGuest",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Is this the same person we already have?"
-   },
-   {
-    "operation": "mergeGuests",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Two records, one person"
-   },
-   {
     "operation": "recordLostItem",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -4116,10 +4375,10 @@
     "summary": "What an upgrade costs, pro-rata"
    },
    {
-    "operation": "reissueEntitlement",
+    "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
-    "summary": "Zero-value reissue of an expired entitlement for a later date"
+    "summary": "Give a hold back"
    },
    {
     "operation": "resendPaymentLink",
@@ -4530,6 +4789,18 @@
     "summary": "Validate and publish a seat map"
    },
    {
+    "operation": "releaseSeatBlock",
+    "contract": "seating",
+    "verb": "DELETE",
+    "summary": "Release a block back to sale"
+   },
+   {
+    "operation": "releaseSeatHold",
+    "contract": "seating",
+    "verb": "DELETE",
+    "summary": "Release a hold"
+   },
+   {
     "operation": "setMapZones",
     "contract": "seating",
     "verb": "PUT",
@@ -4782,6 +5053,12 @@
     "summary": "Publish now, or schedule it"
    },
    {
+    "operation": "releaseCustomDomain",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Give the domain up"
+   },
+   {
     "operation": "setFeatureToggles",
     "contract": "white-label",
     "verb": "PUT",
@@ -4900,7 +5177,8 @@
     "module": "Venue Operations",
     "waves": [
      1,
-     2
+     2,
+     3
     ]
    }
   ],

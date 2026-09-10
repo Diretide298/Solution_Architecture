@@ -9,19 +9,18 @@
 | Contracts | 8 |
 | Modules | 2 |
 | Undrawn | 0 |
-| Operations with no screen | 112 |
+| Operations with no screen | 110 |
 | Waves | wave2 20 · wave3 40 |
 
 ## Gaps
 
-### 112 operations with no screen here
+### 110 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
 | Operation | Contract | | |
 |---|---|---|---|
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
-| `clearTable` | fnb | POST | Mark a table cleared and free |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
 | `createCombo` | fnb | POST | A meal deal, priced as one thing |
 | `createModifierGroup` | fnb | POST | Create a modifier group |
@@ -55,12 +54,13 @@
 | `listMessageTriggers` | marketing-crm | GET | What fires a message, and when |
 | `listReviews` | marketing-crm | GET | List guest reviews and ratings |
 | `listSegmentMembers` | marketing-crm | GET | List guests currently matching a segment |
-| `matchGuest` | marketing-crm | POST | Is this the same person we already have? |
-| `mergeGuests` | marketing-crm | POST | Two records, one person |
 | `recordLostItem` | marketing-crm | POST | Report something lost, or hand something in |
 | `recordPrivacyIncident` | marketing-crm | POST | Log a personal-data breach and start the clock |
 | `respondToReview` | marketing-crm | POST | Respond to a review |
-| … | | | 72 more |
+| `retryMessageDispatch` | marketing-crm | POST | Send it again, or by another channel |
+| `setCallDisposition` | marketing-crm | POST | Why the conversation ended, and any callback |
+| `setMessageTrigger` | marketing-crm | POST | Fire a message from a platform event |
+| … | | | 70 more |
 
 ## Modules
 

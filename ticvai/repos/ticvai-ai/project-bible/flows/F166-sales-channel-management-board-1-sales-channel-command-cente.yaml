@@ -1,0 +1,149 @@
+id: F166
+name: 'Sales Channel Management board 1: Sales Channel Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Sales Channel Management board 1. **This route is read from
+    the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-258
+  entryPoints:
+  - Arrives at Sales Channel Command Center
+steps:
+- step: 1
+  screen: ADM-258
+  action: Opens Sales Channel Command Center
+  operations:
+  - listSaleChannel
+  outcome: Provide administrators with one centralized view of every TICVAI sales channel and its current
+    operational/configuration status.
+- step: 2
+  screen: ADM-259
+  action: Works in Channel Creation & Profile Configuration
+  operations:
+  - createChannelProfile
+  outcome: Create and define a sales channel before products and commercial rules are assigned.
+- step: 3
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-260
+  action: Works in Product & Catalogue Assignment
+  operations:
+  - setProductCatalogue
+  outcome: Control exactly which products are available through each sales channel.
+- step: 5
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-261
+  action: Works in Channel Pricing & Commercial Profile Assignment
+  operations:
+  - setChannelPricingCommercial
+  outcome: Determine which pricing configuration a channel consumes.
+- step: 7
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-262
+  action: Works in Inventory, Capacity & Channel Allocation
+  operations:
+  - listInventoryCapacityChannel
+  outcome: Control how much product inventory or event capacity is available to each sales channel.
+- step: 9
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-263
+  action: Works in Channel Sales Schedule & Availability Windows
+  operations:
+  - listChannelSaleSchedule
+  outcome: Control when each channel is permitted to sell.
+- step: 11
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-264
+  action: Works in Customer & Eligibility Rules by Channel
+  operations:
+  - listCustomerEligibilityRule
+  outcome: Determine who is allowed to purchase through a particular channel.
+- step: 13
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-265
+  action: Works in Channel Sales Rules, Limits & Restrictions
+  operations:
+  - listChannelSaleRule
+  outcome: Configure operational restrictions that apply specifically to a sales channel.
+- step: 15
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-266
+  action: Works in Channel Fees, Payment & Fulfillment Configuration
+  operations:
+  - setChannelFeePayment
+  outcome: Define the commercial and fulfillment behavior associated with each channel.
+- step: 17
+  screen: ADM-258
+  action: Returns to the board's landing screen
+  operations:
+  - listSaleChannel
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-267
+  action: Works in Channel Publication, Readiness & AI Validation
+  operations:
+  - publishChannelReadinessValidation
+  outcome: Perform final validation before a sales channel or channel/product configuration becomes commercially
+    active. Board 2 manages the live operational layer of TICVAI's sales-channel ecosystem after channels
+    have been configured and activated in Board 1.
+branches:
+- at: 1
+  condition: Nothing has been set up on Sales Channel Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Sales Channel Management board 1 visited
+primaryContract: catalogue
+contracts:
+- catalogue

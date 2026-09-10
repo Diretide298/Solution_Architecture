@@ -4,17 +4,17 @@
 
 | | |
 |---|---|
-| Screens | 318 |
-| Operations | 402 |
+| Screens | 367 |
+| Operations | 404 |
 | Contracts | 15 |
 | Modules | 13 |
 | Undrawn | 0 |
-| Operations with no screen | 149 |
-| Waves | wave1 12 · wave2 16 · wave3 290 |
+| Operations with no screen | 150 |
+| Waves | wave1 12 · wave2 16 · wave3 339 |
 
 ## Gaps
 
-### 149 operations with no screen here
+### 150 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -30,7 +30,6 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
-| `issueAccreditationBadge` | approvals | POST | Issue a badge |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -41,6 +40,8 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
+| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
+| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
@@ -48,6 +49,7 @@
 | `captureWalletAuthorisation` | cross-region | POST | Capture a held amount |
 | `getWalletAllocation` | cross-region | GET | The consuming cell's bounded offline allocation |
 | `releaseWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
+| `relinquishWalletAuthorisation` | cross-region | POST | Release a hold without capturing |
 | `setWalletAllocationPolicy` | cross-region | PUT | Set the allocation cap policy |
 | `setPasswordPolicy` | identity | PUT | Length, breach check, lockout and step-up |
 | `setSegregationRules` | identity | PUT | Which permissions may not be held together |
@@ -58,9 +60,7 @@
 | `createForm` | marketing-crm | POST | Define a waiver, survey or capture form |
 | `createInvitationCampaign` | marketing-crm | POST | A quota-bounded, addressed invitation |
 | `createLoyaltyProgramme` | marketing-crm | POST | Create a loyalty programme |
-| `createUrlRedirect` | marketing-crm | POST | 301, 302 and custom redirects |
-| `getJourneyPerformance` | marketing-crm | GET | Entrants, completions, goals reached |
-| … | | | 109 more |
+| … | | | 110 more |
 
 ### 4 modules split across waves
 
@@ -76,7 +76,7 @@
 | Module | Screens | Waves |
 |---|---|---|
 | Commercial | 230 | 3 |
-| Platform | 30 | 3 |
+| Platform | 79 | 3 |
 | Catalogue | 20 | 3 |
 | Tenants & Licensing | 9 | 1, 2, 3 |
 | Releases & Environments | 7 | 1, 2, 3 |
@@ -411,4 +411,53 @@
 | `ADM-316` | Upgrade Execution, Credential Regeneration & Channel Controls | Commercial | 3 | 1 | yes |
 | `ADM-317` | Upgrade History, Exception Management & Audit Explorer | Commercial | 3 | 1 | yes |
 | `ADM-318` | Dead Letters | Platform Ops | 1 | 2 | yes |
+| `ADM-319` | Approval Workflow Library | Platform | 3 | 0 | yes |
+| `ADM-320` | Create Approval Workflow | Platform | 3 | 0 | yes |
+| `ADM-322` | Approval Stage Configuration | Platform | 3 | 0 | yes |
+| `ADM-323` | Condition & Decision Rule Builder | Platform | 3 | 0 | yes |
+| `ADM-324` | Approval Sequence & Parallel Routing | Platform | 3 | 0 | yes |
+| `ADM-325` | Workflow Outcome & Action Configuration | Platform | 3 | 0 | yes |
+| `ADM-326` | Workflow Validation & Simulation | Platform | 3 | 0 | yes |
+| `ADM-327` | Workflow Publication & Lifecycle | Platform | 3 | 0 | yes |
+| `ADM-328` | Workflow Versioning & Change History | Platform | 3 | 0 | yes |
+| `ADM-329` | Approval Matrix Command Center | Platform | 3 | 0 | yes |
+| `ADM-330` | Approval Authority Matrix | Platform | 3 | 0 | yes |
+| `ADM-331` | Organizational Hierarchy Routing | Platform | 3 | 0 | yes |
+| `ADM-332` | Department-Based Approval Matrix | Platform | 3 | 0 | yes |
+| `ADM-333` | Venue & Tenant Approval Matrix | Platform | 3 | 0 | yes |
+| `ADM-334` | Value & Threshold Routing | Platform | 3 | 0 | yes |
+| `ADM-335` | Risk-Based & Conditional Routing | Platform | 3 | 0 | yes |
+| `ADM-336` | Approver Group & Decision Policy | Platform | 3 | 0 | yes |
+| `ADM-337` | Routing Simulator & Conflict Detection | Platform | 3 | 0 | yes |
+| `ADM-338` | AI Routing Advisor & Matrix Optimization | Platform | 3 | 0 | yes |
+| `ADM-339` | Governance & Compliance Command Center | Platform | 3 | 0 | yes |
+| `ADM-340` | Segregation of Duties Policy Manager | Platform | 3 | 0 | yes |
+| `ADM-341` | Four-Eyes & Dual-Control Policy | Platform | 3 | 0 | yes |
+| `ADM-342` | Authentication & MFA Policy Manager | Platform | 3 | 3 | yes |
+| `ADM-343` | Sensitive Action Confirmation | Platform | 3 | 0 | yes |
+| `ADM-344` | Digital Signature Management | Platform | 3 | 0 | yes |
+| `ADM-345` | Immutable Approval Record & Tamper Detection | Platform | 3 | 0 | yes |
+| `ADM-346` | Approval Record Retention Policy | Platform | 3 | 0 | yes |
+| `ADM-347` | Regulatory Audit & Evidence Center | Platform | 3 | 0 | yes |
+| `ADM-348` | Governance Risk & AI Compliance Advisor | Platform | 3 | 0 | yes |
+| `ADM-349` | Approval Integration Command Center | Platform | 3 | 0 | yes |
+| `ADM-350` | Module Integration Registry | Platform | 3 | 0 | yes |
+| `ADM-351` | Approval API Management | Platform | 3 | 0 | yes |
+| `ADM-352` | Workflow Event Framework | Platform | 3 | 0 | yes |
+| `ADM-353` | Webhook Configuration & Subscription Manager | Platform | 3 | 0 | yes |
+| `ADM-354` | External Workflow System Integration | Platform | 3 | 0 | yes |
+| `ADM-355` | Data & Workflow Mapping Studio | Platform | 3 | 0 | yes |
+| `ADM-356` | Integration Security & Access Control | Platform | 3 | 0 | yes |
+| `ADM-357` | Integration Monitoring, Error & Retry Center | Platform | 3 | 0 | yes |
+| `ADM-358` | Integration Analytics & AI Health Advisor | Platform | 3 | 0 | yes |
+| `ADM-359` | Approval Executive KPI Dashboard | Platform | 3 | 0 | yes |
+| `ADM-360` | Approval Volume & Outcome Analytics | Platform | 3 | 0 | yes |
+| `ADM-361` | Approval Processing Time Analytics | Platform | 3 | 0 | yes |
+| `ADM-362` | Bottleneck Analysis & Heatmap | Platform | 3 | 0 | yes |
+| `ADM-363` | Approval Trend & Comparative Analytics | Platform | 3 | 0 | yes |
+| `ADM-364` | Approver & Team Performance Analytics | Platform | 3 | 0 | yes |
+| `ADM-365` | Risk & Governance Analytics | Platform | 3 | 0 | yes |
+| `ADM-366` | AI Approval Intelligence Center | Platform | 3 | 0 | yes |
+| `ADM-367` | AI Optimization & What-If Simulator | Platform | 3 | 0 | yes |
+| `ADM-368` | AI Governance Executive Advisor | Platform | 3 | 0 | yes |
 

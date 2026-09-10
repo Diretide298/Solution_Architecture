@@ -109,6 +109,7 @@ paths:
       operationId: listQueues
       x-ticvai-consumed-by:
         - "P01 WEB-039 Venue Map & Wait Times"
+        - "P02 GST-023 Virtual Queue"
         - "P06 EMP-031 Queue monitor"
         - "P06 EMP-032 Manual wait entry"
         - "P08 BO-001 Queue Directory"
@@ -199,6 +200,7 @@ paths:
     get:
       operationId: getQueue
       x-ticvai-consumed-by:
+        - "P04 POS-029 Order Queue"
         - "P06 EMP-031 Queue monitor"
         - "P06 EMP-032 Manual wait entry"
         - "P08 BO-001 Queue Directory"
@@ -575,6 +577,7 @@ paths:
     get:
       operationId: listQueueEntries
       x-ticvai-consumed-by:
+        - "P04 POS-029 Order Queue"
         - "P06 EMP-031 Queue monitor"
         - "P06 EMP-032 Manual wait entry"
         - "P08 BO-001 Queue Directory"
@@ -639,7 +642,6 @@ paths:
         - "P08 BO-004 Manual Wait Time Entry"
         - "P08 BO-005 Queue Monitor"
         - "P08 BO-038 Reconciliation Queue"
-        - "P11 ACC-006 Reviewer Queue"
       x-ticvai-audience: [guest, public]
       x-ticvai-read-routing: replica
       summary: Wait times across a venue
@@ -886,6 +888,7 @@ paths:
     get:
       operationId: getQueueFeedHealth
       x-ticvai-consumed-by:
+        - "P04 POS-029 Order Queue"
         - "P08 BO-001 Queue Directory"
         - "P08 BO-003 Queue Integration Setup"
       x-ticvai-audience: [staff]

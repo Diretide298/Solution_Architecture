@@ -1,0 +1,155 @@
+id: F152
+name: 'Product Lifecycle   Catalogue Governance board 1: Product Lifecycle Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Product Lifecycle   Catalogue Governance board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-118
+  entryPoints:
+  - Arrives at Product Lifecycle Command Center
+steps:
+- step: 1
+  screen: ADM-118
+  action: Opens Product Lifecycle Command Center
+  operations:
+  - listProductLifecycle
+  outcome: Provide administrators with a centralized operational view of every product and its current
+    lifecycle state.
+- step: 2
+  screen: ADM-119
+  action: Works in Product Creation Workspace
+  operations:
+  - createProduct
+  outcome: Provide a governed starting point for creating a new ticketing product.
+- step: 3
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-120
+  action: Works in Lifecycle Status & Workflow Configuration
+  operations:
+  - setLifecycleStatuWorkflow
+  outcome: Configure how products move between lifecycle states.
+- step: 5
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-121
+  action: Works in Bulk Product Creation & Catalogue Import
+  operations:
+  - createBulkProductCatalogue
+  outcome: Allow large catalogues to be created efficiently rather than configuring every product manually.
+    This directly addresses the matrix requirement for catalogue creation through bulk-file upload.
+- step: 7
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-122
+  action: Works in Product Import / Export & Environment Transfer
+  operations:
+  - listProductImportExport
+  outcome: Allow controlled movement of product configurations between TICVAI environments. This covers
+    the matrix requirement for importing/exporting catalogue products between different environments.
+- step: 9
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-123
+  action: Works in Product Context, Ownership & Assignment
+  operations:
+  - setProductContextOwnership
+  outcome: Define where the product belongs and who is responsible for it.
+- step: 11
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-124
+  action: Works in Channel Publication & Availability
+  operations:
+  - publishChannelAvailability
+  outcome: Control where a product may be exposed for sale.
+- step: 13
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-125
+  action: Works in Publication & Activation Scheduler
+  operations:
+  - publishActivationScheduler
+  outcome: Automate future product lifecycle actions.
+- step: 15
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-126
+  action: Works in Product Duplication & Template Library
+  operations:
+  - listProductDuplicationTemplate
+  outcome: Accelerate product configuration by allowing administrators to reuse proven configurations.
+    The source matrix explicitly requires duplication of products together with associated configuration,
+    rules, pricing and entitlements.
+- step: 17
+  screen: ADM-118
+  action: Returns to the board's landing screen
+  operations:
+  - listProductLifecycle
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-127
+  action: Works in AI Catalogue Builder & Configuration Review
+  operations:
+  - setCatalogueReview
+  outcome: Provide TICVAI's AI-first interface for accelerating product creation and configuration. This
+    directly supports the matrix requirement allowing administrators to upload spreadsheets, brochures,
+    PDFs or existing catalogues and use AI to generate product structures, pricing, rules, entitlements
+    and configurations. Board 2 governs what happens after a product has been created or while an existing
+    product is being changed.
+branches:
+- at: 1
+  condition: Nothing has been set up on Product Lifecycle Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Product Lifecycle   Catalogue Governance board 1 visited
+primaryContract: catalogue
+contracts:
+- catalogue

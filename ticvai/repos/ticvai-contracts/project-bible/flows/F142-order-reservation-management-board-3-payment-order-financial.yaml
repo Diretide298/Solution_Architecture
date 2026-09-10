@@ -1,0 +1,149 @@
+id: F142
+name: 'Order   Reservation Management board 3: Payment & Order Financial Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Order   Reservation Management board 3. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-324
+  entryPoints:
+  - Arrives at Payment & Order Financial Command Center
+steps:
+- step: 1
+  screen: BO-324
+  action: Opens Payment & Order Financial Command Center
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Provide operations and finance teams with a centralized view of the financial status of all
+- step: 2
+  screen: BO-325
+  action: Works in Order Payment Detail & Transaction Ledger
+  operations:
+  - listOrderPaymentDetail
+  outcome: Provide the complete payment history associated with an individual order.
+- step: 3
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-326
+  action: Works in Multi-Payment, Split Tender & Payment Allocation Configuration
+  operations:
+  - setMultiPaymentSplit
+  outcome: Support orders paid using multiple payment methods and determine how each payment is allocated.
+- step: 5
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-327
+  action: Works in Deposit, Partial Payment & Outstanding Balance Management
+  operations:
+  - listDepositPartialPayment
+  outcome: Support commercial scenarios where an order may be confirmed or reserved without full immediate
+    payment.
+- step: 7
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-328
+  action: Works in Order Split, Merge & Transaction Relationship Management
+  operations:
+  - listOrderSplitMerge
+  outcome: Allow complex orders to be reorganized without destroying transaction history.
+- step: 9
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-329
+  action: Works in Related Order & Transaction Relationship Explorer
+  operations:
+  - listRelatedOrderTransaction
+  outcome: Provide a visual relationship map for complex transaction histories. This becomes especially
+    useful after amendments, upgrades, exchanges, reissues, splits and refunds.
+- step: 11
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-330
+  action: Works in External Payment, Partner & Settlement Reference Mapping
+  operations:
+  - listExternalPaymentPartner
+  outcome: Maintain the relationship between TICVAI transactions and external financial/channel references.
+- step: 13
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-331
+  action: Works in Payment Reconciliation & Exception Management
+  operations:
+  - listPaymentReconciliationException
+  outcome: Automatically compare TICVAI payment records with external payment and settlement records.
+- step: 15
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-332
+  action: Works in Financial Traceability, Control & Audit Explorer
+  operations:
+  - listFinancialTraceability
+  outcome: Provide a complete financial audit trail across the order lifecycle.
+- step: 17
+  screen: BO-324
+  action: Returns to the board's landing screen
+  operations:
+  - listPaymentOrderFinancial
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-333
+  action: Works in Order Financial Analytics & AI Reconciliation Intelligence
+  operations:
+  - listOrderFinancialReconciliation
+  outcome: Provide management-level analytics across order payment performance, balances, settlement and
+    reconciliation.
+branches:
+- at: 1
+  condition: Nothing has been set up on Payment & Order Financial Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Order   Reservation Management board 3 visited
+primaryContract: orders
+contracts:
+- orders

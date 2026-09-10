@@ -1,13 +1,13 @@
 id: HLD-LIFECYCLES
 sourceFiles:
   folder: states/
-  files: 125
-  drawn: 124
+  files: 126
+  drawn: 125
   skipped:
   - _schema.yaml
   why: '**`_schema.yaml` is the shape, not a model.** Every state file validates against it; it has
     no entity and no transitions.'
-title: 124 state models and 29 events
+title: 125 state models and 29 events
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 about: '**What can happen to a thing, and in what order.** A state model is a lifecycle within one entity;
@@ -493,7 +493,7 @@ stateModels:
   operations:
   - claimCustomDomain
   - listCustomDomains
-  - releaseCustomDomain
+  - relinquishCustomDomain
   - verifyCustomDomain
   guarded: 12
   ref: diagrams/lld/lifecycles/custom-domain.yaml
@@ -901,7 +901,7 @@ stateModels:
   - forceReleased
   operations:
   - forceReleaseInventoryHold
-  - releaseInventoryHold
+  - relinquishInventoryHold
   guarded: 3
   ref: diagrams/lld/lifecycles/lease.yaml
 - entity: Lost item
@@ -1004,6 +1004,23 @@ stateModels:
   - submitOnboardingApplication
   guarded: 7
   ref: diagrams/lld/lifecycles/onboarding-application.yaml
+- entity: Operator session
+  contract: identity
+  owner: identity
+  service: IdentityService
+  states: null
+  transitions: 3
+  initial:
+  - active
+  terminal:
+  - signedOut
+  - terminated
+  - expired
+  operations:
+  - forceLogout
+  - logout
+  guarded: 3
+  ref: diagrams/lld/lifecycles/operator-session.yaml
 - entity: Order
   contract: orders
   owner: orders
@@ -1578,7 +1595,7 @@ stateModels:
   - expired
   operations:
   - createOrder
-  - releaseSeatHold
+  - relinquishSeatHold
   guarded: 3
   ref: diagrams/lld/lifecycles/seat-hold.yaml
 - entity: SeatMapImportJob
@@ -1630,8 +1647,8 @@ stateModels:
   - createRefund
   - createSeatBlock
   - createSeatHold
-  - releaseSeatBlock
-  - releaseSeatHold
+  - relinquishSeatBlock
+  - relinquishSeatHold
   - updateSeats
   guarded: 12
   ref: diagrams/lld/lifecycles/seat.yaml
@@ -2006,7 +2023,7 @@ stateModels:
   - expired
   operations:
   - captureWalletAuthorisation
-  - releaseWalletAuthorisation
+  - relinquishWalletAuthorisation
   guarded: 7
   ref: diagrams/lld/lifecycles/wallet-authorisation.yaml
 - entity: Wallet pass

@@ -7,10 +7,10 @@
  "audience": "staff",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 10,
+  "screens": 69,
   "operations": 20,
   "contracts": 8,
   "modules": 1,
@@ -18,12 +18,12 @@
   "operationsWithNoScreen": 87
  },
  "waves": {
-  "wave3": 10
+  "wave3": 69
  },
  "modules": [
   {
    "module": "Analytics",
-   "screens": 10,
+   "screens": 69,
    "waves": [
     3
    ]
@@ -39,20 +39,12 @@
    "operations": 4
   },
   {
-   "contract": "inventory",
-   "operations": 3
-  },
-  {
    "contract": "marketing-crm",
    "operations": 3
   },
   {
-   "contract": "tenancy",
-   "operations": 1
-  },
-  {
-   "contract": "orders",
-   "operations": 1
+   "contract": "inventory",
+   "operations": 3
   },
   {
    "contract": "catalogue",
@@ -60,6 +52,14 @@
   },
   {
    "contract": "identity",
+   "operations": 1
+  },
+  {
+   "contract": "orders",
+   "operations": 1
+  },
+  {
+   "contract": "tenancy",
    "operations": 1
   }
  ],
@@ -152,6 +152,537 @@
    "wave": 3,
    "route": "/analytics/suggestions",
    "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "ANL-012",
+   "name": "Live Operations Dashboard",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/live-operations-dashboard-anl-012",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-013",
+   "name": "Revenue Pulse",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/revenue-pulse-anl-013",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-014",
+   "name": "Attendance & Footfall Intelligence",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/attendance-footfall-intelligence-anl-014",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-015",
+   "name": "Capacity & Utilization Monitor",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/capacity-utilization-monitor-anl-015",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-016",
+   "name": "Sales & Channel Performance",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/sales-channel-performance-anl-016",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-017",
+   "name": "Customer, Membership & Loyalty Pulse",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/customer-membership-loyalty-pulse-anl-017",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-018",
+   "name": "Alerts & Exception Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/alerts-exception-center-anl-018",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-019",
+   "name": "AI Management Insights",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ai-management-insights-anl-019",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-020",
+   "name": "Multi-Site & Performance Comparison",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/multi-site-performance-comparison-anl-020",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-021",
+   "name": "Dashboard Library",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/dashboard-library-anl-021",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-022",
+   "name": "Dashboard Creation Wizard",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/dashboard-creation-wizard-anl-022",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-023",
+   "name": "Drag-and-Drop Dashboard Canvas",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/drag-and-drop-dashboard-canvas-anl-023",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-024",
+   "name": "Widget & Visualization Library",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/widget-visualization-library-anl-024",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-025",
+   "name": "KPI Builder",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/kpi-builder-anl-025",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-026",
+   "name": "Targets, Thresholds & KPI Status Rules",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/targets-thresholds-kpi-status-rules-anl-026",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-027",
+   "name": "Data & Filter Configuration",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/data-filter-configuration-anl-027",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-028",
+   "name": "Drill-Down & Interaction Designer",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/drill-down-interaction-designer-anl-028",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-029",
+   "name": "Dashboard Access, Publishing & Versioning",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/dashboard-access-publishing-versioning-anl-029",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-030",
+   "name": "Dashboard Preview, Validation & Health",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/dashboard-preview-validation-health-anl-030",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-031",
+   "name": "Report Catalogue & Library",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-catalogue-library-anl-031",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-032",
+   "name": "Report Creation Wizard",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-creation-wizard-anl-032",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-033",
+   "name": "Data Domain & Dataset Selector",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/data-domain-dataset-selector-anl-033",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-034",
+   "name": "Field & Column Selector",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/field-column-selector-anl-034",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-035",
+   "name": "Filter & Parameter Builder",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/filter-parameter-builder-anl-035",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-036",
+   "name": "Grouping, Aggregation & Calculation Builder",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/grouping-aggregation-calculation-builder-anl-036",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-037",
+   "name": "Cross-Domain Report Composer",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/cross-domain-report-composer-anl-037",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-038",
+   "name": "Report Layout & Formatting Designer",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-layout-formatting-designer-anl-038",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-039",
+   "name": "Report Preview, Test & Validation",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-preview-test-validation-anl-039",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-040",
+   "name": "Save, Run & Report Results Viewer",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/save-run-report-results-viewer-anl-040",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-041",
+   "name": "Reporting Governance Command Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/reporting-governance-command-center-anl-041",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-042",
+   "name": "Report Scheduler",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-scheduler-anl-042",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-043",
+   "name": "Subscription Manager",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/subscription-manager-anl-043",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-044",
+   "name": "Distribution & Delivery Configuration",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/distribution-delivery-configuration-anl-044",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-045",
+   "name": "Export & Download Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/export-download-center-anl-045",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-046",
+   "name": "Report API & Data Delivery Manager",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-api-data-delivery-manager-anl-046",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-047",
+   "name": "Report Access & Sharing Control",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-access-sharing-control-anl-047",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-048",
+   "name": "Delivery Monitoring & Failure Management",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/delivery-monitoring-failure-management-anl-048",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-049",
+   "name": "Report Audit Trail & Compliance",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/report-audit-trail-compliance-anl-049",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-050",
+   "name": "Retention, Archive & Governance Policy",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/retention-archive-governance-policy-anl-050",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-051",
+   "name": "AI Analytics Command Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ai-analytics-command-center-anl-051",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-052",
+   "name": "Ask TICVAI \u2014 Natural Language Analytics",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ask-ticvai-natural-language-analytics-anl-052",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-053",
+   "name": "AI-Generated Dashboard Studio",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ai-generated-dashboard-studio-anl-053",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-054",
+   "name": "AI Report Generator",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ai-report-generator-anl-054",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-055",
+   "name": "Anomaly Detection Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/anomaly-detection-center-anl-055",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-056",
+   "name": "Root-Cause Analysis Explorer",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/root-cause-analysis-explorer-anl-056",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-057",
+   "name": "Forecasting & Predictive Analytics Studio",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/forecasting-predictive-analytics-studio-anl-057",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-058",
+   "name": "AI Recommendation & Next-Best-Action Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ai-recommendation-next-best-action-center-anl-058",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-059",
+   "name": "AI Insight History, Evidence & Explainability",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ai-insight-history-evidence-explainability-anl-059",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-060",
+   "name": "AI Analytics Governance & Model Control",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/ai-analytics-governance-model-control-anl-060",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-061",
+   "name": "BI & Analytics Administration Command Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/bi-analytics-administration-command-center-anl-061",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-062",
+   "name": "Enterprise KPI Library",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/enterprise-kpi-library-anl-062",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-063",
+   "name": "KPI Targets, Thresholds & Scorecards",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/kpi-targets-thresholds-scorecards-anl-063",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-064",
+   "name": "Benchmark & Comparative Analytics Configuration",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/benchmark-comparative-analytics-configuration-anl-064",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-065",
+   "name": "Data Source & Integration Registry",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/data-source-integration-registry-anl-065",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-066",
+   "name": "Semantic Model & Business Data Catalogue",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/semantic-model-business-data-catalogue-anl-066",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-067",
+   "name": "Data Refresh, Pipeline & Data Health Monitor",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/data-refresh-pipeline-data-health-monitor-anl-067",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-068",
+   "name": "Embedded BI, Workspace & Tenant Administration",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/embedded-bi-workspace-tenant-administration-anl-068",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-069",
+   "name": "Analytics Performance, Usage & Cost Monitor",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/analytics-performance-usage-cost-monitor-anl-069",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ANL-070",
+   "name": "Analytics Governance, Security & Audit Center",
+   "module": "Analytics",
+   "wave": 3,
+   "route": "/analytics/analytics-governance-security-audit-center-anl-070",
+   "operations": 0,
    "drawn": true
   }
  ],
@@ -278,6 +809,18 @@
     "summary": "Lift a suspension"
    },
    {
+    "operation": "releaseChannelAllocation",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Return unsold channel allocation to the general pool"
+   },
+   {
+    "operation": "releaseInventoryHold",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Return unsold units"
+   },
+   {
     "operation": "restoreProductVersion",
     "contract": "catalogue",
     "verb": "POST",
@@ -396,18 +939,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "List guests currently matching a segment"
-   },
-   {
-    "operation": "matchGuest",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Is this the same person we already have?"
-   },
-   {
-    "operation": "mergeGuests",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Two records, one person"
    },
    {
     "operation": "recordLostItem",
@@ -560,10 +1091,10 @@
     "summary": "What an upgrade costs, pro-rata"
    },
    {
-    "operation": "reissueEntitlement",
+    "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
-    "summary": "Zero-value reissue of an expired entitlement for a later date"
+    "summary": "Give a hold back"
    },
    {
     "operation": "resendPaymentLink",

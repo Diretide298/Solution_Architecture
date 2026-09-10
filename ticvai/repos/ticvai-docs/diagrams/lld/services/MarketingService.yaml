@@ -1674,6 +1674,7 @@ screens:
 - P01:WEB-017 My Account Dashboard
 - P01:WEB-020 Profile & Preferences
 - P01:WEB-024 Devices, Wishlist & Consent
+- P01:WEB-025 Help Centre / FAQ
 - P01:WEB-026 Survey & Feedback
 - P01:WEB-027 Newsletter Subscription
 - P01:WEB-034 Lost & Found
@@ -1694,12 +1695,15 @@ screens:
 - P02:GST-068 Help & My Cases
 - P02:GST-071 Payment Methods
 - P02:GST-072 Share & Group Booking
+- P02:GST-073 Security & Sign-in
 - P04:POS-002 Sell — Ticket Catalogue
 - P04:POS-005 Payment
+- P04:POS-027 Guest Lookup
 - P05:KSK-013 Call staff
 - P05:KSK-015 Assistant
 - P06:EMP-028 Lost & found
 - P06:EMP-029 Guest assistance
+- P06:EMP-055 Create / Edit Reservation
 - P06:EMP-057 Guest Profile & Dining History
 - P08:BO-005 Queue Monitor
 - P08:BO-036 Device Registry
@@ -1794,6 +1798,14 @@ flows:
 - F02 Guest buys seated tickets
 - F05 Agent resolves a guest complaint
 - F09 Event is cancelled and refunded
+- 'F118 Access Control board 8: Guest Journey Command Center'
+- 'F133 Communication & Notification Platform Services board 1: Communication Service Command Center'
+- 'F134 Customer Service board 1: Customer Service Command Center'
+- 'F135 Customer Service board 2: Contact Center Operations Command Center'
+- 'F150 Privacy  Consent   Preference Management board 1: Privacy & Consent Configuration Command Center'
+- 'F151 Privacy  Consent   Preference Management board 2: Privacy Operations Command Center'
+- 'F181 Waiver, Consent & Digital Form Management board 1: Waiver & Consent Command Center'
+- 'F182 Waiver, Consent & Digital Form Management board 2: Waiver Operations Command Center'
 - F24 A guest asks the assistant and ends up with a person
 - F34 A retail sale, from scan to return
 - F53 A guest earns, sees and spends loyalty

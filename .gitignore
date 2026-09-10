@@ -52,11 +52,25 @@ Thumbs.db
 # Remove this line to commit it.
 ticvai/Updating old wireframes/
 
-# --- drops that arrived beside the repository, not in it ---------------------
-# Three archives and a OneDrive export landed at the root during the September
-# board work; the largest is 263 MB. One of the remotes is a public GitHub repo,
-# so a quarter-gigabyte of upload is not something to do by accident. They are
-# kept on disk and out of the history, like `Updating old wireframes/` above.
-/Docs.zip
-/Handoff_Claude_design.zip
-/OneDrive_2_8-9-2026.zip
+# --- everything that lives at the root and is not a folder -------------------
+# The root is a doormat: archives, GIF captures, handover notes and OneDrive
+# exports get dropped there between sessions, and the largest so far was 263 MB.
+# One of the remotes is a public GitHub repo, so a quarter-gigabyte of upload is
+# not something to do by accident.
+#
+# The package is the folders — pitchdeck/, ticvai/, viewer/. Nothing loose at the
+# root is package, so the root is ignored wholesale and the folders are let back
+# in. A new top-level folder is tracked as before; a new top-level file is not,
+# and needs a `!` line here or a home inside one of the folders.
+/*
+!/*/
+!/.gitignore
+
+# --- superseded screen definitions, and the review scaffolding over them ------
+# The screen layer was rebuilt from the workshop packs on 9 September. The
+# versions it replaced are kept — a regeneration that cannot be compared against
+# what it replaced is one nobody can check — but they are not package: git HEAD
+# already holds them, and a second copy in the tree would be two answers to the
+# same question.
+ticvai/_dump/
+ticvai/_review-*/

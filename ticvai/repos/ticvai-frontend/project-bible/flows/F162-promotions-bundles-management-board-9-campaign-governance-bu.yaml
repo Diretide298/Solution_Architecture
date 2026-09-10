@@ -1,0 +1,154 @@
+id: F162
+name: 'Promotions   Bundles Management board 9: Campaign Governance & Budget Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Promotions   Bundles Management board 9. **This route is
+    read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-218
+  entryPoints:
+  - Arrives at Campaign Governance & Budget Command Center
+steps:
+- step: 1
+  screen: ADM-218
+  action: Opens Campaign Governance & Budget Command Center
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Provide executives, Marketing, Commercial, Revenue, and Finance with one centralized view of
+    the financial and governance status of promotional campaigns.
+- step: 2
+  screen: ADM-219
+  action: Works in Campaign Budget & Financial Limit Setup
+  operations:
+  - setCampaignBudgetFinancial
+  outcome: Define the financial envelope within which a campaign is permitted to operate.
+- step: 3
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-220
+  action: Works in Redemption, Discount & Exposure Limit Manager
+  operations:
+  - listRedemptionDiscountExposure
+  outcome: Define non-budget commercial limits controlling campaign exposure.
+- step: 5
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-221
+  action: Works in Budget Consumption & Forecast Monitor
+  operations:
+  - listBudgetConsumptionForecast
+  outcome: Provide real-time tracking of campaign financial consumption and predict when limits will be
+    reached.
+- step: 7
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-222
+  action: Works in Threshold Actions & Automatic Suspension
+  operations:
+  - listThresholdActionAutomatic
+  outcome: Define what TICVAI should do as financial or redemption thresholds are approached or exceeded.
+    This is explicitly required by the matrix.
+- step: 9
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-223
+  action: Works in Campaign Approval Workflow Designer
+  operations:
+  - approveCampaignWorkflow
+  outcome: Configure multi-level approval workflows for promotions and campaigns. The matrix explicitly
+    requires configurable multi-level approval for promotion creation, modification, activation, and deactivation.
+- step: 11
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-224
+  action: Works in Approval Inbox & Decision Workspace
+  operations:
+  - approveDecision
+  outcome: Provide approvers with enough commercial information to make an informed decision without navigating
+    through every configuration screen.
+- step: 13
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-225
+  action: Works in Campaign Financial & Commercial Simulator
+  operations:
+  - listCampaignFinancialCommercial
+  outcome: Simulate the likely financial result of a campaign before activation. This is a major matrix
+    requirement.
+- step: 15
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-226
+  action: Works in Campaign Experiment & A/B Test Manager
+  operations:
+  - listCampaignExperimentTest
+  outcome: Allow TICVAI to test campaign variants and determine which commercial strategy performs better.
+    The matrix explicitly requires A/B testing of promotion variants, including discount levels, validity
+    periods, bundles, and target segments.
+- step: 17
+  screen: ADM-218
+  action: Returns to the board's landing screen
+  operations:
+  - listCampaignGovernanceBudget
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-227
+  action: Works in Governance Audit, AI Risk & Launch Readiness
+  operations:
+  - listGovernanceRiskLaunch
+  outcome: Provide the final governance checkpoint before a campaign is allowed to go live.
+branches:
+- at: 1
+  condition: Nothing has been set up on Campaign Governance & Budget Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Promotions   Bundles Management board 9 visited
+primaryContract: promotions
+contracts:
+- promotions

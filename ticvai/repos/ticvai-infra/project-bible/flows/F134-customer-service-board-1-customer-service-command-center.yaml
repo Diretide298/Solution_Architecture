@@ -1,0 +1,154 @@
+id: F134
+name: 'Customer Service board 1: Customer Service Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P12 Venue Support
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Customer Service board 1. **This route is read from the
+    screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: SUP-009
+  entryPoints:
+  - Arrives at Customer Service Command Center
+steps:
+- step: 1
+  screen: SUP-009
+  action: Opens Customer Service Command Center
+  operations:
+  - listCustomerService
+  outcome: Provide every customer-service agent with a personalized operational workspace showing customers,
+    cases, tasks, SLAs, alerts and workload.
+- step: 2
+  screen: SUP-010
+  action: Works in Customer 360° Service Profile
+  operations:
+  - listCustomerServiceProfile
+  outcome: Provide the agent with a complete customer-service view of the customer. This should be one
+    of the most important screens in the entire Customer Service module.
+- step: 3
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: SUP-011
+  action: Works in Unified Interaction & Communication History
+  operations:
+  - listUnifiedInteractionCommunication
+  outcome: Provide one chronological timeline of customer interactions across supported service channels.
+- step: 5
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: SUP-012
+  action: Works in Case Creation, Classification & Intelligent Routing
+  operations:
+  - createCaseClassificationIntelligent
+  outcome: Create structured customer-service cases and ensure they reach the correct team.
+- step: 7
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: SUP-013
+  action: Works in Case Investigation & Resolution Workspace
+  operations:
+  - setCaseInvestigationResolution
+  outcome: Provide the primary workspace in which an agent investigates and resolves a case.
+- step: 9
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: SUP-014
+  action: Works in Order, Booking & Ticket Service Workspace
+  operations:
+  - setOrderBookingTicket
+  outcome: Allow customer-service agents to perform permitted ticket/order servicing without entering
+    the underlying technical modules.
+- step: 11
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: SUP-015
+  action: Works in Refund, Compensation & Service Exception Workspace
+  operations:
+  - setRefundCompensationService
+  outcome: Manage cases requiring money, compensation, goodwill or policy exceptions.
+- step: 13
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: SUP-016
+  action: Works in Escalation, Collaboration & Internal Resolution
+  operations:
+  - listEscalationCollaborationInternal
+  outcome: Allow Customer Service to collaborate with other TICVAI departments without losing ownership
+    of the customer case.
+- step: 15
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: SUP-017
+  action: Works in Case Resolution, Closure & Customer Feedback
+  operations:
+  - listCaseResolutionClosure
+  outcome: Govern how cases are resolved and formally closed.
+- step: 17
+  screen: SUP-009
+  action: Returns to the board's landing screen
+  operations:
+  - listCustomerService
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: SUP-018
+  action: Works in AI Customer Service Copilot & Knowledge Workspace
+  operations:
+  - setCustomerServiceCopilot
+  outcome: Create the AI intelligence layer assisting agents throughout the service journey. This should
+    not be a simple chatbot added to the side of the screen. It should understand the customer + transaction
+    + policy + case context. Board 1 focused on the individual customer-service agent and individual customer
+    case. Board 2 moves one level higher and provides the supervisor, contact-center manager, operations
+    manager and service leadership layer.
+branches:
+- at: 1
+  condition: Nothing has been set up on Customer Service Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Customer Service board 1 visited
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

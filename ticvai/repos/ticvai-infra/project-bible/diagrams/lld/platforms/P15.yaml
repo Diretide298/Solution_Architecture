@@ -86,7 +86,7 @@ screens:
   - KIT-010
   boardFrames:
   - FnB Board 3.dc.html#fnb-3a
-  wireframe: wireframes/FnB Board 3.dc.html#fnb-3a
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-001
   inFlows:
   - F83 A kitchen works a service from the rail to the exception
   - F88 An order is assembled, collected and notified
@@ -119,9 +119,10 @@ screens:
   - visitId<-deepLink
   goesTo:
   - KIT-001
+  - KIT-003
   boardFrames:
   - FnB Board 3.dc.html#fnb-3b
-  wireframe: wireframes/FnB Board 3.dc.html#fnb-3b
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-002
   inFlows:
   - F108 A guest orders food at a counter and collects it
   - F29 A table is seated, coursed and split
@@ -142,7 +143,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -154,9 +154,10 @@ screens:
   - outletId<-session
   goesTo:
   - KIT-001
+  - KIT-004
   boardFrames:
   - FnB Board 3.dc.html#fnb-3c
-  wireframe: wireframes/FnB Board 3.dc.html#fnb-3c
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-003
   inFlows:
   - F83 A kitchen works a service from the rail to the exception
   - F88 An order is assembled, collected and notified
@@ -183,6 +184,7 @@ screens:
   - orderId<-KIT-002
   goesTo:
   - KIT-001
+  - KIT-008
   boardFrames:
   - FnB Board 3.dc.html#fnb-3d
   wireframe: wireframes/P15 Kitchen Display.dc.html#kit-004
@@ -213,7 +215,7 @@ screens:
   - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3e
-  wireframe: wireframes/FnB Board 3.dc.html#fnb-3e
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-005
   inFlows: null
 - screen: KIT-006
   name: Expeditor & Order Assembly
@@ -242,9 +244,10 @@ screens:
   - orderId<-session
   goesTo:
   - KIT-001
+  - KIT-002
   boardFrames:
   - FnB Board 3.dc.html#fnb-3f
-  wireframe: wireframes/FnB Board 3.dc.html#fnb-3f
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-006
   inFlows:
   - F88 An order is assembled, collected and notified
 - screen: KIT-007
@@ -304,7 +307,7 @@ screens:
   - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3h
-  wireframe: wireframes/FnB Board 3.dc.html#fnb-3h
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-008
   inFlows:
   - F83 A kitchen works a service from the rail to the exception
 - screen: KIT-009
@@ -319,7 +322,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   - offline
@@ -332,7 +334,7 @@ screens:
   - KIT-001
   boardFrames:
   - FnB Board 3.dc.html#fnb-3j
-  wireframe: wireframes/FnB Board 3.dc.html#fnb-3j
+  wireframe: wireframes/P15 Kitchen Display.dc.html#kit-009
   inFlows: null
 - screen: KIT-010
   name: Kitchen Performance, AI & Operational Optimization

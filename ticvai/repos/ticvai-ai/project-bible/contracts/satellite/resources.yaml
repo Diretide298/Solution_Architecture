@@ -126,6 +126,7 @@ paths:
     get:
       operationId: getResourceAvailability
       x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
         - "P02 GST-070 Reserve a Table or Cabana"
         - "P08 BO-096 Resource Calendar"
       summary: When it is free, with conflicts already resolved
@@ -173,6 +174,7 @@ paths:
     post:
       operationId: bookResource
       x-ticvai-consumed-by:
+        - "P01 WEB-031 My Reservations"
         - "P02 GST-070 Reserve a Table or Cabana"
         - "P08 BO-096 Resource Calendar"
       summary: Reserve a specific resource for a window

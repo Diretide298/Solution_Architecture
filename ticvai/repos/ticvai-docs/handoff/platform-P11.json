@@ -7,12 +7,12 @@
  "audience": "public",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 8,
   "operations": 4,
-  "contracts": 2,
+  "contracts": 1,
   "modules": 2,
   "undrawn": 0,
   "operationsWithNoScreen": 0
@@ -39,11 +39,7 @@
  "contracts": [
   {
    "contract": "approvals",
-   "operations": 3
-  },
-  {
-   "contract": "queue",
-   "operations": 1
+   "operations": 4
   }
  ],
  "screens": [
@@ -62,7 +58,7 @@
    "module": "Applicant Journey",
    "wave": 3,
    "route": "/applicant-journey/registration-form",
-   "operations": 1,
+   "operations": 0,
    "drawn": true
   },
   {
@@ -116,7 +112,7 @@
    "module": "Reviewer (Internal)",
    "wave": 3,
    "route": "/reviewer-internal/credential-register",
-   "operations": 0,
+   "operations": 1,
    "drawn": true
   }
  ],

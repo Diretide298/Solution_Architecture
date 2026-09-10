@@ -1,0 +1,151 @@
+id: F136
+name: 'Group Sales   Corporate Booking Management board 1: Group Sales Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Group Sales   Corporate Booking Management board 1. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-264
+  entryPoints:
+  - Arrives at Group Sales Command Center
+steps:
+- step: 1
+  screen: BO-264
+  action: Opens Group Sales Command Center
+  operations:
+  - listGroupSale
+  outcome: Provide the Group Sales team with a centralized commercial workspace showing the entire group-sales
+    pipeline.
+- step: 2
+  screen: BO-265
+  action: Works in Group Enquiry & Opportunity Capture
+  operations:
+  - listGroupEnquiryOpportunity
+  outcome: Capture a new group-sales enquiry and convert it into a structured sales opportunity.
+- step: 3
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-266
+  action: Works in Group Customer & Organization Profile
+  operations:
+  - listGroupCustomerOrganization
+  outcome: Maintain the customer or organization buying directly from TICVAI.
+- step: 5
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-267
+  action: Works in Group Requirements, Availability & Capacity Planner
+  operations:
+  - listGroupRequirementAvailability
+  outcome: Determine whether TICVAI can accommodate the requested group before preparing a quotation.
+- step: 7
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-268
+  action: Works in Group Package & Experience Builder
+  operations:
+  - setGroupPackageExperience
+  outcome: Build a complete commercial package tailored to the group's requirements.
+- step: 9
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-269
+  action: Works in Group Quotation Builder & Proposal Generation
+  operations:
+  - setGroupQuotationProposal
+  outcome: Turn the configured group package into a professional customer quotation.
+- step: 11
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-270
+  action: Works in Quote Revision, Negotiation & Version Management
+  operations:
+  - listQuoteRevisionNegotiation
+  outcome: Manage the commercial negotiation process without losing historical versions.
+- step: 13
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-271
+  action: Works in Group Discount, Exception & Approval Workflow
+  operations:
+  - approveGroupDiscountException
+  outcome: Govern non-standard group pricing and commercial exceptions before a quote is committed.
+- step: 15
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-272
+  action: Works in Quote-to-Booking Conversion & Confirmation
+  operations:
+  - listQuoteBookingConversion
+  outcome: Convert an accepted quotation into a confirmed TICVAI group booking without re-entering the
+    commercial configuration.
+- step: 17
+  screen: BO-264
+  action: Returns to the board's landing screen
+  operations:
+  - listGroupSale
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-273
+  action: Works in Group Booking 360° & Handover Workspace
+  operations:
+  - setGroupBookingHandover
+  outcome: Provide a consolidated view of the completed sales journey and hand the confirmed group cleanly
+    from Sales to Operations. 360° Header Board 1 ended when the quotation was accepted and converted
+    into a confirmed group booking. Board 2 takes over from confirmation until the group visit is completed
+    and financially closed.
+branches:
+- at: 1
+  condition: Nothing has been set up on Group Sales Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Group Sales   Corporate Booking Management board 1 visited
+primaryContract: orders
+contracts:
+- orders

@@ -52,8 +52,17 @@ def persistence_map() -> dict:
             continue
         for n, sch in ((doc.get("components") or {}).get("schemas") or {}).items():
             t = (sch or {}).get("x-ticvai-persistence")
-            if t:
-                out[n] = str(t).strip('"')
+            if not t:
+                continue
+            t = str(t).strip('"').strip()
+            # **`none` is an answer, not a table.** Schemas that are computed, projected or held
+            # only in a session say so here — "none — computed", "none — projection", "none —
+            # Redis session registry". Taking that literally put a table called
+            # `none — projection` into the lineage on 10 September, and `check-package` was right
+            # to refuse a table the schema reference has never heard of.
+            if t.lower().startswith("none"):
+                continue
+            out[n] = t
     return out
 
 

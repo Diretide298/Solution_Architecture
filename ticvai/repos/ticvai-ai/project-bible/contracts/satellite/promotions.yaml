@@ -395,7 +395,6 @@ paths:
       operationId: createPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - staff
       - partner
@@ -478,7 +477,6 @@ paths:
       operationId: updatePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - staff
       - partner
@@ -539,7 +537,6 @@ paths:
       operationId: pausePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - staff
       - partner
@@ -587,7 +584,6 @@ paths:
       operationId: endPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - staff
       - partner
@@ -635,7 +631,6 @@ paths:
       operationId: unschedulePromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - staff
       - partner
@@ -672,7 +667,6 @@ paths:
       operationId: publishPromotion
       x-ticvai-consumed-by:
         - "P08 BO-010 Promotions & Coupons"
-        - "P10 PTR-010 Cart & Quote"
       x-ticvai-audience:
       - staff
       - partner
@@ -963,6 +957,7 @@ paths:
       operationId: getCouponCode
       x-ticvai-consumed-by:
         - "P01 WEB-010 Shopping Cart"
+        - "P02 GST-037 Offers & Promotions"
       x-ticvai-audience:
       - staff
       - guest
@@ -1282,6 +1277,7 @@ paths:
     get:
       operationId: getBundle
       x-ticvai-consumed-by:
+        - "P01 WEB-008 Add-ons & Upsell"
         - "P02 GST-056 Bundle Package"
       x-ticvai-audience:
       - staff

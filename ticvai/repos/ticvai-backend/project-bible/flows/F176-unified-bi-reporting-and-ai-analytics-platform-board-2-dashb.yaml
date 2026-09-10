@@ -1,0 +1,130 @@
+id: F176
+name: 'Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P16 Venue Analytics
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Unified BI Reporting and AI Analytics Platform board 2.
+    **This route is read from the screens' own navigation**, and the reason anyone walks it has still
+    to be written.
+  entryScreen: ANL-021
+  entryPoints:
+  - Arrives at Dashboard Library
+steps:
+- step: 1
+  screen: ANL-021
+  action: Opens Dashboard Library
+  operations: []
+  outcome: Provide a centralized catalogue for all standard, custom, AI-generated and embedded TICVAI
+    dashboards.
+- step: 2
+  screen: ANL-022
+  action: Works in Dashboard Creation Wizard
+  operations: []
+  outcome: Guide users through creation of a new dashboard.
+- step: 3
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ANL-023
+  action: Works in Drag-and-Drop Dashboard Canvas
+  operations: []
+  outcome: Provide the main visual workspace for dashboard construction.
+- step: 5
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ANL-024
+  action: Works in Widget & Visualization Library
+  operations: []
+  outcome: Provide reusable visual components for dashboard construction.
+- step: 7
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ANL-025
+  action: Works in KPI Builder
+  operations: []
+  outcome: Allow authorized business users to create standardized enterprise KPIs.
+- step: 9
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ANL-026
+  action: Works in Targets, Thresholds & KPI Status Rules
+  operations: []
+  outcome: Configure how TICVAI determines whether KPI performance is healthy, warning or critical.
+- step: 11
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ANL-027
+  action: Works in Data & Filter Configuration
+  operations: []
+  outcome: Control what data a dashboard/widget uses and how users can filter it.
+- step: 13
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ANL-028
+  action: Works in Drill-Down & Interaction Designer
+  operations: []
+  outcome: Configure how users move from high-level KPIs into deeper analytics.
+- step: 15
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ANL-029
+  action: Works in Dashboard Access, Publishing & Versioning
+  operations: []
+  outcome: Govern who can access dashboards and how dashboard changes reach production.
+- step: 17
+  screen: ANL-021
+  action: Returns to the board's landing screen
+  operations: []
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ANL-030
+  action: Works in Dashboard Preview, Validation & Health
+  operations: []
+  outcome: Validate dashboards before publication and monitor their technical/analytical health afterward.
+branches:
+- at: 1
+  condition: Nothing has been set up on Dashboard Library yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Unified BI Reporting and AI Analytics Platform board 2 visited
+primaryContract: unknown
+contracts:
+- unknown

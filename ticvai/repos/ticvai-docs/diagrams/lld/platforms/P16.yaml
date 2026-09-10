@@ -1,5 +1,5 @@
 id: LLD-P16
-title: P16 Venue Analytics — Cross-Domain Reporting — 10 screens
+title: P16 Venue Analytics — Cross-Domain Reporting — 69 screens
 generatedBy: tools/derive-diagrams.py
 index: diagrams/hld/00-platform.yaml
 audience: staff
@@ -35,7 +35,7 @@ why: '**26 board screens collapsed to nine.** F&B, Retail and POS each ended the
   not necessarily a separate codebase.'
 modulesUsed:
 - module: analytics
-  screens: 9
+  screens: 68
 - module: ai
   screens: 1
 servicesCalled:
@@ -56,9 +56,9 @@ servicesCalled:
 - service: OrderService
   operationCalls: 1
 coverage:
-  screens: 10
-  inAFlow: 5
-  drawn: 10
+  screens: 69
+  inAFlow: 64
+  drawn: 69
   note: '**A screen in no flow has been specified and never walked.** Every flow written in this package
     has found a defect.'
 screens:
@@ -79,7 +79,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -96,6 +95,20 @@ screens:
   - ANL-008
   - ANL-009
   - ANL-010
+  - ANL-012
+  - ANL-013
+  - ANL-014
+  - ANL-015
+  - ANL-016
+  - ANL-017
+  - ANL-018
+  - ANL-019
+  - ANL-020
+  - ANL-021
+  - ANL-031
+  - ANL-041
+  - ANL-051
+  - ANL-061
   boardFrames:
   - FnB Board 6.dc.html#fnb-6a
   - POS Board 6.dc.html#pos-6a
@@ -117,7 +130,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -149,7 +161,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -184,7 +195,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -193,6 +203,7 @@ screens:
   - reportId<-deepLink
   goesTo:
   - ANL-001
+  - ANL-006
   boardFrames:
   - FnB Board 6.dc.html#fnb-6d
   - Retail Board 6.dc.html#ret-6c
@@ -215,7 +226,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -224,6 +234,7 @@ screens:
   - reportId<-deepLink
   goesTo:
   - ANL-001
+  - ANL-007
   boardFrames:
   - FnB Board 6.dc.html#fnb-6e
   - Retail Board 6.dc.html#ret-6f
@@ -247,7 +258,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -260,7 +270,7 @@ screens:
   boardFrames:
   - FnB Board 6.dc.html#fnb-6f
   - Retail Board 6.dc.html#ret-6d
-  wireframe: wireframes/Retail Board 6.dc.html#ret-6d
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-006
   inFlows:
   - F82 A month is analysed from incrementality to a scheduled report
 - screen: ANL-007
@@ -281,7 +291,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -291,6 +300,7 @@ screens:
   - segmentId<-deepLink
   goesTo:
   - ANL-001
+  - ANL-004
   boardFrames:
   - Retail Board 6.dc.html#ret-6e
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-007
@@ -311,7 +321,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -345,7 +354,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - venueId<-session
@@ -378,10 +386,8 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
-  - shadowRunning
   offlineState: false
   entryParams:
   - venueId<-session
@@ -392,3 +398,1300 @@ screens:
   - POS Board 6.dc.html#pos-6f
   wireframe: wireframes/P16 Venue Analytics.dc.html#anl-010
   inFlows: null
+- screen: ANL-012
+  name: Live Operations Dashboard
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-012
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-013
+  name: Revenue Pulse
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-013
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-014
+  name: Attendance & Footfall Intelligence
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-014
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-015
+  name: Capacity & Utilization Monitor
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-015
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-016
+  name: Sales & Channel Performance
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-016
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-017
+  name: Customer, Membership & Loyalty Pulse
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-017
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-018
+  name: Alerts & Exception Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-018
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-019
+  name: AI Management Insights
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-020
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-019
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-020
+  name: Multi-Site & Performance Comparison
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-012
+  - ANL-013
+  - ANL-014
+  - ANL-015
+  - ANL-016
+  - ANL-017
+  - ANL-018
+  - ANL-019
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-020
+  inFlows:
+  - 'F175 Unified BI Reporting and AI Analytics Platform board 1: Multi-Site & Performance Comparison'
+- screen: ANL-021
+  name: Dashboard Library
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-022
+  - ANL-023
+  - ANL-024
+  - ANL-025
+  - ANL-026
+  - ANL-027
+  - ANL-028
+  - ANL-029
+  - ANL-030
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-021
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-022
+  name: Dashboard Creation Wizard
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-022
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-023
+  name: Drag-and-Drop Dashboard Canvas
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-023
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-024
+  name: Widget & Visualization Library
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-024
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-025
+  name: KPI Builder
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-025
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-026
+  name: Targets, Thresholds & KPI Status Rules
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-026
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-027
+  name: Data & Filter Configuration
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-027
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-028
+  name: Drill-Down & Interaction Designer
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-028
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-029
+  name: Dashboard Access, Publishing & Versioning
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-029
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-030
+  name: Dashboard Preview, Validation & Health
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-021
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-030
+  inFlows:
+  - 'F176 Unified BI Reporting and AI Analytics Platform board 2: Dashboard Library'
+- screen: ANL-031
+  name: Report Catalogue & Library
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-032
+  - ANL-033
+  - ANL-034
+  - ANL-035
+  - ANL-036
+  - ANL-037
+  - ANL-038
+  - ANL-039
+  - ANL-040
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-031
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-032
+  name: Report Creation Wizard
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-032
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-033
+  name: Data Domain & Dataset Selector
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-033
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-034
+  name: Field & Column Selector
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-034
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-035
+  name: Filter & Parameter Builder
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-035
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-036
+  name: Grouping, Aggregation & Calculation Builder
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-036
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-037
+  name: Cross-Domain Report Composer
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-037
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-038
+  name: Report Layout & Formatting Designer
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-038
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-039
+  name: Report Preview, Test & Validation
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-039
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-040
+  name: Save, Run & Report Results Viewer
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-031
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-040
+  inFlows:
+  - 'F177 Unified BI Reporting and AI Analytics Platform board 3: Report Catalogue & Library'
+- screen: ANL-041
+  name: Reporting Governance Command Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-042
+  - ANL-043
+  - ANL-044
+  - ANL-045
+  - ANL-046
+  - ANL-047
+  - ANL-048
+  - ANL-049
+  - ANL-050
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-041
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-042
+  name: Report Scheduler
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-042
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-043
+  name: Subscription Manager
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-043
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-044
+  name: Distribution & Delivery Configuration
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-044
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-045
+  name: Export & Download Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-045
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-046
+  name: Report API & Data Delivery Manager
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-046
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-047
+  name: Report Access & Sharing Control
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-047
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-048
+  name: Delivery Monitoring & Failure Management
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-048
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-049
+  name: Report Audit Trail & Compliance
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-049
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-050
+  name: Retention, Archive & Governance Policy
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-041
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-050
+  inFlows:
+  - 'F178 Unified BI Reporting and AI Analytics Platform board 4: Reporting Governance Command Center'
+- screen: ANL-051
+  name: AI Analytics Command Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-052
+  - ANL-053
+  - ANL-054
+  - ANL-055
+  - ANL-056
+  - ANL-057
+  - ANL-058
+  - ANL-059
+  - ANL-060
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-051
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-052
+  name: Ask TICVAI — Natural Language Analytics
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-052
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-053
+  name: AI-Generated Dashboard Studio
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-053
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-054
+  name: AI Report Generator
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-054
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-055
+  name: Anomaly Detection Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-055
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-056
+  name: Root-Cause Analysis Explorer
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-056
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-057
+  name: Forecasting & Predictive Analytics Studio
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-057
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-058
+  name: AI Recommendation & Next-Best-Action Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-058
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-059
+  name: AI Insight History, Evidence & Explainability
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-059
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-060
+  name: AI Analytics Governance & Model Control
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-051
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-060
+  inFlows:
+  - 'F179 Unified BI Reporting and AI Analytics Platform board 9: AI Analytics Command Center'
+- screen: ANL-061
+  name: BI & Analytics Administration Command Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-001
+  - ANL-062
+  - ANL-063
+  - ANL-064
+  - ANL-065
+  - ANL-066
+  - ANL-067
+  - ANL-068
+  - ANL-069
+  - ANL-070
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-061
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-062
+  name: Enterprise KPI Library
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-062
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-063
+  name: KPI Targets, Thresholds & Scorecards
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-063
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-064
+  name: Benchmark & Comparative Analytics Configuration
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-064
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-065
+  name: Data Source & Integration Registry
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-065
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-066
+  name: Semantic Model & Business Data Catalogue
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-066
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-067
+  name: Data Refresh, Pipeline & Data Health Monitor
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-067
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-068
+  name: Embedded BI, Workspace & Tenant Administration
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-068
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-069
+  name: Analytics Performance, Usage & Cost Monitor
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-069
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'
+- screen: ANL-070
+  name: Analytics Governance, Security & Audit Center
+  module: Analytics
+  requiresModule: analytics
+  wave: 3
+  density: compact
+  operations: []
+  states:
+  - emptyFirstRun
+  - emptyNoAccess
+  - emptyNoResults
+  - error
+  - loading
+  offlineState: false
+  entryParams: []
+  goesTo:
+  - ANL-061
+  boardFrames: null
+  wireframe: wireframes/P16 Venue Analytics.dc.html#anl-070
+  inFlows:
+  - 'F180 Unified BI Reporting and AI Analytics Platform board 10: BI & Analytics Administration Command
+    Center'

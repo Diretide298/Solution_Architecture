@@ -308,6 +308,20 @@
   "refs_in": 1
  },
  {
+  "module": "subscription",
+  "purpose": "Owned by SubscriptionService",
+  "why": "**One table in its own schema, and the boundary is the point.** The subscription contract declares 112 operations and writes almost all of them into `control` \u2014 plans, licences, agreements, tenants. `partner_quote` is the exception: a quote is a partner's own working figure before an agreement exists, so it cannot sit in `control` next to the agreement it has not become. **A schema with one table is cheaper than a table in the wrong schema**",
+  "tables": 1,
+  "written": 0,
+  "columns": 7,
+  "ops": 112,
+  "tier": "satellite",
+  "cross": 1,
+  "contracts": "subscription",
+  "refs_out": 1,
+  "refs_in": 0
+ },
+ {
   "module": "sync",
   "purpose": "Owned by CrossRegionService",
   "why": "Segregated by domain; owned by CrossRegionService.",

@@ -1,0 +1,641 @@
+{
+ "CreateOrderLine": {
+  "x-ticvai-persistence": "none — request only",
+  "type": "object",
+  "required": [
+   "id",
+   "variantId",
+   "quantity",
+   "quotedUnitPrice"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$"
+   },
+   "variantId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "performanceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "inventoryHoldId": {
+    "type": "string",
+    "nullable": true,
+    "description": "Lease the units were drawn from. Absent for uncontended products."
+   },
+   "seatIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    },
+    "description": "Seated products only. Not available offline."
+   },
+   "quantity": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "quotedUnitPrice": {
+    "allOf": [
+     {
+      "$ref": "../shared/common.yaml#/components/schemas/Money"
+     }
+    ],
+    "description": "What the client charged, from its local bundle."
+   },
+   "holderName": {
+    "type": "string",
+    "nullable": true
+   },
+   "dataMaskValues": {
+    "type": "object",
+    "additionalProperties": true
+   }
+  }
+ },
+ "FxRate": {
+  "type": "object",
+  "x-ticvai-persistence": "ledger.fx_rate",
+  "required": [
+   "fromCurrency",
+   "toCurrency",
+   "rate",
+   "purpose",
+   "effectiveFrom"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "fromCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "toCurrency": {
+    "type": "string",
+    "pattern": "^[A-Z]{3}$"
+   },
+   "rate": {
+    "type": "number",
+    "description": "Units of `toCurrency` per one `fromCurrency`. Six decimal places — a two-place rate on a three-place currency loses money on every transaction, quietly.\n"
+   },
+   "purpose": {
+    "$ref": "#/components/schemas/FxRatePurpose"
+   },
+   "source": {
+    "$ref": "#/components/schemas/FxRateSource"
+   },
+   "effectiveFrom": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "effectiveTo": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "A rate change is a new row. The old one is never edited — a transaction posted last Tuesday must still reconcile at last Tuesday's rate.\n"
+   },
+   "setByPrincipalId": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "providerReference": {
+    "type": "string",
+    "nullable": true,
+    "description": "The provider's own identifier for this quote. **What makes a rate reproducible** — an auditor asking why a payment converted at 3.6725 gets an answer that is checkable against the source rather than a number somebody typed."
+   },
+   "fetchedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true,
+    "description": "When the rate was pulled. **Distinct from `effectiveFrom`**, which is when it applies — a rate fetched at 06:00 for a business day starting at 00:00 has two different times and conflating them makes a late feed look like a backdated rate."
+   }
+  }
+ },
+ "FxRatePurpose": {
+  "type": "string",
+  "description": "A venue does not accept dollars at the rate it books an intercompany balance at. Separating them is what stops a spread on the counter appearing as a loss in the accounts.\n",
+  "enum": [
+   "tender",
+   "interEntity",
+   "reporting",
+   "revaluation"
+  ]
+ },
+ "FxRateSource": {
+  "type": "string",
+  "description": "**Where the rate came from, and which provider specifically.** `source: provider` said a feed set it and not which one — two tenants on different feeds were indistinguishable in the ledger, and a rate cannot be defended in an audit without naming its origin.\n\n**`uaeCentralBank` is the default for AED pairs.** The UAE Central Bank publishes an official daily rate and it is what a UAE auditor expects to see — a commercial feed is defensible for tender and awkward for statutory reporting.\n\n**`openExchangeRates` and `ecb` are the commercial and reference options.** ECB publishes daily reference rates free and is the usual fallback for non-AED pairs; Open Exchange Rates is the common commercial feed with intraday granularity. **The choice is per purpose, not per platform** — a tender rate wants intraday, a reporting rate wants the official daily close.",
+  "enum": [
+   "manual",
+   "uaeCentralBank",
+   "ecb",
+   "openExchangeRates",
+   "cardScheme",
+   "provider"
+  ]
+ },
+ "GroupBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.group_booking",
+  "description": "BL-028. **`BO-026 Group Bookings` ran on generic order operations** — no group size, no quota, no leader, no per-attendee capture.\n**The leader is the point.** A school booking forty places has one person who pays, one who is called if the coach is late, and forty who need names collecting — and a generic order has one guest.\n",
+  "required": [
+   "id",
+   "orderId",
+   "leaderSubjectId",
+   "expectedSize",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "leaderSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "organisationName": {
+    "type": "string",
+    "nullable": true
+   },
+   "expectedSize": {
+    "type": "integer"
+   },
+   "confirmedSize": {
+    "type": "integer",
+    "nullable": true
+   },
+   "minimumSize": {
+    "type": "integer",
+    "nullable": true,
+    "description": "**Below which the group rate does not apply.** A booking for forty that arrives as twelve is a pricing question somebody has to answer at the gate, and stating the threshold means answering it at booking instead.\n"
+   },
+   "attendeeCaptureRequired": {
+    "type": "boolean",
+    "default": false,
+    "description": "**Whether names are needed before admission.** A school trip usually needs them and a corporate day out usually does not, and the difference is a safeguarding requirement rather than a preference.\n"
+   },
+   "attendeeCaptureDueBy": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "provisional",
+     "confirmed",
+     "namesPending",
+     "complete",
+     "cancelled"
+    ]
+   }
+  }
+ },
+ "Page": {
+  "type": "object",
+  "required": [
+   "items",
+   "hasMore"
+  ],
+  "properties": {
+   "items": {
+    "type": "array",
+    "items": {}
+   },
+   "nextCursor": {
+    "type": "string"
+   },
+   "hasMore": {
+    "type": "boolean"
+   }
+  }
+ },
+ "ResaleListing": {
+  "type": "object",
+  "x-ticvai-persistence": "orders.resale_listing",
+  "description": "BL-060. **Smaller than it first looked** — most of the machinery exists. An entitlement can already be transferred, an order can already be created, and payment already routes. What was missing is the listing itself and a cart line that can point at one.\n**A resale is a transfer with money attached**, and the venue is in the middle: the seller's entitlement is voided and a new one issued to the buyer, so **the ticket that admits is always one the venue issued.** That is what stops a screenshot at the gate.\n",
+  "required": [
+   "id",
+   "entitlementId",
+   "sellerSubjectId",
+   "askPrice",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "entitlementId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "sellerSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "askPrice": {
+    "$ref": "../shared/common.yaml#/components/schemas/Money"
+   },
+   "priceCapPercent": {
+    "type": "number",
+    "nullable": true,
+    "description": "**A ceiling as a percentage of face value**, because uncapped resale is a venue watching its own tickets sold at four times the price with its name on them. Null means uncapped, which is a venue decision rather than a default.\n"
+   },
+   "sellerFeePercent": {
+    "type": "number"
+   },
+   "buyerFeePercent": {
+    "type": "number"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "listed",
+     "reserved",
+     "sold",
+     "withdrawn",
+     "expired"
+    ]
+   },
+   "listedAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "soldToSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "payoutStatus": {
+    "type": "string",
+    "enum": [
+     "pending",
+     "held",
+     "paid",
+     "failed"
+    ],
+    "description": "**The seller is paid after the buyer is admitted, not after they pay.** A resale refunded at the gate for a void ticket cannot be clawed back from a seller who has already been paid.\n"
+   },
+   "scopePath": {
+    "type": "string",
+    "description": "**The partition key** (ADR-0005). Added 31 August: the operations that write this table declare a scope and the table carried no column for it — **49 tables were in that state**, so a row could be written at venue scope and then read by anything that could reach the table.\n\n**`scope_path` rather than a specific id** because it is prefix-comparable: `uae.dubai` contains `uae.dubai.marina`, and one index answers every level of the walk.\n\n**Operations write it at `venue` scope.**"
+   }
+  }
+ },
+ "Reservation": {
+  "x-ticvai-persistence": "orders.reservation",
+  "type": "object",
+  "required": [
+   "id",
+   "venueId",
+   "status",
+   "expiresAt",
+   "createdAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "venueId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "held",
+     "converted",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "lines": {
+    "type": "array",
+    "items": {
+     "$ref": "#/components/schemas/CreateOrderLine"
+    }
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "convertedOrderId": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "ResourceAvailability": {
+  "type": "object",
+  "description": "**Free windows, with setup and teardown already subtracted.** A client computing this from bookings will forget the turnaround.\n",
+  "properties": {
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "freeWindows": {
+    "type": "array",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      }
+     }
+    }
+   },
+   "blockedWindows": {
+    "type": "array",
+    "description": "**With a reason, because they are not the same.** Booked and under repair need different responses from an operator looking for something free — wait, or look elsewhere.\n",
+    "items": {
+     "type": "object",
+     "properties": {
+      "from": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "to": {
+       "type": "string",
+       "format": "date-time"
+      },
+      "reason": {
+       "type": "string",
+       "enum": [
+        "booked",
+        "setup",
+        "teardown",
+        "maintenance",
+        "blackout",
+        "closed"
+       ]
+      }
+     }
+    }
+   }
+  }
+ },
+ "ResourceBooking": {
+  "type": "object",
+  "x-ticvai-persistence": "resources.booking",
+  "required": [
+   "id",
+   "resourceId",
+   "from",
+   "to",
+   "status"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "resourceId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "orderId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "from": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "to": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "reserved",
+     "checkedOut",
+     "returned",
+     "overdue",
+     "cancelled",
+     "noShow"
+    ]
+   },
+   "recurrenceGroupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Ties the occurrences of a recurring booking. **Cancelling one week does not cancel the series**, and cancelling the series is a separate act with a separate confirmation.\n"
+   },
+   "depositAuthorisationId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "The hold, through `orders.authoriseStoredValue` (CF-126). **A deposit taken and refunded is two transactions and a fee; held and released is neither.**\n"
+   },
+   "checkedOutAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "dueBackAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "returnedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "conditionOut": {
+    "type": "string",
+    "nullable": true
+   },
+   "conditionIn": {
+    "type": "string",
+    "nullable": true
+   }
+  }
+ },
+ "TableReservation": {
+  "type": "object",
+  "x-ticvai-persistence": "fnb.table_reservation",
+  "required": [
+   "outletId",
+   "startsAt",
+   "partySize"
+  ],
+  "properties": {
+   "id": {
+    "type": "string",
+    "format": "uuid",
+    "readOnly": true
+   },
+   "outletId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "subjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true
+   },
+   "guestName": {
+    "type": "string"
+   },
+   "contactPoint": {
+    "type": "string"
+   },
+   "partySize": {
+    "type": "integer",
+    "minimum": 1
+   },
+   "startsAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "durationMinutes": {
+    "type": "integer",
+    "description": "**How long the cover is held.** An outlet turning tables twice an evening needs this to be real, or the second sitting cannot be booked.\n"
+   },
+   "tableIds": {
+    "type": "array",
+    "description": "Usually empty until seating. **Committing a specific table at booking time refuses later bookings against a constraint that did not need to exist.**\n",
+    "items": {
+     "type": "string",
+     "format": "uuid"
+    }
+   },
+   "status": {
+    "$ref": "#/components/schemas/TableReservationStatus"
+   },
+   "groupId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "5.1.2. Several bookings managed as one party across adjacent tables."
+   },
+   "notes": {
+    "type": "string",
+    "description": "Allergies",
+    "occasion": null,
+    "accessibility.": null
+   },
+   "actualPartySize": {
+    "type": "integer",
+    "nullable": true,
+    "readOnly": true
+   },
+   "tableVisitId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "readOnly": true
+   },
+   "createdAt": {
+    "type": "string",
+    "format": "date-time",
+    "readOnly": true
+   }
+  }
+ },
+ "TableReservationStatus": {
+  "type": "string",
+  "enum": [
+   "booked",
+   "confirmed",
+   "seated",
+   "completed",
+   "cancelled",
+   "noShow"
+  ]
+ },
+ "TicketTransfer": {
+  "x-ticvai-persistence": "orders.ticket_transfer",
+  "type": "object",
+  "required": [
+   "id",
+   "orderId",
+   "ticketIds",
+   "status",
+   "offeredAt",
+   "expiresAt"
+  ],
+  "properties": {
+   "id": {
+    "type": "string"
+   },
+   "orderId": {
+    "type": "string"
+   },
+   "ticketIds": {
+    "type": "array",
+    "items": {
+     "type": "string"
+    }
+   },
+   "fromSubjectId": {
+    "type": "string",
+    "format": "uuid"
+   },
+   "toSubjectId": {
+    "type": "string",
+    "format": "uuid",
+    "nullable": true,
+    "description": "Set only on claim. Ownership moves then, not at offer."
+   },
+   "recipientAddressMasked": {
+    "type": "string"
+   },
+   "status": {
+    "type": "string",
+    "enum": [
+     "offered",
+     "claimed",
+     "expired",
+     "cancelled"
+    ]
+   },
+   "claimUrl": {
+    "type": "string",
+    "nullable": true
+   },
+   "offeredAt": {
+    "type": "string",
+    "format": "date-time"
+   },
+   "claimedAt": {
+    "type": "string",
+    "format": "date-time",
+    "nullable": true
+   },
+   "expiresAt": {
+    "type": "string",
+    "format": "date-time",
+    "description": "An unclaimed transfer expires and the tickets return. A transfer to a mistyped address must not strand a ticket somewhere nobody can reach.\n"
+   }
+  }
+ }
+}

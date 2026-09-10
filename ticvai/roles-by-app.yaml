@@ -1,0 +1,481 @@
+$id: ticvai/roles-by-app.yaml
+title: Permissions each shipped app requires
+generatedBy: tools/derive-app-roles.py
+generated: '2026-09-10'
+description: '**Derived from what each app''s screens call, not decided here.** For every app, the permissions
+  its operations declare in `x-ticvai-permission`, tiered by what the key permits. Role names, headcounts
+  and the approval hierarchy are deliberately absent: who at a venue may configure pricing is the client''s
+  decision and a plausible answer written here would be read as one they made.'
+theTwoVocabularies:
+  onOperations: 127
+  inRolesYaml: 35
+  shared: 0
+  note: '**Zero shared keys.** The contracts carry 127 permission keys across 1538 operations; `roles.yaml`
+    grants 35, all of them POS. `check-screens` validates a screen''s `guard` against `roles.yaml`, so
+    the only guards anyone could write were POS ones — and that is what the package shows: venue-pos declares
+    every guard in it and the other four apps declare none. **Joining these two is the work; this file
+    is the evidence for what the join has to cover.**'
+tiers:
+  read: Sees it. The floor of any signed-in session, and the tier a read-only audit or a duty manager
+    covering an unfamiliar area sits at.
+  operate: Does the day's work. Everything a person on shift needs and nothing that changes how the venue
+    is set up.
+  configure: Changes how it works for everyone else. The tier that needs a named owner, because a change
+    here outlives the shift that made it.
+apps:
+  guest:
+    name: TICVAI Guest
+    platforms:
+    - P01
+    - P02
+    - P05
+    screens: 134
+    operations: 156
+    permissions: 23
+    tiers:
+      read:
+      - CASE_VIEW
+      - GUEST_VIEW
+      - LEDGER_VIEW
+      - MARKETING_VIEW
+      - ORDER_VIEW
+      - PRICE_VIEW
+      - PRODUCT_VIEW
+      - QUEUE_VIEW
+      - RESOURCE_VIEW
+      - VENUE_MAP_VIEW
+      operate:
+      - AI_USE
+      - GUEST_VIEW_PII
+      - LOYALTY_REDEEM
+      - ORDER_CANCEL
+      - ORDER_CREATE
+      - ORDER_MODIFY
+      - ORDER_REPRINT
+      - RESOURCE_BOOK
+      configure:
+      - ACCESS_POINT_CONFIGURE
+      - CASE_MANAGE
+      - GUEST_MANAGE
+      - MARKETING_MANAGE
+      - TENANT_CONFIGURE
+    operationsWithNoPermission:
+    - abandonCart
+    - addCartLine
+    - addToWishlist
+    - checkoutCart
+    - claimCart
+    - claimLocationSession
+    - claimTableSession
+    - claimTicketTransfer
+    - completeSsoAuthorization
+    - createGuestFnbOrder
+    - createMfaChallenge
+    - createParkingEntitlement
+    - createRefundRequest
+    - createTableReservation
+    - deleteGuestAccount
+    - endKioskAssist
+    - enrolMfaMethod
+    - extendCart
+    - getCart
+    - getGameCard
+    - getGuestBill
+    - getGuestMenu
+    - getGuestOrderStatus
+    - getGuestSession
+    - getLoyaltyPosition
+    - getTenantAppStatus
+    - getWaitTimes
+    - getWaitingGuest
+    - getWishlist
+    - guestLogout
+    - guestSocialLogin
+    - guestUaePassLogin
+    - handoverToAgent
+    - joinQueue
+    - joinWaitlist
+    - leaveQueue
+    - leaveWaitlist
+    - linkGuestCheckout
+    - listDeliveryLocations
+    - listDiningOutlets
+    operationsWithNoPermissionCount: 68
+  ticvai-control:
+    name: TICVAI Control
+    platforms:
+    - P09
+    - P10
+    - P11
+    - P14
+    screens: 434
+    operations: 538
+    permissions: 62
+    tiers:
+      read:
+      - AI_AUDIT_VIEW
+      - APPROVAL_VIEW
+      - CASE_VIEW
+      - DEVELOPER_VIEW
+      - GUEST_VIEW
+      - MARKETING_VIEW
+      - ORDER_VIEW
+      - PARTNER_VIEW
+      - PERMISSION_VIEW
+      - PLATFORM_BILLING_VIEW
+      - PLATFORM_CELL_VIEW
+      - PLATFORM_MIGRATION_VIEW
+      - PLATFORM_RELEASE_VIEW
+      - PLATFORM_TENANT_VIEW
+      - PRICE_VIEW
+      - PRODUCT_VIEW
+      - SCOPE_VIEW
+      - SETTLEMENT_VIEW
+      - WORKFORCE_VIEW
+      operate:
+      - APPROVAL_ACT
+      - APPROVAL_DECIDE
+      - APPROVAL_REQUEST
+      - CREDIT_OVERRIDE
+      - ORDER_CREATE
+      - ORDER_DISCOUNT
+      - ORDER_EXCHANGE
+      - ORDER_MODIFY
+      - ORDER_REFUND
+      - ORDER_REPRINT
+      - ORDER_RESCHEDULE
+      - ORDER_VOID
+      - PLATFORM_MIGRATION_APPLY
+      - PLATFORM_RELEASE_PROMOTE
+      - PLATFORM_TENANT_TERMINATE
+      - REPORT_VIEW_VENUE
+      - SESSION_FORCE_LOGOUT
+      - SETTLEMENT_RECONCILE
+      - TICKET_LOOKUP
+      configure:
+      - AI_CONFIGURE
+      - ANNOUNCEMENT_PUBLISH
+      - APPROVAL_CONFIGURE
+      - CAPACITY_CONFIGURE
+      - CASE_MANAGE
+      - CREDIT_MANAGE
+      - DEVELOPER_ADMIN
+      - DEVELOPER_MANAGE
+      - MARKETING_MANAGE
+      - PARTNER_MANAGE
+      - PERMISSION_GRANT
+      - PLATFORM_BILLING_MANAGE
+      - PLATFORM_CELL_MANAGE
+      - PLATFORM_PLAN_MANAGE
+      - PLATFORM_RELEASE_MANAGE
+      - PLATFORM_TENANT_MANAGE
+      - PRICE_CONFIGURE
+      - PRODUCT_CONFIGURE
+      - REPORT_MANAGE
+      - ROLE_MANAGE
+      - SCOPE_MANAGE
+      - TENANT_CONFIGURE
+      - TENANT_PUBLISH
+      - USER_MANAGE
+    operationsWithNoPermission:
+    - addCartLine
+    - checkoutCart
+    - getCart
+    - getCurrentSession
+    - getGuestSession
+    - listMfaMethods
+    - listSsoProviders
+    - login
+    - propagateCrossRegionEntitlement
+    - reconcileRedemptions
+    - removeCartLine
+    - sendTransactionalMessage
+    - updateCartLine
+    operationsWithNoPermissionCount: 13
+  venue-management:
+    name: TICVAI Venue Management
+    platforms:
+    - P08
+    - P12
+    - P13
+    - P16
+    screens: 550
+    operations: 810
+    permissions: 107
+    tiers:
+      read:
+      - AI_AUDIT_VIEW
+      - APPROVAL_VIEW
+      - ASSET_LIBRARY_VIEW
+      - ASSET_VIEW
+      - CASE_VIEW
+      - DEVELOPER_VIEW
+      - DEVICE_VIEW
+      - GUEST_VIEW
+      - INCIDENT_VIEW
+      - LEDGER_VIEW
+      - MARKETING_VIEW
+      - ORDER_VIEW
+      - PARTNER_VIEW
+      - PERMISSION_VIEW
+      - PLATFORM_BILLING_VIEW
+      - PLATFORM_CELL_VIEW
+      - PLATFORM_TENANT_VIEW
+      - PRICE_VIEW
+      - PRODUCT_VIEW
+      - QUEUE_VIEW
+      - RESOURCE_VIEW
+      - SCOPE_VIEW
+      - SETTLEMENT_VIEW
+      - VENUE_MAP_VIEW
+      - WORKFORCE_VIEW
+      - WORK_ORDER_VIEW
+      operate:
+      - ACCESS_OVERRIDE
+      - ACCESS_VALIDATE
+      - AI_APPROVE
+      - AI_USE
+      - APPROVAL_ACT
+      - APPROVAL_DECIDE
+      - APPROVAL_REQUEST
+      - ATTENDANCE_RECORD
+      - CASH_LIFT
+      - INCIDENT_REPORT
+      - LEDGER_APPROVE
+      - LEDGER_POST
+      - MAINTENANCE_APPROVE
+      - MAINTENANCE_EXECUTE
+      - MARKETING_SEND
+      - ORDER_CANCEL
+      - ORDER_CREATE
+      - ORDER_DISCOUNT
+      - ORDER_EXCHANGE
+      - ORDER_MODIFY
+      - ORDER_REFUND
+      - ORDER_REFUND_APPROVE
+      - ORDER_REFUND_BULK
+      - ORDER_REPRINT
+      - ORDER_RESCHEDULE
+      - ORDER_VOID
+      - OVERSHORT_ACCEPT
+      - PLATFORM_RELEASE_PROMOTE
+      - PLATFORM_TENANT_TERMINATE
+      - REPORT_SCHEDULE
+      - REPORT_VIEW_VENUE
+      - REPORT_VIEW_WORKSTATION
+      - RESOURCE_BOOK
+      - SESSION_FORCE_LOGOUT
+      - SETTLEMENT_RECONCILE
+      - SHIFT_APPROVE_OPEN
+      - SHIFT_CLOSE
+      - SHIFT_OPEN
+      - SHIFT_REOPEN
+      - SHIFT_SUSPEND
+      - TICKET_LOOKUP
+      - TURNSTILE_MODE_SET
+      - WORK_ORDER_VERIFY
+      configure:
+      - ACCESS_POINT_CONFIGURE
+      - ACCOUNT_CONFIGURE
+      - AI_CONFIGURE
+      - ANNOUNCEMENT_PUBLISH
+      - APPROVAL_CONFIGURE
+      - ASSET_LIBRARY_MANAGE
+      - ASSET_MANAGE
+      - CAPACITY_CONFIGURE
+      - CASE_MANAGE
+      - DEVELOPER_MANAGE
+      - DEVICE_CONFIGURE
+      - EVENT_CONFIGURE
+      - GUEST_MANAGE
+      - INCIDENT_MANAGE
+      - MARKETING_MANAGE
+      - PARKING_CONFIGURE
+      - PARTNER_MANAGE
+      - PERFORMANCE_CONFIGURE
+      - PLATFORM_BILLING_MANAGE
+      - PLATFORM_CELL_MANAGE
+      - PLATFORM_TENANT_MANAGE
+      - PRICE_CONFIGURE
+      - PRODUCT_CONFIGURE
+      - QUEUE_MANAGE
+      - REGION_CONFIGURE
+      - REPORT_MANAGE
+      - RESOURCE_MANAGE
+      - ROLE_MANAGE
+      - SCOPE_MANAGE
+      - TAX_CONFIGURE
+      - TENANT_CONFIGURE
+      - TENANT_PUBLISH
+      - USER_MANAGE
+      - VENUE_MAP_MANAGE
+      - VENUE_MAP_PUBLISH
+      - WORKFORCE_MANAGE
+      - WORKSTATION_CONFIGURE
+      - WORK_ORDER_MANAGE
+    operationsWithNoPermission:
+    - createRefundRequest
+    - getCurrentSession
+    - getGuestMenu
+    - getGuestOrderStatus
+    - getGuestSession
+    - getTenantAppStatus
+    - getWaitTimes
+    - getWishlist
+    - listDeliveryLocations
+    - listDiningOutlets
+    - listGuestDevices
+    - listMfaMethods
+    - listSsoProviders
+    - login
+    - recordConsent
+    - recordDeviceHeartbeat
+    - recordGamePlay
+    - syncGamePlays
+    operationsWithNoPermissionCount: 18
+  venue-pos:
+    name: TICVAI POS
+    platforms:
+    - P04
+    - P15
+    screens: 40
+    operations: 155
+    permissions: 44
+    tiers:
+      read:
+      - APPROVAL_VIEW
+      - ASSET_LIBRARY_VIEW
+      - DEVICE_VIEW
+      - GUEST_VIEW
+      - INCIDENT_VIEW
+      - ORDER_VIEW
+      - PRICE_VIEW
+      - PRODUCT_VIEW
+      - QUEUE_VIEW
+      - SCOPE_VIEW
+      - WORKFORCE_VIEW
+      operate:
+      - ACCESS_VALIDATE
+      - APPROVAL_DECIDE
+      - APPROVAL_REQUEST
+      - CASH_ADD
+      - CASH_LIFT
+      - INCIDENT_REPORT
+      - LOYALTY_REDEEM
+      - ORDER_CREATE
+      - ORDER_DISCOUNT
+      - ORDER_EXCHANGE
+      - ORDER_MODIFY
+      - ORDER_REFUND
+      - ORDER_REPRINT
+      - ORDER_RESCHEDULE
+      - ORDER_VOID
+      - OVERSHORT_ACCEPT
+      - REPORT_VIEW_VENUE
+      - REPORT_VIEW_WORKSTATION
+      - SESSION_FORCE_LOGOUT
+      - SHIFT_APPROVE_OPEN
+      - SHIFT_CLOSE
+      - SHIFT_OPEN
+      - SHIFT_REOPEN
+      - SHIFT_SUSPEND
+      configure:
+      - ACCESS_POINT_CONFIGURE
+      - PERFORMANCE_CONFIGURE
+      - PRODUCT_CONFIGURE
+      - QUEUE_MANAGE
+      - REPORT_MANAGE
+      - TENANT_CONFIGURE
+      - USER_MANAGE
+      - WORKFORCE_MANAGE
+      - WORKSTATION_CONFIGURE
+    operationsWithNoPermission:
+    - addCartLine
+    - getCart
+    - getCurrentSession
+    - getGuestMenu
+    - getLoyaltyPosition
+    - login
+    - recordDeviceHeartbeat
+    - selectRole
+    operationsWithNoPermissionCount: 8
+  venue-staff-mobile:
+    name: TICVAI Venue Staff
+    platforms:
+    - P06
+    - P07
+    screens: 77
+    operations: 191
+    permissions: 55
+    tiers:
+      read:
+      - ASSET_LIBRARY_VIEW
+      - CASE_VIEW
+      - DEVICE_VIEW
+      - GUEST_VIEW
+      - INCIDENT_VIEW
+      - INSPECTION_VIEW
+      - ORDER_VIEW
+      - PERMISSION_VIEW
+      - PRODUCT_VIEW
+      - QUEUE_VIEW
+      - SCOPE_VIEW
+      - VENUE_MAP_VIEW
+      - WORKFORCE_VIEW
+      - WORK_ORDER_VIEW
+      operate:
+      - ACCESS_OVERRIDE
+      - ACCESS_VALIDATE
+      - AI_USE
+      - ATTENDANCE_RECORD
+      - CASH_LIFT
+      - INCIDENT_REPORT
+      - INSPECTION_SUBMIT
+      - LEDGER_POST
+      - MAINTENANCE_APPROVE
+      - MAINTENANCE_EXECUTE
+      - ORDER_CREATE
+      - ORDER_DISCOUNT
+      - ORDER_EXCHANGE
+      - ORDER_MODIFY
+      - ORDER_REFUND
+      - ORDER_REPRINT
+      - ORDER_RESCHEDULE
+      - ORDER_VOID
+      - OVERSHORT_ACCEPT
+      - REPORT_VIEW_VENUE
+      - REPORT_VIEW_WORKSTATION
+      - SHIFT_APPROVE_OPEN
+      - SHIFT_CLOSE
+      - SHIFT_OPEN
+      - SHIFT_REOPEN
+      - SHIFT_SUSPEND
+      - TICKET_LOOKUP
+      - TURNSTILE_MODE_SET
+      - WORK_ORDER_VERIFY
+      configure:
+      - ANNOUNCEMENT_PUBLISH
+      - CAPACITY_CONFIGURE
+      - CASE_MANAGE
+      - DEVICE_CONFIGURE
+      - GUEST_MANAGE
+      - INCIDENT_MANAGE
+      - INSPECTION_MANAGE
+      - PRODUCT_CONFIGURE
+      - QUEUE_MANAGE
+      - ROLE_MANAGE
+      - WORKFORCE_MANAGE
+      - WORK_ORDER_MANAGE
+    operationsWithNoPermission:
+    - createTableReservation
+    - getCurrentSession
+    - getGuestSession
+    - getWaitTimes
+    - listDeliveryLocations
+    - listDiningOutlets
+    - listMfaMethods
+    - listSsoProviders
+    - login
+    - logout
+    - selectRole
+    operationsWithNoPermissionCount: 11

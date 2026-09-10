@@ -1,0 +1,149 @@
+id: F171
+name: 'Ticket Resale Marketplace board 1: Resale Marketplace Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Ticket Resale Marketplace board 1. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-278
+  entryPoints:
+  - Arrives at Resale Marketplace Command Center
+steps:
+- step: 1
+  screen: ADM-278
+  action: Opens Resale Marketplace Command Center
+  operations:
+  - listResaleMarketplace
+  outcome: Provide administrators with a centralized operational view of the TICVAI resale marketplace.
+- step: 2
+  screen: ADM-279
+  action: Works in Resale Eligibility Rule Configuration
+  operations:
+  - setResaleEligibilityRule
+  outcome: Define whether a ticket is allowed to enter the resale marketplace. Not every TICVAI ticket
+    should automatically be resellable.
+- step: 3
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-280
+  action: Works in Resale Policy & Marketplace Settings
+  operations:
+  - listResalePolicyMarketplace
+  outcome: Configure the overall business policies governing a resale marketplace.
+- step: 5
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-281
+  action: Works in Listing Creation & Seller Configuration
+  operations:
+  - createListingSeller
+  outcome: Define how eligible ticket holders create resale listings.
+- step: 7
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-282
+  action: Works in Resale Pricing & Price Guardrails
+  operations:
+  - listResalePricingPrice
+  outcome: Control the permitted resale price while protecting the operator, seller and buyer.
+- step: 9
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-283
+  action: Works in Resale Fees, Commission & Seller Proceeds
+  operations:
+  - listResaleFeeCommission
+  outcome: Configure the commercial model of the resale marketplace.
+- step: 11
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-284
+  action: Works in Listing Approval & Moderation
+  operations:
+  - approveListingModeration
+  outcome: Determine whether listings are published automatically or require operator review.
+- step: 13
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-285
+  action: Works in Resale Inventory & Availability Management
+  operations:
+  - listResaleInventoryAvailability
+  outcome: Maintain an accurate, synchronized view of tickets currently available through resale.
+- step: 15
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-286
+  action: Works in Listing Lifecycle, Expiry & Cancellation
+  operations:
+  - listListingLifecycleExpiry
+  outcome: Control the full lifecycle of a resale listing from creation until sale, withdrawal or expiry.
+- step: 17
+  screen: ADM-278
+  action: Returns to the board's landing screen
+  operations:
+  - listResaleMarketplace
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-287
+  action: Works in AI Resale Configuration & Marketplace Recommendations
+  operations:
+  - setResaleMarketplaceRecommendation
+  outcome: Provide TICVAI's AI intelligence layer for optimizing resale configuration while keeping commercial
+    control with the operator. Board 2 manages what happens once a resale listing attracts a buyer and
+    enters the transaction stage.
+branches:
+- at: 1
+  condition: Nothing has been set up on Resale Marketplace Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Ticket Resale Marketplace board 1 visited
+primaryContract: orders
+contracts:
+- orders

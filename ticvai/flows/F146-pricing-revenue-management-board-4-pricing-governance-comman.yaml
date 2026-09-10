@@ -1,0 +1,156 @@
+id: F146
+name: 'Pricing   Revenue Management board 4: Pricing Governance Command Center'
+actor: platformAdmin
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P09 TICVAI Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Pricing   Revenue Management board 4. **This route is read
+    from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: ADM-078
+  entryPoints:
+  - Arrives at Pricing Governance Command Center
+steps:
+- step: 1
+  screen: ADM-078
+  action: Opens Pricing Governance Command Center
+  operations:
+  - listPricingGovernance
+  outcome: Provide Commercial, Revenue, Finance, and authorized management with one operational view of
+    all pricing changes and governance activities.
+- step: 2
+  screen: ADM-079
+  action: Works in Pricing Change Request & Workspace
+  operations:
+  - setPricingChangeRequest
+  outcome: Provide a governed workspace for creating individual or structured pricing changes before modifying
+    production pricing.
+- step: 3
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: ADM-080
+  action: Works in Bulk Pricing Update, Import & Mass Maintenance
+  operations:
+  - listBulkPricingUpdate
+  outcome: Allow large pricing portfolios to be updated efficiently without manually editing hundreds
+    or thousands of records.
+- step: 5
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: ADM-081
+  action: Works in Pricing Version & Baseline Management
+  operations:
+  - listPricingVersionBaseline
+  outcome: Maintain immutable versions of pricing configuration so TICVAI always knows what configuration
+    existed at a particular time.
+- step: 7
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: ADM-082
+  action: Works in Pricing Change Impact Analysis
+  operations:
+  - listPricingChangeImpact
+  outcome: Determine the commercial and operational consequences of a pricing change before approval and
+    publication. This is one of the most important screens in Board 4.
+- step: 9
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: ADM-083
+  action: Works in Pricing Approval Workflow & Authority Matrix
+  operations:
+  - approvePricingWorkflowAuthority
+  outcome: Configure who must approve pricing changes based on their commercial risk and scope.
+- step: 11
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: ADM-084
+  action: Works in Pricing Publication & Effective-Date Scheduler
+  operations:
+  - publishPricingEffectiveDate
+  outcome: Control exactly when approved pricing becomes commercially effective.
+- step: 13
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: ADM-085
+  action: Works in Pricing Distribution, Synchronization & Publication Monitor
+  operations:
+  - listPricingDistributionSynchronization
+  outcome: Ensure published pricing reaches every TICVAI channel and dependent system consistently.
+- step: 15
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: ADM-086
+  action: Works in Pricing Rollback & Emergency Control Center
+  operations:
+  - listPricingRollbackEmergency
+  outcome: Provide controlled recovery when a pricing publication is incorrect or creates unacceptable
+    commercial impact.
+- step: 17
+  screen: ADM-078
+  action: Returns to the board's landing screen
+  operations:
+  - listPricingGovernance
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: ADM-087
+  action: Works in Pricing History, Audit & Compliance Explorer
+  operations:
+  - listPricingCompliance
+  outcome: 'Provide complete forensic traceability for every pricing configuration and change. Enable
+    TICVAI revenue administrators to configure dynamic-pricing strategies using real-time commercial conditions
+    such as: Demand + Occupancy + Availability + Inventory + Booking Velocity + Time-to- Event + Season
+    + Day + Timeslot + Channel + Customer Segment + Location The engine converts those conditions into
+    controlled price movements while always respecting commercial guardrails.'
+branches:
+- at: 1
+  condition: Nothing has been set up on Pricing Governance Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Pricing   Revenue Management board 4 visited
+primaryContract: catalogue
+contracts:
+- catalogue

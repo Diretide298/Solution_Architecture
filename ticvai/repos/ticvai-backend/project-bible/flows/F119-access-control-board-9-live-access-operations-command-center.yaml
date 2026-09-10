@@ -1,0 +1,154 @@
+id: F119
+name: 'Access Control board 9: Live Access Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Access Control board 9. **This route is read from the screens'
+    own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-224
+  entryPoints:
+  - Arrives at Live Access Operations Command Center
+steps:
+- step: 1
+  screen: BO-224
+  action: Opens Live Access Operations Command Center
+  operations:
+  - listLiveAccess
+  outcome: Provide the venue control room with a real-time view of access operations across all gates,
+    parks, zones, and attractions.
+- step: 2
+  screen: BO-225
+  action: Works in Podium Operations Console
+  operations:
+  - listPodiumConsole
+  outcome: Provide the operational interface described in the matrix for attendants controlling one or
+    more turnstiles.
+- step: 3
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-226
+  action: Works in Ticket & Credential Investigation Console
+  operations:
+  - listTicketCredentialInvestigation
+  outcome: Allow operators to quickly investigate why a guest cannot enter.
+- step: 5
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-227
+  action: Works in Validation Exception & Reason Code Manager
+  operations:
+  - listValidationExceptionReason
+  outcome: Standardize what happens when access is not automatically granted. The matrix requires the
+    scanner to display a reason code when a ticket is invalid.
+- step: 7
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-228
+  action: Works in Manual Override & Supervisor Approval
+  operations:
+  - approveManualOverrideSupervisor
+  outcome: Allow authorized staff to bypass selected access restrictions when operationally justified.
+    The matrix explicitly requires Allow Override and operator-based ticket override.
+- step: 9
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-229
+  action: Works in Credential Disable, Blacklist & Whitelist Operations
+  operations:
+  - listCredentialDisableBlacklist
+  outcome: Provide immediate operational security control over individual credentials.
+- step: 11
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-230
+  action: Works in Live Gate Mode & Lane Control
+  operations:
+  - listLiveGateMode
+  outcome: Allow operations to change access-point modes during live operations without entering the Board
+    6 engineering configuration. Board 6 defines which modes a device can support. Board 9 controls which
+    permitted mode it is currently running.
+- step: 13
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-231
+  action: Works in Queue, Throughput & Lane Optimization
+  operations:
+  - listQueueThroughputLane
+  outcome: Manage entrance flow in real time. This addresses the matrix requirement to improve entrance
+    flow and queuing, particularly for large B2B groups.
+- step: 15
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-232
+  action: Works in Operational Incident & Exception Workspace
+  operations:
+  - setOperationalIncidentException
+  outcome: Manage access incidents that require more than a simple override.
+- step: 17
+  screen: BO-224
+  action: Returns to the board's landing screen
+  operations:
+  - listLiveAccess
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-233
+  action: Works in Operations Audit, Shift Handover & Control Summary
+  operations:
+  - listShiftHandoverSummary
+  outcome: Provide full accountability for everything operators and supervisors changed during live access
+    operations.
+branches:
+- at: 1
+  condition: Nothing has been set up on Live Access Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Access Control board 9 visited
+primaryContract: access
+contracts:
+- access

@@ -7,24 +7,24 @@
  "audience": "staff",
  "formFactor": "posTerminal",
  "offlineCapable": true,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 24,
-  "operations": 118,
-  "contracts": 18,
+  "screens": 30,
+  "operations": 139,
+  "contracts": 19,
   "modules": 4,
   "undrawn": 0,
-  "operationsWithNoScreen": 170
+  "operationsWithNoScreen": 172
  },
  "waves": {
-  "wave1": 21,
+  "wave1": 27,
   "wave2": 3
  },
  "modules": [
   {
    "module": "Sell",
-   "screens": 19,
+   "screens": 24,
    "waves": [
     1,
     2
@@ -32,7 +32,7 @@
   },
   {
    "module": "Shift",
-   "screens": 3,
+   "screens": 4,
    "waves": [
     1,
     2
@@ -56,7 +56,11 @@
  "contracts": [
   {
    "contract": "orders",
-   "operations": 23
+   "operations": 24
+  },
+  {
+   "contract": "fnb",
+   "operations": 20
   },
   {
    "contract": "shift",
@@ -67,20 +71,20 @@
    "operations": 13
   },
   {
-   "contract": "fnb",
-   "operations": 11
-  },
-  {
    "contract": "retail",
    "operations": 10
   },
   {
    "contract": "tenancy",
-   "operations": 7
+   "operations": 9
   },
   {
    "contract": "reporting",
    "operations": 7
+  },
+  {
+   "contract": "identity",
+   "operations": 6
   },
   {
    "contract": "seating",
@@ -91,32 +95,28 @@
    "operations": 5
   },
   {
-   "contract": "approvals",
-   "operations": 3
-  },
-  {
    "contract": "marketing-crm",
-   "operations": 3
+   "operations": 4
   },
   {
-   "contract": "workforce",
-   "operations": 2
+   "contract": "queue",
+   "operations": 3
   },
   {
    "contract": "access",
-   "operations": 2
+   "operations": 3
+  },
+  {
+   "contract": "approvals",
+   "operations": 3
   },
   {
    "contract": "games",
    "operations": 2
   },
   {
-   "contract": "identity",
+   "contract": "workforce",
    "operations": 2
-  },
-  {
-   "contract": "finance",
-   "operations": 1
   },
   {
    "contract": "assets",
@@ -125,9 +125,22 @@
   {
    "contract": "inventory",
    "operations": 1
+  },
+  {
+   "contract": "finance",
+   "operations": 1
   }
  ],
  "screens": [
+  {
+   "id": "POS-000",
+   "name": "Sign In",
+   "module": "Shift",
+   "wave": 1,
+   "route": "/sign-in",
+   "operations": 5,
+   "drawn": true
+  },
   {
    "id": "POS-001",
    "name": "Begin Shift",
@@ -269,7 +282,7 @@
    "module": "Sell",
    "wave": 1,
    "route": "/sell/till-configuration",
-   "operations": 2,
+   "operations": 5,
    "drawn": true
   },
   {
@@ -343,16 +356,55 @@
    "route": "/sell/outlet-setup",
    "operations": 5,
    "drawn": true
+  },
+  {
+   "id": "POS-025",
+   "name": "Till Home",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/home",
+   "operations": 5,
+   "drawn": true
+  },
+  {
+   "id": "POS-026",
+   "name": "Receipt & Reprint",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/sell/receipt",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "POS-027",
+   "name": "Guest Lookup",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/sell/guests",
+   "operations": 2,
+   "drawn": true
+  },
+  {
+   "id": "POS-028",
+   "name": "Table Service",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/sell/tables",
+   "operations": 8,
+   "drawn": true
+  },
+  {
+   "id": "POS-029",
+   "name": "Order Queue",
+   "module": "Sell",
+   "wave": 1,
+   "route": "/sell/queue",
+   "operations": 4,
+   "drawn": true
   }
  ],
  "gaps": {
   "operationsWithNoScreen": [
-   {
-    "operation": "issueAccreditationBadge",
-    "contract": "approvals",
-    "verb": "POST",
-    "summary": "Issue a badge"
-   },
    {
     "operation": "assessProductChange",
     "contract": "catalogue",
@@ -412,6 +464,18 @@
     "contract": "catalogue",
     "verb": "POST",
     "summary": "Lift a suspension"
+   },
+   {
+    "operation": "releaseChannelAllocation",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Return unsold channel allocation to the general pool"
+   },
+   {
+    "operation": "releaseInventoryHold",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Return unsold units"
    },
    {
     "operation": "restoreProductVersion",
@@ -514,12 +578,6 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Give an item its choices"
-   },
-   {
-    "operation": "clearTable",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Mark a table cleared and free"
    },
    {
     "operation": "closeCorrectiveAction",
@@ -762,18 +820,6 @@
     "summary": "List guests currently matching a segment"
    },
    {
-    "operation": "matchGuest",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Is this the same person we already have?"
-   },
-   {
-    "operation": "mergeGuests",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Two records, one person"
-   },
-   {
     "operation": "recordLostItem",
     "contract": "marketing-crm",
     "verb": "POST",
@@ -924,10 +970,10 @@
     "summary": "What an upgrade costs, pro-rata"
    },
    {
-    "operation": "reissueEntitlement",
+    "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
-    "summary": "Zero-value reissue of an expired entitlement for a later date"
+    "summary": "Give a hold back"
    },
    {
     "operation": "resendPaymentLink",
@@ -1036,6 +1082,18 @@
     "contract": "promotions",
     "verb": "POST",
     "summary": "Cancel a voucher"
+   },
+   {
+    "operation": "overrideWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit against a failed redemption"
+   },
+   {
+    "operation": "redeemWaitingGuest",
+    "contract": "queue",
+    "verb": "POST",
+    "summary": "Admit a party at the ride"
    },
    {
     "operation": "cancelReportExecution",
@@ -1318,6 +1376,18 @@
     "contract": "seating",
     "verb": "POST",
     "summary": "Validate and publish a seat map"
+   },
+   {
+    "operation": "releaseSeatBlock",
+    "contract": "seating",
+    "verb": "DELETE",
+    "summary": "Release a block back to sale"
+   },
+   {
+    "operation": "releaseSeatHold",
+    "contract": "seating",
+    "verb": "DELETE",
+    "summary": "Release a hold"
    },
    {
     "operation": "setMapZones",

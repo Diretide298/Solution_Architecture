@@ -7,7 +7,7 @@
  "audience": "staff",
  "formFactor": "kiosk",
  "offlineCapable": true,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
   "screens": 10,
@@ -15,7 +15,7 @@
   "contracts": 3,
   "modules": 1,
   "undrawn": 0,
-  "operationsWithNoScreen": 31
+  "operationsWithNoScreen": 30
  },
  "waves": {
   "wave2": 10
@@ -142,12 +142,6 @@
     "contract": "fnb",
     "verb": "PUT",
     "summary": "Give an item its choices"
-   },
-   {
-    "operation": "clearTable",
-    "contract": "fnb",
-    "verb": "POST",
-    "summary": "Mark a table cleared and free"
    },
    {
     "operation": "closeCorrectiveAction",

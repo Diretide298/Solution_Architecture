@@ -19,7 +19,7 @@ schemas:
   tables: 34
   stores:
   - postgres
-  largestTable: fnb.kitchen_ticket
+  largestTable: fnb.table_reservation
 operationsByContract:
 - contract: fnb
   count: 99
@@ -1087,6 +1087,7 @@ writesOutside:
   operations: 2
   why: '**The owner defines the row; this service may only append to it.**'
 screens:
+- P01:WEB-031 My Reservations
 - P01:WEB-036 F&B – Browse & Order
 - P01:WEB-037 Menu Item Detail
 - P01:WEB-038 F&B – Order Tracking
@@ -1104,6 +1105,8 @@ screens:
 - P04:POS-021 Sell — Food & Drink
 - P04:POS-022 Send to Kitchen
 - P04:POS-024 Outlet Setup
+- P04:POS-028 Table Service
+- P04:POS-029 Order Queue
 - P05:KSK-016 Order Food
 - P06:EMP-030 Venue map
 - P06:EMP-051 Restaurant Service Command Center

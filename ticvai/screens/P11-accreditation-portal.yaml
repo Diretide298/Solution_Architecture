@@ -43,544 +43,1065 @@ platform:
     **Declared 24 August.** The file was written from the first generation and nothing pointed at it:
     `check-wireframes` has no unmatched-board concept, so the Python suite passed while the viewer flagged
     an orphan. **A board nobody references is a board nobody reviews.**'
+  targetApp:
+    app: ticvai-control
+    name: TICVAI Control
+    shell: web
+    siblings:
+    - P09
+    - P10
+    - P14
+    note: '**TICVAI operates all four**, whoever signs in. The partner portal, the accreditation intake
+      and the developer portal are outward faces of the control plane, not separate products — but their
+      users are not TICVAI staff, and the permission model has to hold that line.'
+    decided: 10 September 2026
 screens:
 - id: ACC-001
   name: Landing / Programme Overview
   module: Applicant Journey
   wave: 3
+  requiresModule: accreditation
+  pattern: publicPortalLanding
+  density: compact
+  purpose: 'Explain what accreditation at this venue is, what an application needs, and how long it takes
+    — then offer the two ways in. **The explanation is the screen**, not a preamble to it.
+
+    '
+  apis: []
+  apisNote: '**Zero operations is correct here and is not a gap.** The programme text is content, not
+    data, and a landing page that fetches before it can say what it is has made an applicant wait to read
+    a paragraph. Confirmed against the drawn frame, which reaches the same conclusion.
+
+    '
   layout:
     template: detail
     regions:
     - name: contentBody
+      slot: introduction
       components:
       - kind: detailPanel
+        label: What accreditation is, and is not
+        notes: 'Programme, guidelines, and **what accreditation is not** — the section that prevents most
+          refused applications, because the common failure is applying for the wrong thing.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-001
+      - kind: detailPanel
+        label: What you will need
+        notes: 'Press card number if held, the performances they intend to cover, and a commission letter.
+          **Listed before the form opens**, because an applicant who discovers on step three that they
+          need a document from an editor abandons the application.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-001
+      - kind: detailPanel
+        label: How long it takes
+        notes: 'Time to apply, time to a decision, and the cut-off before the performance. **Three numbers,
+          stated** — CF and MoM both record that the absence of a stated turnaround is what generates
+          the phone calls this screen exists to prevent.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-001
+    - name: actionBar
+      slot: entryActions
+      components:
+      - kind: primaryButton
+        label: Start an application
+        notes: Goes to ACC-002.
+      - kind: secondaryButton
+        label: Track an existing one
+        notes: '**Resume is not optional.** An application abandoned partway is the common case, and `ACC-004`
+          takes a reference rather than a login.
+
+          '
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
+    loading: The programme text, from the CMS bundle. Nothing is fetched per applicant.
+    error: '**Content failed and the two actions still work.** An applicant who knows what they came to
+      do should not be blocked by a paragraph that did not load.
 
+      '
+    emptyNoResults: 'No programme is open. Says when the next one opens rather than showing an empty page
+      — *"accreditation for the winter season opens 4 November"* is an answer; a blank screen is not.
 
-      The screen this app sits on. Everything else is entered from here and returns to it.'
-    error: Could not load
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-001
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+      '
+    emptyFirstRun: No programme is open yet. Says when the next one opens rather than showing an empty
+      page — a date is an answer, a blank screen is not.
+  navigation:
+    isEntryPoint: true
+    exitTo:
+    - ACC-002
+    - ACC-004
+    notes: '**Corrected 9 September.** The previous `exitTo` also listed `ACC-003`, which is the review
+      step inside the application and cannot be reached from a landing page. Inferred navigation had made
+      every P11 screen a child of this one.
+
+      '
+    transitions:
+    - to: ACC-002
+      trigger: Registration Form
+      provenance: structural — ACC-001 is P11's home screen and its exits are its launcher
+    - to: ACC-004
+      trigger: Application Status Tracking
+      provenance: structural — ACC-001 is P11's home screen and its exits are its launcher
   implementation:
     app: accreditation-web
     route: /applicant-journey/landing-programme-overview
     component: apps/accreditation-web/src/routes/applicant-journey/LandingProgrammeOverviewDetail.tsx
     status: notStarted
-  navigation:
-    isEntryPoint: true
-    inferred: true
-    exitTo:
-    - ACC-002
-    - ACC-003
-    - ACC-004
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
-  purpose: The screen this app sits on. Everything else is entered from here and returns to it.
-  density: compact
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-001
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.
 - id: ACC-002
   name: Registration Form
   module: Applicant Journey
   wave: 3
+  requiresModule: accreditation
+  pattern: multiStepForm
+  density: compact
+  purpose: 'Collect who the applicant works for, what they intend to cover, and the documents that support
+    it — in steps, with a draft that survives leaving.
+
+    '
+  apis: []
+  gaps:
+  - operation: createAccreditationApplication
+    why: '**The registration form cannot register.** The screen declared `listApprovalRequests`, which
+      is a reviewer''s read, and nothing that creates an application. Removed 9 September rather than
+      left in place: an operation that is on a screen because it was nearby is the residue pattern this
+      package has now found five times.
+
+      '
+    source: 7 September workshop — accreditation form builder, categories and programme setup
+  - operation: saveAccreditationDraft
+    why: 'The pattern requires a draft that autosaves. **A four-step form that loses everything to a dropped
+      connection is a form people do not come back to**, and the drawn frame offers *"Save and finish
+      later"* against nothing.
+
+      '
+    source: frame claude-design/Accreditation Board.dc.html#acc-002
   layout:
-    template: form
+    template: wizard
     regions:
     - name: contentBody
+      slot: progress
       components:
-      - kind: detailPanel
-      - kind: dataTable
-        derived: true
-        impliedBy: listApprovalRequests
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+      - kind: progressIndicator
+        label: Step 1 of 4 — Organisation
+        notes: Organisation · Coverage · Documents · Check and submit.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-002
+    - name: contentBody
+      slot: fields
+      components:
+      - kind: textField
+        label: Organisation
+        notes: Who you work for. Free text — an outlet that is not on a list is still an outlet.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-002
+      - kind: selectField
+        label: Role
+        notes: Photographer, writer, broadcast, technical. **Drives what coverage may be requested.**
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-002
+      - kind: textField
+        label: Press card number
+        notes: Optional, and marked so. Its absence is a reviewer's signal, not a blocker.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-002
+      - kind: textField
+        label: Commissioning editor
+        notes: Who commissioned the coverage, where there is one.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-002
+      - kind: fileUpload
+        label: Supporting documents
+        notes: Commission letter and badge photo. Accepted formats stated before the picker opens.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-002
+      - kind: consentBlock
+        label: Consent
+        notes: '**Stated once, unticked, and collected before documents rather than after.** The 2 September
+          session recorded consent language as a live question for face data; the same principle applies
+          to a press photograph. An accepted-by-default consent is not consent.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-002
+    - name: actionBar
+      slot: submit
+      components:
+      - kind: primaryButton
+        label: Continue
+      - kind: secondaryButton
+        label: Save and finish later
+  overlays:
+  - id: saveAndExit
+    component: confirmDialog
+    trigger: Save and finish later
+    body: '**Says what is kept and how to get back.** *"Your draft is saved. Return with reference ACC-4417"*
+      — a dialog that says only *"saved"* leaves the applicant with nothing to return with.
+
+      '
+    provenance: authored, from pattern multiStepForm
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
+    loading: The draft, where one exists.
+    emptyFirstRun: A new application. Step one, nothing prefilled except what the account knows.
+    error: '**The draft is safe and the step is not lost.** Errors on a long form must never clear entered
+      fields.
 
+      '
+    denied: The programme is closed. Says when it reopens.
+  entryState:
+    params:
+    - name: applicationRef
+      from: deepLink
+      optional: true
+    preloaded:
+    - programmeName
+    coldEntry: '**Reached from the landing page, or resumed from a link in an acknowledgement email weeks
+      later.** A reference that no longer resolves says the programme closed and offers the current one,
+      rather than showing an empty form.
 
-      Find registration form for this venue.'
-    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `APPROVAL_VIEW` to read approvals; a person without it sees the reason and who to ask, because
-      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
-
-
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
-      terminal is the way through.
-
-
-      **Also reached when `accreditation` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
-      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
-      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
-      when the list is empty, and this screen gained the list before it gained the sentence.'
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-002
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+      '
+  navigation:
+    entryFrom:
+    - ACC-001
+    exitTo:
+    - ACC-001
+    - ACC-003
+    - ACC-007
+    transitions:
+    - to: ACC-007
+      trigger: A reviewer checks and approves
+      provenance: flow F23 step 1→2
+    - to: ACC-003
+      trigger: Application Review & Submit
+      carries:
+      - applicationRef
+      provenance: derived — ACC-003 declares entryState.params applicationRef, so an edge into it must
+        carry them
   implementation:
     app: accreditation-web
     route: /applicant-journey/registration-form
     component: apps/accreditation-web/src/routes/applicant-journey/RegistrationForm.tsx
     status: notStarted
-  navigation:
-    entryFrom:
-    - ACC-001
-    inferred: true
-    exitTo:
-    - ACC-001
-    - ACC-003
-    - ACC-004
-    - ACC-007
-    fromFlows: true
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
-  purpose: Find registration form for this venue.
-  apis:
-  - operationId: listApprovalRequests
-    contract: approvals
-    purpose: Requests awaiting a decision, or already decided
-    trigger: onLoad
-  density: compact
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-002
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.
 - id: ACC-003
   name: Application Review & Submit
   module: Applicant Journey
   wave: 3
+  requiresModule: accreditation
+  pattern: multiStepForm
+  density: compact
+  purpose: 'Show everything the applicant entered, let them change any of it, say what happens next, and
+    submit.
+
+    '
+  apis: []
+  gaps:
+  - operation: submitAccreditationApplication
+    why: '**The submit button has nothing behind it.** The screen declared no operation at all, and submit
+      is the one act it exists for.
+
+      '
+    source: frame claude-design/Accreditation Board.dc.html#acc-003
   layout:
     template: wizard
     regions:
     - name: contentBody
+      slot: progress
+      components:
+      - kind: progressIndicator
+        label: Step 4 of 4 — Check and submit
+    - name: contentBody
+      slot: review
       components:
       - kind: detailPanel
+        label: Organisation
+        notes: '**Every answer, each with its own Change link back to the step that owns it.** *Change*,
+          not *Back* — an applicant on step four wants to fix one field, not walk backwards through three.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-003
+      - kind: detailPanel
+        label: Coverage requested
+        notes: 'Named performances and named areas — *"stalls, pit"*. **Coverage is specific, and that
+          is the point**: a badge that says *press* and nothing else is a badge a steward cannot act on,
+          which is the same decision `ACC-005` renders.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-003
+      - kind: detailPanel
+        label: Documents
+        notes: Each file with its accepted-or-not state, so a rejected upload is visible before submit.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-003
+      - kind: detailPanel
+        label: What happens next
+        notes: 'An acknowledgement immediately, a decision within a stated number of working days. **Set
+          before submit, not after** — this is where the expectation is formed.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-003
+    - name: actionBar
+      slot: submit
+      components:
+      - kind: primaryButton
+        label: Submit application
+  overlays:
+  - id: submitConfirm
+    component: confirmDialog
+    trigger: Submit application
+    body: 'Names what is being submitted and that it cannot be edited afterwards, only withdrawn.
+
+      '
+    provenance: authored, from pattern multiStepForm
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
+    loading: The completed draft.
+    error: '**Submission failed and nothing was lost.** The application stays a draft and the button stays
+      available.
 
+      '
+    denied: The programme closed while the application was open. Says so plainly.
+    emptyNoResults: 'No draft to review. Sends the applicant to `ACC-002` rather than showing an empty
+      summary.
 
-      Application Review & Submit — the screen a person opens when they need to deal with application
-      review & submit.'
-    error: Could not load
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-003
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+      '
+    emptyFirstRun: No draft to review. Sends the applicant to ACC-002 rather than showing an empty summary.
+  entryState:
+    params:
+    - name: applicationRef
+      from: ACC-002
+    preloaded:
+    - everything entered on ACC-002
+    coldEntry: '**Cannot be reached cold and should not be.** Opened directly, it loads the draft behind
+      the reference or says the reference is unknown.
+
+      '
+  navigation:
+    entryFrom:
+    - ACC-002
+    exitTo:
+    - ACC-002
+    - ACC-004
+    transitions:
+    - to: ACC-002
+      trigger: Registration Form
+      carries:
+      - applicationRef
+      provenance: derived — ACC-002 declares entryState.params applicationRef, so an edge into it must
+        carry them
+    - to: ACC-004
+      trigger: Application Status Tracking
+      carries:
+      - applicationRef
+      provenance: derived — ACC-004 declares entryState.params applicationRef, so an edge into it must
+        carry them
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-review-and-submit
     component: apps/accreditation-web/src/routes/applicant-journey/ApplicationReviewAndSubmitWizard.tsx
     status: notStarted
-  navigation:
-    entryFrom:
-    - ACC-001
-    inferred: true
-    exitTo:
-    - ACC-001
-    - ACC-002
-    - ACC-004
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
-  purpose: Application Review & Submit — the screen a person opens when they need to deal with application
-    review & submit.
-  density: compact
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-003
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.
 - id: ACC-004
   name: Application Status Tracking
   module: Applicant Journey
   wave: 3
+  requiresModule: accreditation
+  pattern: statusTracker
+  density: compact
+  purpose: 'Tell an applicant where their application is and when they will hear — **with a date, not
+    a queue position.**
+
+    '
+  apis: []
+  gaps:
+  - operation: getAccreditationApplicationByReference
+    why: '**A status screen with no status read.** The screen declared no operation. It also cannot use
+      the reviewer''s `listApprovalRequests`: an applicant is not authenticated as a principal with approval
+      permissions, and **the reference is the credential** — which is a deliberate design decision and
+      needs an operation shaped for it.
+
+      '
+    source: frame claude-design/Accreditation Board.dc.html#acc-004
+  - operation: withdrawAccreditationApplication
+    why: The screen offers *Withdraw this application* and nothing performs it.
+    source: frame claude-design/Accreditation Board.dc.html#acc-004
+  - operation: addAccreditationDocument
+    why: The screen offers *Add a document* — the common reviewer request — and nothing performs it.
+    source: frame claude-design/Accreditation Board.dc.html#acc-004
   layout:
     template: detail
     regions:
     - name: contentBody
+      slot: state
+      components:
+      - kind: banner
+        label: With a reviewer
+        bindsTo: ApprovalRequest.status
+        notes: 'Where it is now, and **the date a decision is due** — `ApprovalRequest.slaDueAt`. *"Fourth
+          in the queue"* was considered and rejected on the frame: a position moves backwards and a date
+          does not.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-004
+      - kind: timeline
+        label: Where it has been
+        bindsTo: ApprovalRequest.decisions
+        notes: Received, documents checked, decision — each with its date.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-004
+    - name: contentBody
+      slot: record
       components:
       - kind: detailPanel
+        label: Application
+        bindsTo: ApprovalRequest.summary
+        notes: The reference, the performances, and what was requested.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-004
+    - name: actionBar
+      slot: actions
+      components:
+      - kind: secondaryButton
+        label: Add a document
+      - kind: destructiveButton
+        label: Withdraw this application
+  overlays:
+  - id: confirmWithdraw
+    component: confirmDialog
+    trigger: Withdraw this application
+    body: '**States that withdrawal is final and the programme may close before a new application can
+      be made.** A withdrawal that can be made by accident is one the venue hears about by telephone.
+
+      '
+    provenance: authored, from pattern statusTracker
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
+    loading: The application behind the reference.
+    emptyNoResults: '**The reference is not recognised.** Says so without hinting whether it once existed
+      — a status endpoint that distinguishes *never existed* from *withdrawn* is an enumeration oracle.
 
+      '
+    error: Could not load. The reference is unaffected and can be retried.
+    denied: The reference has expired. Applications are readable for a stated period after the season.
+    emptyFirstRun: No application behind this reference yet — a reference issued but not submitted. Points
+      back at the draft.
+  entryState:
+    params:
+    - name: applicationRef
+      from: deepLink
+    preloaded: []
+    coldEntry: '**This screen is always reached cold** — from an acknowledgement email, usually weeks
+      later and often on a different device. That is the design, and it is why the reference is the only
+      thing it takes.
 
-      Find application status tracking for this venue.'
-    error: Could not load
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-004
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+      '
+  navigation:
+    entryFrom:
+    - ACC-001
+    - ACC-003
+    exitTo:
+    - ACC-001
+    - ACC-005
+    transitions:
+    - to: ACC-005
+      trigger: Accreditation Badge
+      carries:
+      - applicationRef
+      provenance: derived — ACC-005 declares entryState.params applicationRef, so an edge into it must
+        carry them
   implementation:
     app: accreditation-web
     route: /applicant-journey/application-status-tracking
     component: apps/accreditation-web/src/routes/applicant-journey/ApplicationStatusTrackingDetail.tsx
     status: notStarted
-  navigation:
-    entryFrom:
-    - ACC-001
-    exitTo:
-    - ACC-001
-    - ACC-002
-    - ACC-003
-    inferred: true
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
-  purpose: Find application status tracking for this venue.
-  density: compact
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-004
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.
 - id: ACC-005
   name: Accreditation Badge
   module: Applicant Journey
   wave: 3
+  requiresModule: accreditation
+  pattern: credentialView
+  density: touchLarge
+  densityReason: '**Held up at a stage door, at night, by somebody carrying equipment.** The same handheld
+    that scans a ticket scans this, and the failure mode is a steward asking the holder to brighten their
+    screen.
+
+    '
+  purpose: 'Present the issued badge so it can be scanned, and say exactly where it is valid.
+
+    '
+  apis:
+  - operationId: listAccreditationBadges
+    contract: approvals
+    purpose: The badges issued against this application
+    trigger: onLoad
+  - operationId: issueAccreditationBadge
+    contract: approvals
+    purpose: Issue the badge
+    trigger: onAction
+  gaps:
+  - operation: getAccreditationBadge
+    why: 'The screen shows one badge and the only read is a list. **A holder opening their own badge should
+      not fetch every badge issued** — and `listAccreditationBadges` carries a reviewer''s permission,
+      which an applicant does not have.
+
+      '
+    source: contract approvals.yaml — listAccreditationBadges is the only badge read
   layout:
-    template: detail
+    template: fullscreen
     regions:
     - name: contentBody
+      slot: credential
+      components:
+      - kind: credentialDisplay
+        label: Your badge
+        bindsTo: AccreditationBadge
+        notes: 'The scannable credential, rendered large and bright. **Offline is required** — a stage
+          door is the worst signal in the building, and the 2 September decision that a dynamic-QR ticket
+          is redirected into the app exists for exactly this reason.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-005
+    - name: contentBody
+      slot: identity
       components:
       - kind: detailPanel
-      - kind: dataTable
-        derived: true
-        impliedBy: listApprovalRequests
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
+        label: Holder
+        bindsTo: AccreditationBadge.holderName
+        notes: Name, role and outlet, as printed. Photographer · The Northern Review.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-005
+      - kind: detailPanel
+        label: Where it works
+        bindsTo: AccreditationBadge.zones
+        notes: '**Stage door, stalls and pit, named performances — and *any other door, refused*.** The
+          negative case is stated on the badge because the steward reads this, not a policy.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-005
+    - name: contentBody
+      slot: validity
+      components:
+      - kind: banner
+        label: Valid until
+        bindsTo: AccreditationBadge.expiresAt
+        notes: '**`expired` and `revoked` must be unmistakable and must not resemble `loading`.** `AccreditationBadge.state`
+          carries both, and `revokedReason` says why.
+
+          '
+        provenance: contract approvals.yaml AccreditationBadge.state
+    - name: actionBar
+      slot: actions
+      components:
+      - kind: secondaryButton
+        label: Add to phone
+      - kind: secondaryButton
+        label: Print
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
+    loading: The badge.
+    emptyNoResults: No badge yet — the application has not been approved. Points at `ACC-004`.
+    error: Could not refresh. **The cached badge still displays and says when it was last checked.**
+    offline: '**Serves the cached badge and says so.** A badge that will not render without a network
+      is a badge that fails at the door it was issued for.
 
+      '
+    emptyFirstRun: No badge issued yet. The application has not been approved; points at ACC-004.
+  entryState:
+    params:
+    - name: applicationRef
+      from: ACC-004
+      optional: true
+    preloaded:
+    - holderName
+    coldEntry: 'Opened from a bookmark or a wallet pass. Loads the badge behind the reference, or explains
+      that badges are issued only after approval.
 
-      Find accreditation badge for this venue.'
-    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `APPROVAL_VIEW` to read approvals; a person without it sees the reason and who to ask, because
-      an empty table reads as *there is no data* and sends somebody to support with the wrong question.
-
-
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
-      terminal is the way through.
-
-
-      **Also reached when `accreditation` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
-      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
-      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
-      when the list is empty, and this screen gained the list before it gained the sentence.'
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-005
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+      '
+  navigation:
+    entryFrom:
+    - ACC-004
+    - ACC-007
+    exitTo:
+    - ACC-004
+    transitions:
+    - to: ACC-004
+      trigger: Application Status Tracking
+      carries:
+      - applicationRef
+      provenance: derived — ACC-004 declares entryState.params applicationRef, so an edge into it must
+        carry them
+    - to: SCN-003
+      trigger: A steward scans it at a service gate
+      provenance: flow F23 step 3→4
+      operation: issueAccreditationBadge
+      crossesDevice: true
+      back: false
   implementation:
     app: accreditation-web
     route: /applicant-journey/accreditation-badge
     component: apps/accreditation-web/src/routes/applicant-journey/AccreditationBadgeDetail.tsx
     status: notStarted
-  navigation:
-    entryFrom:
-    - ACC-001
-    exitTo:
-    - ACC-001
-    - ACC-002
-    - ACC-003
-    inferred: true
-    fromFlows: true
-  notes: 'States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement. **Cross-platform navigation
-    removed 24 August**: SCN-003. **A till does not navigate to a back office and a guest app does not
-    navigate to either** — those are device handovers, and a flow declares them with `crossesDevice` rather
-    than a screen pretending there is a link.'
-  purpose: Find accreditation badge for this venue.
-  apis:
-  - operationId: listApprovalRequests
-    contract: approvals
-    purpose: Requests awaiting a decision, or already decided
-    trigger: onLoad
-  - operationId: listAccreditationBadges
-    contract: approvals
-    purpose: Badges issued and their state
-    trigger: onLoad
-  density: compact
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-005
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.
 - id: ACC-006
   name: Reviewer Queue
   module: Reviewer (Internal)
   wave: 3
+  requiresModule: accreditation
+  pattern: approvalInbox
+  density: compact
+  purpose: 'Work the queue of applications waiting on a decision, oldest-due first, and approve the straightforward
+    ones without opening them.
+
+    '
+  apis:
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: Accreditation applications awaiting a decision
+    trigger: onLoad
+  gaps:
+  - operation: getWaitTimes
+    removed: true
+    why: '**Removed 9 September.** The screen declared `getWaitTimes`, which is the guest app''s ride-queue
+      read. A reviewer queue and a virtual queue share a word and nothing else — the fourth instance of
+      a name collision in this package after `release`, `generatedPack` and `provenance`.
+
+      '
+    source: frame claude-design/Accreditation Board.dc.html#acc-006
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
+      slot: filters
+      components:
+      - kind: searchField
+        label: Applicant or outlet
+        notes: Searches holder name and organisation. **Not "find a record".**
+      - kind: selectField
+        label: Performance
+        notes: All performances, or one. A reviewer usually works one night at a time.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-006
+    - name: contentBody
+      slot: queue
+      components:
+      - kind: dataTable
+        label: Queue
+        bindsTo: ApprovalRequest[]
+        columns:
+        - ApprovalRequest.summary
+        - ApprovalRequest.requestedAt
+        - ApprovalRequest.slaDueAt
+        - ApprovalRequest.status
+        notes: '**Due first, and how long it has waited.** `slaDueAt` is the sort, not `requestedAt` —
+          an application for tonight outranks one submitted earlier for next month. Rows carry the signals
+          a reviewer decides on: *no press card, no commission*, *commission letter attached*, *accredited
+          last season*.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-006
+    - name: contextPanel
+      slot: item
       components:
       - kind: detailPanel
+        label: Selected application
+        bindsTo: ApprovalRequest
+        notes: Enough to approve without opening `ACC-007`.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-006
+    - name: actionBar
+      slot: decision
+      components:
+      - kind: primaryButton
+        label: Approve
+        permission: APPROVAL_DECIDE
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
+    loading: The queue.
+    emptyFirstRun: '**An empty queue is success, not a broken screen.** Nothing is waiting — says so as
+      reassurance, and says when the next applications are expected.
 
-
-      Find the right one quickly, and act on it without opening it.'
-    error: Could not load
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-006
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+      '
+    emptyNoResults: Nothing matches this filter. The queue itself is not empty.
+    emptyNoAccess: You do not review for this programme.
+    error: Could not load the queue. **No decision is lost** — nothing was in flight.
+  entryState:
+    params:
+    - name: programmeId
+      from: session
+    preloaded: []
+    coldEntry: Opens on the reviewer's own programmes, due-first.
+  navigation:
+    entryFrom:
+    - ACC-001
+    exitTo:
+    - ACC-007
+    - ACC-008
+    transitions:
+    - to: ACC-007
+      trigger: Reviewer Application Detail
+      carries:
+      - requestId
+      provenance: derived — ACC-007 declares entryState.params requestId, so an edge into it must carry
+        them
+    - to: ACC-008
+      trigger: Credential Register
+      carries:
+      - programmeId
+      provenance: derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry
+        them
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-queue
     component: apps/accreditation-web/src/routes/reviewer-internal/ReviewerQueueList.tsx
     status: notStarted
-  navigation:
-    entryFrom:
-    - ACC-001
-    exitTo:
-    - ACC-001
-    - ACC-007
-    - ACC-008
-    inferred: true
-  apis:
-  - operationId: getWaitTimes
-    contract: queue
-    purpose: Wait times across a venue
-    trigger: onLoad
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
-  purpose: Find the right one quickly, and act on it without opening it.
-  density: compact
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-006
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.
 - id: ACC-007
   name: Reviewer Application Detail
   module: Reviewer (Internal)
   wave: 3
+  requiresModule: accreditation
+  pattern: approvalInbox
+  density: compact
+  purpose: 'Everything the decision needs about one application, in one place, so the reviewer does not
+    open another screen to decide.
+
+    '
+  apis:
+  - operationId: listApprovalRequests
+    contract: approvals
+    purpose: The application under review
+    trigger: onLoad
+  - operationId: decideApprovalRequest
+    contract: approvals
+    purpose: Approve or refuse, with a reason
+    trigger: onAction
+    invalidates:
+    - listApprovalRequests
+    - listAccreditationBadges
+  gaps:
+  - operation: getApprovalRequest
+    why: 'The screen shows one application and the only read is a list. **A detail screen that fetches
+      a collection to find one row is a detail screen that gets slower as the queue grows.**
+
+      '
+    source: contract approvals.yaml
   layout:
-    template: detail
+    template: split
     regions:
     - name: contentBody
+      slot: item
       components:
       - kind: detailPanel
+        label: The application
+        bindsTo: ApprovalRequest
+        notes: 'Role, outlet, press card, commission — **including the ones that are absent**, stated
+          as *Not stated* and *None attached* rather than left blank. A blank field and a declared absence
+          look identical and only one is information.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-007
+      - kind: detailPanel
+        label: History with this venue
+        notes: '**Accredited before, and conditions breached.** This is the field the decision usually
+          turns on and the one a reviewer would otherwise go looking for.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-007
+      - kind: banner
+        label: Decision due
+        bindsTo: ApprovalRequest.slaDueAt
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-007
+    - name: actionBar
+      slot: decision
+      components:
       - kind: primaryButton
-        derived: true
-        impliedBy: decideApprovalRequest
-        notes: The act the screen exists for.
-      - kind: dataTable
-        derived: true
-        impliedBy: listApprovalRequests
-        notes: '**Cursor pagination, never offset** — offset drifts under concurrent writes, which on
-          a venue''s busiest hour is a list that skips rows.'
-      - kind: secondaryButton
-        label: Cancel
-        notes: '**A screen that can submit must be leaveable without submitting.**'
-        derived: true
-        impliedBy: decideApprovalRequest
+        label: Approve
+        permission: APPROVAL_DECIDE
+      - kind: destructiveButton
+        label: Refuse
+        permission: APPROVAL_DECIDE
+  overlays:
+  - id: refuse
+    component: confirmDialog
+    trigger: Refuse
+    body: '**Captures the reason, and says the applicant will read it.** `ApprovalDecision.reason` is
+      part of the record; a refusal with no reason produces an appeal by telephone.
+
+      '
+    bindsTo: ApprovalDecision.reason
+    provenance: authored, from pattern approvalInbox
+  - id: approveWithConditions
+    component: drawer
+    trigger: Approve
+    body: 'Coverage granted may be narrower than coverage requested — *stalls, not pit*. **The badge renders
+      what is granted**, so the two screens must agree.
+
+      '
+    provenance: frame claude-design/Accreditation Board.dc.html#acc-005
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
+    loading: The application.
+    error: '**A failed decision is not a made decision.** Says the decision was not recorded and leaves
+      the buttons live.
 
+      '
+    emptyNoAccess: You do not review for this programme.
+    emptyNoResults: This application was decided by somebody else while it was open. Shows the decision.
+    emptyFirstRun: Nothing selected. The queue is where a reviewer starts.
+  entryState:
+    params:
+    - name: requestId
+      from: ACC-006
+    preloaded:
+    - summary
+    - requestedAt
+    - slaDueAt
+    coldEntry: 'Reached from the queue, or from a link in a reviewer''s email. Opened cold it loads the
+      application, or says it has already been decided and by whom.
 
-      Everything known about one reviewer application, and what can be done to it.'
-    emptyNoAccess: '**Says which permission is missing, and never renders as an empty list.** This screen
-      needs `APPROVAL_DECIDE`, `APPROVAL_VIEW` to use approvals; a person without it sees the reason and
-      who to ask, because an empty table reads as *there is no data* and sends somebody to support with
-      the wrong question.
-
-
-      **Authority is carried by the person, not the device** (ADR-0002) — so signing in again on the same
-      terminal is the way through.
-
-
-      **Also reached when `accreditation` is not licensed.** The tenant has not bought this module, which
-      is a commercial answer and not a permission one — say which, because the person to ask is different.'
-    error: Could not load
-    emptyNoResults: 'Nothing matches the current filters. **The filters are named and clearable from here**
-      — an empty list with the filter state hidden elsewhere is a person who thinks the data is gone.
-      **Added 25 August with the derived list component**: a screen that lists has to say what it shows
-      when the list is empty, and this screen gained the list before it gained the sentence.'
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-007
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+      '
+  navigation:
+    entryFrom:
+    - ACC-002
+    - ACC-006
+    exitTo:
+    - ACC-005
+    - ACC-006
+    - ACC-008
+    transitions:
+    - to: ACC-005
+      trigger: The badge is issued
+      provenance: flow F23 step 2→3
+    - to: ACC-006
+      trigger: Reviewer Queue
+      carries:
+      - programmeId
+      provenance: derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry
+        them
+    - to: ACC-008
+      trigger: Credential Register
+      carries:
+      - programmeId
+      provenance: derived — ACC-008 declares entryState.params programmeId, so an edge into it must carry
+        them
   implementation:
     app: accreditation-web
     route: /reviewer-internal/reviewer-application-detail
     component: apps/accreditation-web/src/routes/reviewer-internal/ReviewerApplicationDetail.tsx
     status: notStarted
-  navigation:
-    entryFrom:
-    - ACC-001
-    inferred: true
-    exitTo:
-    - ACC-001
-    - ACC-005
-    - ACC-006
-    - ACC-008
-    fromFlows: true
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
-  purpose: Everything known about one reviewer application, and what can be done to it.
-  apis:
-  - operationId: decideApprovalRequest
-    contract: approvals
-    purpose: Approve or reject
-    trigger: onAction
-  - operationId: listApprovalRequests
-    contract: approvals
-    purpose: Requests awaiting a decision, or already decided
-    trigger: onLoad
-  density: compact
-  entryState:
-    params:
-    - name: requestId
-      from: deepLink
-    coldEntry: '**A guest arriving cold on a link that no longer resolves is shown what happened and one
-      way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened
-      three weeks late all land here, and the person holding the link did nothing wrong. **The screen
-      names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.**
-      Arrives with `requestId`.'
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-007
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.
 - id: ACC-008
   name: Credential Register
   module: Reviewer (Internal)
   wave: 3
+  requiresModule: accreditation
+  pattern: listDetail
+  density: compact
+  purpose: 'Every credential issued this season, who holds it, where it is valid, and whether it has been
+    used — and revoke one when it has to be revoked.
+
+    '
+  purposeNote: '**Rewritten 9 September.** The purpose read *"Get a guest into the app, fast, on a device
+    that may be shared"*, which is a login screen''s purpose on a credential register. Found independently
+    by Claude Design on the drawn frame and by this pass.
+
+    '
+  apis:
+  - operationId: listAccreditationBadges
+    contract: approvals
+    purpose: Credentials issued for this programme
+    trigger: onLoad
+  gaps:
+  - operation: revokeAccreditationBadge
+    why: 'The register offers **Revoke** and nothing performs it. `AccreditationBadge.state` and `revokedReason`
+      exist to record the outcome, so the schema is ready and the operation is not.
+
+      '
+    source: contract approvals.yaml AccreditationBadge.revokedReason
+  - field: AccreditationBadge.lastUsedAt
+    why: 'The register shows a **last used** column and the schema has no such field. *Not yet* is the
+      value that matters — a credential issued and never presented is the one to ask about.
+
+      '
+    source: frame claude-design/Accreditation Board.dc.html#acc-008
   layout:
-    template: list
+    template: split
     regions:
     - name: contentBody
+      slot: filters
+      components:
+      - kind: searchField
+        label: Holder or reference
+      - kind: selectField
+        label: Season
+        notes: Defaults to the current season. **A register scoped to all time is a register nobody reads.**
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-008
+    - name: contentBody
+      slot: collection
+      components:
+      - kind: dataTable
+        label: Credential register
+        bindsTo: AccreditationBadge[]
+        columns:
+        - AccreditationBadge.holderName
+        - AccreditationBadge.zones
+        - AccreditationBadge.issuedAt
+        - AccreditationBadge.state
+        notes: 'Holder, valid for, issued, last used. **Revoked rows stay visible and read as revoked**
+          — removing them from the register is how a revoked badge gets re-issued by mistake.
+
+          '
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-008
+    - name: contextPanel
+      slot: selection
       components:
       - kind: detailPanel
+        label: Credential
+        bindsTo: AccreditationBadge
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-008
+    - name: actionBar
+      slot: rowActions
+      components:
+      - kind: destructiveButton
+        label: Revoke
+        permission: APPROVAL_DECIDE
+      - kind: secondaryButton
+        label: Export
+        notes: The register is what a venue hands to a security team before a performance.
+        provenance: frame claude-design/Accreditation Board.dc.html#acc-008
+  overlays:
+  - id: confirmRevoke
+    component: confirmDialog
+    trigger: Revoke
+    body: '**Names the holder and what stops working, and captures the reason.** A revocation takes somebody''s
+      access to a building they may already be standing outside.
+
+      '
+    bindsTo: AccreditationBadge.revokedReason
+    provenance: authored, from pattern listDetail
   states:
-    loading: Content loads
-    emptyFirstRun: '**A venue that opened this morning.** Nothing here yet, and nothing on this screen
-      creates the first one — it is filled by another screen or by a job, and this state names which rather
-      than leaving somebody looking for a button that does not exist.
-
-
-      Get a guest into the app, fast, on a device that may be shared.'
-    error: Could not load
-  wireframe:
-    status: notStarted
-    provenance: generated
-    board: wireframes/P11 Accreditation Web.dc.html#acc-008
-  openQuestions:
-  - 'Unblocked by the 7 September workshop
-    (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue), which this question said did not
-    exist. Decided there - identity documents are OCR''d to auto-populate the form, and the extracted
-    data is stored as structured fields rather than only the image, because expiry tracking and renewal
-    prompts cannot read a scan; uniqueness is enforced on passport and Emirates ID and a duplicate
-    submission is blocked; the web portal is primary with the mobile app a secondary route for
-    individual applicants. And one decision removes screens rather than adding them - accreditation-
-    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate
-    system. Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the
-    design corpus and no operation has been drafted from them yet.'
+    loading: The register.
+    emptyFirstRun: No credentials issued yet this season. Points at the queue.
+    emptyNoResults: Nothing matches. The register is not empty.
+    emptyNoAccess: You do not administer credentials for this programme.
+    error: Could not load. **No credential is affected** by a failed read.
+  entryState:
+    params:
+    - name: programmeId
+      from: session
+    preloaded: []
+    coldEntry: Opens on the current season.
+  navigation:
+    entryFrom:
+    - ACC-006
+    - ACC-007
+    exitTo:
+    - ACC-006
+    - ACC-007
+    transitions:
+    - to: ACC-006
+      trigger: Reviewer Queue
+      carries:
+      - programmeId
+      provenance: derived — ACC-006 declares entryState.params programmeId, so an edge into it must carry
+        them
+    - to: ACC-007
+      trigger: Reviewer Application Detail
+      carries:
+      - requestId
+      provenance: derived — ACC-007 declares entryState.params requestId, so an edge into it must carry
+        them
   implementation:
     app: accreditation-web
     route: /reviewer-internal/credential-register
     component: apps/accreditation-web/src/routes/reviewer-internal/CredentialRegisterList.tsx
     status: notStarted
-  navigation:
-    entryFrom:
-    - ACC-001
-    exitTo:
-    - ACC-001
-    - ACC-006
-    - ACC-007
-    inferred: true
-  notes: States derived from the screen pattern on 17 August, not individually considered. Purpose derived
-    from the screen name and its operations on 17 August, not from a requirement.
-  purpose: Get a guest into the app, fast, on a device that may be shared.
-  density: compact
-  requiresModule: accreditation
-  statesDerived: true
+  wireframe:
+    status: notStarted
+    provenance: generated
+    board: wireframes/P11 Accreditation Web.dc.html#acc-008
+  resolvedQuestions:
+  - Unblocked by the 7 September workshop (TICVAI_MoM_2026-09-07_Accreditation_Entitlements_VirtualQueue),
+    which this question said did not exist. Decided there - identity documents are OCR'd to auto-populate
+    the form, and the extracted data is stored as structured fields rather than only the image, because
+    expiry tracking and renewal prompts cannot read a scan; uniqueness is enforced on passport and Emirates
+    ID and a duplicate submission is blocked; the web portal is primary with the mobile app a secondary
+    route for individual applicants. And one decision removes screens rather than adding them - accreditation-
+    holder monitoring is to be a filtered view inside general entitlement monitoring, not a separate system.
+    Capability and API mapping can now be done; 74 pages of ACCREDITATION.pdf are also in the design corpus
+    and no operation has been drafted from them yet.

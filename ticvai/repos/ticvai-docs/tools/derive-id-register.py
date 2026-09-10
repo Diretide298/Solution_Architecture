@@ -52,8 +52,14 @@ def collect() -> dict:
         doc = yaml.safe_load(f.read_text(encoding="utf-8"))
         for s in doc["screens"]:
             pre, num = s["id"].rsplit("-", 1)
-            origin = "pack" if (s.get("source") or {}).get("pack") else "authored"
-            reg.setdefault(pre, {})[int(num)] = origin
+            # **`drawnBy`, not `origin`.** This axis and `wireframe.provenance` are both about
+            # where a screen came from, and until 8 September they used the same word for
+            # opposite things: `generatedPack` here meant *the client drew it in a design pack*,
+            # while `provenance: generated` means *a tool wrote it and nobody drew anything*.
+            # One vocabulary, two senses, is the `release` collision again — renamed rather than
+            # explained, for the same reason.
+            drawn_by = "clientPack" if (s.get("source") or {}).get("pack") else "authored"
+            reg.setdefault(pre, {})[int(num)] = drawn_by
     return reg
 
 
@@ -62,14 +68,14 @@ def build(reg: dict) -> dict:
            "updated": str(datetime.date.today()), "prefixes": {}}
     for pre in sorted(reg):
         nums = reg[pre]
-        packn = sorted(n for n, o in nums.items() if o == "pack")
+        packn = sorted(n for n, o in nums.items() if o == "clientPack")
         auth = sorted(n for n, o in nums.items() if o == "authored")
         out["prefixes"][pre] = {
             "issued": len(nums),
             "highWaterMark": max(nums),
             "nextFree": max(nums) + 1,
             "authored": ("%d-%d" % (min(auth), max(auth))) if auth else None,
-            "generatedPack": ("%d-%d" % (min(packn), max(packn))) if packn else None,
+            "fromClientPack": ("%d-%d" % (min(packn), max(packn))) if packn else None,
         }
     return out
 
@@ -89,7 +95,7 @@ def main() -> int:
     print("%d ids across %d prefixes" % (total, len(reg)))
     for pre, v in out["prefixes"].items():
         print("  %-4s issued %-4d next free %-4d  authored %-9s pack %s"
-              % (pre, v["issued"], v["nextFree"], v["authored"], v["generatedPack"]))
+              % (pre, v["issued"], v["nextFree"], v["authored"], v["fromClientPack"]))
 
     if not a.apply:
         print("\n  nothing written - pass --apply")

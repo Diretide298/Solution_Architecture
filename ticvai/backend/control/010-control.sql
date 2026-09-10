@@ -1,4 +1,4 @@
--- control — 50 tables
+-- control — 51 tables
 -- **Derived. Do not hand-edit.**
 
 -- The one credential model (CF-135a). 2.7.52, 7.1.25 and 7.1.30 each asserted their own. Bound to
@@ -57,8 +57,11 @@ CREATE TABLE IF NOT EXISTS control.api_version (
     id                                uuid PRIMARY KEY NOT NULL
 );
 
--- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is
+-- One archival run against one table in one cell, with what it moved and what it destroyed counted
+-- separately. rows_archived and rows_purged are two numbers because they are two different
+-- consequences — copying rows out is reversible and deleting them is not, and a single
+-- rows_processed would hide which of the two happened. error holds the failure text, because an
+-- archival job that fails silently is
 CREATE TABLE IF NOT EXISTS control.archival_job (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid,
@@ -71,8 +74,10 @@ CREATE TABLE IF NOT EXISTS control.archival_job (
     error                             text
 );
 
--- Holds 9 columns. No description has been written for this table — the name is the only thing
--- saying what it is
+-- One backup, and whether anyone has proved it restores. restore_tested_at is the column that
+-- matters: a backup nobody has restored from is a belief, not a backup, and it is null far more
+-- often than state being completed suggests. scope names what was taken — a cell, a tenant
+-- database — because ADR-0038 makes those different sizes of loss
 CREATE TABLE IF NOT EXISTS control.backup_run (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid,
@@ -155,6 +160,18 @@ CREATE TABLE IF NOT EXISTS control.cell_cluster (
     provisioned_at                    timestamptz
 );
 
+-- Holds 7 columns. No description has been written for this table — the name is the only thing
+-- saying what it is. Reached by: 1 tables reference it
+CREATE TABLE IF NOT EXISTS control.cell_instance (
+    id                                uuid PRIMARY KEY NOT NULL,
+    cell_id                           uuid NOT NULL,
+    name                              text NOT NULL,
+    status                            text NOT NULL,
+    max_connections                   integer,
+    created_at                        timestamptz,
+    retired_at                        timestamptz
+);
+
 -- Work running against a cell — provisioning, migration, decommission
 CREATE TABLE IF NOT EXISTS control.cell_job (
     id                                uuid PRIMARY KEY NOT NULL,
@@ -178,6 +195,8 @@ CREATE TABLE IF NOT EXISTS control.cell_tenant (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid NOT NULL,
     tenant_id                         uuid NOT NULL,
+    instance_id                       uuid NOT NULL,
+    pinned_instance                   boolean,
     database_name                     text NOT NULL,
     status                            text NOT NULL,
     provisioned_at                    timestamptz,
@@ -566,8 +585,11 @@ CREATE TABLE IF NOT EXISTS control.sandbox (
     last_reset_at                     timestamptz
 );
 
--- Holds 8 columns. No description has been written for this table — the name is the only thing
--- saying what it is
+-- The bounds a service scales within inside one cell, not the scaling itself. replica_floor and
+-- replica_ceiling are the decision; target_utilisation_pct and scale_step_pct are how fast it
+-- moves between them. A ceiling is a cost limit and a floor is an availability one, and a cell
+-- that hits its ceiling under load is a capacity decision someone has to take rather than a fault
+-- to page on
 CREATE TABLE IF NOT EXISTS control.scaling_policy (
     id                                uuid PRIMARY KEY NOT NULL,
     cell_id                           uuid,

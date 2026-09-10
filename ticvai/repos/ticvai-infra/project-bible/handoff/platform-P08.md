@@ -4,17 +4,17 @@
 
 | | |
 |---|---|
-| Screens | 363 |
+| Screens | 393 |
 | Operations | 666 |
 | Contracts | 27 |
 | Modules | 8 |
 | Undrawn | 0 |
-| Operations with no screen | 228 |
-| Waves | wave1 60 · wave2 79 · wave3 224 |
+| Operations with no screen | 229 |
+| Waves | wave1 60 · wave2 79 · wave3 254 |
 
 ## Gaps
 
-### 228 operations with no screen here
+### 229 operations with no screen here
 
 **In a contract this platform uses, callable by its audience, and reaching no screen on any platform serving that audience.** Either a screen is missing or the endpoint should not exist — and the second is worth considering first.
 
@@ -30,7 +30,6 @@
 | `removeIndexEntry` | ai | DELETE | Remove one record from the index |
 | `setIndexSource` | ai | PUT | Declare a source indexed |
 | `setSuggestionProvider` | ai | PUT |  |
-| `issueAccreditationBadge` | approvals | POST | Issue a badge |
 | `assessProductChange` | catalogue | POST | What a change would touch, before making it |
 | `bulkChangePrices` | catalogue | POST | Reprice a category or a whole catalogue |
 | `cloneProduct` | catalogue | POST | Copy a product as a new draft |
@@ -41,6 +40,8 @@
 | `listWaitlistEntries` | catalogue | GET | Who is waiting for capacity |
 | `offerWaitlistCapacity` | catalogue | POST | Tell a waiting guest that capacity appeared |
 | `reinstateEntitlement` | catalogue | POST | Lift a suspension |
+| `releaseChannelAllocation` | catalogue | POST | Return unsold channel allocation to the general pool |
+| `releaseInventoryHold` | catalogue | DELETE | Return unsold units |
 | `restoreProductVersion` | catalogue | POST | Put a previous version back |
 | `suspendEntitlement` | catalogue | POST | Suspend or reinstate an entitlement |
 | `updateDonationCampaign` | catalogue | PATCH | Amend or close a campaign |
@@ -58,9 +59,8 @@
 | `setFxProvider` | finance | PUT | Which provider serves which purpose |
 | `validateRecognitionSchedules` | finance | POST | Find product kinds claimed by more than one schedule |
 | `attachModifierGroup` | fnb | PUT | Give an item its choices |
-| `clearTable` | fnb | POST | Mark a table cleared and free |
 | `closeCorrectiveAction` | fnb | POST | Close a signed finding |
-| … | | | 188 more |
+| … | | | 189 more |
 
 ### 8 modules split across waves
 
@@ -73,7 +73,7 @@
 - **People & Access Rights** — waves 1, 2, 3
 - **Sell** — waves 1, 2, 3
 - **Stock & Supply** — waves 1, 2
-- **Venue Operations** — waves 1, 2
+- **Venue Operations** — waves 1, 2, 3
 
 ## Modules
 
@@ -82,7 +82,7 @@
 | Access & Venue | 175 | 1, 2, 3 |
 | Sell | 75 | 1, 2, 3 |
 | Orders & Money | 59 | 1, 2, 3 |
-| Venue Operations | 15 | 1, 2 |
+| Venue Operations | 45 | 1, 2, 3 |
 | Stock & Supply | 15 | 1, 2 |
 | People & Access Rights | 12 | 1, 2, 3 |
 | Food & Beverage | 8 | 1, 2 |
@@ -138,7 +138,7 @@
 | `BO-044` | F&B Outlets | Venue Operations | 2 | 15 | yes |
 | `BO-045` | Menu Management | Food & Beverage | 1 | 10 | yes |
 | `BO-046` | Kitchen Display | Food & Beverage | 1 | 5 | yes |
-| `BO-047` | F&B Order Management | Orders & Money | 2 | 14 | yes |
+| `BO-047` | Order Corrections & Exceptions | Orders & Money | 2 | 14 | yes |
 | `BO-048` | Retail Products | Orders & Money | 2 | 4 | yes |
 | `BO-049` | Stock Levels | Stock & Supply | 2 | 6 | yes |
 | `BO-050` | Stock Position & Valuation | Stock & Supply | 2 | 2 | yes |
@@ -455,4 +455,34 @@
 | `BO-361` | Credential Usage & Cross-Media Traceability | Access & Venue | 3 | 1 | yes |
 | `BO-362` | Credential Security, Audit & Operational Evidence | Access & Venue | 3 | 1 | yes |
 | `BO-363` | Ticket Media Analytics & AI Operations Intelligence | Access & Venue | 3 | 1 | yes |
+| `BO-364` | Approval Command Center Dashboard | Venue Operations | 3 | 0 | yes |
+| `BO-365` | My Approval Inbox | Venue Operations | 3 | 0 | yes |
+| `BO-366` | Team / Shared Approval Queue | Venue Operations | 3 | 0 | yes |
+| `BO-367` | Approval Request Detail | Venue Operations | 3 | 0 | yes |
+| `BO-368` | AI Decision Support | Venue Operations | 3 | 0 | yes |
+| `BO-369` | High Priority & Risk Queue | Venue Operations | 3 | 0 | yes |
+| `BO-370` | Escalated Approval Center | Venue Operations | 3 | 0 | yes |
+| `BO-371` | Completed Approval History | Venue Operations | 3 | 0 | yes |
+| `BO-372` | Approval SLA & Workload Monitor | Venue Operations | 3 | 0 | yes |
+| `BO-373` | Approval Activity & Notification Center | Venue Operations | 3 | 0 | yes |
+| `BO-374` | Approval Decision Workspace | Venue Operations | 3 | 0 | yes |
+| `BO-375` | Business Context & Evidence Viewer | Venue Operations | 3 | 0 | yes |
+| `BO-376` | Approval Timeline & Decision Chain | Venue Operations | 3 | 0 | yes |
+| `BO-377` | Approve & Sensitive Action Confirmation | Venue Operations | 3 | 0 | yes |
+| `BO-378` | Reject / Return / Request Information | Venue Operations | 3 | 0 | yes |
+| `BO-379` | Requester Modification & Resubmission | Venue Operations | 3 | 0 | yes |
+| `BO-380` | Withdrawal, Cancellation, Expiration & Reopening | Venue Operations | 3 | 0 | yes |
+| `BO-381` | Segregation of Duties & Four-Eyes Control | Venue Operations | 3 | 0 | yes |
+| `BO-382` | Approved Action Execution & Status | Venue Operations | 3 | 0 | yes |
+| `BO-383` | Decision Record & Immutable Audit View | Venue Operations | 3 | 0 | yes |
+| `BO-384` | Delegation & Escalation Command Center | Venue Operations | 3 | 0 | yes |
+| `BO-385` | Delegation Management | Venue Operations | 3 | 0 | yes |
+| `BO-386` | Temporary Delegation & Availability Calendar | Venue Operations | 3 | 0 | yes |
+| `BO-387` | Out-of-Office & Substitute Routing | Venue Operations | 3 | 0 | yes |
+| `BO-388` | Approval SLA Policy Configuration | Venue Operations | 3 | 0 | yes |
+| `BO-389` | Reminder & Breach Notification Rules | Venue Operations | 3 | 0 | yes |
+| `BO-390` | Escalation Policy Builder | Venue Operations | 3 | 0 | yes |
+| `BO-391` | Live Escalation Operations Center | Venue Operations | 3 | 0 | yes |
+| `BO-392` | SLA & Escalation Performance Analytics | Venue Operations | 3 | 0 | yes |
+| `BO-393` | AI SLA & Escalation Advisor | Venue Operations | 3 | 0 | yes |
 

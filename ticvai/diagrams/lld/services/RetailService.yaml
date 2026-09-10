@@ -18,7 +18,7 @@ schemas:
   tables: 15
   stores:
   - postgres
-  largestTable: retail.shop_and_drop
+  largestTable: retail.merchandise
 operationsByContract:
 - contract: retail
   count: 37
@@ -460,6 +460,7 @@ screens:
 - P04:POS-011 Returns, Refunds & Exchanges
 - P04:POS-012 Omnichannel Order & Fulfilment Center
 - P04:POS-023 Sell — Merchandise
+- P04:POS-026 Receipt & Reprint
 - P05:KSK-011 Collect a booking
 - P05:KSK-017 Shop
 - P06:EMP-068 Reservation, Allocation & Omnichannel Inventory

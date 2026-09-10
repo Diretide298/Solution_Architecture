@@ -1,0 +1,155 @@
+id: F139
+name: 'Membership   Annual Pass Management board 2: Member Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P08 Venue Management
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Membership   Annual Pass Management board 2. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: BO-294
+  entryPoints:
+  - Arrives at Member Operations Command Center
+steps:
+- step: 1
+  screen: BO-294
+  action: Opens Member Operations Command Center
+  operations:
+  - listMember
+  outcome: Provide membership teams with a real-time operational dashboard for the complete active member
+    population.
+- step: 2
+  screen: BO-295
+  action: Works in Member 360° Membership Account Workspace
+  operations:
+  - setMemberMembershipAccount
+  outcome: Provide a complete operational view of an individual member and their membership contract.
+    This should be the primary screen an authorized membership-service agent opens when helping a member.
+- step: 3
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: BO-296
+  action: Works in Membership Activation, Assignment & Credential Management
+  operations:
+  - listMembershipActivationCredential
+  outcome: Manage the operational process that turns a purchased membership product into an active membership
+    assigned to a specific individual.
+- step: 5
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: BO-297
+  action: Works in Visit, Admission & Entitlement Usage Monitor
+  operations:
+  - listVisitAdmissionEntitlement
+  outcome: Provide membership teams with complete visibility of how a member uses admission and other
+    membership entitlements.
+- step: 7
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: BO-298
+  action: Works in Membership Freeze, Suspension & Reactivation Management
+  operations:
+  - listMembershipFreezeSuspension
+  outcome: Manage temporary interruption of membership rights without necessarily terminating the membership
+    contract.
+- step: 9
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: BO-299
+  action: Works in Membership Upgrade, Downgrade & Product Migration Operations
+  operations:
+  - listMembershipUpgradeDowngrade
+  outcome: Manage operational movement of an active member between membership products or tiers.
+- step: 11
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: BO-300
+  action: Works in Renewal Operations & Auto-Renewal Management
+  operations:
+  - listRenewalAuto
+  outcome: Operationally manage memberships approaching expiry and execute the renewal policies configured
+    in Board 1.
+- step: 13
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: BO-301
+  action: Works in Member Exceptions, Overrides & Service Recovery
+  operations:
+  - listMemberExceptionOverride
+  outcome: Provide controlled handling of member-specific situations that fall outside normal membership
+    policy.
+- step: 15
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: BO-302
+  action: Works in Member Lifecycle History, Audit & Case Timeline
+  operations:
+  - listMemberLifecycleCase
+  outcome: Maintain a complete historical record of everything that has happened to the membership from
+    purchase to final expiry.
+- step: 17
+  screen: BO-294
+  action: Returns to the board's landing screen
+  operations:
+  - listMember
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: BO-303
+  action: Works in Membership Analytics, Renewal Intelligence & AI Retention Center
+  operations:
+  - listMembershipRenewalRetention
+  outcome: Turn membership operational data into actionable intelligence for retention, renewal, product
+    optimization and member engagement.
+branches:
+- at: 1
+  condition: Nothing has been set up on Member Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Membership   Annual Pass Management board 2 visited
+primaryContract: subscription
+contracts:
+- subscription

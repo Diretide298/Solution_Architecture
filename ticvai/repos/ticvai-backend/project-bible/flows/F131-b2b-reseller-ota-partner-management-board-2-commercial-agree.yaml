@@ -1,0 +1,158 @@
+id: F131
+name: 'B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
+actor: partner
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P10 Partner Web
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as B2B, Reseller & OTA Partner Management board 2. **This route
+    is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: PTR-032
+  entryPoints:
+  - Arrives at Commercial Agreement Command Center
+steps:
+- step: 1
+  screen: PTR-032
+  action: Opens Commercial Agreement Command Center
+  operations:
+  - listCommercialAgreement
+  outcome: Provide commercial and finance teams with a centralized view of all partner agreements and
+    their current commercial health.
+- step: 2
+  screen: PTR-033
+  action: Works in Agreement & Contract Terms Builder
+  operations:
+  - setAgreementContractTerm
+  outcome: Create the structured commercial agreement governing the partner relationship.
+- step: 3
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: PTR-034
+  action: Works in Partner Rate & Net Pricing Configuration
+  operations:
+  - setPartnerRateNet
+  outcome: Define the commercial pricing basis available to a partner without recreating TICVAI's Pricing
+    Engine.
+- step: 5
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: PTR-035
+  action: Works in Commission, Margin & Incentive Management
+  operations:
+  - listCommissionMarginIncentive
+  outcome: Configure how partner commissions and commercial incentives are calculated.
+- step: 7
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: PTR-036
+  action: Works in Credit Limit & Exposure Management
+  operations:
+  - listCreditLimitExposure
+  outcome: Control the financial exposure TICVAI permits for partners buying on account. This should be
+    one of the strongest finance-control screens in the B2B module.
+- step: 9
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: PTR-037
+  action: Works in Deposit, Guarantee & Financial Security Management
+  operations:
+  - listDepositGuaranteeFinancial
+  outcome: Manage financial security required to support partner credit or commercial access.
+- step: 11
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: PTR-038
+  action: Works in Payment Terms, Billing & Account Configuration
+  operations:
+  - setPaymentTermBilling
+  outcome: Define how the partner pays TICVAI and how transactions are financially grouped.
+- step: 13
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: PTR-039
+  action: Works in Commercial Allocation, Quota & Commitment Management
+  operations:
+  - listCommercialAllocationQuota
+  outcome: Define the commercial commitment of inventory to a partner. This differs from Area 4's operational
+    channel allocation.
+- step: 15
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: PTR-040
+  action: Works in Booking Limits, Commercial Exceptions & Approval
+  operations:
+  - approveBookingLimitCommercial
+  outcome: Control transaction limits and provide a governed mechanism for commercial exceptions.
+- step: 17
+  screen: PTR-032
+  action: Returns to the board's landing screen
+  operations:
+  - listCommercialAgreement
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: PTR-041
+  action: Works in Commercial Agreement 360°, Health & AI Review
+  operations:
+  - listCommercialAgreementHealth
+  outcome: 'Give management a single consolidated view of the complete commercial relationship with a
+    partner. Board 3 manages the day-to-day operational and financial relationship with active B2B, reseller
+    and OTA partners. The three boards now form a clean lifecycle: Board 1 — Who is the partner? Onboarding
+    → Organization → Users → Territory → Compliance → Permissions → Activation Board 2 — Under what commercial
+    terms can they transact? Agreement → Rates → Commission → Credit → Security → Billing → Allocation
+    → Limits Board 3 — What happens once the partner starts doing business? Orders → Reservations → Cancellations
+    → Statements → Reconciliation → Commission Settlement → Disputes → Performance → Risk → AI Optimization
+    A key principle for Board 3 is that it should provide a Partner Operations 360° without rebuilding
+    functionality already owned by Orders, Finance, Ticketing, Payment or Channel Management.'
+branches:
+- at: 1
+  condition: Nothing has been set up on Commercial Agreement Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on B2B, Reseller & OTA Partner Management board 2 visited
+primaryContract: subscription
+contracts:
+- subscription

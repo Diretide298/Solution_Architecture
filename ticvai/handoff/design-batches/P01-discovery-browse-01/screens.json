@@ -1,0 +1,860 @@
+[
+ {
+  "id": "WEB-001",
+  "name": "Home / Landing",
+  "module": "Discovery & Browse",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C79",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/discovery-and-browse/home-landing",
+   "component": "apps/guest-web/src/routes/discovery-and-browse/HomeLandingDashboard.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "isEntryPoint": true,
+   "exitTo": [
+    "WEB-002",
+    "WEB-003",
+    "WEB-004",
+    "WEB-016",
+    "WEB-036",
+    "WEB-037",
+    "WEB-038",
+    "WEB-039",
+    "WEB-040",
+    "WEB-041",
+    "WEB-042",
+    "WEB-043",
+    "WEB-044",
+    "WEB-045",
+    "WEB-046"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-004",
+     "trigger": "Opens a product and decides",
+     "provenance": "flow F01 step 1→2"
+    },
+    {
+     "to": "WEB-002",
+     "trigger": "Event & Attraction Listing",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-003",
+     "trigger": "Search Results",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-016",
+     "trigger": "Login / Register",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-036",
+     "trigger": "F&B – Browse & Order",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-037",
+     "trigger": "Menu Item Detail",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-038",
+     "trigger": "F&B – Order Tracking",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-039",
+     "trigger": "Venue Map & Wait Times",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-040",
+     "trigger": "Virtual Queue",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-041",
+     "trigger": "Parking – Reserve & Pay",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-042",
+     "trigger": "Retail & Shop and Drop",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-043",
+     "trigger": "Loyalty & Rewards",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-044",
+     "trigger": "AI Concierge – Home",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-045",
+     "trigger": "Help Centre & Accessibility",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    },
+    {
+     "to": "WEB-046",
+     "trigger": "In-Venue Notifications",
+     "provenance": "structural — WEB-001 is P01's home screen and its exits are its launcher"
+    }
+   ]
+  },
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getTenantAppStatus` reads one of them — list, select, act",
+  "purpose": "Show a guest what is on and give them one obvious way to start booking.",
+  "gaps": [
+   {
+    "operation": "getTenantConfig",
+    "why": "**1 declared operation reach no component on this screen**: getTenantConfig. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every home landing",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected home landing",
+       "bindsTo": "TenantAppStatus",
+       "columns": [
+        "TenantAppStatus.isPublished",
+        "TenantAppStatus.publishedVersion",
+        "TenantAppStatus.publishedAt",
+        "TenantAppStatus.draftVersion",
+        "TenantAppStatus.hasUnpublishedChanges",
+        "TenantAppStatus.activeModuleCount",
+        "TenantAppStatus.licensedModuleCount",
+        "TenantAppStatus.activePageCount",
+        "TenantAppStatus.isInMaintenance",
+        "TenantAppStatus.maintenanceMessage",
+        "TenantAppStatus.expectedBackAt",
+        "TenantAppStatus.recentChanges"
+       ],
+       "operation": "getTenantAppStatus",
+       "provenance": "contract white-label.yaml GET /tenant-config/status"
+      }
+     ]
+    },
+    {
+     "name": "header",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "iconButton",
+       "label": "Search",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "secondaryButton",
+       "label": "Sign in",
+       "notes": "Becomes an account menu once authenticated",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "banner",
+       "bindsTo": "TenantAppStatus.maintenanceMessage",
+       "notes": "Only when isInMaintenance. Tenant-branded, never a generic error page",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "HomepageLayout.sections",
+       "notes": "Section order comes from tenant configuration (WLB-011), not from code. A section referencing a disabled module must not render at all",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The home landing list.",
+   "error": "Could not load. Names which read failed and leaves the home landing untouched.",
+   "emptyFirstRun": "No home landing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the home landing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getTenantAppStatus",
+    "purpose": "Maintenance check before rendering anything",
+    "trigger": "onLoad",
+    "contract": "white-label"
+   },
+   {
+    "operationId": "getTenantConfig",
+    "contract": "white-label",
+    "purpose": "Full working configuration",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "TenantAppStatus.isPublished",
+    "TenantAppStatus.publishedVersion",
+    "TenantAppStatus.publishedAt",
+    "TenantAppStatus.draftVersion",
+    "TenantAppStatus.hasUnpublishedChanges"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-001"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 3 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-002",
+  "name": "Event & Attraction Listing",
+  "module": "Discovery & Browse",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C79",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/discovery-and-browse/event-and-attraction-listing",
+   "component": "apps/guest-web/src/routes/discovery-and-browse/EventAndAttractionListingList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001",
+    "WEB-003"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-003",
+    "WEB-004"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-004",
+     "trigger": "Attraction Details",
+     "carries": [
+      "eventId",
+      "productId"
+     ],
+     "provenance": "derived — WEB-004 declares entryState.params eventId, productId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Cross-surface parity, 31 August**: added getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listProducts` reads the population and `getWaitTimes` reads one of them — list, select, act",
+  "purpose": "Browse and filter everything bookable.",
+  "gaps": [
+   {
+    "operation": "listPerformances",
+    "why": "**2 declared operations reach no component on this screen**: listPerformances, searchCatalogue. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every event attraction listing",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo"
+       ],
+       "operation": "listProducts",
+       "provenance": "contract catalogue.yaml GET /products"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected event attraction listing",
+       "bindsTo": "WaitTime",
+       "columns": [
+        "WaitTime.queueId",
+        "WaitTime.queueName",
+        "WaitTime.attractionProductId",
+        "WaitTime.status",
+        "WaitTime.waitMinutes",
+        "WaitTime.source",
+        "WaitTime.isStale",
+        "WaitTime.heightRequirementCm",
+        "WaitTime.zone",
+        "WaitTime.asOf"
+       ],
+       "operation": "getWaitTimes",
+       "provenance": "contract queue.yaml GET /queues/wait-times"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "searchField",
+       "label": "Search events and attractions",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "multiSelect",
+       "label": "Category",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "datePicker",
+       "label": "Date",
+       "notes": "Format from region settings, not a locale guess",
+       "provenance": "carried from the previous definition"
+      },
+      {
+       "kind": "cardList",
+       "bindsTo": "Product[]",
+       "notes": "Cursor pagination. Infinite scroll with an explicit load-more fallback",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The event attraction listing list.",
+   "error": "Could not load. Names which read failed and leaves the event attraction listing untouched.",
+   "emptyFirstRun": "No event attraction listing yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the event attraction listing are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPerformances",
+    "contract": "catalogue",
+    "purpose": "List performances of an event",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "searchCatalogue",
+    "contract": "catalogue",
+    "purpose": "Find something by name",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "deepLink"
+    }
+   ],
+   "coldEntry": "**A guest arriving cold on a link that no longer resolves is shown what happened and one way onward — never a 404.** A shared ticket, a forwarded confirmation and a push notification opened three weeks late all land here, and the person holding the link did nothing wrong. **The screen names the thing, says it is expired, cancelled or withdrawn, and offers the list it came from.** Arrives with `eventId`.",
+   "preloaded": [
+    "WaitTime.queueId",
+    "WaitTime.queueName",
+    "WaitTime.attractionProductId",
+    "WaitTime.status",
+    "WaitTime.waitMinutes"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-002"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-003",
+  "name": "Search Results",
+  "module": "Discovery & Browse",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C79",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/discovery-and-browse/search-results",
+   "component": "apps/guest-web/src/routes/discovery-and-browse/SearchResultsList.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-002",
+    "WEB-004"
+   ],
+   "inferred": true,
+   "transitions": [
+    {
+     "to": "WEB-002",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — WEB-002 declares entryState.params eventId, so an edge into it must carry them"
+    },
+    {
+     "to": "WEB-004",
+     "trigger": "Attraction Details",
+     "carries": [
+      "eventId",
+      "productId"
+     ],
+     "provenance": "derived — WEB-004 declares entryState.params eventId, productId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "Purpose derived from the screen name and its operations on 17 August, not from a requirement.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`searchCatalogue` reads a population and nothing reads one of them; the detail is the row until a `get` exists",
+  "purpose": "Find something when the guest does not know what it is called.",
+  "gaps": [
+   {
+    "operation": "listProducts",
+    "why": "**1 declared operation reach no component on this screen**: listProducts. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every search results",
+       "bindsTo": "Money",
+       "columns": [
+        "Money.amount",
+        "Money.currency",
+        "Money.scale"
+       ],
+       "operation": "searchCatalogue",
+       "provenance": "contract catalogue.yaml GET /search"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected search results",
+       "bindsTo": "Money",
+       "columns": [
+        "Money.amount",
+        "Money.currency",
+        "Money.scale"
+       ],
+       "operation": "searchCatalogue",
+       "provenance": "contract catalogue.yaml GET /search"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The search results list.",
+   "error": "Could not load. Names which read failed and leaves the search results untouched.",
+   "emptyFirstRun": "No search results yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the search results are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "searchCatalogue",
+    "contract": "catalogue",
+    "purpose": "Find something by name",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listProducts",
+    "contract": "catalogue",
+    "purpose": "List products",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "preloaded": [
+    "Money.amount",
+    "Money.currency",
+    "Money.scale"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-003"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 2 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ },
+ {
+  "id": "WEB-004",
+  "name": "Attraction Details",
+  "module": "Discovery & Browse",
+  "requiresModule": "ticketing",
+  "wave": 1,
+  "capability": "C79",
+  "implementation": {
+   "app": "guest-web",
+   "route": "/discovery-and-browse/event-attraction-detail",
+   "component": "apps/guest-web/src/routes/discovery-and-browse/EventAttractionDetail.tsx",
+   "status": "notStarted"
+  },
+  "navigation": {
+   "entryFrom": [
+    "WEB-001",
+    "WEB-002",
+    "WEB-003"
+   ],
+   "exitTo": [
+    "WEB-001",
+    "WEB-002",
+    "WEB-003",
+    "WEB-005"
+   ],
+   "transitions": [
+    {
+     "to": "WEB-005",
+     "trigger": "Chooses ticket types and quantities",
+     "provenance": "flow F01 step 2→3"
+    },
+    {
+     "to": "WEB-002",
+     "trigger": "Event & Attraction Listing",
+     "carries": [
+      "eventId"
+     ],
+     "provenance": "derived — WEB-002 declares entryState.params eventId, so an edge into it must carry them"
+    }
+   ]
+  },
+  "notes": "**Renamed 31 August** from *Event / Attraction Detail*. **A guest surface is one product with two renderings** — a screen named differently on web and app is two screens to a developer and one journey to a guest. **Cross-surface parity, 31 August**: added getAvailability, getWaitTimes. **A guest does not know which surface they are on** — the same named screen on web and app now calls the same guest-callable operations.",
+  "density": "compact",
+  "pattern": "listDetail",
+  "patternReason": "`listPerformances` reads the population and `getProduct` reads one of them — list, select, act",
+  "purpose": "Decide whether to book this.",
+  "gaps": [
+   {
+    "operation": "getAvailability",
+    "why": "**2 declared operations reach no component on this screen**: getAvailability, getWaitTimes. Either the screen is missing what calls them, or the declaration is residue.",
+    "source": "the screen's own declarations"
+   }
+  ],
+  "layout": {
+   "template": "split",
+   "regions": [
+    {
+     "name": "contentBody",
+     "slot": "collection",
+     "components": [
+      {
+       "kind": "dataTable",
+       "label": "Every attraction",
+       "bindsTo": "Performance",
+       "columns": [
+        "Performance.id",
+        "Performance.eventId",
+        "Performance.startsAt",
+        "Performance.endsAt",
+        "Performance.approvalRequestId",
+        "Performance.requiresApprovalToCancel",
+        "Performance.status",
+        "Performance.admissionRulesId",
+        "Performance.seatMapId"
+       ],
+       "operation": "listPerformances",
+       "provenance": "contract catalogue.yaml GET /events/{eventId}/performances"
+      }
+     ]
+    },
+    {
+     "name": "contextPanel",
+     "slot": "selection",
+     "components": [
+      {
+       "kind": "detailPanel",
+       "label": "The selected attraction",
+       "bindsTo": "Product",
+       "columns": [
+        "Product.id",
+        "Product.code",
+        "Product.name",
+        "Product.description",
+        "Product.kind",
+        "Product.venueId",
+        "Product.scopePath",
+        "Product.createdByPrincipalId",
+        "Product.approvedByPrincipalId",
+        "Product.responsibleDepartmentId",
+        "Product.onSaleFrom",
+        "Product.onSaleTo",
+        "Product.lifecycleState",
+        "Product.isSellable",
+        "Product.hasVariants",
+        "Product.variantCount"
+       ],
+       "operation": "getProduct",
+       "provenance": "contract catalogue.yaml GET /products/{productId}"
+      }
+     ]
+    },
+    {
+     "name": "contentBody",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "banner",
+       "bindsTo": "Product.lifecycleState",
+       "notes": "Shown only when withdrawn — reachable via a stale link but no longer sellable. A silent 404 on a shared link is a bad guest experience",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    },
+    {
+     "name": "actionBar",
+     "slot": "carried",
+     "components": [
+      {
+       "kind": "primaryButton",
+       "label": "Select tickets",
+       "notes": "Disabled with a stated reason when not sellable",
+       "provenance": "carried from the previous definition"
+      }
+     ]
+    }
+   ]
+  },
+  "states": {
+   "loading": "The attraction list.",
+   "error": "Could not load. Names which read failed and leaves the attraction untouched.",
+   "emptyFirstRun": "No attraction yet. Carries the create action; distinct from a filter that matched nothing.",
+   "emptyNoResults": "The filter narrowed it and the attraction are still there. Names the active filter and offers to clear it.",
+   "emptyNoAccess": "Names the missing permission. **Never an empty table** — that reads as *there is no data* and sends somebody to support with the wrong question."
+  },
+  "apis": [
+   {
+    "operationId": "getProduct",
+    "contract": "catalogue",
+    "purpose": "Read a product",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "listPerformances",
+    "contract": "catalogue",
+    "purpose": "List performances of an event",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getAvailability",
+    "contract": "catalogue",
+    "purpose": "Live remaining capacity",
+    "trigger": "onLoad"
+   },
+   {
+    "operationId": "getWaitTimes",
+    "contract": "queue",
+    "purpose": "Wait times across a venue",
+    "trigger": "onLoad"
+   }
+  ],
+  "entryState": {
+   "params": [
+    {
+     "name": "eventId",
+     "from": "WEB-002"
+    },
+    {
+     "name": "productId",
+     "from": "WEB-001"
+    }
+   ],
+   "coldEntry": "Resolves from the session; a cold arrival is the ordinary case.",
+   "preloaded": [
+    "Product.id",
+    "Product.code",
+    "Product.name",
+    "Product.description",
+    "Product.kind"
+   ]
+  },
+  "wireframe": {
+   "status": "notStarted",
+   "provenance": "generated",
+   "board": "wireframes/P01 Guest Web.dc.html#web-004"
+  },
+  "apisNote": "Rebuilt 9 September 2026 from the 4 operations this screen declares, not from a workshop pack — it has none. Columns are every field the response schema declares, plumbing aside — narrowing them to the ones that matter is work a person still owes this screen.",
+  "_platform": {
+   "code": "P01",
+   "audience": "guest",
+   "formFactor": "web",
+   "shortName": "Guest Web",
+   "name": "Guest Web — Storefront",
+   "offlineCapable": false,
+   "app": "guest-web",
+   "operator": "guest",
+   "targetApp": {
+    "app": "guest",
+    "name": "TICVAI Guest",
+    "shell": "web",
+    "siblings": [
+     "P02",
+     "P05"
+    ],
+    "note": "**One guest product in three shells.** Web, mobile and kiosk share 73–91% of their operations; the kiosk is the same product in a fixed frame with no keyboard, and is deliberately narrower rather than different.",
+    "decided": "10 September 2026"
+   }
+  }
+ }
+]

@@ -1,0 +1,154 @@
+id: F151
+name: 'Privacy  Consent   Preference Management board 2: Privacy Operations Command Center'
+actor: venueManager
+wave: 3
+frequency: routine
+criticality: operational
+platforms:
+- P13 Venue CMS
+provenance: derived-from-board
+offlineBehaviour: Not stated by the board. **The client's reference does not say**, and this flow will
+  not guess.
+trigger:
+  description: The work the client grouped as Privacy  Consent   Preference Management board 2. **This
+    route is read from the screens' own navigation**, and the reason anyone walks it has still to be written.
+  entryScreen: CMS-031
+  entryPoints:
+  - Arrives at Privacy Operations Command Center
+steps:
+- step: 1
+  screen: CMS-031
+  action: Opens Privacy Operations Command Center
+  operations:
+  - listPrivacy
+  outcome: Provide Privacy, Compliance and authorized operational teams with a centralized real-time overview
+    of privacy operations across TICVAI.
+- step: 2
+  screen: CMS-032
+  action: Works in Customer Privacy, Consent & Preference 360°
+  operations:
+  - listCustomerPrivacyConsent
+  outcome: Provide one authoritative privacy view for an individual customer or participant. This becomes
+    the privacy equivalent of the customer 360° workspace. n ed el
+- step: 3
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 4
+  screen: CMS-033
+  action: Works in Consent Evidence, History & Withdrawal Management
+  operations:
+  - listConsentEvidenceWithdrawal
+  outcome: Maintain legally and operationally useful evidence of every consent event and manage subsequent
+    withdrawals.
+- step: 5
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 6
+  screen: CMS-034
+  action: Works in Data Subject / Customer Privacy Request Management
+  operations:
+  - listDataSubjectCustomer
+  outcome: Provide a governed case-management workflow for customer privacy requests.
+- step: 7
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 8
+  screen: CMS-035
+  action: Works in Data Discovery, Access, Export & Correction Workspace
+  operations:
+  - setDataDiscoveryAccess
+  outcome: Allow authorized privacy teams to locate customer data across TICVAI and connected systems
+    when fulfilling access, export or correction requests.
+- step: 9
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 10
+  screen: CMS-036
+  action: Works in Deletion, Anonymization & Restriction Operations
+  operations:
+  - listDeletionAnonymizationRestriction
+  outcome: Govern privacy requests or policies requiring personal data to be deleted, anonymized or restricted.
+    This screen requires strong controls because deletion may affect financial, ticketing, fraud, legal
+    and operational records.
+- step: 11
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 12
+  screen: CMS-037
+  action: Works in Data Retention, Expiry & Legal Hold Operations
+  operations:
+  - listDataRetentionExpiry
+  outcome: Operationalize retention policies associated with Board 1 processing purposes and data categories.
+- step: 13
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 14
+  screen: CMS-038
+  action: Works in Privacy Compliance, Exception & Investigation Workspace
+  operations:
+  - setPrivacyComplianceException
+  outcome: Provide a centralized workspace for privacy configuration and operational exceptions requiring
+    investigation.
+- step: 15
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 16
+  screen: CMS-039
+  action: Works in Privacy Audit, Evidence & Compliance Reporting
+  operations:
+  - listPrivacyEvidenceCompliance
+  outcome: Provide immutable auditability and management/compliance reporting across privacy operations.
+- step: 17
+  screen: CMS-031
+  action: Returns to the board's landing screen
+  operations:
+  - listPrivacy
+  outcome: Ready for the next screen on this board
+- step: 18
+  screen: CMS-040
+  action: Works in Privacy Analytics & AI Compliance Intelligence
+  operations:
+  - listPrivacyCompliance
+  outcome: Provide executives, Privacy Officers and Compliance teams with actionable privacy analytics
+    and AI-assisted risk detection. This should be the intelligence layer across both Privacy Boards.
+branches:
+- at: 1
+  condition: Nothing has been set up on Privacy Operations Command Center yet
+  behaviour: The screen declares `emptyFirstRun`. **On a new tenant this is the expected state**, and
+    it is a different situation from an empty result on an established one.
+  severity: expected
+  resolvedBy: Automatic
+- at: 1
+  condition: The operator does not hold the permission this screen requires
+  behaviour: The screen declares `emptyNoAccess`. **The journey stops here rather than failing later**,
+    which is the right shape -- but the permission that would satisfy it is not granted by any role in
+    `roles.yaml`.
+  severity: requiresStaff
+  resolvedBy: Unresolved -- see the permission join
+exitStates:
+- state: completed
+  description: Every screen on Privacy  Consent   Preference Management board 2 visited
+primaryContract: marketing-crm
+contracts:
+- marketing-crm

@@ -593,6 +593,7 @@ paths:
     get:
       operationId: listAiConversations
       x-ticvai-consumed-by:
+        - "P01 WEB-044 AI Concierge – Home"
         - "P02 GST-068 Help & My Cases"
         - "P06 EMP-019 AI assistant — home"
         - "P06 EMP-020 AI assistant — answer"

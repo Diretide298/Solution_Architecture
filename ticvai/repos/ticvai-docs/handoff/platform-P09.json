@@ -7,20 +7,20 @@
  "audience": "platformAdmin",
  "formFactor": "web",
  "offlineCapable": false,
- "generated": "2026-09-08",
+ "generated": "2026-09-10",
  "note": "Derived by tools/derive-platform.py. **The gaps section is the point** \u2014 a page listing what exists is a directory; one listing what is missing is a worklist.",
  "counts": {
-  "screens": 318,
-  "operations": 402,
+  "screens": 367,
+  "operations": 404,
   "contracts": 15,
   "modules": 13,
   "undrawn": 0,
-  "operationsWithNoScreen": 149
+  "operationsWithNoScreen": 150
  },
  "waves": {
   "wave1": 12,
   "wave2": 16,
-  "wave3": 290
+  "wave3": 339
  },
  "modules": [
   {
@@ -32,7 +32,7 @@
   },
   {
    "module": "Platform",
-   "screens": 30,
+   "screens": 79,
    "waves": [
     3
    ]
@@ -144,7 +144,7 @@
   },
   {
    "contract": "approvals",
-   "operations": 22
+   "operations": 24
   },
   {
    "contract": "white-label",
@@ -175,11 +175,11 @@
    "operations": 3
   },
   {
-   "contract": "workforce",
+   "contract": "tenancy",
    "operations": 2
   },
   {
-   "contract": "tenancy",
+   "contract": "workforce",
    "operations": 2
   }
  ],
@@ -3045,6 +3045,447 @@
    "route": "/platform/dead-letters",
    "operations": 2,
    "drawn": true
+  },
+  {
+   "id": "ADM-319",
+   "name": "Approval Workflow Library",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-workflow-library-adm-319",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-320",
+   "name": "Create Approval Workflow",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/create-approval-workflow-adm-320",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-322",
+   "name": "Approval Stage Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-stage-configuration-adm-322",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-323",
+   "name": "Condition & Decision Rule Builder",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/condition-decision-rule-builder-adm-323",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-324",
+   "name": "Approval Sequence & Parallel Routing",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-sequence-parallel-routing-adm-324",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-325",
+   "name": "Workflow Outcome & Action Configuration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-outcome-action-configuration-adm-325",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-326",
+   "name": "Workflow Validation & Simulation",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-validation-simulation-adm-326",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-327",
+   "name": "Workflow Publication & Lifecycle",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-publication-lifecycle-adm-327",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-328",
+   "name": "Workflow Versioning & Change History",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-versioning-change-history-adm-328",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-329",
+   "name": "Approval Matrix Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-matrix-command-center-adm-329",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-330",
+   "name": "Approval Authority Matrix",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-authority-matrix-adm-330",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-331",
+   "name": "Organizational Hierarchy Routing",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/organizational-hierarchy-routing-adm-331",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-332",
+   "name": "Department-Based Approval Matrix",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/department-based-approval-matrix-adm-332",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-333",
+   "name": "Venue & Tenant Approval Matrix",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/venue-tenant-approval-matrix-adm-333",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-334",
+   "name": "Value & Threshold Routing",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/value-threshold-routing-adm-334",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-335",
+   "name": "Risk-Based & Conditional Routing",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/risk-based-conditional-routing-adm-335",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-336",
+   "name": "Approver Group & Decision Policy",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approver-group-decision-policy-adm-336",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-337",
+   "name": "Routing Simulator & Conflict Detection",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/routing-simulator-conflict-detection-adm-337",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-338",
+   "name": "AI Routing Advisor & Matrix Optimization",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-routing-advisor-matrix-optimization-adm-338",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-339",
+   "name": "Governance & Compliance Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/governance-compliance-command-center-adm-339",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-340",
+   "name": "Segregation of Duties Policy Manager",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/segregation-of-duties-policy-manager-adm-340",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-341",
+   "name": "Four-Eyes & Dual-Control Policy",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/four-eyes-dual-control-policy-adm-341",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-342",
+   "name": "Authentication & MFA Policy Manager",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/authentication-mfa-policy-manager-adm-342",
+   "operations": 3,
+   "drawn": true
+  },
+  {
+   "id": "ADM-343",
+   "name": "Sensitive Action Confirmation",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/sensitive-action-confirmation-adm-343",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-344",
+   "name": "Digital Signature Management",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/digital-signature-management-adm-344",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-345",
+   "name": "Immutable Approval Record & Tamper Detection",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/immutable-approval-record-tamper-detection-adm-345",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-346",
+   "name": "Approval Record Retention Policy",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-record-retention-policy-adm-346",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-347",
+   "name": "Regulatory Audit & Evidence Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/regulatory-audit-evidence-center-adm-347",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-348",
+   "name": "Governance Risk & AI Compliance Advisor",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/governance-risk-ai-compliance-advisor-adm-348",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-349",
+   "name": "Approval Integration Command Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-integration-command-center-adm-349",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-350",
+   "name": "Module Integration Registry",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/module-integration-registry-adm-350",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-351",
+   "name": "Approval API Management",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-api-management-adm-351",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-352",
+   "name": "Workflow Event Framework",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/workflow-event-framework-adm-352",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-353",
+   "name": "Webhook Configuration & Subscription Manager",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/webhook-configuration-subscription-manager-adm-353",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-354",
+   "name": "External Workflow System Integration",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/external-workflow-system-integration-adm-354",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-355",
+   "name": "Data & Workflow Mapping Studio",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/data-workflow-mapping-studio-adm-355",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-356",
+   "name": "Integration Security & Access Control",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/integration-security-access-control-adm-356",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-357",
+   "name": "Integration Monitoring, Error & Retry Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/integration-monitoring-error-retry-center-adm-357",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-358",
+   "name": "Integration Analytics & AI Health Advisor",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/integration-analytics-ai-health-advisor-adm-358",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-359",
+   "name": "Approval Executive KPI Dashboard",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-executive-kpi-dashboard-adm-359",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-360",
+   "name": "Approval Volume & Outcome Analytics",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-volume-outcome-analytics-adm-360",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-361",
+   "name": "Approval Processing Time Analytics",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-processing-time-analytics-adm-361",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-362",
+   "name": "Bottleneck Analysis & Heatmap",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/bottleneck-analysis-heatmap-adm-362",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-363",
+   "name": "Approval Trend & Comparative Analytics",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approval-trend-comparative-analytics-adm-363",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-364",
+   "name": "Approver & Team Performance Analytics",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/approver-team-performance-analytics-adm-364",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-365",
+   "name": "Risk & Governance Analytics",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/risk-governance-analytics-adm-365",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-366",
+   "name": "AI Approval Intelligence Center",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-approval-intelligence-center-adm-366",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-367",
+   "name": "AI Optimization & What-If Simulator",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-optimization-what-if-simulator-adm-367",
+   "operations": 0,
+   "drawn": true
+  },
+  {
+   "id": "ADM-368",
+   "name": "AI Governance Executive Advisor",
+   "module": "Platform",
+   "wave": 3,
+   "route": "/platform/ai-governance-executive-advisor-adm-368",
+   "operations": 0,
+   "drawn": true
   }
  ],
  "gaps": {
@@ -3110,12 +3551,6 @@
     "summary": ""
    },
    {
-    "operation": "issueAccreditationBadge",
-    "contract": "approvals",
-    "verb": "POST",
-    "summary": "Issue a badge"
-   },
-   {
     "operation": "assessProductChange",
     "contract": "catalogue",
     "verb": "POST",
@@ -3176,6 +3611,18 @@
     "summary": "Lift a suspension"
    },
    {
+    "operation": "releaseChannelAllocation",
+    "contract": "catalogue",
+    "verb": "POST",
+    "summary": "Return unsold channel allocation to the general pool"
+   },
+   {
+    "operation": "releaseInventoryHold",
+    "contract": "catalogue",
+    "verb": "DELETE",
+    "summary": "Return unsold units"
+   },
+   {
     "operation": "restoreProductVersion",
     "contract": "catalogue",
     "verb": "POST",
@@ -3213,6 +3660,12 @@
    },
    {
     "operation": "releaseWalletAuthorisation",
+    "contract": "cross-region",
+    "verb": "POST",
+    "summary": "Release a hold without capturing"
+   },
+   {
+    "operation": "relinquishWalletAuthorisation",
     "contract": "cross-region",
     "verb": "POST",
     "summary": "Release a hold without capturing"
@@ -3318,18 +3771,6 @@
     "contract": "marketing-crm",
     "verb": "GET",
     "summary": "List guests currently matching a segment"
-   },
-   {
-    "operation": "matchGuest",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Is this the same person we already have?"
-   },
-   {
-    "operation": "mergeGuests",
-    "contract": "marketing-crm",
-    "verb": "POST",
-    "summary": "Two records, one person"
    },
    {
     "operation": "recordLostItem",
@@ -3482,10 +3923,10 @@
     "summary": "What an upgrade costs, pro-rata"
    },
    {
-    "operation": "reissueEntitlement",
+    "operation": "releaseStoredValue",
     "contract": "orders",
     "verb": "POST",
-    "summary": "Zero-value reissue of an expired entitlement for a later date"
+    "summary": "Give a hold back"
    },
    {
     "operation": "resendPaymentLink",
@@ -3882,6 +4323,12 @@
     "contract": "white-label",
     "verb": "POST",
     "summary": "Publish now, or schedule it"
+   },
+   {
+    "operation": "releaseCustomDomain",
+    "contract": "white-label",
+    "verb": "DELETE",
+    "summary": "Give the domain up"
    },
    {
     "operation": "setFeatureToggles",

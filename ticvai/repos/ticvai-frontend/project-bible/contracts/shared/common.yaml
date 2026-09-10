@@ -77,7 +77,7 @@ components:
         reason and expiry (CF-126).
 
         **The concern is not tidiness. Only one of the six could hold an authorisation.** `authoriseWalletSpend`
-        / `captureWalletAuthorisation` / `releaseWalletAuthorisation` gave two-phase spend to the retail
+        / `captureWalletAuthorisation` / `relinquishWalletAuthorisation` gave two-phase spend to the retail
         wallet alone, so **a guest with 200 game credits starting a play the machine then failed had no
         held balance** — the credits were either taken or not, with no third state.
 

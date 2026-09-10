@@ -50,6 +50,7 @@ screens:
   - listApiVersions
   states:
   - emptyFirstRun
+  - emptyNoAccess
   - emptyNoResults
   - error
   - loading
@@ -74,7 +75,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false
@@ -129,7 +129,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - sandboxId<-deepLink
@@ -156,7 +155,6 @@ screens:
   - emptyNoResults
   - error
   - loading
-  - partial
   offlineState: false
   entryParams:
   - subscriptionId<-deepLink
@@ -184,6 +182,7 @@ screens:
   entryParams: []
   goesTo:
   - DEV-001
+  - DEV-007
   boardFrames: null
   wireframe: wireframes/P14 Developer.dc.html#dev-006
   inFlows:
@@ -225,7 +224,6 @@ screens:
   states:
   - emptyFirstRun
   - emptyNoAccess
-  - emptyNoResults
   - error
   - loading
   offlineState: false

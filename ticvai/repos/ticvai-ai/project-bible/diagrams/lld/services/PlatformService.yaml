@@ -1,5 +1,5 @@
 id: LLD-PlatformService
-title: PlatformService — 167 operations, 50 tables
+title: PlatformService — 167 operations, 51 tables
 generatedBy: tools/derive-diagrams.py
 tier: platform
 index: diagrams/hld/02-services.yaml
@@ -20,7 +20,7 @@ coverage:
     unwalked rather than under-documented.'
 schemas:
 - schema: control
-  tables: 50
+  tables: 51
   stores:
   - postgres
   largestTable: control.partner_agreement
@@ -1445,6 +1445,12 @@ tables:
   writtenBy:
   - subscription
   foreignWriters: null
+- table: control.cell_instance
+  columns: 7
+  store: postgres
+  parent: control.cell
+  writtenBy: []
+  foreignWriters: null
 - table: control.cell_job
   columns: 10
   store: postgres
@@ -1453,7 +1459,7 @@ tables:
   - subscription
   foreignWriters: null
 - table: control.cell_tenant
-  columns: 7
+  columns: 9
   store: postgres
   parent: control.cell
   writtenBy: []
@@ -1851,6 +1857,12 @@ flows:
 - F102 A brand is set, previewed, published and rolled back
 - F104 A platform operator signs in under MFA
 - F105 A rate limit is set and a developer hits it
+- F109 A tenant gets its first administrator
+- F110 A partner is onboarded onto the B2B portal
+- 'F131 B2B, Reseller & OTA Partner Management board 2: Commercial Agreement Command Center'
+- 'F132 B2B, Reseller & OTA Partner Management board 3: Partner Operations Command Center'
+- 'F138 Membership   Annual Pass Management board 1: Membership & Annual Pass Command Center'
+- 'F139 Membership   Annual Pass Management board 2: Member Operations Command Center'
 - F16 A venue opens for the first time
 - F27 A developer integrates
 - F77 A promotion is built, bundled, published and measured
